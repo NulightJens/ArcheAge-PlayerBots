@@ -30,7 +30,7 @@ public sealed class BotGearCommand : ICommand
 
     public string GetCommandHelpText() =>
         "Target a live bot or pass its id. Show prints localized equipment names; equip evaluates bag items; " +
-        "inspect synchronizes the client detail view; create builds and equips a Magnificent loadout. " +
+        "inspect synchronizes the client detail view; create builds, equips, saves, and restarts the bot. " +
         "Example: /botgear create celestial flame leather nodachi";
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -139,20 +139,42 @@ public sealed class BotGearCommand : ICommand
         if (state is { IsInitialized: true })
             BotArchetypeManager.Instance.ForceReevaluate(bot);
         bot.SaveDirectlyToDatabase();
-        bot.BroadcastPacket(new SCUnitStatePacket(bot), true);
 
-        var equipped = bot.Inventory.Equipment.Items
+        var botId = bot.Id;
+        var botName = bot.Name;
+        var refreshed = RestartAfterCreate(
+            botId,
+            id => BotManager.Instance.DespawnBot(id),
+            id => BotManager.Instance.SpawnBot(id),
+            out var despawned);
+        var result = refreshed ?? bot;
+        var equipped = result.Inventory.Equipment.Items
             .Where(item => item != null)
             .ToArray();
         var equippedFromLoadout = equipped.Count(item =>
             item.Grade == (byte)loadout.Grade && loadout.Items.Any(expected => expected.TemplateId == item.TemplateId));
         var armorPrefix = loadout.Armor[0].Name.Split(' ', StringSplitOptions.RemoveEmptyEntries)[1];
+        var refreshStatus = refreshed != null
+            ? $"saved and restarted for client refresh (ObjId: {refreshed.ObjId})."
+            : despawned
+                ? $"saved, but respawn failed; run /addbot {botId}."
+                : "saved, but the automatic restart could not begin.";
 
         CommandManager.SendNormalText(this, messageOutput,
-            $"Created {created.Count} {loadout.Grade} items for '{bot.Name}': prefix={loadout.RequestedProfile}, " +
+            $"Created {created.Count} {loadout.Grade} items for '{botName}': prefix={loadout.RequestedProfile}, " +
             $"armor={loadout.RequestedArmorType} ({armorPrefix}), weapon={loadout.MainWeapon.Name}, " +
             $"bow={loadout.Bow.Name}, instrument={loadout.Instrument.Name}, jewelry={loadout.Necklace.Name}. " +
-            $"Equipped matching slots={equippedFromLoadout}; saved and visually refreshed.");
+            $"Equipped matching slots={equippedFromLoadout}; {refreshStatus}");
+    }
+
+    internal static Character RestartAfterCreate(
+        uint botId,
+        Func<uint, bool> despawn,
+        Func<uint, Character> spawn,
+        out bool despawned)
+    {
+        despawned = despawn(botId);
+        return despawned ? spawn(botId) : null;
     }
 
     private void Equip(Character bot, IMessageOutput messageOutput)

@@ -22,7 +22,7 @@ SHA-256: `7b3e9d8872cf708522631a11bb051bd9976c31d4f934eee0c9dfc1e90eec633c`
 
 The earlier `aaemu-3.0.4.2-r336598-alpha-v2.patch` remains unchanged as the pre-equipment-visibility contract; it is not the active installer patch.
 
-This track remains experimental, not runtime-supported. In addition to server-start acceptance, native account/character creation, login/world entry, and one-bot spawn/follow/combat/class/gear paths have passed once. The 3.0 suite now passes 156/156. Install it only with the explicit experimental flag and an isolated matching-client environment. Runtime promotion still requires clean-start repeats, four-role party/combat behavior, scale/resource gates, and clean populated recovery.
+This track remains experimental, not runtime-supported. In addition to server-start acceptance, native account/character creation, login/world entry, and one-bot spawn/follow/combat/class/gear paths have passed once. The 3.0 suite now passes 157/157. Install it only with the explicit experimental flag and an isolated matching-client environment. Runtime promotion still requires clean-start repeats, four-role party/combat behavior, scale/resource gates, and clean populated recovery.
 
 The earlier `aaemu-3.0.4.2-r336598-alpha.patch` remains unchanged as the compile-only alpha contract; it is not the active installer patch.
 

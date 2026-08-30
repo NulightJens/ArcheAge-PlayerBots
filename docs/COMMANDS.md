@@ -111,7 +111,7 @@ The normal AAEmu `/kit <characterName> <kitName>` command now asks PlayerBots to
 | `/botgear [id] show` | List equipped slots with localized item names, grades, template IDs, and instance IDs |
 | `/botgear [id] equip` | Re-evaluate and equip the best compatible bag items |
 | `/botgear [id] inspect` | Synchronize the bot and send its read-only character detail to the GM client |
-| `/botgear [id] create <grade> <prefix> <armor> <weapon>` | Create and equip a complete Magnificent loadout |
+| `/botgear [id] create <grade> <prefix> <armor> <weapon>` | Create, equip, save, and restart the bot with a complete Magnificent loadout |
 
 The ID is optional when the GM currently targets a live bot. For example, target the bot and run:
 
@@ -120,7 +120,7 @@ The ID is optional when the GM currently targets a live bot. For example, target
 /botgear show
 ```
 
-`grade` accepts AAEmu's item-grade names from `Crude` through `Mythic`. `prefix` is the Magnificent stat family (`earth`, `flame`, `gale`/`wind`, `life`, or `wave`), `armor` is `cloth`, `leather`, or `plate`, and `weapon` is any primary weapon available for that family, such as `nodachi`, `greatsword`, `greataxe`, `staff`, or `club`. The command adds seven armor pieces, a necklace, two earrings, two rings, the requested primary weapon, a bow, and an instrument, then runs normal bot equipment evaluation and saves the character.
+`grade` accepts AAEmu's item-grade names from `Crude` through `Mythic`. `prefix` is the Magnificent stat family (`earth`, `flame`, `gale`/`wind`, `life`, or `wave`), `armor` is `cloth`, `leather`, or `plate`, and `weapon` is any primary weapon available for that family, such as `nodachi`, `greatsword`, `greataxe`, `staff`, or `club`. The command adds seven armor pieces, a necklace, two earrings, two rings, the requested primary weapon, a bow, and an instrument, then runs normal bot equipment evaluation, saves the character, and restarts that bot through the normal logout/login lifecycle so nearby clients receive a fresh visual snapshot.
 
 Some Magnificent families do not contain a literal seven-piece armor set, bow, or instrument with the requested prefix. In that case PlayerBots selects the closest complete stat-compatible Magnificent set and prints every actual English item name instead of pretending an exact item exists.
 

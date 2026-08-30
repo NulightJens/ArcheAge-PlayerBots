@@ -93,6 +93,51 @@ public class BotCommandsTests
     }
 
     [Test]
+    public async Task BotGear_CreateRefresh_RestartsTheSameBotAfterACompleteDespawn()
+    {
+        var calls = new List<string>();
+        var refreshed = new CharacterMock { Id = 2 };
+
+        var result = BotGearCommand.RestartAfterCreate(
+            2,
+            id =>
+            {
+                calls.Add($"despawn:{id}");
+                return true;
+            },
+            id =>
+            {
+                calls.Add($"spawn:{id}");
+                return refreshed;
+            },
+            out var despawned);
+
+        await Assert.That(despawned).IsTrue();
+        await Assert.That(result).IsSameReferenceAs(refreshed);
+        await Assert.That(calls).IsEquivalentTo(["despawn:2", "spawn:2"]);
+    }
+
+    [Test]
+    public async Task BotGear_CreateRefresh_DoesNotSpawnWhenDespawnFails()
+    {
+        var spawnCalls = 0;
+
+        var result = BotGearCommand.RestartAfterCreate(
+            2,
+            _ => false,
+            _ =>
+            {
+                spawnCalls++;
+                return new CharacterMock();
+            },
+            out var despawned);
+
+        await Assert.That(despawned).IsFalse();
+        await Assert.That(result).IsNull();
+        await Assert.That(spawnCalls).IsEqualTo(0);
+    }
+
+    [Test]
     public async Task BotGearCatalog_ParsesGradeAliasesAndScoresMatchingProfiles()
     {
         await Assert.That(BotGearCatalog.TryParseGrade("celestial", out var grade)).IsTrue();

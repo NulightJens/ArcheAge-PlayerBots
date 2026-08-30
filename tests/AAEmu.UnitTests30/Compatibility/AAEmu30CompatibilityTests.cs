@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using AAEmu.Commons.Network;
@@ -53,6 +54,31 @@ public sealed class AAEmu30CompatibilityTests
         Assert.Equal(objectId, stream.ReadBc());
         Assert.True(stream.ReadBoolean());
         Assert.False(stream.HasBytes);
+    }
+
+    [Fact]
+    public void BotGearCreateRefreshUsesTheNormalDespawnSpawnLifecycle()
+    {
+        var calls = new List<string>();
+        var refreshed = new TestCharacter { Id = 2 };
+
+        var result = BotGearCommand.RestartAfterCreate(
+            2,
+            id =>
+            {
+                calls.Add($"despawn:{id}");
+                return true;
+            },
+            id =>
+            {
+                calls.Add($"spawn:{id}");
+                return refreshed;
+            },
+            out var despawned);
+
+        Assert.True(despawned);
+        Assert.Same(refreshed, result);
+        Assert.Equal(["despawn:2", "spawn:2"], calls);
     }
 
     [Fact]
