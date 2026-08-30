@@ -4,6 +4,12 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ## Unreleased
 
+### Documentation and onboarding
+
+- Reworked the public README and user guides around installation, first bot, party control, configuration, commands, and troubleshooting.
+- Clarified that ArcheAge PlayerBots controls selected existing characters and does not claim random-account populations, automated raid or battleground completion, or a public server-capacity target.
+- Simplified `/bot` help topics and updated compatibility guidance for the supported 1.2 track and experimental, server-start-validated 3.0 track.
+
 ### ArcheAge 3.0 server-start adapter
 
 - Added a standalone, opt-in adapter for NL0bP/AAEmu client `3.0.4.2 r336598`, pinned to base `8c1c943bb2309eefffb9da2aa99a408d0acbb095`.

@@ -17,7 +17,7 @@ public sealed class BotHelpCommand : ICommand
         CommandManager.Instance.Register(CommandNames, this);
     }
 
-    public string GetCommandLineHelp() => "[start|party|combat|develop|diagnostics|scale|limitations]";
+    public string GetCommandLineHelp() => "[start|party|combat|config|diagnostics|limitations]";
 
     public string GetCommandHelpText() =>
         "Shows the PlayerBots quick start and topic-based command reference.";
@@ -36,7 +36,7 @@ public sealed class BotHelpCommand : ICommand
             case "start":
                 Send(messageOutput,
                     "PlayerBots quick start: /addbot <characterId> | /botstate <id> grind | /botstate <id> idle | /removebot <id>.",
-                    "More help: /bot party, /bot combat, /bot develop, /bot diagnostics, /bot scale, /bot limitations.");
+                    "More help: /bot party, /bot combat, /bot config, /bot diagnostics, /bot limitations.");
                 return;
             case "party":
                 Send(messageOutput,
@@ -48,26 +48,26 @@ public sealed class BotHelpCommand : ICommand
                     "Combat state: /botstate <id> grind [killGoal] | idle | free. Controlled target: /botattackobject <id|all> <npcObjId>.",
                     "Rotations: /botrotation <id|all> show|reload, or /botrotation <id> set <rotationId>. Duels: /botduel <id1> <id2>.");
                 return;
+            case "config":
             case "develop":
                 Send(messageOutput,
-                    "Edit Data/BotArchetypes.json and Data/BotRotations/*.json, then run /reloadbotarchetype and /botrotation all reload.",
-                    "Edit Configurations/BotConfig.json, then run /reloadbotconfig. Use /botarchetype <id> force to re-evaluate equipment and learned skills.");
+                    "Runtime settings: edit Configurations/BotConfig.json beside AAEmu.Game, then run /reloadbotconfig.",
+                    "Content: edit Data/BotArchetypes.json or Data/BotRotations/*.json, then run /reloadbotarchetype or /botrotation all reload.");
                 return;
             case "diagnostics":
                 Send(messageOutput,
                     "Inspect: /botstate <id>, /botdebug <id>, /botactions <id>, /botvalues <id> [filter], /botrotation <id> show.",
-                    "Measure: /botmetrics reset before a window, then /botmetrics snapshot. Stop a case with /botstate <id> idle.",
-                    "Controlled buffs: /botbuff <id> <buffId> [abLevel]; remove with /botbuff <id> -<buffId>. No selected target is required.");
+                    "Measure: /botmetrics reset before a window, then /botmetrics snapshot. Activity changes use /botmetrics activity <0-100> and are runtime-only.");
                 return;
             case "scale":
                 Send(messageOutput,
                     "Scale controls: /botmetrics activity <0-100>, /botmetrics reset, /botmetrics snapshot.",
-                    "Use Scripts/Benchmarks/ScaleGate for retained 0/10/50/100 measurements; a resource budget is required before claiming capacity.");
+                    "Use modules/archeage-playerbots/scripts/scale for retained measurements; approve a server resource budget before claiming capacity.");
                 return;
             case "limitations":
                 Send(messageOutput,
-                    "Current limits: ArcheAge 1.2 r208022 only; movement is not a navmesh proof; jump animation and stealth-search behavior remain experimental.",
-                    "Native ArcheAge collision and direct pursuit are the default. Pairwise crowd repulsion and boss orbit logic are intentionally not enabled.");
+                    "Compatibility: ArcheAge 1.2 r208022 is supported. The 3.0.4.2 r336598 track is experimental and server-start-validated only.",
+                    "Movement uses direct pursuit and native collision, not navmesh navigation. Jump presentation and stealth search remain experimental.");
                 return;
             default:
                 CommandManager.SendDefaultHelpText(this, messageOutput);

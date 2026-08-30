@@ -1,35 +1,39 @@
-# Operator Commands
+# Commands
 
-Run `/bot` in game for the quick start and `/help <command>` for exact arguments. Examples use `<gm-character-name>`; replace it with the operator's current GM character, never a hard-coded test name.
+Run `/bot` in game for the quick guide. Run `/help <command>` whenever you need the exact arguments for one command.
 
-| Command | Access | Purpose |
-| --- | ---: | --- |
-| `/bot [topic]` | Everyone | Topic-based PlayerBots help. |
-| `/botcontrol <id> <verb> [role]` | Party owner | Native-party follow, stay, attack, passive, and role control. |
-| `/addbot <id>` | GM | Log in an existing offline character as a bot. |
-| `/removebot <id>` | GM | Save and normally log out a bot. |
-| `/botstate <id> [state\|free] [killGoal]` | GM | Inspect or force idle, grind, questing, roaming, following, or resting. |
-| `/movebot <id> <x> <y> <z> [walk\|run]` | GM | Give one explicit movement destination. |
-| `/botfollow <id\|all> <name\|stop\|status> [...]` | GM | Direct follow and deterministic staging formation. |
-| `/botattackobject <id\|all> <npcObjId>` | GM | Run a contained fight against one NPC object. |
-| `/botarchetype <id> [force\|reroll]` | GM | Inspect or re-evaluate a class/equipment plan. |
-| `/botrotation <id\|all> show\|reload` | GM | Inspect or reload rotations. |
-| `/botrotation <id> set <rotationId>` | GM | Override one bot's rotation. |
-| `/botduel <id1> <id2>` | GM | Start a bot-versus-bot duel. |
-| `/botjump <id\|name\|all>` | GM | Queue the experimental bot jump path. |
-| `/spawnpassive <npcTemplateId> [distance]` | GM | Spawn a stationary development target. |
-| `/botactions <id> [co\|nc]` | GM | Show recent decisions. |
-| `/botvalues <id> [filter]` | GM | Inspect blackboard values. |
-| `/botdebug <id>` | GM | Show detailed runtime state. |
-| `/botbuff <id> <buffId\|-buffId> [abLevel]` | GM | Apply or remove a data-pack buff from one bot for controlled development tests. |
-| `/botstrategy ...` | GM | Inspect or alter engine strategies. |
-| `/botmetrics [snapshot\|reset\|activity]` | GM | Capture host and whole-server measurements. |
-| `/reloadbotconfig` | GM | Reload `Configurations/BotConfig.json`. |
-| `/reloadbotarchetype` | GM | Reload archetypes, retaining the last valid set on failure. |
+Most server-management commands require GM access. `/botcontrol` is available through the bot's live party relationship.
 
-## Native party control
+## Get started
 
-Spawn a bot, invite its character through the normal client party UI, then assign a role and order:
+Use the ID of an existing character that is currently offline:
+
+```text
+/addbot 2
+/botstate 2 grind
+```
+
+Stop the bot and save it through normal logout:
+
+```text
+/botstate 2 idle
+/removebot 2
+```
+
+| Command | Purpose |
+| --- | --- |
+| `/bot [topic]` | Show the in-game PlayerBots guide |
+| `/addbot <characterId>` | Log in an existing offline character as a bot |
+| `/removebot <characterId>` | Save and log out an active bot |
+| `/botstate <id>` | Show the bot's current state |
+| `/botstate <id> <state> [killGoal]` | Force a state and optionally stop grinding after a number of kills |
+| `/botstate <id> free` | Return the bot to automatic state control |
+
+Available states are `idle`, `grind`, `questing`, `roaming`, `following`, and `resting`.
+
+## Party control
+
+Invite the active bot through the normal ArcheAge party UI. Assign its party role, then give it an order:
 
 ```text
 /botcontrol 2 role healer
@@ -39,34 +43,90 @@ Spawn a bot, invite its character through the normal client party UI, then assig
 /botcontrol 2 stay
 ```
 
-Roles are `tank`, `healer`, and `attacker`. Authorization follows live party membership; unrelated players cannot control a bot by guessing its ID.
+Roles are `tank`, `healer`, and `attacker`.
 
-## GM staging
+| Order | Result |
+| --- | --- |
+| `follow` | Follow the party owner in formation |
+| `stay` | Hold the current position |
+| `attack` | Enable normal party combat behavior |
+| `passive` | Stop aggressive party behavior |
+| `role <role>` | Set the bot's party job |
 
-Direct follow is useful when staging a physical test without a native party:
+Authorization follows current party membership and ownership. An unrelated player cannot control a bot by guessing its ID.
+
+## Direct GM control
+
+These commands are useful for staging bots outside a normal party:
+
+| Command | Purpose |
+| --- | --- |
+| `/botfollow <id\|all> <characterName>` | Follow an online character |
+| `/botfollow <id\|all> stop` | Stop direct follow |
+| `/botfollow <id\|all> status` | Show direct-follow status |
+| `/movebot <id> <x> <y> <z> [walk\|run]` | Move one bot toward coordinates |
+| `/botattackobject <id\|all> <npcObjId>` | Attack one exact NPC object |
+| `/botreset <id>` | Clear current combat work and start a fresh target search |
+| `/botduel <id1> <id2>` | Start a duel between two bots |
+
+Direct follow accepts optional formation settings:
 
 ```text
-/botfollow all <gm-character-name> 3 auto 1.5
-/botfollow all status
-/botfollow all stop
+/botfollow all <characterName> 3 auto 2.5
 ```
 
-The optional values are rear gap, column count (`auto` allowed), and spacing. This is deterministic formation placement, not collision avoidance.
+The optional values are rear distance, column count (`auto` allowed), and spacing. The formation is deterministic; it is not collision avoidance or navmesh pathfinding.
 
-## Controlled bot buffs
+## Archetypes and rotations
 
-`/botbuff` does not require a client-side selection. Positive IDs apply a known buff template; negative IDs remove it:
+| Command | Purpose |
+| --- | --- |
+| `/botarchetype <id>` | Show the bot's assigned archetype |
+| `/botarchetype <id> force` | Re-evaluate the character and apply its plan |
+| `/botarchetype <id> reroll` | Choose a new eligible archetype |
+| `/botrotation <id\|all> show` | Show the active rotation |
+| `/botrotation <id> set <rotationId>` | Override one bot's rotation |
+| `/botrotation <id\|all> reload` | Reload rotation files |
+| `/reloadbotarchetype` | Reload `Data/BotArchetypes.json` |
+| `/reloadbotconfig` | Reload `Configurations/BotConfig.json` |
+
+See [Configuration](CONFIGURATION.md) before editing runtime data.
+
+## Diagnostics
+
+| Command | Purpose |
+| --- | --- |
+| `/botdebug <id>` | Show movement, target, combat, follow, and runtime state |
+| `/botactions <id> [co\|nc]` | Show recent combat or non-combat action attempts |
+| `/botvalues <id> [filter]` | Show computed blackboard values |
+| `/botstrategy <id\|all> <co\|nc\|de> <operation>` | List or change engine strategies |
+| `/botmetrics snapshot` | Capture the current metrics window |
+| `/botmetrics reset` | Start a fresh metrics window |
+| `/botmetrics activity <0-100>` | Change activity percentage until the server restarts |
+
+For strategy operations, use `?` to list, `+name` to add, `-name` to remove, or `~name` to toggle. Example:
 
 ```text
-/botbuff 2 <buffId>
-/botbuff 2 -<buffId>
+/botstrategy 2 co ?
 ```
 
-Buff IDs are client-data specific. This is a GM development surface for repeatable state tests, not a PlayerBots combat ability or a substitute for natural mana/recovery testing.
+## Development commands
 
-## Headless local administration
+These commands are intended for controlled testing, not everyday play:
 
-The Web API accepts the same commands with synthetic actor `@system`:
+| Command | Purpose |
+| --- | --- |
+| `/spawnpassive <npcTemplateId> [distance]` | Spawn a stationary, non-retaliating target |
+| `/botbuff <id> <buffId> [abLevel]` | Apply a known data-pack buff |
+| `/botbuff <id> -<buffId>` | Remove that buff |
+| `/botjump <id\|name\|all>` | Queue the experimental server-side jump |
+| `/exportworld [outDir]` | Export loaded 1.2 world geometry for development |
+
+Buff and skill IDs are specific to the active client data. Do not assume an ID from 1.2 has the same meaning in 3.0.
+
+## Local command API
+
+AAEmu's loopback Web API can run the same commands with the synthetic `@system` actor:
 
 ```powershell
 $body = @{ character = '@system'; arguments = '2' } | ConvertTo-Json
@@ -75,4 +135,4 @@ Invoke-RestMethod -Method Post `
   -ContentType 'application/json' -Body $body
 ```
 
-`@system` has administrator access and no user authentication. Keep the API bound to loopback; never expose port 1280 publicly.
+> **Security:** `@system` has administrator access and no user authentication. Keep the command API bound to `127.0.0.1`; never expose its port publicly.

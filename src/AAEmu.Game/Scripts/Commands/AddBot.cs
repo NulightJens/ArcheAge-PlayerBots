@@ -22,7 +22,7 @@ public class AddBot : ICommand
 
     public string GetCommandHelpText()
     {
-        return "Spawns an existing character as a connectionless bot in the world, for testing.";
+        return "Logs in an existing offline character as a server-controlled bot.";
     }
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)

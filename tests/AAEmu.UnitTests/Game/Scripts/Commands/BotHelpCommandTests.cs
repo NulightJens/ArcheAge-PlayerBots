@@ -14,7 +14,7 @@ public class BotHelpCommandTests
 
         await Assert.That(messages.Length).IsEqualTo(2);
         await Assert.That(messages[0]).Contains("/addbot <characterId>");
-        await Assert.That(messages[1]).Contains("/bot party");
+        await Assert.That(messages[1]).Contains("/bot config");
     }
 
     [Test]
@@ -34,6 +34,27 @@ public class BotHelpCommandTests
 
         await Assert.That(output.Messages).HasSingleItem();
         await Assert.That(output.Messages.Single()).Contains("Help for |cFFFFFFFF/bot|r");
+    }
+
+    [Test]
+    public async Task Execute_ConfigTopic_PointsToRuntimeConfiguration()
+    {
+        var output = Execute("config");
+        var messages = output.Messages.ToArray();
+
+        await Assert.That(messages[0]).Contains("Configurations/BotConfig.json");
+        await Assert.That(messages[1]).Contains("Data/BotRotations");
+    }
+
+    [Test]
+    public async Task Execute_LimitationsTopic_ExplainsSupportedAndExperimentalTracks()
+    {
+        var output = Execute("limitations");
+        var messages = output.Messages.ToArray();
+
+        await Assert.That(messages[0]).Contains("1.2 r208022 is supported");
+        await Assert.That(messages[0]).Contains("server-start-validated only");
+        await Assert.That(messages[1]).Contains("not navmesh navigation");
     }
 
     private static CharacterMessageOutput Execute(params string[] args)

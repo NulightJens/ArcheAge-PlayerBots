@@ -1,121 +1,151 @@
-# Installation
+# Installation Guide
+
+This guide covers a clean ArcheAge PlayerBots installation and updating an existing one.
+
+> **Important:** PlayerBots requires a documented AAEmu base and must be cloned at `modules/archeage-playerbots`. The installer checks both requirements before it changes the server.
+
+## Contents
+
+- [Requirements](#requirements)
+- [Clean installation](#clean-installation)
+- [Database setup](#database-setup)
+- [Verify the installation](#verify-the-installation)
+- [Experimental ArcheAge 3.0 track](#experimental-archeage-30-track)
+- [Updating](#updating)
+- [What the installer changes](#what-the-installer-changes)
 
 ## Requirements
 
-- A clean AAEmu checkout containing one tested base:
-  - supported 1.2: `62e3eb1d87da01194802ac886cd500134facad28`;
-  - server-start-validated 3.0 alpha: `8c1c943bb2309eefffb9da2aa99a408d0acbb095` from NL0bP/AAEmu's `client_version/3.0_client_(2017_04_20)+` branch.
-- The .NET SDK selected by AAEmu's `global.json`.
-- Matching server and client data for the selected track. Never mix the 1.2 and 3.0 data sets.
-- A versioned, isolated database for first installation and testing.
+| Track | AAEmu base | Status |
+| --- | --- | --- |
+| ArcheAge 1.2 `r208022` | `AAEmu/AAEmu` commit `62e3eb1d87da01194802ac886cd500134facad28` | Supported |
+| ArcheAge 3.0.4.2 `r336598` | `NL0bP/AAEmu` commit `8c1c943bb2309eefffb9da2aa99a408d0acbb095` | Experimental; server startup only |
 
-## Install beside AAEmu
+You also need:
 
-Clone this repository at the exact module path:
+- the .NET SDK selected by the AAEmu checkout;
+- client and server data that match the selected ArcheAge version;
+- an isolated or safely versioned Game database for the first installation.
+
+Never mix 1.2 and 3.0 client data, compact databases, or Game databases.
+
+## Clean installation
+
+### 1. Prepare AAEmu
+
+For a new supported 1.2 server:
+
+```powershell
+git clone https://github.com/AAEmu/AAEmu.git
+Set-Location AAEmu
+git switch -c playerbots-host 62e3eb1d87da01194802ac886cd500134facad28
+```
+
+An existing server checkout can also be used when it contains that tested base and has no tracked local changes.
+
+### 2. Clone PlayerBots
+
+From the AAEmu root:
+
+```powershell
+New-Item -ItemType Directory -Force modules | Out-Null
+git clone https://github.com/NulightJens/ArcheAge-PlayerBots modules/archeage-playerbots
+```
+
+The final layout must be:
 
 ```text
 AAEmu/
   AAEmu.Game/
   AAEmu.UnitTests/
   modules/
-    archeage-playerbots/    <- this repository
+    archeage-playerbots/
 ```
+
+### 3. Check and install
 
 Windows:
 
 ```powershell
-Set-Location C:\path\to\AAEmu
-New-Item -ItemType Directory -Force modules | Out-Null
-git clone https://github.com/NulightJens/ArcheAge-PlayerBots modules/archeage-playerbots
+& .\modules\archeage-playerbots\scripts\Install-PlayerBots.ps1 -AAEmuRoot $PWD -CheckOnly
 & .\modules\archeage-playerbots\scripts\Install-PlayerBots.ps1 -AAEmuRoot $PWD
 dotnet build AAEmu.slnx --no-incremental
 ```
 
-Use `-CheckOnly` to validate compatibility without changing the host:
+Linux or macOS:
 
-```powershell
-& .\modules\archeage-playerbots\scripts\Install-PlayerBots.ps1 -AAEmuRoot $PWD -CheckOnly
+```bash
+./modules/archeage-playerbots/scripts/install-playerbots.sh "$PWD" --check-only
+./modules/archeage-playerbots/scripts/install-playerbots.sh "$PWD"
+dotnet build AAEmu.slnx --no-incremental
 ```
 
-Linux/macOS equivalents are in `scripts/install-playerbots.sh` and use `--check-only`.
+`CheckOnly` is read-only. It reports whether the server is ready for installation or already installed.
 
-### Server-start-validated 3.0 alpha
+## Database setup
 
-The 3.0 adapter is available for isolated development, but it is not a supported runtime release yet. The explicit flag prevents accidental installation into an unverified production environment:
+The installer places this migration in AAEmu's normal update directory:
+
+```text
+SQL/updates/2026-08-25_aaemu_game_bot_archetype_plans.sql
+```
+
+Start AAEmu through its normal database-update process so the migration is applied to the Game database. PlayerBots checks its schema at startup and reports a clear error when the migration is missing.
+
+Use the same database backup and versioning practices you use for AAEmu itself.
+
+## Verify the installation
+
+Start Login and Game, then log in with a GM character. Choose an existing character that is currently offline:
+
+```text
+/bot
+/addbot 2
+/botstate 2 grind
+/botstate 2 idle
+/removebot 2
+```
+
+Replace `2` with the offline character's ID. A successful `/removebot` saves and logs out the character; it does not delete it.
+
+Continue with [Configuration](CONFIGURATION.md) or the full [Command Guide](COMMANDS.md).
+
+## Experimental ArcheAge 3.0 track
+
+The 3.0 adapter is available for isolated development only. Matching assets and server startup have been validated, but client login, bot lifecycle, party behavior, combat, and population recovery are still awaiting acceptance.
+
+Use the exact NL0bP/AAEmu base from the requirements table and opt in explicitly:
 
 ```powershell
 & .\modules\archeage-playerbots\scripts\Install-PlayerBots.ps1 -AAEmuRoot $PWD -Track AAEmu30 -AllowExperimental -CheckOnly
 & .\modules\archeage-playerbots\scripts\Install-PlayerBots.ps1 -AAEmuRoot $PWD -Track AAEmu30 -AllowExperimental
 dotnet build AAEmu.sln --no-incremental
-dotnet test .\AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-build
 ```
 
-Runtime acceptance requires a mutually matching `3.0.4.2 r336598` client, `game_pak`, `compact.sqlite3`, and `compact.server.table.sqlite3`. The retained isolated stack passed database integrity, server startup, module schema, loopback `@system` metrics, and zero-bot graceful restart. Client login, serializer, one-bot lifecycle, party, combat, populated recovery, and scale gates remain open and must not be inferred from server startup.
+Do not use a live 1.2 database. Before starting the server, follow the [ArcheAge 3.0 acceptance runbook](AAEMU30-ACCEPTANCE.md) to verify the client, `game_pak`, compact databases, ports, and loopback command API.
 
-Before starting the 3.0 server, copy `docs/examples/aaemu30-assets.provenance.example.json` outside the repository, replace every placeholder with the acquired files' hashes and source record, and run the read-only preflight:
+## Updating
+
+Update the module and validate the installed host before rebuilding:
 
 ```powershell
-& .\modules\archeage-playerbots\scripts\Test-AAEmu30Assets.ps1 `
-    -AAEmuRoot $PWD `
-    -ClientRoot 'D:\path\to\ArcheAge-3.0.4.2-r336598' `
-    -ProvenancePath 'D:\path\to\aaemu30-assets.provenance.json' `
-    -OutputPath 'D:\evidence\aaemu30-asset-preflight.json'
+git -C .\modules\archeage-playerbots pull --ff-only
+& .\modules\archeage-playerbots\scripts\Install-PlayerBots.ps1 -AAEmuRoot $PWD -CheckOnly
+dotnet build AAEmu.slnx --no-incremental
 ```
 
-The preflight pins the emulator lineage, requires all three files, validates SQLite headers and recorded SHA-256 hashes, and rejects the known 1.2 compact-database hashes. It does not prove client/server serializer compatibility; that remains a live login gate.
+When release notes introduce a new compatibility patch, review it before changing a server branch that already contains local AAEmu modifications.
 
-After Login and Game report ready, verify the loopback operator boundary and capture a zero-bot metrics document:
+## What the installer changes
 
-```powershell
-& .\modules\archeage-playerbots\scripts\Test-AAEmu30Runtime.ps1 `
-    -BaseUri 'http://127.0.0.1:1280/api' `
-    -ExpectedRuntimeCount 0 `
-    -OutputPath 'D:\evidence\aaemu30-runtime-smoke.json'
-```
+PlayerBots stays in its own Git repository. The installer:
 
-The command refuses non-loopback endpoints because `@system` has administrative access. A passing smoke document proves server status, command resolution, and metrics serialization; it does not prove client login or bot behavior.
+- applies the reviewed compatibility patch for the detected AAEmu track;
+- adds conditional build imports and the small host hooks PlayerBots needs;
+- copies one module migration into `SQL/updates/`.
 
-## What installation changes
+It refuses an unknown AAEmu lineage, conflicting tracked host changes, a patch that does not apply cleanly, or a different file at the migration path.
 
-The module remains a separate Git repository. Installation selects a reviewed compatibility patch for the detected track and copies one migration into `SQL/updates/`. The 1.2 patch updates 26 host files; the active 3.0 alpha v2 patch updates 22 host files. The patches:
+The optional 1.2 dependency-security patch in `compatibility/` is not applied automatically. Server owners can review it and current NuGet advisories separately because dependency policy belongs to the host.
 
-- imports the module's Game and test MSBuild targets;
-- registers bot services and startup/shutdown lifecycle;
-- supplies party, duel, world-query, tick-metric, character, packet, and command-API hooks;
-- adapts host tests to the new injected dependencies.
-
-No AAEmu-owned source is copied into this repository, and module source is not copied into AAEmu project directories.
-
-## Optional tested host security baseline
-
-The pinned 1.2 upstream base resolves `SQLitePCLRaw.lib.e_sqlite3` 2.1.11 and `SSH.NET` 2025.1.0, which NuGet currently flags with high-severity advisories. PlayerBots does not silently take ownership of AAEmu dependency policy. Operators can review and explicitly apply the tested 1.2 package-only baseline:
-
-```powershell
-git apply --check .\modules\archeage-playerbots\compatibility\aaemu-1.2-security-baseline.patch
-git apply .\modules\archeage-playerbots\compatibility\aaemu-1.2-security-baseline.patch
-dotnet restore AAEmu.slnx
-dotnet list AAEmu.slnx package --vulnerable --include-transitive
-```
-
-The retained clean validation reported no vulnerable packages after this optional patch. Re-evaluate advisories at install time because package security data changes.
-
-The untouched 3.0 baseline independently resolves `SQLitePCLRaw.lib.e_sqlite3` 2.1.11 and currently reports `GHSA-2m69-gcr7-jv3q`. No 3.0 dependency upgrade is bundled in this alpha adapter; that host policy must be reviewed separately.
-
-## Database
-
-AAEmu's updater must apply `2026-08-25_aaemu_game_bot_archetype_plans.sql` to the test or deployment Game database. The runtime also checks the bot schema during startup. Back up or version databases according to your normal AAEmu operating procedure.
-
-## Upgrade
-
-Commit the AAEmu host integration changes and the migration file in your own server branch. Then update the module repository and rebuild. Do not blindly reapply a newer compatibility patch over local host changes: run the installer's check-only mode first and review its release notes.
-
-## Troubleshooting
-
-- **Wrong module path:** clone exactly at `modules/archeage-playerbots`.
-- **Base commit missing:** fetch AAEmu history, then retry.
-- **Patch does not apply:** use the supported base or port/review the host hooks against your AAEmu revision.
-- **Tracked local changes:** commit them in your AAEmu server branch before installation.
-- **Different migration exists:** compare both files manually; the installer intentionally refuses to overwrite it.
-- **Commands not discovered:** confirm both MSBuild imports are present, then perform a non-incremental rebuild.
-- **3.0 assets missing:** stop before runtime startup; obtain the exact `3.0.4.2 r336598` data set, record hashes and provenance, and stage it with a versioned test database.
-- **3.0 serializer mismatch:** confirm the launcher/client, `game_pak`, compact databases, and emulator revision all belong to the same 3.0 lineage.
+If installation does not complete, see [Troubleshooting](TROUBLESHOOTING.md).

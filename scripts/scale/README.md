@@ -1,5 +1,7 @@
 # PlayerBots scale/resource truth gate
 
+This is an advanced release and capacity-validation tool. It is not required to install PlayerBots or run a normal group of companions. Start with the [PlayerBots Guide](../../docs/README.md) unless you are measuring a dedicated server environment.
+
 This directory contains the retained, live-server 0/10/50/100 PlayerBots
 ladder. It does not start, stop, deploy to, or force-terminate AAEmu. The
 operator must start an isolated runtime and later stop it with a real Ctrl+C so

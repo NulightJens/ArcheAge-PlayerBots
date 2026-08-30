@@ -2,7 +2,7 @@
 
 ## Supported release
 
-Security fixes target the latest `0.1.x` release candidate on the documented AAEmu 1.2 compatibility base.
+Security fixes target the current development line and the latest public prerelease on the documented AAEmu 1.2 compatibility base. The ArcheAge 3.0 track is experimental and is not a supported runtime release.
 
 ## Reporting
 

@@ -1,6 +1,8 @@
 # AAEmu compatibility files
 
-These patches are intentionally visible and reviewable. They are applied to an AAEmu checkout; no AAEmu-owned source is stored in this module repository.
+This page is a maintainer reference for the versioned AAEmu host patches. Normal installations should use the [Installation Guide](../docs/INSTALLATION.md) and the provided installer rather than applying these files manually.
+
+The patches are intentionally visible and reviewable. They are applied to an AAEmu checkout; no AAEmu-owned source is stored in this module repository.
 
 ## ArcheAge 1.2 host hooks
 
