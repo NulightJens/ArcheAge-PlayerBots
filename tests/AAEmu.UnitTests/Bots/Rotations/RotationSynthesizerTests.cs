@@ -110,12 +110,13 @@ public sealed class RotationSynthesizerTests
         foreach (var input in inputs)
         {
             var result = synthesizer.Synthesize(input.Item1, input.Item2, input.Item3, input.Item4, input.Item5, rows);
-            File.WriteAllText($"/tmp/r4-{input.Item1}.json", RotationSynthesizer.Serialize(result.Definition));
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), $"r4-{input.Item1}.json"),
+                RotationSynthesizer.Serialize(result.Definition));
         }
 
-        await Assert.That(File.Exists("/tmp/r4-abolisher.tank.json")).IsTrue();
-        await Assert.That(File.Exists("/tmp/r4-reaper.caster.json")).IsTrue();
-        await Assert.That(File.Exists("/tmp/r4-templar.support.json")).IsTrue();
+        await Assert.That(File.Exists(Path.Combine(Path.GetTempPath(), "r4-abolisher.tank.json"))).IsTrue();
+        await Assert.That(File.Exists(Path.Combine(Path.GetTempPath(), "r4-reaper.caster.json"))).IsTrue();
+        await Assert.That(File.Exists(Path.Combine(Path.GetTempPath(), "r4-templar.support.json"))).IsTrue();
     }
 
     [Test]

@@ -196,7 +196,7 @@ public sealed class RotationReplayTests
             await Assert.That(strategy.Filler.LastSelectedActionName).IsEqualTo("autoattack");
             await Assert.That(engine.LastActionLog.Any(log => log.Action == "filler" &&
                 log.Result == BotActionResult.Success)).IsTrue();
-            File.WriteAllText("/tmp/r4e-step1-swing.log",
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), "r4e-step1-swing.log"),
                 $"autoattack: {strategy.Filler.LastSelectedActionName} selected within " +
                 $"{simulated.Runtime.Metrics.BrainSteps} brain tick(s){Environment.NewLine}");
         }
@@ -210,7 +210,7 @@ public sealed class RotationReplayTests
     private static async Task AssertTraceAsync(string rotation, string mode, bool useCharacterTarget)
     {
         var trace = RecordRotationTrace(rotation, useCharacterTarget);
-        var outputPath = $"/tmp/r4c-{rotation}-legacy-{mode}-rotation.trace";
+        var outputPath = Path.Combine(Path.GetTempPath(), $"r4c-{rotation}-legacy-{mode}-rotation.trace");
         File.WriteAllText(outputPath, trace);
         var goldenRelativePath = $"AAEmu.UnitTests/Bots/Rotations/Goldens/{rotation}-legacy-{mode}.trace";
         var goldenPath = FindGoldenPath(goldenRelativePath);
@@ -422,7 +422,7 @@ public sealed class RotationReplayTests
             }
 
             AssertWinningActionBound(winningActionNames);
-            File.AppendAllText("/tmp/r4e-step2-winner-counts.log",
+            File.AppendAllText(Path.Combine(Path.GetTempPath(), "r4e-step2-winner-counts.log"),
                 $"trace={rotation}-{(useCharacterTarget ? "pvp" : "pve")}: " +
                 string.Join(", ", winningActionNames.OrderBy(pair => pair.Key)
                     .Select(pair => $"{pair.Key}={pair.Value}")) + Environment.NewLine);
