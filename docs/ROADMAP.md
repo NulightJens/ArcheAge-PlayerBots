@@ -18,9 +18,9 @@ Status: released as `0.1.0-rc.2`; accepted fixes continue under Unreleased.
 ## 0.2: believable combat
 
 - Completed: explicit attack, follow, state, and party work wakes brains shed by inactive-duel cleanup without keeping Idle brains active. A four-role physical regression passed with all roles casting, zero tick errors, and zero runtime overlaps.
-- Completed stationary-target checkpoint: Primeval used Endless Arrows for 33 of 45 hostile-target casts (73.3%). Close-target and moving-target behavior remains open.
+- Completed: stationary and close-range Primeval checkpoints. Endless Arrows supplied 33 of 45 hostile-target casts in the four-role sample and 11 of 15 damaging shots after a close escape. The close trial used Snare, Backdrop, and one tangent-dominant destination to settle at 19.182 m; moving-hostile pursuit remains open.
 - Completed: a sampled 16.985 m Darkrunner approach held short-range filler and Triple Slash, allowed only legal gap closers during approach, and did not execute Whirlwind Slash until 3.936 m. Boundary regressions reject Whirlwind Slash beyond 5 m and Sunder Earth beyond 9 m.
-- Keep Endless Arrows dominant while Primeval responds to close targets with root, backdrop, and lateral movement.
+- Validate the accepted Primeval range and lateral-escape behavior against a moving hostile target.
 - Let Daggerspell anchor around Fireball range while satisfying useful shorter-range conditions.
 - Let Cleric select and move toward injured party recipients while the owner is moving.
 - Instrument stealth search, loss, release, and reacquisition.
