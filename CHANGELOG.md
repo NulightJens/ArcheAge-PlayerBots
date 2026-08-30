@@ -4,6 +4,15 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ## Unreleased
 
+### Staged quest controls
+
+- Added `/botquest scan`, `inspect`, `status`, `accept`, and `report` as bounded GM development controls for exact-NPC quest discovery and one selected quest lifecycle. This is a vertical slice, not an autonomous questing claim.
+- Quest scanning uses lazy NPC-to-quest indexes built once after AAEmu loads quest templates; it does not rescan all 6,606 3.0 quests during bot brain ticks.
+- Acceptance and reporting fail closed unless the bot is within 6 meters of the exact supported NPC. Emotion, kill-trigger, and NPC-group starters remain deferred.
+- Reporting invokes only the selected active quest's live report act. It does not use AAEmu's broadcast report helper, which can advance multiple active quests sharing the same NPC.
+- Live 3.0 quest 330 acceptance survived a graceful server save/restart, rejected a report at 17.9 meters, completed at the exact reporter, left nearby quest 6198 inactive, and remained completed after normal bot logout/re-add.
+- Published new immutable full installer patches for both host lines: 1.2 v3 and 3.0 alpha-v4. Previous compatibility patches remain byte-identical; the new versions add the explicit GM access contract for `/botquest`.
+
 ### Human class and gear controls
 
 - Restored `/setclass [botId] <archetype> [level]` from the T-009 development path. It replaces all three skill trees, rebuilds active/passive skills, saves the final archetype, refreshes compatible gear, and normally respawns the bot so clients receive a fresh sheet.

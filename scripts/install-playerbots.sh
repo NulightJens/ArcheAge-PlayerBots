@@ -59,12 +59,12 @@ fi
 case "$track" in
   aaemu12)
     supported_base="$base_12"
-    patch_path="$module_root/compatibility/aaemu-1.2-r208022-v2.patch"
+    patch_path="$module_root/compatibility/aaemu-1.2-r208022-v3.patch"
     status=supported
     ;;
   aaemu30)
     supported_base="$base_30"
-    patch_path="$module_root/compatibility/aaemu-3.0.4.2-r336598-alpha-v3.patch"
+    patch_path="$module_root/compatibility/aaemu-3.0.4.2-r336598-alpha-v4.patch"
     status=server-start-validated
     ;;
   *) echo "Unknown track '$track'; expected aaemu12 or aaemu30." >&2; exit 2 ;;

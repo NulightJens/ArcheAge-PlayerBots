@@ -15,12 +15,12 @@ $ErrorActionPreference = 'Stop'
 $tracks = @{
     'AAEmu12' = @{
         Base = '62e3eb1d87da01194802ac886cd500134facad28'
-        Patch = 'compatibility\aaemu-1.2-r208022-v2.patch'
+        Patch = 'compatibility\aaemu-1.2-r208022-v3.patch'
         Status = 'supported'
     }
     'AAEmu30' = @{
         Base = '8c1c943bb2309eefffb9da2aa99a408d0acbb095'
-        Patch = 'compatibility\aaemu-3.0.4.2-r336598-alpha-v3.patch'
+        Patch = 'compatibility\aaemu-3.0.4.2-r336598-alpha-v4.patch'
         Status = 'server-start-validated'
     }
 }

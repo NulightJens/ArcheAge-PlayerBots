@@ -81,6 +81,35 @@ public class BotCommandsTests
     }
 
     [Test]
+    public async Task BotQuest_SeparatesDiscoveryFromExplicitLifecycleActions()
+    {
+        var command = new BotQuestCommand();
+
+        await Assert.That(command.CommandNames).Contains("botquest");
+        await Assert.That(command.GetCommandLineHelp()).Contains("scan <botId> [radius]");
+        await Assert.That(BotQuestCommand.TryParse(["scan", "2", "40"], out var scan)).IsTrue();
+        await Assert.That(scan.Verb).IsEqualTo(BotQuestVerb.Scan);
+        await Assert.That(scan.BotId).IsEqualTo(2u);
+        await Assert.That(scan.Radius).IsEqualTo(40f);
+        await Assert.That(BotQuestCommand.TryParse(["accept", "2", "330"], out var accept)).IsTrue();
+        await Assert.That(accept.Verb).IsEqualTo(BotQuestVerb.Accept);
+        await Assert.That(accept.QuestId).IsEqualTo(330u);
+        await Assert.That(BotQuestCommand.TryParse(["status", "2", "330"], out var status)).IsTrue();
+        await Assert.That(status.Verb).IsEqualTo(BotQuestVerb.Status);
+        await Assert.That(BotQuestCommand.TryParse(["report", "2", "330", "1"], out var report)).IsTrue();
+        await Assert.That(report.Verb).IsEqualTo(BotQuestVerb.Report);
+        await Assert.That(report.QuestId).IsEqualTo(330u);
+        await Assert.That(report.SelectedReward).IsEqualTo(1);
+        await Assert.That(BotQuestCommand.TryParse(["report", "2", "330", "-1"], out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryParse(["scan", "2", "101"], out _)).IsFalse();
+        await Assert.That(BotQuestCommand.IsValidSelectedReward([], 0)).IsTrue();
+        await Assert.That(BotQuestCommand.IsValidSelectedReward([], 1)).IsFalse();
+        await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 0)).IsFalse();
+        await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 2)).IsTrue();
+        await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 3)).IsFalse();
+    }
+
+    [Test]
     public async Task BotGear_Show_UsesCurrentlyTargetedLiveBotWhenIdIsOmitted()
     {
         var bot = AddBot(2);

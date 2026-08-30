@@ -36,6 +36,13 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 - Measure natural mana exhaustion, rest, recovery, and re-entry without administrator healing.
 - Revisit jump only when packets produce correct animation and geometry interaction.
 
+## 0.3: questing vertical slices
+
+- Completed once on 3.0: discover and inspect exact-NPC quest relations, accept quest 330 through AAEmu's native lifecycle, persist its ready state through a graceful server restart, reject a remote report, report only the selected quest at the exact NPC, and retain completion through bot logout/re-add.
+- Automated contract: lazy NPC quest indexes, 100-meter scan ceiling, 6-meter interaction ceiling, explicit status, nonnegative reward index, and no support claim for emotion, kill-trigger, or NPC-group starters.
+- Next: repeat the exact-NPC accept/report gate from a clean 3.0 start, then add one kill objective, one talk/emote objective, one delivery/item objective, and one travel objective as separately measured slices.
+- Autonomous quest selection, routing, and chaining remain deferred until those objective executors and navigation boundaries pass independently.
+
 ## 0.4: population operations
 
 - Approve a whole-server reserve and latency budget from an empty-server baseline.
@@ -56,7 +63,8 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 - Completed once: native account/character creation, matching launcher authentication, character selection, and world entry without DLL or serializer failure.
 - Completed once: rendered bot spawn, normal logout/re-add, follow, and controlled dummy combat. Database/runtime inspection retained the three Darkrunner trees and 23 skills.
 - Completed once: `/setclass` refreshed Battlerage/Auramancy/Shadowplay at level 55; `/kit` auto-equipped a grade-5 two-handed weapon, and normal logout/re-add retained class and equipment.
-- Next: repeat the login/lifecycle/class/gear gates from a clean start, then run four-role party/combat and 0/10/50/100 resource/recovery gates.
+- Completed once: the staged exact-NPC quest 330 accept/report flow, including graceful-restart and bot-reload persistence plus fail-closed distance and unrelated-quest checks.
+- Next: repeat the login/lifecycle/class/gear and exact-NPC quest gates from a clean start, then run four-role party/combat and 0/10/50/100 resource/recovery gates.
 - Promotion rule: 3.0 remains server-start-validated alpha until every runtime gate passes; configuration, a successful build, or server startup alone is not a support claim.
 
 ## Shelved experiments

@@ -1,0 +1,414 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
+using AAEmu.Game.Core.Managers;
+using AAEmu.Game.Core.Managers.Bots;
+using AAEmu.Game.Core.Managers.World;
+using AAEmu.Game.GameData;
+using AAEmu.Game.Models.Game;
+using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.NPChar;
+using AAEmu.Game.Models.Game.Quests;
+using AAEmu.Game.Models.Game.Quests.Acts;
+using AAEmu.Game.Models.Game.Quests.Static;
+using AAEmu.Game.Models.Game.Quests.Templates;
+using AAEmu.Game.Models.Game.Units;
+using AAEmu.Game.Utils;
+using AAEmu.Game.Utils.Scripts;
+
+namespace AAEmu.Game.Scripts.Commands;
+
+/// <summary>
+/// Human-facing, deliberately staged quest controls. Scan and inspect are
+/// read-only. Accept uses AAEmu's normal quest lifecycle and requires the bot
+/// to be beside the exact NPC that starts the quest.
+/// </summary>
+public sealed class BotQuestCommand : ICommand
+{
+    internal const float DefaultScanRadius = 35f;
+    internal const float MaximumScanRadius = 100f;
+    internal const float InteractionRadius = 6f;
+
+    public string[] CommandNames { get; set; } = ["botquest"];
+
+    public void OnLoad() => CommandManager.Instance.Register(CommandNames, this);
+
+    public string GetCommandLineHelp() =>
+        "scan <botId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, report <botId> <questId> [rewardIndex]";
+
+    public string GetCommandHelpText() =>
+        "Scans nearby NPC quest relations, explains a structured quest, or accepts/reports it through AAEmu's normal quest acts. " +
+        "NPC-group starters and autonomous objective execution are intentionally deferred.";
+
+    public void Execute(Character character, string[] args, IMessageOutput messageOutput)
+    {
+        if (!TryParse(args, out var request))
+        {
+            CommandManager.SendDefaultHelpText(this, messageOutput);
+            return;
+        }
+
+        var bot = BotManager.Instance.GetBot(request.BotId);
+        if (bot == null)
+        {
+            BotCommandArgs.SendUnknownBot(this, messageOutput, request.BotId);
+            return;
+        }
+
+        switch (request.Verb)
+        {
+            case BotQuestVerb.Scan:
+                Scan(bot, request.Radius, messageOutput);
+                break;
+            case BotQuestVerb.Inspect:
+                Inspect(bot, request.QuestId, messageOutput);
+                break;
+            case BotQuestVerb.Status:
+                Status(bot, request.QuestId, messageOutput);
+                break;
+            case BotQuestVerb.Accept:
+                Accept(bot, request.QuestId, messageOutput);
+                break;
+            case BotQuestVerb.Report:
+                Report(bot, request.QuestId, request.SelectedReward, messageOutput);
+                break;
+        }
+    }
+
+    internal static bool TryParse(string[] args, out BotQuestRequest request)
+    {
+        request = default;
+        if (args == null || args.Length < 2 ||
+            !Enum.TryParse<BotQuestVerb>(args[0], true, out var verb) ||
+            !uint.TryParse(args[1], NumberStyles.None, CultureInfo.InvariantCulture, out var botId) || botId == 0)
+            return false;
+
+        switch (verb)
+        {
+            case BotQuestVerb.Scan:
+                if (args.Length > 3)
+                    return false;
+                var radius = DefaultScanRadius;
+                if (args.Length == 3 &&
+                    (!float.TryParse(args[2], NumberStyles.Float, CultureInfo.InvariantCulture, out radius) ||
+                     radius <= 0f || radius > MaximumScanRadius))
+                    return false;
+                request = new BotQuestRequest(verb, botId, 0, radius, 0);
+                return true;
+            case BotQuestVerb.Inspect:
+            case BotQuestVerb.Status:
+            case BotQuestVerb.Accept:
+                if (args.Length != 3 ||
+                    !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out var questId) || questId == 0)
+                    return false;
+                request = new BotQuestRequest(verb, botId, questId, 0f, 0);
+                return true;
+            case BotQuestVerb.Report:
+                if (args.Length is < 3 or > 4 ||
+                    !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out questId) || questId == 0)
+                    return false;
+                var selectedReward = 0;
+                if (args.Length == 4 &&
+                    (!int.TryParse(args[3], NumberStyles.None, CultureInfo.InvariantCulture, out selectedReward) || selectedReward < 0))
+                    return false;
+                request = new BotQuestRequest(verb, botId, questId, 0f, selectedReward);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void Scan(Character bot, float radius, IMessageOutput messageOutput)
+    {
+        var relations = WorldManager.GetAround<Npc>(bot, radius, true)
+            .Select(npc => new NearbyQuestNpc(
+                npc,
+                Distance(bot, npc),
+                QuestManager.Instance.GetPlayerBotNpcQuestStarts(npc.TemplateId),
+                QuestManager.Instance.GetPlayerBotNpcQuestReports(npc.TemplateId)))
+            .Where(result => result.Starts.Count > 0 || result.Reports.Count > 0)
+            .OrderBy(result => result.Distance)
+            .ThenBy(result => result.Npc.ObjId)
+            .ToList();
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' quest scan: radius={radius:F1}m, quest_npcs={relations.Count}.");
+        foreach (var relation in relations)
+        {
+            CommandManager.SendNormalText(this, messageOutput,
+                $"npc='{LocalizedNpcName(relation.Npc)}' template={relation.Npc.TemplateId} obj={relation.Npc.ObjId} " +
+                $"distance={relation.Distance:F1}m position=({relation.Npc.Transform.World.Position.X:F1}," +
+                $"{relation.Npc.Transform.World.Position.Y:F1},{relation.Npc.Transform.World.Position.Z:F1})");
+            foreach (var quest in relation.Starts)
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"  START quest={quest.Id} name='{LocalizedQuestName(quest.Id)}' level={quest.Level} status={GetAvailability(bot, quest)} objective={DescribeObjectiveShape(quest)}");
+            foreach (var quest in relation.Reports.Where(quest => bot.Quests.HasQuest(quest.Id)))
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"  REPORT quest={quest.Id} name='{LocalizedQuestName(quest.Id)}' active=true objective={DescribeObjectiveShape(quest)}");
+        }
+    }
+
+    private void Inspect(Character bot, uint questId, IMessageOutput messageOutput)
+    {
+        var quest = QuestManager.Instance.GetTemplate(questId);
+        if (quest == null)
+        {
+            CommandManager.SendErrorText(this, messageOutput, $"Unknown quest id {questId}.");
+            return;
+        }
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Quest {quest.Id} '{LocalizedQuestName(quest.Id)}': level={quest.Level}, zone={quest.ZoneId}, repeatable={quest.Repeatable}, status={GetAvailability(bot, quest)}.");
+        foreach (var component in quest.Components.Values.OrderBy(component => component.KindId).ThenBy(component => component.Id))
+        {
+            var acts = component.ActTemplates.Count == 0
+                ? "none"
+                : string.Join(", ", component.ActTemplates.Select(DescribeAct));
+            CommandManager.SendNormalText(this, messageOutput,
+                $"component={component.Id} step={component.KindId}: {acts}");
+        }
+    }
+
+    private void Status(Character bot, uint questId, IMessageOutput messageOutput)
+    {
+        if (bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
+        {
+            CommandManager.SendNormalText(this, messageOutput,
+                $"Bot '{bot.Name}' quest {questId}: lifecycle=active step={activeQuest.Step} status={activeQuest.Status} " +
+                $"objective={activeQuest.GetQuestObjectiveStatus()} acceptor={activeQuest.QuestAcceptorType}:{activeQuest.AcceptorId}.");
+            return;
+        }
+
+        var lifecycle = bot.Quests.HasQuestCompleted(questId) ? "completed" : "inactive";
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' quest {questId}: lifecycle={lifecycle}.");
+    }
+
+    private void Accept(Character bot, uint questId, IMessageOutput messageOutput)
+    {
+        var quest = QuestManager.Instance.GetTemplate(questId);
+        if (quest == null)
+        {
+            CommandManager.SendErrorText(this, messageOutput, $"Unknown quest id {questId}.");
+            return;
+        }
+
+        var starterNpcIds = quest.Components.Values
+            .SelectMany(component => component.ActTemplates)
+            .Select(GetExactStarterNpcId)
+            .Where(npcId => npcId != 0)
+            .ToHashSet();
+        if (starterNpcIds.Count == 0)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} has no supported exact-NPC starter. NPC groups are not accepted by this milestone.");
+            return;
+        }
+
+        var starter = WorldManager.GetAround<Npc>(bot, InteractionRadius, true)
+            .Where(npc => starterNpcIds.Contains(npc.TemplateId))
+            .Select(npc => new { Npc = npc, Distance = Distance(bot, npc) })
+            .Where(candidate => candidate.Distance <= InteractionRadius)
+            .OrderBy(candidate => candidate.Distance)
+            .FirstOrDefault();
+        if (starter == null)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Bot '{bot.Name}' is not within {InteractionRadius:F1}m of the exact NPC starter for quest {questId}.");
+            return;
+        }
+
+        var accepted = bot.Quests.AddQuestFromNpc(questId, starter.Npc.ObjId);
+        if (!accepted)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"AAEmu rejected quest {questId} for bot '{bot.Name}'; no quest state was fabricated.");
+            return;
+        }
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' accepted quest {questId} from npc template={starter.Npc.TemplateId} obj={starter.Npc.ObjId} distance={starter.Distance:F1}m.");
+    }
+
+    private void Report(Character bot, uint questId, int selectedReward, IMessageOutput messageOutput)
+    {
+        if (!bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not active for bot '{bot.Name}'.");
+            return;
+        }
+
+        if (!activeQuest.QuestSteps.TryGetValue(QuestComponentKind.Ready, out var readyStep))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} has no supported ready/report step.");
+            return;
+        }
+
+        var reportActs = readyStep.Components.Values
+            .SelectMany(component => component.Acts)
+            .Where(act => act.Template is QuestActConReportNpc)
+            .ToList();
+        if (reportActs.Count == 0)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not at a supported exact-NPC report step.");
+            return;
+        }
+
+        var selectiveRewardIndexes = activeQuest.QuestSteps
+            .GetValueOrDefault(QuestComponentKind.Reward)?.Components.Values
+            .SelectMany(component => component.Acts)
+            .Where(act => act.Template is QuestActSupplySelectiveItem)
+            .Select(act => act.Template.ThisSelectiveIndex)
+            .Distinct()
+            .OrderBy(index => index)
+            .ToArray() ?? [];
+        if (!IsValidSelectedReward(selectiveRewardIndexes, selectedReward))
+        {
+            var expected = selectiveRewardIndexes.Length == 0
+                ? "0 (this quest has no selective reward)"
+                : string.Join(", ", selectiveRewardIndexes);
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} does not accept reward index {selectedReward}; expected {expected}.");
+            return;
+        }
+
+        var reporter = WorldManager.GetAround<Npc>(bot, InteractionRadius, true)
+            .Select(npc => new { Npc = npc, Distance = Distance(bot, npc) })
+            .Where(candidate => candidate.Distance <= InteractionRadius && reportActs.Any(act =>
+                act.Template is QuestActConReportNpc report && report.NpcId == candidate.Npc.TemplateId))
+            .OrderBy(candidate => candidate.Distance)
+            .FirstOrDefault();
+        if (reporter == null)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Bot '{bot.Name}' is not within {InteractionRadius:F1}m of the exact NPC reporter for quest {questId}.");
+            return;
+        }
+
+        var matchingReportActs = reportActs.Where(act =>
+                act.Template is QuestActConReportNpc report && report.NpcId == reporter.Npc.TemplateId)
+            .ToArray();
+        var completionBefore = matchingReportActs
+            .Select(act => act.OverrideObjectiveCompleted)
+            .ToArray();
+
+        // AAEmu's generic report method broadcasts to all active quests at this NPC.
+        // Invoke only the selected quest's live act so native readiness, rewards, and
+        // evaluation remain intact without advancing unrelated quests.
+        var previousTarget = bot.CurrentTarget;
+        bot.CurrentTarget = reporter.Npc;
+        try
+        {
+            var reportArgs = new OnReportNpcArgs
+            {
+                QuestId = questId,
+                NpcId = reporter.Npc.TemplateId,
+                Selected = selectedReward,
+                Transform = reporter.Npc.Transform
+            };
+            foreach (var reportAct in matchingReportActs)
+                reportAct.OnReportNpc(bot, reportArgs);
+        }
+        finally
+        {
+            bot.CurrentTarget = previousTarget;
+        }
+
+        var accepted = matchingReportActs
+            .Select((act, index) => act.OverrideObjectiveCompleted && !completionBefore[index])
+            .Any(changed => changed);
+        if (!accepted)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"AAEmu rejected quest {questId} reporting for bot '{bot.Name}'; no completion was claimed.");
+            return;
+        }
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' submitted quest {questId} to npc template={reporter.Npc.TemplateId} " +
+            $"obj={reporter.Npc.ObjId} distance={reporter.Distance:F1}m reward_index={selectedReward}; " +
+            $"accepted_acts={matchingReportActs.Length}, native evaluation requested.");
+    }
+
+    internal static bool IsValidSelectedReward(IReadOnlyCollection<int> selectiveRewardIndexes, int selectedReward) =>
+        selectiveRewardIndexes.Count == 0 ? selectedReward == 0 : selectiveRewardIndexes.Contains(selectedReward);
+
+    private static string GetAvailability(Character bot, QuestTemplate quest)
+    {
+        if (bot.Quests.HasQuest(quest.Id))
+            return "active";
+        if (bot.Quests.HasQuestCompleted(quest.Id) && !quest.Repeatable)
+            return "completed";
+        return quest.GetComponents(QuestComponentKind.Start)
+            .All(component => UnitRequirementsGameData.Instance.CanComponentRun(component, bot))
+            ? "eligible"
+            : "blocked";
+    }
+
+    private static string DescribeObjectiveShape(QuestTemplate quest)
+    {
+        var types = quest.Components.Values
+            .Where(component => component.KindId == QuestComponentKind.Progress)
+            .SelectMany(component => component.ActTemplates)
+            .Select(act => act.GetType().Name)
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        return types.Length == 0 ? "travel/report" : string.Join('+', types);
+    }
+
+    private static string LocalizedNpcName(Npc npc) =>
+        LocalizationManager.Instance.Get("npcs", "name", npc.TemplateId, npc.Template?.Name ?? $"NPC {npc.TemplateId}");
+
+    private static string LocalizedQuestName(uint questId) =>
+        LocalizationManager.Instance.Get("quest_contexts", "name", questId, $"Quest {questId}");
+
+    private static string DescribeAct(QuestActTemplate act)
+    {
+        var target = act switch
+        {
+            QuestActConAcceptNpc accept => $" npc={accept.NpcId}",
+            QuestActConAcceptNpcEmotion emotion => $" npc={emotion.NpcId}",
+            QuestActConAcceptNpcKill kill => $" npc={kill.NpcId}",
+            QuestActConReportNpc report => $" npc={report.NpcId}",
+            _ => string.Empty
+        };
+        var count = act.Count > 0 ? $" count={act.Count}" : string.Empty;
+        return $"{act.GetType().Name}{target}{count}";
+    }
+
+    private static uint GetExactStarterNpcId(QuestActTemplate act) => act switch
+    {
+        QuestActConAcceptNpc accept => accept.NpcId,
+        _ => 0
+    };
+
+    private static float Distance(Character bot, Npc npc) =>
+        (float)MathUtil.CalculateDistance(bot.Transform.World.Position, npc.Transform.World.Position);
+
+    private sealed record NearbyQuestNpc(
+        Npc Npc,
+        float Distance,
+        IReadOnlyList<QuestTemplate> Starts,
+        IReadOnlyList<QuestTemplate> Reports);
+}
+
+internal enum BotQuestVerb
+{
+    Scan,
+    Inspect,
+    Status,
+    Accept,
+    Report
+}
+
+internal readonly record struct BotQuestRequest(
+    BotQuestVerb Verb,
+    uint BotId,
+    uint QuestId,
+    float Radius,
+    int SelectedReward);

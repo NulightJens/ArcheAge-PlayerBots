@@ -42,6 +42,30 @@ public sealed class AAEmu30CompatibilityTests
     }
 
     [Fact]
+    public void QuestDiscoveryCommandsRemainStagedAndBoundedOnThe30Adapter()
+    {
+        var command = new BotQuestCommand();
+
+        Assert.Contains("botquest", command.CommandNames);
+        Assert.True(BotQuestCommand.TryParse(["scan", "2", "35"], out var scan));
+        Assert.Equal(BotQuestVerb.Scan, scan.Verb);
+        Assert.Equal(35f, scan.Radius);
+        Assert.True(BotQuestCommand.TryParse(["inspect", "2", "330"], out var inspect));
+        Assert.Equal(BotQuestVerb.Inspect, inspect.Verb);
+        Assert.Equal(330u, inspect.QuestId);
+        Assert.True(BotQuestCommand.TryParse(["status", "2", "330"], out var status));
+        Assert.Equal(BotQuestVerb.Status, status.Verb);
+        Assert.True(BotQuestCommand.TryParse(["report", "2", "330"], out var report));
+        Assert.Equal(BotQuestVerb.Report, report.Verb);
+        Assert.Equal(0, report.SelectedReward);
+        Assert.False(BotQuestCommand.TryParse(["scan", "2", "100.1"], out _));
+        Assert.True(BotQuestCommand.IsValidSelectedReward([], 0));
+        Assert.False(BotQuestCommand.IsValidSelectedReward([], 1));
+        Assert.False(BotQuestCommand.IsValidSelectedReward([1, 2], 0));
+        Assert.True(BotQuestCommand.IsValidSelectedReward([1, 2], 2));
+    }
+
+    [Fact]
     public void BotEquipmentVisibilityUsesThe30PublicInspectionPacket()
     {
         const uint objectId = 0x10203;
