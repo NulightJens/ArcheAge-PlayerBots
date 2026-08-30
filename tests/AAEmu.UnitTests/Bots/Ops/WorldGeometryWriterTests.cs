@@ -127,6 +127,7 @@ public class WorldGeometryWriterTests
 }
 """;
 
-        await Assert.That(WorldGeometryWriter.Serialize(document)).IsEqualTo(expected);
+        await Assert.That(WorldGeometryWriter.Serialize(document).ReplaceLineEndings("\n"))
+            .IsEqualTo(expected.ReplaceLineEndings("\n"));
     }
 }

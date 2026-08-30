@@ -319,7 +319,8 @@ ev=search_give_up
 
     private static async Task AssertRecordedTrace(Trace trace, string recordedTrace)
     {
-        await Assert.That(string.Join('\n', trace.Lines)).IsEqualTo(recordedTrace.Trim());
+        await Assert.That(string.Join('\n', trace.Lines))
+            .IsEqualTo(recordedTrace.Trim().ReplaceLineEndings("\n"));
     }
 
     private static Trace RunStrategyFollowTrace()
