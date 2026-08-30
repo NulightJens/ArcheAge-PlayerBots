@@ -5,6 +5,7 @@ using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.UnitManagers;
 using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.Items;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Units.Static;
@@ -29,6 +30,11 @@ public sealed class AAEmu30CompatibilityTests
         Assert.Equal("Auramancy", SetBotClass.TreeName(AbilityType.Will));
         Assert.Contains("botgear", gear.CommandNames);
         Assert.Contains("botequip", gear.CommandNames);
+        Assert.Contains("create <grade> <prefix> <armor> <weapon>", gear.GetCommandLineHelp());
+        Assert.Equal("Mainhand", BotGearCommand.EquipmentSlotName(new EquipItem { Slot = 15 }));
+        Assert.True(BotGearCatalog.TryParseGrade("celestial", out var grade));
+        Assert.Equal(ItemGrade.Celestial, grade);
+        Assert.Equal("gale", BotGearCatalog.NormalizeProfile("wind"));
     }
 
     [Fact]

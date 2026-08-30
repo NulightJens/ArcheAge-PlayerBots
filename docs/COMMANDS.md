@@ -108,11 +108,23 @@ The normal AAEmu `/kit <characterName> <kitName>` command now asks PlayerBots to
 
 | Command | Purpose |
 | --- | --- |
-| `/botgear <id> show` | List equipped slots and equipment candidates in the bag |
-| `/botgear <id> equip` | Re-evaluate and equip the best compatible bag items |
-| `/botgear <id> inspect` | Open the bot's read-only remote character-detail sheet in the GM client |
+| `/botgear [id] show` | List equipped slots with localized item names, grades, template IDs, and instance IDs |
+| `/botgear [id] equip` | Re-evaluate and equip the best compatible bag items |
+| `/botgear [id] inspect` | Synchronize the bot and send its read-only character detail to the GM client |
+| `/botgear [id] create <grade> <prefix> <armor> <weapon>` | Create and equip a complete Magnificent loadout |
 
-`/botequip` is an alias for `/botgear`. ArcheAge's remote-detail protocol is read-only: the stock client cannot safely drag equipment into another character's inventory. Use `/kit` and `/botgear ... equip` for server-authoritative changes.
+The ID is optional when the GM currently targets a live bot. For example, target the bot and run:
+
+```text
+/botgear create celestial flame leather nodachi
+/botgear show
+```
+
+`grade` accepts AAEmu's item-grade names from `Crude` through `Mythic`. `prefix` is the Magnificent stat family (`earth`, `flame`, `gale`/`wind`, `life`, or `wave`), `armor` is `cloth`, `leather`, or `plate`, and `weapon` is any primary weapon available for that family, such as `nodachi`, `greatsword`, `greataxe`, `staff`, or `club`. The command adds seven armor pieces, a necklace, two earrings, two rings, the requested primary weapon, a bow, and an instrument, then runs normal bot equipment evaluation and saves the character.
+
+Some Magnificent families do not contain a literal seven-piece armor set, bow, or instrument with the requested prefix. In that case PlayerBots selects the closest complete stat-compatible Magnificent set and prints every actual English item name instead of pretending an exact item exists.
+
+`/botequip` is an alias for `/botgear`. ArcheAge's remote-detail protocol is read-only: the stock client cannot safely drag equipment into another character's inventory. The server sends the detail packet, but some stock clients display it only after their normal **View Equipment** action. Use `/kit`, `/botgear ... create`, and `/botgear ... equip` for server-authoritative changes.
 
 ## Diagnostics
 

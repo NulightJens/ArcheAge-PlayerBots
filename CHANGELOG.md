@@ -7,10 +7,13 @@ Player-facing patch notes come first; developer packaging detail follows.
 ### Human class and gear controls
 
 - Restored `/setclass [botId] <archetype> [level]` from the T-009 development path. It replaces all three skill trees, rebuilds active/passive skills, saves the final archetype, refreshes compatible gear, and normally respawns the bot so clients receive a fresh sheet.
-- Added `/botgear <botId> show|equip|inspect` (`/botequip` alias) for equipment reporting, server-authoritative bag evaluation, and the stock client's read-only remote character sheet.
+- Added target-first `/botgear [botId] show|equip|inspect` (`/botequip` alias) for localized equipment reporting, server-authoritative bag evaluation, and the stock client's read-only remote character detail.
+- Added `/botgear [botId] create <grade> <prefix> <armor> <weapon>`. It creates a complete Magnificent loadout at the requested grade, resolves stat-compatible fallbacks when a literal family piece does not exist, immediately evaluates equipment, prints the actual English item names, saves the bot, and broadcasts its refreshed state.
 - Integrated AAEmu's `/kit` command with live PlayerBots so compatible kit items are evaluated, equipped, and saved immediately instead of remaining unused in the bag.
 - Live 3.0 acceptance set `Darkrunnerbot` to Battlerage/Auramancy/Shadowplay at level 55 with 23 skills and 5 passives, equipped a grade-5 two-handed kit weapon, and retained both class and equipment across normal logout/re-add.
-- Passed the clean 1.2 installer suite at 1,736 total (1,732 passed, 4 intentional skips) and the 3.0 adapter suite at 155/155.
+- Live 3.0 acceptance created `/botgear 2 create celestial flame leather nodachi`, equipped all 15 requested slots, and retained the identical item instances across normal logout/re-add. The active data pack resolved the missing literal Flame pieces honestly as Magnificent Desert leather, a Lightning Bow, and a Quake Flute while retaining Flame jewelry and the Flame Nodachi.
+- Corrected equipment reporting to read each item's authoritative equipment-container slot; 3.0 no longer mislabels a main-hand weapon by its list position.
+- Passed the clean 1.2 installer suite at 1,738 total (1,734 passed, 4 intentional skips) and the 3.0 adapter suite at 155/155.
 
 ### Documentation and onboarding
 

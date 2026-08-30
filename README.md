@@ -54,9 +54,12 @@ Log in with a GM character and choose the ID of an existing offline character:
 ```text
 /addbot 2
 /setclass 2 Darkrunner 55
+/botgear 2 create celestial flame leather nodachi
 /botgear 2 show
 /botstate 2 grind
 ```
+
+You can omit the ID from `/botgear` after selecting the live bot. Grade, Magnificent prefix, armor type, and primary weapon are command variables; see [Bot equipment](docs/COMMANDS.md#bot-equipment) for supported values and the exact fallback rules when a literal matching set does not exist in the active data pack.
 
 Invite the bot through the normal ArcheAge party UI, then give it a role and an order:
 

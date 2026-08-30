@@ -7,6 +7,7 @@ using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Expeditions;
+using AAEmu.Game.Models.Game.Items;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
@@ -67,13 +68,43 @@ public class BotCommandsTests
     }
 
     [Test]
-    public async Task BotGear_ExposesShowEquipAndInspectWorkflow()
+    public async Task BotGear_ExposesTargetFirstHumanWorkflowWithoutBrokenPipeMarkup()
     {
         var command = new BotGearCommand();
 
         await Assert.That(command.CommandNames).Contains("botgear");
         await Assert.That(command.CommandNames).Contains("botequip");
-        await Assert.That(command.GetCommandLineHelp()).Contains("show|equip|inspect");
+        await Assert.That(command.GetCommandLineHelp()).Contains("show, equip, inspect");
+        await Assert.That(command.GetCommandLineHelp()).Contains("create <grade> <prefix> <armor> <weapon>");
+        await Assert.That(command.GetCommandLineHelp()).DoesNotContain("|");
+        await Assert.That(BotGearCommand.EquipmentSlotName(new EquipItem { Slot = 15 })).IsEqualTo("Mainhand");
+    }
+
+    [Test]
+    public async Task BotGear_Show_UsesCurrentlyTargetedLiveBotWhenIdIsOmitted()
+    {
+        var bot = AddBot(2);
+        var requester = new CharacterMock { CurrentTarget = bot };
+        var output = new CharacterMessageOutput(requester);
+
+        new BotGearCommand().Execute(requester, ["show"], output);
+
+        await Assert.That(output.Messages.Any(message => message.Contains("Bot 'bot2' (Id: 2)"))).IsTrue();
+    }
+
+    [Test]
+    public async Task BotGearCatalog_ParsesGradeAliasesAndScoresMatchingProfiles()
+    {
+        await Assert.That(BotGearCatalog.TryParseGrade("celestial", out var grade)).IsTrue();
+        await Assert.That(grade).IsEqualTo(ItemGrade.Celestial);
+        await Assert.That(BotGearCatalog.NormalizeProfile("Wind")).IsEqualTo("gale");
+        await Assert.That(BotGearCatalog.NormalizeToken("Great-Sword")).IsEqualTo("greatsword");
+
+        var flame = new BotGearCatalog.AttributeVector(6, 0, 0, 0, 0);
+        var desert = new BotGearCatalog.AttributeVector(6, 0, 4, 0, 0);
+        var meadow = new BotGearCatalog.AttributeVector(0, 0, 0, 6, 4);
+        await Assert.That(BotGearCatalog.Similarity(flame, desert)).IsGreaterThan(0);
+        await Assert.That(BotGearCatalog.Similarity(flame, meadow)).IsEqualTo(0);
     }
 
     [Test]
