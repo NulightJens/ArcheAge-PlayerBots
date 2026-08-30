@@ -56,7 +56,8 @@ public sealed class BotHelpCommand : ICommand
             case "diagnostics":
                 Send(messageOutput,
                     "Inspect: /botstate <id>, /botdebug <id>, /botactions <id>, /botvalues <id> [filter], /botrotation <id> show.",
-                    "Measure: /botmetrics reset before a window, then /botmetrics snapshot. Stop a case with /botstate <id> idle.");
+                    "Measure: /botmetrics reset before a window, then /botmetrics snapshot. Stop a case with /botstate <id> idle.",
+                    "Controlled buffs: /botbuff <id> <buffId> [abLevel]; remove with /botbuff <id> -<buffId>. No selected target is required.");
                 return;
             case "scale":
                 Send(messageOutput,

@@ -39,7 +39,7 @@ Linux/macOS equivalents are in `scripts/install-playerbots.sh` and use `--check-
 
 ## What installation changes
 
-The module remains a separate Git repository. Installation applies `compatibility/aaemu-1.2-r208022.patch` to 26 existing AAEmu source/project/test files and copies one migration into `SQL/updates/`. The patch:
+The module remains a separate Git repository. Installation applies `compatibility/aaemu-1.2-r208022-v2.patch` to 26 existing AAEmu source/project/test files and copies one migration into `SQL/updates/`. The patch:
 
 - imports the module's Game and test MSBuild targets;
 - registers bot services and startup/shutdown lifecycle;

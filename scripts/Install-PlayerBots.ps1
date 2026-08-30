@@ -33,7 +33,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "This module currently supports AAEmu 1.2 descendants of $supportedBase."
 }
 
-$patchPath = Join-Path $moduleRoot 'compatibility\aaemu-1.2-r208022.patch'
+$patchPath = Join-Path $moduleRoot 'compatibility\aaemu-1.2-r208022-v2.patch'
 $sqlSource = Join-Path $moduleRoot 'sql\2026-08-25_aaemu_game_bot_archetype_plans.sql'
 $sqlDestination = Join-Path $aaemuRoot 'SQL\updates\2026-08-25_aaemu_game_bot_archetype_plans.sql'
 

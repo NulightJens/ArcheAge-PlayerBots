@@ -7,6 +7,9 @@ using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Expeditions;
+using AAEmu.Game.Models.Game.Skills;
+using AAEmu.Game.Models.Game.Skills.Templates;
+using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Scripts.Commands;
 using AAEmu.Game.Utils.Scripts;
 using AAEmu.UnitTests.Utils.Mocks;
@@ -20,6 +23,7 @@ public class BotCommandsTests
     private BotCombatManager _previousCombatManager;
     private BotArchetypeManager _previousArchetypeManager;
     private Func<IDuelManager> _previousDuelManagerResolver;
+    private Func<uint, BuffTemplate> _previousBuffTemplateResolver;
     private BotManager _botManager;
     private FakeBotCombatManager _combatManager;
     private FakeBotArchetypeManager _archetypeManager;
@@ -32,6 +36,7 @@ public class BotCommandsTests
         _previousCombatManager = BotCombatManager.Instance;
         _previousArchetypeManager = BotArchetypeManager.Instance;
         _previousDuelManagerResolver = BotDuelCommand.DuelManagerResolver;
+        _previousBuffTemplateResolver = BotBuffCommand.BuffTemplateResolver;
 
         _botManager = new BotManager(_ => null, onlineLookup: _ => null);
         _combatManager = new FakeBotCombatManager();
@@ -45,6 +50,7 @@ public class BotCommandsTests
     {
         BotTestFixture.RegisterSingletons(_previousBotManager, _previousCombatManager, _previousArchetypeManager);
         BotDuelCommand.DuelManagerResolver = _previousDuelManagerResolver;
+        BotBuffCommand.BuffTemplateResolver = _previousBuffTemplateResolver;
     }
 
     [Test]
@@ -242,6 +248,90 @@ public class BotCommandsTests
     }
 
     [Test]
+    public async Task BotDebug_SearchingState_ExposesLossSearchAndDuelDiagnostics()
+    {
+        var bot = AddDebugBot(2);
+        var opponent = AddBot(3);
+        bot.CurrentTarget = opponent;
+        var state = new BotCombatState
+        {
+            CurrentState = BotCombatStateType.Searching,
+            PreviousState = BotCombatStateType.Dueling,
+            ForcedState = BotCombatStateType.Grinding,
+            IsActive = true,
+            IsSearching = true,
+            SearchStartTime = DateTime.UtcNow.AddSeconds(-5),
+            SearchRadius = 4.5f,
+            SearchAngle = 1.25f,
+            LastKnownTargetPosition = new Vector3(10, 20, 30),
+            InDuel = true,
+            DuelOpponent = opponent
+        };
+        _combatManager.States[bot.Id] = state;
+
+        var output = Execute(new BotDebugCommand(), "2");
+
+        await Assert.That(output.Messages).Contains(message =>
+            message.Contains("State: Searching, Previous: Dueling, Forced: Grinding"));
+        await Assert.That(output.Messages).Contains("[botdebug] Stealthed: False");
+        await Assert.That(output.Messages).Contains(message =>
+            message.Contains("Target: null, CurrentTarget: bot3"));
+        await Assert.That(output.Messages).Contains(message =>
+            message.Contains("Duel: active=True, opponent=bot3"));
+        await Assert.That(output.Messages).Contains(message =>
+            message.Contains("Search: active=True") &&
+            message.Contains("radius=4.50") &&
+            message.Contains("angle=1.25") &&
+            message.Contains("last_known=<10, 20, 30>"));
+    }
+
+    [Test]
+    public async Task BotBuff_AppliesAndRemovesStealthWithoutASelectedTarget()
+    {
+        var bot = AddBot(2);
+        var active = false;
+        Buff appliedBuff = null;
+        var buffs = Mock.Of<IBuffs>();
+        buffs.CheckBuff(599).Returns(_ => active);
+        buffs.AddBuff(Any<Buff>(), Any<uint>(), Any<int>())
+            .Callback((Buff buff, uint index, int forcedDuration) =>
+            {
+                appliedBuff = buff;
+                active = true;
+            });
+        buffs.RemoveBuff(599).Callback(_ => active = false);
+        bot.Buffs = buffs.Object;
+        BotBuffCommand.BuffTemplateResolver = id => id == 599
+            ? new BuffTemplate { Id = 599, Duration = 45000, Stealth = true }
+            : null;
+
+        var applied = Execute(new BotBuffCommand(), "2", "599", "1");
+        var wasApplied = bot.Buffs.CheckBuff(599);
+        var removed = Execute(new BotBuffCommand(), "2", "-599");
+
+        await Assert.That(wasApplied).IsTrue();
+        await Assert.That(bot.Buffs.CheckBuff(599)).IsFalse();
+        await Assert.That(appliedBuff).IsNotNull();
+        await Assert.That(appliedBuff.Template.Stealth).IsTrue();
+        await Assert.That(appliedBuff.Owner).IsEqualTo(bot);
+        await Assert.That(appliedBuff.Caster).IsEqualTo(bot);
+        await Assert.That(applied.Messages.Single()).Contains("stealth=True");
+        await Assert.That(removed.Messages.Single()).Contains("Removed buff 599");
+    }
+
+    [Test]
+    public async Task BotBuff_UnknownBuff_ReportsErrorWithoutMutation()
+    {
+        var bot = AddBot(2);
+        BotBuffCommand.BuffTemplateResolver = _ => null;
+
+        var output = Execute(new BotBuffCommand(), "2", "999999");
+
+        await Assert.That(bot.Buffs.CheckBuff(999999)).IsFalse();
+        await Assert.That(output.Messages.Single()).Contains("Unknown buff id 999999");
+    }
+
+    [Test]
     public async Task BotDuel_DeadBot_Refused()
     {
         var bot1 = AddBot(2);
@@ -331,6 +421,21 @@ public class BotCommandsTests
         BotTestFixture.GetPrivateField<ConcurrentDictionary<uint, Character>>(_botManager, "ActiveBots")[id] = bot;
         BotTestFixture.GetPrivateField<ConcurrentDictionary<uint, BotMovementState>>(_botManager, "_botStates")[id] = new BotMovementState();
         return bot;
+    }
+
+    private DebugCharacterMock AddDebugBot(uint id)
+    {
+        var bot = new DebugCharacterMock { Id = id, ObjId = 1000 + id, Name = $"bot{id}", Hp = 100, Mp = 100 };
+        bot.Transform.Local.SetPosition(Vector3.Zero);
+        BotTestFixture.GetPrivateField<ConcurrentDictionary<uint, Character>>(_botManager, "ActiveBots")[id] = bot;
+        BotTestFixture.GetPrivateField<ConcurrentDictionary<uint, BotMovementState>>(_botManager, "_botStates")[id] = new BotMovementState();
+        return bot;
+    }
+
+    private sealed class DebugCharacterMock : CharacterMock
+    {
+        public override int MaxHp => 100;
+        public override int MaxMp => 100;
     }
 
     private static CharacterMessageOutput Execute(ICommand command, params string[] args)

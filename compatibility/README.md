@@ -4,9 +4,11 @@ These patches are intentionally visible and reviewable. They are applied to an A
 
 ## Required host hooks
 
-`aaemu-1.2-r208022.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and adds the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs.
+`aaemu-1.2-r208022-v2.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and adds the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs. Version 2 also registers the GM-only `/botbuff` development command in the host access table.
 
-SHA-256: `31443eb7fa1185470ebfff98bf5ee1ef7494da47ce2b872b9691d12f7dc2122d`
+SHA-256: `5c174a63bbdf94e4e49421787558bf8224407d36748d560fdf9643f6c9c188c3`
+
+The released `aaemu-1.2-r208022.patch` remains unchanged for `0.1.0-rc.2`; it is not the active Unreleased installer contract.
 
 Use the installer rather than applying this patch manually; it validates lineage, applicability, dirty tracked files, and the migration.
 

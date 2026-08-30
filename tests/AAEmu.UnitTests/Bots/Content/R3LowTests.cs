@@ -8,6 +8,8 @@ using AAEmu.Game.Bots.Kernel;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Faction;
+using AAEmu.Game.Models.Game.Skills;
+using AAEmu.Game.Models.Game.Units;
 using AAEmu.UnitTests.Utils.Mocks;
 
 namespace AAEmu.UnitTests.Bots.Content;
@@ -158,6 +160,75 @@ public sealed class R3LowTests
         await Assert.That(trigger.IsActive(context)).IsTrue();
         await Assert.That(metrics.Snapshot().InvalidTargets).IsEqualTo(1L);
         await Assert.That(metrics.Snapshot().ObservedKills).IsEqualTo(1L);
+    }
+
+    [Test]
+    public async Task TargetStealthedTrigger_AcceptsDuelOpponentRejectedByNormalAttackability()
+    {
+        var bot = BotTestFixture.MakeBot(1, Vector3.Zero);
+        var target = BotTestFixture.MakeBot(2, new Vector3(20f, 0f, 0f));
+        target.Hp = target.MaxHp = 100;
+        target.ObjId = bot.ObjId;
+        var faction = new SystemFaction();
+        bot.Faction = faction;
+        target.Faction = faction;
+        var buffs = Mock.Of<IBuffs>();
+        buffs.HasEffectsMatchingCondition(Any<Func<Buff, bool>>()).Returns(true);
+        target.Buffs = buffs.Object;
+        var state = new BotCombatState
+        {
+            CurrentState = BotCombatStateType.Dueling,
+            Target = target,
+            InDuel = true,
+            DuelOpponent = target
+        };
+        var config = new BotConfig { UseEngine = false };
+        var runtime = new BotRuntime(bot, new BotMovementState(), state, config: config);
+        var context = new BotContext(bot, runtime, runtime.Blackboard, s_now, config, BotEngineKind.Combat);
+        var trigger = new TargetStealthedTrigger();
+
+        await Assert.That(bot.CanAttack(target)).IsFalse();
+        await Assert.That(trigger.IsActive(context)).IsTrue();
+    }
+
+    [Test]
+    public async Task CombatBase_StealthedDuelOpponentPreemptsContinuousRotationFiller()
+    {
+        var bot = BotTestFixture.MakeBot(1, Vector3.Zero);
+        var target = BotTestFixture.MakeBot(2, new Vector3(20f, 0f, 0f));
+        target.Hp = target.MaxHp = 100;
+        var buffs = Mock.Of<IBuffs>();
+        buffs.HasEffectsMatchingCondition(Any<Func<Buff, bool>>()).Returns(true);
+        target.Buffs = buffs.Object;
+        var state = new BotCombatState
+        {
+            CurrentState = BotCombatStateType.Dueling,
+            Target = target,
+            InDuel = true,
+            DuelOpponent = target,
+            IsActive = true
+        };
+        var config = new BotConfig { UseEngine = false };
+        var runtime = new BotRuntime(bot, new BotMovementState(), state, config: config);
+        var mover = new FollowMover();
+        var rotation = new ProbeAction("rotation-probe");
+        var engine = new BotEngine(
+            BotEngineKind.Combat,
+            config,
+            [new CombatBaseStrategy(), new RotationProbeStrategy()],
+            [new BeginSearchAction(mover), rotation]);
+        var context = new BotContext(bot, runtime, runtime.Blackboard, s_now, config,
+            BotEngineKind.Combat, mover: mover);
+
+        var result = engine.DoNextAction(context, minimal: false);
+
+        await Assert.That(result).IsTrue();
+        await Assert.That(engine.LastActionLog[^1].Action).IsEqualTo("begin-search");
+        await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Searching);
+        await Assert.That(state.IsSearching).IsTrue();
+        await Assert.That(state.Target).IsNull();
+        await Assert.That(state.LastKnownTargetPosition).IsEqualTo(target.Transform.World.Position);
+        await Assert.That(rotation.ExecuteCount).IsEqualTo(0);
     }
 
     [Test]
@@ -319,5 +390,16 @@ public sealed class R3LowTests
             ExecuteCount++;
             return BotActionResult.Success;
         }
+    }
+
+    private sealed class RotationProbeStrategy : IBotStrategy
+    {
+        public string Name => "rotation-probe-strategy";
+        public string SiblingGroup => "rotation";
+        public IReadOnlyList<BotNextAction> DefaultActions { get; } =
+            [new BotNextAction("rotation-probe", 11f)];
+
+        public void InitTriggers(List<BotTriggerNode> triggers) { }
+        public void InitMultipliers(List<IBotMultiplier> multipliers) { }
     }
 }

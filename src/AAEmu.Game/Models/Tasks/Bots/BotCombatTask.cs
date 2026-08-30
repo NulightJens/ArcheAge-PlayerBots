@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Threading;
 using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Body;
+using AAEmu.Game.Bots.Host;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Core.Managers.World;
@@ -71,6 +72,7 @@ public class BotCombatTask : Task
 
     internal uint BotId => _bot.Id;
     internal BotBlackboard Blackboard => _blackboard;
+    internal BotHostMetrics HostMetrics { get; set; }
     private DateTime Now => _timeProvider.GetUtcNow().UtcDateTime;
 
     public override void Execute()
@@ -401,6 +403,7 @@ public class BotCombatTask : Task
         var targetPosition = _state.LastKnownTargetPosition.Value;
         var currentPosition = _bot.Transform.World.Position;
         var distanceToLast = Vector3.Distance(currentPosition, targetPosition);
+        HostMetrics?.RecordWorldScan(BotWorldScanKind.Search);
         var nearbyCharacters = WorldManager.GetAround<Character>(_bot, 30f, true);
         Unit foundTarget = null;
 

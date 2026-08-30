@@ -21,6 +21,7 @@ Run `/bot` in game for the quick start and `/help <command>` for exact arguments
 | `/botactions <id> [co\|nc]` | GM | Show recent decisions. |
 | `/botvalues <id> [filter]` | GM | Inspect blackboard values. |
 | `/botdebug <id>` | GM | Show detailed runtime state. |
+| `/botbuff <id> <buffId\|-buffId> [abLevel]` | GM | Apply or remove a data-pack buff from one bot for controlled development tests. |
 | `/botstrategy ...` | GM | Inspect or alter engine strategies. |
 | `/botmetrics [snapshot\|reset\|activity]` | GM | Capture host and whole-server measurements. |
 | `/reloadbotconfig` | GM | Reload `Configurations/BotConfig.json`. |
@@ -51,6 +52,17 @@ Direct follow is useful when staging a physical test without a native party:
 ```
 
 The optional values are rear gap, column count (`auto` allowed), and spacing. This is deterministic formation placement, not collision avoidance.
+
+## Controlled bot buffs
+
+`/botbuff` does not require a client-side selection. Positive IDs apply a known buff template; negative IDs remove it:
+
+```text
+/botbuff 2 <buffId>
+/botbuff 2 -<buffId>
+```
+
+Buff IDs are client-data specific. This is a GM development surface for repeatable state tests, not a PlayerBots combat ability or a substitute for natural mana/recovery testing.
 
 ## Headless local administration
 

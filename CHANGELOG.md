@@ -18,10 +18,14 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Passed Primeval's moving-hostile gate against a level-50 melee fixture. The target moved 18.13 m, Primeval reported movement in 10 of 24 retained samples, and Endless Arrows starts overlapped the moving segment. A companion 30-second sample kept Endless Arrows at 16 of 22 offensive casts (72.73%); the isolated resource repeat completed 12/12 casts with a 0.7 ms bot-host p95 and no scans, path requests, skipped ticks, overlaps, or tick errors.
 - Passed the continuously moving-owner Cleric gate. During a 10.038-second leader movement covering 34.66 m, the Cleric retained its follow target in all 37 samples, repositioned 19.29 m toward a 53.23%-health party member, completed Antithesis while the leader was still moving, raised the recipient to 91.13%, and resumed leader-directed movement inside the same input window. The four-runtime pass had one successful cast, zero failures, zero path requests, zero skipped ticks, zero runtime overlaps, and zero tick errors; bot-host p95 was 1.2 ms.
 - Tightened the physical-test protocol: mortal fixtures must be staged away from the human observer and unrelated respawning hostiles. A post-measurement cleanup caused observer and melee-bot deaths and is explicitly excluded from the accepted ranged result.
+- Added a high-priority stealth-loss transition so an available rotation cannot starve search behavior when the current target disappears into stealth.
+- Added search-state, last-known-position, duel-opponent, and target-stealth diagnostics; legacy search scans now contribute to the same lightweight host metrics as engine scans.
+- Added the GM-only `/botbuff` command for applying and removing data-pack buffs without a selected client target, enabling reproducible stealth-state trials.
+- Passed the isolated automated stealth milestone with the complete 1,732-test suite: 1,728 passed, 4 intentionally skipped, and 0 failed. Client-visible loss, release, and reacquisition remain a physical gate.
 
 ### Next combat pass
 
-- Add observable stealth loss, search, release, and reacquisition states.
+- Physically validate stealth loss, search, release, and reacquisition using a verified 1.2 stealth buff.
 - Run mortal-combat cohorts at 1, 5, 10, 25, 50, and 100 bots with matched Idle controls.
 
 ## 0.1.0-rc.2 - 2026-08-29

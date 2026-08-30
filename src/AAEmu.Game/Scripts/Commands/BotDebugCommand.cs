@@ -48,6 +48,8 @@ namespace AAEmu.Game.Scripts.Commands
             CommandManager.SendNormalText(this, messageOutput, $"Position: {bot.Transform.World.Position}");
             CommandManager.SendNormalText(this, messageOutput, $"HP: {bot.Hp}/{bot.MaxHp}, MP: {bot.Mp}/{bot.MaxMp}");
             CommandManager.SendNormalText(this, messageOutput, $"IsDead: {bot.IsDead}, IsInBattle: {bot.IsInBattle}");
+            var isStealthed = bot.Buffs?.HasEffectsMatchingCondition(effect => effect.Template.Stealth) == true;
+            CommandManager.SendNormalText(this, messageOutput, $"Stealthed: {isStealthed}");
 
             if (moveState != null)
             {
@@ -67,9 +69,19 @@ namespace AAEmu.Game.Scripts.Commands
             if (combatState != null)
             {
                 CommandManager.SendNormalText(this, messageOutput, $"--- Combat State ---");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"State: {combatState.CurrentState}, Previous: {combatState.PreviousState}, Forced: {combatState.ForcedState?.ToString() ?? "null"}");
                 CommandManager.SendNormalText(this, messageOutput, $"IsActive: {combatState.IsActive}");
                 CommandManager.SendNormalText(this, messageOutput, $"IsResting: {combatState.IsResting}");
-                CommandManager.SendNormalText(this, messageOutput, $"Target: {combatState.Target?.Name ?? "null"}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Target: {combatState.Target?.Name ?? "null"}, CurrentTarget: {bot.CurrentTarget?.Name ?? "null"}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Duel: active={combatState.InDuel}, opponent={combatState.DuelOpponent?.Name ?? "null"}");
+                var searchElapsed = combatState.IsSearching && combatState.SearchStartTime != default
+                    ? Math.Max(0d, (DateTime.UtcNow - combatState.SearchStartTime).TotalSeconds)
+                    : 0d;
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Search: active={combatState.IsSearching}, elapsed_s={searchElapsed:F2}, radius={combatState.SearchRadius:F2}, angle={combatState.SearchAngle:F2}, last_known={combatState.LastKnownTargetPosition?.ToString() ?? "null"}");
                 CommandManager.SendNormalText(this, messageOutput, $"KillCount: {combatState.KillCount}");
                 CommandManager.SendNormalText(this, messageOutput, $"ShouldRespawn: {combatState.ShouldRespawn}");
             }

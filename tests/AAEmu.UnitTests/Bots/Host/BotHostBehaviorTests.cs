@@ -333,6 +333,36 @@ public class BotHostBehaviorTests
     }
 
     [Test]
+    public async Task SearchingState_LegacyWorldScanIsIncludedInHostMetrics()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        BotSim sim = null;
+        try
+        {
+            config.ActivityPercent = 100;
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Searching, runLegacyBrain: true);
+            bot.Runtime.CombatState.IsActive = true;
+            bot.Runtime.CombatState.IsSearching = true;
+            bot.Runtime.CombatState.SearchStartTime = sim.Time.GetUtcNow().UtcDateTime;
+            bot.Runtime.CombatState.LastKnownTargetPosition = new System.Numerics.Vector3(20f, 0f, 0f);
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+
+            var metrics = sim.Host.Metrics.Snapshot();
+            await Assert.That(metrics.WorldScans).IsEqualTo(1L);
+            await Assert.That(metrics.SearchScans).IsEqualTo(1L);
+        }
+        finally
+        {
+            sim?.Reset();
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
     public async Task FollowingState_KeepsFollowTargetAndBandThroughLegacyBrain()
     {
         var config = BotConfig.Instance;

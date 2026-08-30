@@ -14,6 +14,11 @@ public sealed class CombatBaseStrategy : IBotStrategy
     public void InitTriggers(List<BotTriggerNode> triggers)
     {
         new BodyBaseStrategy().InitTriggers(triggers);
+        // Compiled rotations normally outrank the legacy tick. Detect target
+        // stealth here so a continuously useful rotation cannot starve the
+        // legacy brain's loss/search transition.
+        triggers.Add(new BotTriggerNode(new TargetStealthedTrigger(),
+            [new BotNextAction("begin-search", BotRelevance.Raid)]));
         triggers.Add(new BotTriggerNode(new NotFacingTargetTrigger(), [new BotNextAction("set-facing", BotRelevance.Move + 7)]));
     }
 

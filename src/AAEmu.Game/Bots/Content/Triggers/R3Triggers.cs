@@ -153,7 +153,11 @@ public sealed class TargetStealthedTrigger : IBotTrigger
     public bool IsActive(BotContext context)
     {
         var target = TriggerHelpers.Target(context);
-        return TriggerHelpers.ValidTarget(context, target) && target.Buffs.HasEffectsMatchingCondition(effect => effect.Template.Stealth);
+        var state = context.Runtime.CombatState;
+        var isDuelOpponent = state.InDuel && ReferenceEquals(target, state.DuelOpponent);
+        var isValidTarget = target?.Transform != null && !target.IsDead &&
+                            (isDuelOpponent || context.Bot.CanAttack(target));
+        return isValidTarget && target.Buffs.HasEffectsMatchingCondition(effect => effect.Template.Stealth);
     }
 }
 

@@ -62,6 +62,8 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
         {
             runtime.Retired = false;
             runtime.HostMetrics = Metrics;
+            if (runtime.Brain != null)
+                runtime.Brain.HostMetrics = Metrics;
             runtime.KillCreditSubscription.Metrics = Metrics;
         }
 
@@ -170,7 +172,10 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
             if (runtime.Mover != null)
                 runtime.Mover.Cancelled = true;
             if (runtime.Brain != null)
+            {
+                runtime.Brain.HostMetrics = null;
                 runtime.Brain.Cancelled = true;
+            }
         }
 
         if (_runtimes.IsEmpty)

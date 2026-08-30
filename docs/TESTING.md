@@ -83,6 +83,20 @@ Do not replace `<GM-character-name>` with a repository-specific character. Use t
 
 Never report a controlled-heal case as proof of natural sustainability.
 
+## Stealth loss and reacquisition
+
+Use a verified stealth buff ID from the active client data; never assume a template ID transfers between 1.2 and 3.0.
+
+1. Put one attacker and one target in an isolated duel or contained hostile fixture.
+2. Reset metrics and capture `/botdebug <attackerId>` before loss.
+3. Apply stealth with `/botbuff <targetId> <stealthBuffId>` while the attacker has a continuously usable rotation.
+4. Require the attacker to enter Searching, clear its live target, retain a last-known position, and increment the search-scan metric without a tick error or runtime overlap.
+5. Remove stealth with `/botbuff <targetId> -<stealthBuffId>` while the target remains inside the bounded search area.
+6. Require reacquisition and legal combat re-entry. Repeat with the target outside the search timeout/radius and require clean release instead.
+7. Stop both bots in Idle and verify that target, movement destination, and retained runtime work are cleared.
+
+An automated trigger/search/metrics pass is necessary but does not substitute for client-visible loss and reacquisition evidence.
+
 ## Population/resource gate
 
 The harness under `scripts/scale/` measures exact 0/10/50/100 populations, process CPU/memory, allocation/GC, server and bot-host latency, scans, casts, cadence, lifecycle, and recovery. Run it only against task-owned runtime paths and new versioned test databases.

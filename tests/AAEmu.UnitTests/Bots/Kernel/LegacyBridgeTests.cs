@@ -47,7 +47,8 @@ public class LegacyBridgeTests
             "in-hostile-area",
             "not-facing-target",
             "stuck",
-            "target-invalid"]);
+            "target-invalid",
+            "target-stealthed"]);
     }
 
     [Test]

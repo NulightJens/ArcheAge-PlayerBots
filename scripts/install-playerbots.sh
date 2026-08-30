@@ -11,7 +11,7 @@ check_only="${2:-}"
 module_root="$(cd "$(dirname "$0")/.." && pwd)"
 expected_module_root="$aaemu_root/modules/archeage-playerbots"
 supported_base="62e3eb1d87da01194802ac886cd500134facad28"
-patch_path="$module_root/compatibility/aaemu-1.2-r208022.patch"
+patch_path="$module_root/compatibility/aaemu-1.2-r208022-v2.patch"
 sql_source="$module_root/sql/2026-08-25_aaemu_game_bot_archetype_plans.sql"
 sql_destination="$aaemu_root/SQL/updates/2026-08-25_aaemu_game_bot_archetype_plans.sql"
 
