@@ -15,7 +15,7 @@ This repository is **not an AAEmu fork**. AAEmu is a required host dependency. T
 | AAEmu | ArcheAge 1.2 line based on `62e3eb1d87da01194802ac886cd500134facad28` |
 | Game/client data | 1.2 `r208022` |
 | ArcheAge 3.0 | Not yet supported |
-| Module release | `0.1.0-rc.1` |
+| Module release | `0.1.0-rc.2` |
 
 ## Install
 

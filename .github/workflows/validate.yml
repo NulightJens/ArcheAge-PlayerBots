@@ -45,7 +45,13 @@ jobs:
         run: dotnet build ./aaemu/AAEmu.slnx --no-incremental
 
       - name: Test
-        run: dotnet test ./aaemu/AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build
+        working-directory: ./aaemu
+        run: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build
+
+      - name: Compile command scripts
+        working-directory: ./aaemu
+        run: ./AAEmu.Game/bin/Debug/net10.0/AAEmu.Game.exe compiler-check
 
       - name: Audit vulnerable packages
-        run: dotnet list ./aaemu/AAEmu.slnx package --vulnerable --include-transitive
+        working-directory: ./aaemu
+        run: dotnet list AAEmu.slnx package --vulnerable --include-transitive

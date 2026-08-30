@@ -11,6 +11,14 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Let Cleric reposition toward injured party members while combat and follow goals compete.
 - Add observable stealth loss, search, release, and reacquisition states.
 
+## 0.1.0-rc.2 - 2026-08-29
+
+### Release automation
+
+- Made the hosted Windows test step run from the AAEmu root so .NET discovers AAEmu's Microsoft Testing Platform configuration.
+- Added the command-script compiler and vulnerable-package audit to the hosted release gate.
+- No PlayerBots runtime behavior changed from `0.1.0-rc.1`.
+
 ## 0.1.0-rc.1 - 2026-08-29
 
 ### Standalone release
