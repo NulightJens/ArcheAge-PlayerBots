@@ -14,7 +14,7 @@ This repository is **not an AAEmu fork**. AAEmu is a required host dependency. T
 | --- | --- |
 | ArcheAge 1.2 | Supported on AAEmu base `62e3eb1d87da01194802ac886cd500134facad28` with `r208022` data |
 | ArcheAge 3.0 | Compile-validated alpha on NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095`, client `3.0.4.2 r336598` |
-| 3.0 runtime acceptance | Blocked until matching `game_pak`, `compact.sqlite3`, and `compact.server.table.sqlite3` are supplied and isolated login/lifecycle tests pass |
+| 3.0 runtime acceptance | Matching client/`game_pak` verified; blocked on decrypted `compact.sqlite3`, `compact.server.table.sqlite3`, and isolated login/lifecycle tests |
 | Module version | `0.2.0-alpha.1` |
 
 ## Install
