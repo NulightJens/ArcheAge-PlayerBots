@@ -418,6 +418,55 @@ public class BotManagerTests
     }
 
     [Test]
+    public async Task SpawnBot_PublishesEquipmentVisibilityAfterWorldSpawn()
+    {
+        var previousBotManager = BotManager.Instance;
+        var previousCombatManager = BotCombatManager.Instance;
+        var fakeCombatManager = new FakeBotCombatManager();
+        var bot = BotTestFixture.MakeBot(1010, Vector3.Zero);
+        bot.MaxHp = 100;
+        bot.Hp = 100;
+        var sequence = new List<string>();
+        Character published = null;
+        Character.UsedCharacterObjIds.Remove(bot.Id);
+
+        var manager = new BotManager(
+            _ => bot,
+            onlineLookup: _ => null,
+            fullLoader: _ => { },
+            onBotSpawn: _ => sequence.Add("archetype"),
+            saveAndRemove: _ => { },
+            leaveWorld: _ => { },
+            setWorld: character => BotTestFixture.SetPrivateField(character, "_parentWorld", BotTestFixture.MakeWorld()),
+            prepareCharacter: _ => false,
+            spawn: _ => sequence.Add("spawn"),
+            publishEquipmentVisibility: character =>
+            {
+                sequence.Add("equipment-public");
+                published = character;
+            });
+
+        try
+        {
+            Character.UsedCharacterObjIds[bot.Id] = bot.ObjId;
+            BotTestFixture.RegisterSingletons(manager, fakeCombatManager);
+
+            var result = manager.SpawnBot(bot.Id, out var spawnedBot);
+
+            await Assert.That(result).IsEqualTo(SpawnResult.Ok);
+            await Assert.That(spawnedBot).IsSameReferenceAs(bot);
+            await Assert.That(published).IsSameReferenceAs(bot);
+            await Assert.That(sequence).IsEquivalentTo(["archetype", "spawn", "equipment-public"]);
+        }
+        finally
+        {
+            manager.DespawnBot(bot.Id);
+            Character.UsedCharacterObjIds.Remove(bot.Id);
+            BotTestFixture.RegisterSingletons(previousBotManager, previousCombatManager);
+        }
+    }
+
+    [Test]
     public async Task SpawnBot_Success_RebindsTeamOnceAfterRuntimeAndActiveRegistration()
     {
         var previousBotManager = BotManager.Instance;

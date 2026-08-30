@@ -16,11 +16,13 @@ Use the installer rather than applying this patch manually; it validates lineage
 
 ## ArcheAge 3.0 alpha host hooks
 
-`aaemu-3.0.4.2-r336598-alpha-v2.patch` targets exact base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` from NL0bP/AAEmu's `client_version/3.0_client_(2017_04_20)+` branch. It adds the older host-line equivalents of PlayerBots lifecycle, party, world-query, tick-metric, character, command, service-startup, and build hooks. Version 2 also gives the loopback Web API its connectionless `@system` actor, bypasses account lookup only for that actor type, and connects `/kit` to PlayerBots equipment evaluation.
+`aaemu-3.0.4.2-r336598-alpha-v3.patch` targets exact base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` from NL0bP/AAEmu's `client_version/3.0_client_(2017_04_20)+` branch. It adds the older host-line equivalents of PlayerBots lifecycle, party, world-query, tick-metric, character, command, service-startup, and build hooks. Version 3 also gives the loopback Web API its connectionless `@system` actor, bypasses account lookup only for that actor type, connects `/kit` to PlayerBots equipment evaluation, and publishes every bot's equipment visibility to newly nearby clients.
 
-SHA-256: `3a27f1b481eef981f589a259d94171b679dd1fd3faa8472f55c376573d68c07f`
+SHA-256: `7b3e9d8872cf708522631a11bb051bd9976c31d4f934eee0c9dfc1e90eec633c`
 
-This track remains experimental, not runtime-supported. In addition to server-start acceptance, native account/character creation, login/world entry, and one-bot spawn/follow/combat/class/gear paths have passed once. The 3.0 suite now passes 155/155. Install it only with the explicit experimental flag and an isolated matching-client environment. Runtime promotion still requires clean-start repeats, four-role party/combat behavior, scale/resource gates, and clean populated recovery.
+The earlier `aaemu-3.0.4.2-r336598-alpha-v2.patch` remains unchanged as the pre-equipment-visibility contract; it is not the active installer patch.
+
+This track remains experimental, not runtime-supported. In addition to server-start acceptance, native account/character creation, login/world entry, and one-bot spawn/follow/combat/class/gear paths have passed once. The 3.0 suite now passes 156/156. Install it only with the explicit experimental flag and an isolated matching-client environment. Runtime promotion still requires clean-start repeats, four-role party/combat behavior, scale/resource gates, and clean populated recovery.
 
 The earlier `aaemu-3.0.4.2-r336598-alpha.patch` remains unchanged as the compile-only alpha contract; it is not the active installer patch.
 

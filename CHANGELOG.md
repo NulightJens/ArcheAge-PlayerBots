@@ -13,7 +13,8 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Live 3.0 acceptance set `Darkrunnerbot` to Battlerage/Auramancy/Shadowplay at level 55 with 23 skills and 5 passives, equipped a grade-5 two-handed kit weapon, and retained both class and equipment across normal logout/re-add.
 - Live 3.0 acceptance created `/botgear 2 create celestial flame leather nodachi`, equipped all 15 requested slots, and retained the identical item instances across normal logout/re-add. The active data pack resolved the missing literal Flame pieces honestly as Magnificent Desert leather, a Lightning Bow, and a Quake Flute while retaining Flame jewelry and the Flame Nodachi.
 - Corrected equipment reporting to read each item's authoritative equipment-container slot; 3.0 no longer mislabels a main-hand weapon by its list position.
-- Passed the clean 1.2 installer suite at 1,738 total (1,734 passed, 4 intentional skips) and the 3.0 adapter suite at 155/155.
+- Made equipment visibility an enforced bot policy: every 3.0 bot publishes **public** after spawning, newly nearby clients receive the public flag with its world snapshot, and `/botgear inspect` reasserts public before sending character details. Connectionless bots cannot drift back to private after logout/re-add, and no database preference or per-tick work was added.
+- Passed the clean 1.2 installer suite at 1,739 total (1,735 passed, 4 intentional skips) and the 3.0 adapter suite at 156/156.
 
 ### Documentation and onboarding
 
@@ -24,9 +25,9 @@ Player-facing patch notes come first; developer packaging detail follows.
 ### ArcheAge 3.0 server-start adapter
 
 - Added a standalone, opt-in adapter for NL0bP/AAEmu client `3.0.4.2 r336598`, pinned to base `8c1c943bb2309eefffb9da2aa99a408d0acbb095`.
-- Added version-specific build/test compatibility plus a reviewed 23-file host patch covering lifecycle, startup/shutdown, party events, world lookup, tick metrics, combat attribution, persistence, operator command registration, kit auto-equip, and the loopback `@system` actor.
+- Added version-specific build/test compatibility plus a reviewed host patch covering lifecycle, startup/shutdown, party events, world lookup, tick metrics, combat attribution, persistence, operator command registration, kit auto-equip, bot equipment visibility, and the loopback `@system` actor.
 - Added fail-closed dual-track PowerShell and Bash installation. The 3.0 path requires an explicit experimental flag while runtime acceptance is outstanding.
-- Passed non-incremental 3.0 Game and full-solution compilation with zero errors and the complete 155/155 adapter suite. Coverage includes persisted HP/MP restoration, aggro cleanup, kill attribution, tick-metric maxima, connectionless administrative access, Web API actor resolution, and the human-facing class/gear commands.
+- Passed non-incremental 3.0 Game and full-solution compilation with zero errors and the complete 156/156 adapter suite. Coverage includes persisted HP/MP restoration, aggro cleanup, kill attribution, tick-metric maxima, connectionless administrative access, Web API actor resolution, human-facing class/gear commands, and the equipment-visibility packet contract.
 - Acquired and integrity-checked the matching compact databases, then passed isolated 3.0 Login/Game startup, module migration, loopback status/metrics, zero-bot graceful cleanup, and clean restart on non-1.2 ports. Runtime support is not claimed until client login, one-bot lifecycle, four-role combat, and scale/recovery gates pass.
 - Audited all 94 configured skill IDs and 38 passive-buff IDs against 3.0 data. The four role anchors retain their expected ranges; 36 skills differ from 1.2 and five rotation skills changed target semantics, which are explicit physical-test gates rather than assumed parity.
 - Added a read-only 3.0 asset-provenance preflight that verifies the pinned emulator lineage, all three required files, SQLite headers, recorded SHA-256 hashes, and explicit rejection of known 1.2 compact databases before runtime startup.

@@ -20,7 +20,7 @@ $tracks = @{
     }
     'AAEmu30' = @{
         Base = '8c1c943bb2309eefffb9da2aa99a408d0acbb095'
-        Patch = 'compatibility\aaemu-3.0.4.2-r336598-alpha-v2.patch'
+        Patch = 'compatibility\aaemu-3.0.4.2-r336598-alpha-v3.patch'
         Status = 'server-start-validated'
     }
 }

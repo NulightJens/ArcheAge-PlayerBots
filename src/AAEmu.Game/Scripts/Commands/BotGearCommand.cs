@@ -3,6 +3,7 @@ using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Core.Packets.G2C;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game.Items;
 using AAEmu.Game.Models.Game.Items.Actions;
 using AAEmu.Game.Utils.Scripts;
@@ -86,7 +87,7 @@ public sealed class BotGearCommand : ICommand
             .Count(item => item is EquipItem) ?? 0;
 
         CommandManager.SendNormalText(this, messageOutput,
-            $"Bot '{bot.Name}' (Id: {bot.Id}) abilities={TreeSummary(bot)} equipped={equipped.Length} bagItems={bot.Inventory?.Bag?.Items?.Count(item => item != null) ?? 0}.");
+            $"Bot '{bot.Name}' (Id: {bot.Id}) abilities={TreeSummary(bot)} equipped={equipped.Length} bagItems={bot.Inventory?.Bag?.Items?.Count(item => item != null) ?? 0} gearVisibility=public.");
         foreach (var item in equipped)
         {
             var name = ItemName(item);
@@ -182,9 +183,10 @@ public sealed class BotGearCommand : ICommand
         }
 
         requester.SendPacket(new SCUnitStatePacket(bot));
+        BotEquipmentVisibility.SendPublicTo(bot, requester);
         requester.SendPacket(new SCCharDetailPacket(bot, true));
         CommandManager.SendNormalText(this, messageOutput,
-            $"Synchronized and sent the read-only character detail for '{bot.Name}'. The stock client may require its normal View Equipment action before displaying the window; remote drag-and-drop editing is not supported.");
+            $"Published and synchronized the read-only character detail for '{bot.Name}'. Remote drag-and-drop editing is not supported.");
     }
 
     private static string ItemName(Item item)

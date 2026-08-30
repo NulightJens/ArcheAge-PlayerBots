@@ -7,7 +7,7 @@ This runbook promotes the `3.0.4.2 r336598` track by evidence, not by configurat
 | Gate | State | Acceptance evidence |
 |---|---|---|
 | Asset identity | Passed | Client version, `game_pak`, both SQLite databases, SHA-256 provenance, SQLite integrity |
-| Host adapter | Passed | Active v2 patch, zero-error builds, clean 1.2 installer suite, 155/155 3.0 unit tests |
+| Host adapter | Passed | Active v3 patch, zero-error builds, clean 1.2 installer suite, 156/156 3.0 unit tests |
 | Server startup | Passed | Login/Game registration, module schema, unique ports, loopback status and `@system` metrics |
 | Client login/serializer | Passed once | Native account and character creation, character select, and world entry completed without serializer or DLL error |
 | One-bot lifecycle | Passed once | Rendered spawn/follow/combat, clean server restart, normal logout/re-add, zero overlap/error |

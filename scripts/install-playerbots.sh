@@ -64,7 +64,7 @@ case "$track" in
     ;;
   aaemu30)
     supported_base="$base_30"
-    patch_path="$module_root/compatibility/aaemu-3.0.4.2-r336598-alpha-v2.patch"
+    patch_path="$module_root/compatibility/aaemu-3.0.4.2-r336598-alpha-v3.patch"
     status=server-start-validated
     ;;
   *) echo "Unknown track '$track'; expected aaemu12 or aaemu30." >&2; exit 2 ;;

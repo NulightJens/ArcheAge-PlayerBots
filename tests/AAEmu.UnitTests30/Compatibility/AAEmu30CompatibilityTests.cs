@@ -1,11 +1,14 @@
 using System;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using AAEmu.Commons.Network;
 using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.UnitManagers;
+using AAEmu.Game.Core.Packets.G2C;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Items;
+using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Units.Static;
@@ -35,6 +38,21 @@ public sealed class AAEmu30CompatibilityTests
         Assert.True(BotGearCatalog.TryParseGrade("celestial", out var grade));
         Assert.Equal(ItemGrade.Celestial, grade);
         Assert.Equal("gale", BotGearCatalog.NormalizeProfile("wind"));
+    }
+
+    [Fact]
+    public void BotEquipmentVisibilityUsesThe30PublicInspectionPacket()
+    {
+        const uint objectId = 0x10203;
+        var packet = new SCUnitOpenEquipInfoPacket(objectId, BotEquipmentVisibility.IsPublic);
+        var stream = new PacketStream();
+
+        packet.Write(stream);
+        stream.Pos = 0;
+
+        Assert.Equal(objectId, stream.ReadBc());
+        Assert.True(stream.ReadBoolean());
+        Assert.False(stream.HasBytes);
     }
 
     [Fact]

@@ -124,7 +124,7 @@ The ID is optional when the GM currently targets a live bot. For example, target
 
 Some Magnificent families do not contain a literal seven-piece armor set, bow, or instrument with the requested prefix. In that case PlayerBots selects the closest complete stat-compatible Magnificent set and prints every actual English item name instead of pretending an exact item exists.
 
-`/botequip` is an alias for `/botgear`. ArcheAge's remote-detail protocol is read-only: the stock client cannot safely drag equipment into another character's inventory. The server sends the detail packet, but some stock clients display it only after their normal **View Equipment** action. Use `/kit`, `/botgear ... create`, and `/botgear ... equip` for server-authoritative changes.
+`/botequip` is an alias for `/botgear`. ArcheAge's remote-detail protocol is read-only: the stock client cannot safely drag equipment into another character's inventory. PlayerBots forces every connectionless bot's equipment visibility to **public** at spawn and whenever a new client sees it; `/botgear inspect` reasserts that state before sending the detail packet. Use `/kit`, `/botgear ... create`, and `/botgear ... equip` for server-authoritative changes.
 
 ## Diagnostics
 

@@ -47,7 +47,7 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 
 - Completed: pinned NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` for client `3.0.4.2 r336598`.
 - Completed: compile-time compatibility layer, version-specific Game/test MSBuild targets, and reviewed 23-file host patch.
-- Completed: non-incremental Game and full-solution builds with zero compiler errors; the current 3.0 adapter suite passed 155/155, including class/gear command and persisted-resource coverage.
+- Completed: non-incremental Game and full-solution builds with zero compiler errors; the current 3.0 adapter suite passed 156/156, including class/gear command, equipment-visibility packet, and persisted-resource coverage.
 - Completed: fail-closed dual-track installers and machine-readable compatibility metadata. The 3.0 track requires an explicit experimental flag.
 - Completed: acquired and integrity-tested the matching client, 36.81 GB `game_pak`, decrypted `compact.sqlite3`, and `compact.server.table.sqlite3`; retained provenance includes every SHA-256.
 - Completed: isolated MySQL schemas and unique Login/Game/Stream/Web API ports; server startup loaded 491,683 translations, 257 zones, 6,606 quests, 36,694 item templates, and 24,175 skills.

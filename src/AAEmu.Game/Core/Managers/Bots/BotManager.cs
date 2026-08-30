@@ -47,6 +47,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
     private readonly Action<Character> _setWorld;
     private readonly Func<Character, bool> _prepareCharacter;
     private readonly Action<Character> _spawn;
+    private readonly Action<Character> _publishEquipmentVisibility;
     private readonly Action<Character> _teamLoginRebind;
     private readonly IWorldManager _worldManager;
     private readonly ICharacterManager _characterManager;
@@ -98,6 +99,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
         };
         _prepareCharacter = PrepareCharacter;
         _spawn = character => character.Spawn();
+        _publishEquipmentVisibility = BotEquipmentVisibility.PublishPublic;
         _teamLoginRebind = character => TeamManager.Instance.UpdateAtLogin(character);
     }
 
@@ -111,6 +113,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
         Action<Character> setWorld = null,
         Func<Character, bool> prepareCharacter = null,
         Action<Character> spawn = null,
+        Action<Character> publishEquipmentVisibility = null,
         Action<Character> teamLoginRebind = null)
     {
         _worldManager = null;
@@ -131,6 +134,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
         _setWorld = setWorld ?? SetDefaultWorld;
         _prepareCharacter = prepareCharacter ?? PrepareCharacter;
         _spawn = spawn ?? (character => character.Spawn());
+        _publishEquipmentVisibility = publishEquipmentVisibility ?? BotEquipmentVisibility.PublishPublic;
         _teamLoginRebind = teamLoginRebind ?? (_ => { });
     }
 
@@ -258,6 +262,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
             // Step 8: Spawn once with the fully initialized state.
             // Spawn() = ParentWorld.AddObject(this) + Show()
             _spawn(character);
+            _publishEquipmentVisibility(character);
 
             if (resurrectOnSpawn)
             {
