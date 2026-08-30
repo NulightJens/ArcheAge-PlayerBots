@@ -11,11 +11,11 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Added regressions for direct command wake-up, native-party command wake-up, and runtime reuse after reactivation.
 - Physically reproduced two detached brains, then verified all four roles reactivated and cast against one passive target: 150/150 successful cast attempts, zero tick errors, zero runtime overlaps, and a 1.557 ms maximum bot-host tick.
 - In that physical sample, Endless Arrows was 33 of 45 Primeval hostile-target casts (73.3%).
+- Passed a 16.985 m Darkrunner approach sample: short-range filler and Triple Slash were held, while Tiger Strike, Overwhelm, Shadowsmite, Charge, and Whirlwind Slash succeeded only inside their legal ranges. Automated effect-radius boundaries retain 5.00/5.01 m coverage for Whirlwind Slash and 9.00/9.01 m for Sunder Earth.
 
 ### Next combat pass
 
 - Keep Endless Arrows dominant while Primeval reacts to close targets without running into melee.
-- Hold melee skills until their legal range rather than spending them during approach.
 - Let Cleric reposition toward injured party members while combat and follow goals compete.
 - Add observable stealth loss, search, release, and reacquisition states.
 
