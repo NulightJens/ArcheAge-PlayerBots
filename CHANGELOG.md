@@ -4,6 +4,14 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ## Unreleased
 
+### Lifecycle and control
+
+- Fixed an inactive-duel lifecycle hole that could leave a bot in Combat state with no scheduled brain, presenting physically as only half of a party fighting.
+- Explicit attack, follow, non-idle state, free-active, and authorized native-party commands now reattach a shed brain on demand while preserving the low-cost detached Idle path.
+- Added regressions for direct command wake-up, native-party command wake-up, and runtime reuse after reactivation.
+- Physically reproduced two detached brains, then verified all four roles reactivated and cast against one passive target: 150/150 successful cast attempts, zero tick errors, zero runtime overlaps, and a 1.557 ms maximum bot-host tick.
+- In that physical sample, Endless Arrows was 33 of 45 Primeval hostile-target casts (73.3%).
+
 ### Next combat pass
 
 - Keep Endless Arrows dominant while Primeval reacts to close targets without running into melee.

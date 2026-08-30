@@ -104,6 +104,8 @@ namespace AAEmu.Game.Scripts.Commands
             if (cmd == "free")
             {
                 BotCombatManager.Instance.SetForcedState(bot, null);
+                if (combatState.IsActive)
+                    BotCombatManager.Instance.StartListening(bot);
                 CommandManager.SendNormalText(this, messageOutput,
                     $"Bot '{bot.Name}' is now free (current state: {combatState.CurrentState}).");
                 return;
@@ -144,6 +146,13 @@ namespace AAEmu.Game.Scripts.Commands
                 combatState.Target = null;
                 bot.CurrentTarget = null;
                 combatState.TransitionTo(BotCombatStateType.Idle);
+            }
+            else
+            {
+                // State commands are also wake commands. Reattach a combat brain
+                // that may have been shed by inactive-duel cleanup while keeping
+                // forced Idle as the zero-work path.
+                BotCombatManager.Instance.StartListening(bot);
             }
             var goalSuffix = killGoal.HasValue ? $" with kill goal {killGoal.Value}" : string.Empty;
             CommandManager.SendNormalText(this, messageOutput,

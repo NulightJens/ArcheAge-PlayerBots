@@ -101,6 +101,10 @@ public sealed class BotFollowCommand : ICommand
             bot.CurrentTarget = null;
             runtime.CombatState.SetForcedState(BotCombatStateType.Following);
             runtime.CombatState.TransitionTo(BotCombatStateType.Following);
+            // Following itself is movement-driven, but the combat brain is what
+            // observes the leader entering combat and preempts follow. A bot that
+            // previously ended an inactive duel may have that brain detached.
+            BotCombatManager.Instance.StartListening(bot);
         }
 
         var rows = eligible.Length == 0 ? 0 : (eligible.Length + columns - 1) / columns;

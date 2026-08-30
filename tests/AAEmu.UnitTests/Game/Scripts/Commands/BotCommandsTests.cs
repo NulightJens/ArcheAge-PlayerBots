@@ -129,6 +129,7 @@ public class BotCommandsTests
         var output = Execute(new BotStateCommand(), "2", "free");
 
         await Assert.That(state.IsForced).IsFalse();
+        await Assert.That(_combatManager.StartListeningCalls).Contains(bot.Id);
         await Assert.That(output.Messages.Single()).Contains("current state: Grinding");
         await Assert.That(output.Messages.Single()).DoesNotContain("returned to idle");
     }
@@ -169,7 +170,25 @@ public class BotCommandsTests
         await Assert.That(state.KillCount).IsEqualTo(0);
         await Assert.That(state.IsActive).IsTrue();
         await Assert.That(state.ForcedState).IsEqualTo(BotCombatStateType.Grinding);
+        await Assert.That(_combatManager.StartListeningCalls).Contains(bot.Id);
         await Assert.That(output.Messages.Single()).Contains("kill goal 1");
+    }
+
+    [Test]
+    public async Task BotState_Following_ReattachesListenerEvenWhenInactive()
+    {
+        var bot = AddBot(2);
+        var state = new BotCombatState
+        {
+            CurrentState = BotCombatStateType.Idle,
+            IsActive = false
+        };
+        _combatManager.States[bot.Id] = state;
+
+        Execute(new BotStateCommand(), "2", "following");
+
+        await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Following);
+        await Assert.That(_combatManager.StartListeningCalls).Contains(bot.Id);
     }
 
     [Test]

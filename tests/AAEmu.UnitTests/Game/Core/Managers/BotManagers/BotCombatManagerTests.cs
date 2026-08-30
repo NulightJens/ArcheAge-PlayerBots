@@ -89,6 +89,29 @@ public class BotCombatManagerTests
     }
 
     [Test]
+    public async Task StartListening_AfterInactiveDuel_ReattachesBrainWithoutReplacingRuntime()
+    {
+        var manager = new BotCombatManager();
+        var bot = BotTestFixture.MakeBot(30, default);
+        var opponent = BotTestFixture.MakeBot(31, default);
+
+        manager.EnableCombat(bot);
+        var runtime = BotHost.Instance.GetRuntime(bot.Id);
+        manager.DisableCombat(bot);
+        manager.StartDuel(bot, opponent);
+        manager.EndDuel(bot);
+
+        await Assert.That(manager.IsTaskRunning(bot.Id)).IsFalse();
+
+        manager.StartListening(bot);
+
+        await Assert.That(manager.IsTaskRunning(bot.Id)).IsTrue();
+        await Assert.That(BotHost.Instance.GetRuntime(bot.Id)).IsSameReferenceAs(runtime);
+
+        manager.StopListening(bot);
+    }
+
+    [Test]
     public async Task ResetBot_WasActive_ReEnablesAndKeepsForcedState()
     {
         var previousBotManager = BotManager.Instance;

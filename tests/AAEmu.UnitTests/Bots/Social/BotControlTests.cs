@@ -41,6 +41,26 @@ public class BotControlTests
     }
 
     [Test]
+    public async Task Dispatch_AuthorizedCommand_ReattachesBrainBeforeQueuingAction()
+    {
+        var leader = MakeCharacter(1, "leader", Vector3.Zero);
+        var bot = MakeBot(2, new Vector3(5, 0, 0));
+        var team = new Team { Id = 77, OwnerId = leader.Id, IsParty = true };
+        team.AddMember(leader);
+        team.AddMember(bot);
+        var runtime = CreateRuntime(bot);
+        runtime.TeamHooks.Refresh(team);
+        var combat = new FakeBotCombatManager();
+        var dispatcher = CreateDispatcher(team, combat, (bot.Id, runtime));
+
+        var result = dispatcher.Dispatch(leader, bot.Id, BotControlVerb.Follow);
+
+        await Assert.That(result.Accepted).IsTrue();
+        await Assert.That(combat.StartListeningCalls).Contains(bot.Id);
+        await Assert.That(runtime.Engines[(int)BotEngineKind.NonCombat].Queue.Count).IsEqualTo(1);
+    }
+
+    [Test]
     public async Task CommandGrammar_OnlyAcceptsTypedVerbAndRoleWithoutRequesterIdentity()
     {
         var parsed = BotControlCommand.TryParse(
@@ -447,6 +467,14 @@ public class BotControlTests
 
     private static BotControlDispatcher CreateDispatcher(Team team, params (uint id, BotRuntime runtime)[] runtimes)
     {
+        return CreateDispatcher(team, new FakeBotCombatManager(), runtimes);
+    }
+
+    private static BotControlDispatcher CreateDispatcher(
+        Team team,
+        IBotCombatManager combat,
+        params (uint id, BotRuntime runtime)[] runtimes)
+    {
         var bots = Mock.Of<IBotManager>();
         var host = Mock.Of<IBotHost>();
         var teams = Mock.Of<ITeamManager>();
@@ -456,7 +484,7 @@ public class BotControlTests
             host.GetRuntime(id).Returns(runtime);
         }
         teams.GetActiveTeamByUnit(Any<uint>()).Returns(team);
-        return new BotControlDispatcher(bots.Object, host.Object, teams.Object, TimeProvider.System);
+        return new BotControlDispatcher(bots.Object, host.Object, teams.Object, TimeProvider.System, combat);
     }
 
     private static void Tick(BotRuntime runtime)

@@ -15,6 +15,7 @@ public sealed class BotControlDispatcher : Singleton<BotControlDispatcher>
     private readonly IBotManager _bots;
     private readonly IBotHost _host;
     private readonly ITeamManager _teams;
+    private readonly IBotCombatManager _combat;
     private readonly TimeProvider _timeProvider;
 
     internal BotControlDispatcher()
@@ -26,11 +27,13 @@ public sealed class BotControlDispatcher : Singleton<BotControlDispatcher>
         IBotManager bots,
         IBotHost host,
         ITeamManager teams,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IBotCombatManager combat = null)
     {
         _bots = bots ?? throw new ArgumentNullException(nameof(bots));
         _host = host ?? throw new ArgumentNullException(nameof(host));
         _teams = teams ?? throw new ArgumentNullException(nameof(teams));
+        _combat = combat ?? BotCombatManager.Instance;
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
@@ -75,6 +78,10 @@ public sealed class BotControlDispatcher : Singleton<BotControlDispatcher>
         if (engine == null)
             return Reject(BotControlStatus.Unavailable, $"Bot {botId} has no control engine.");
 
+        // Inactive duel cleanup can shed the brain without retiring the runtime.
+        // Party commands must wake that brain before queuing an event, otherwise
+        // the command is accepted but no engine tick can ever consume it.
+        _combat.StartListening(bot);
         if (!engine.EnqueueCommand(
             BotControlAction.ActionName,
             new BotEvent("party-control", command),

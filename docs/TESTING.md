@@ -41,6 +41,19 @@ Use one Darkrunner, Primeval, Daggerspell, and Cleric.
 
 `7511` is the level-40 Elite Training Scarecrow in the verified 1.2 data. Treat template IDs as data-pack-specific. Passive targets are useful for rotation and positioning; natural hostile camps are required for chase, reacquisition, mortality, and repeated-kill tests.
 
+## Brain reactivation regression
+
+This checks the low-cost lifecycle boundary where an inactive duel is allowed to shed its combat task, but later player work must wake it again.
+
+1. Put two nearby fixtures in Idle and confirm `/botdebug <id>` reports `IsActive: False`.
+2. Run `/botduel <id1> <id2>` and let it end normally.
+3. Confirm both participants report `Combat task running: False`.
+4. Restore health and mana, spawn a passive `7511`, reset metrics, and run `/botattackobject all <npcObjId>`.
+5. Within one second, confirm all selected bots report `Combat task running: True`; after the sample, require a successful cast from every intended role plus zero tick errors and runtime overlaps.
+6. Repeat the detached setup, then issue `/botfollow <id> <GM-character-name> 3 auto 1.5`; confirm the bot is moving toward the named character and its combat task is running again.
+
+Do not replace `<GM-character-name>` with a repository-specific character. Use the GM character logged into the test server.
+
 ## Mana lanes
 
 - Controlled rotation: use `/heal <exact-character-name>` before and after the observation window, never during it.

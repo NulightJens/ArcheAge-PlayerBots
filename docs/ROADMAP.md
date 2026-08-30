@@ -4,7 +4,7 @@ The goal is believable, useful, lightweight party members and world population. 
 
 ## 0.1 release candidate: foundation
 
-Status: implemented; standalone packaging is under release verification.
+Status: released as `0.1.0-rc.2`; accepted fixes continue under Unreleased.
 
 - Connectionless persistent-character lifecycle.
 - Data-driven archetypes and rotations.
@@ -17,6 +17,8 @@ Status: implemented; standalone packaging is under release verification.
 
 ## 0.2: believable combat
 
+- Completed: explicit attack, follow, state, and party work wakes brains shed by inactive-duel cleanup without keeping Idle brains active. A four-role physical regression passed with all roles casting, zero tick errors, and zero runtime overlaps.
+- Completed stationary-target checkpoint: Primeval used Endless Arrows for 33 of 45 hostile-target casts (73.3%). Close-target and moving-target behavior remains open.
 - Prove melee skills are held until legal range.
 - Keep Endless Arrows dominant while Primeval responds to close targets with root, backdrop, and lateral movement.
 - Let Daggerspell anchor around Fireball range while satisfying useful shorter-range conditions.

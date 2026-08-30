@@ -89,6 +89,11 @@ public sealed class BotAttackObjectCommand : ICommand
             runtime.CombatState.IsActive = true;
             runtime.CombatState.SetForcedState(BotCombatStateType.Idle);
             runtime.CombatState.TransitionTo(BotCombatStateType.Combat);
+            // Inactive duel cleanup deliberately detaches the combat task while
+            // retaining the lightweight movement runtime. Reattach it before
+            // reporting this bot as engaged, otherwise the state changes to
+            // Combat but no brain remains to execute the contained trial.
+            BotCombatManager.Instance.StartListening(bot);
             engaged++;
         }
 
