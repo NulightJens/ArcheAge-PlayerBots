@@ -13,6 +13,7 @@ Player-facing patch notes come first; developer packaging detail follows.
 - In that physical sample, Endless Arrows was 33 of 45 Primeval hostile-target casts (73.3%).
 - Passed a 16.985 m Darkrunner approach sample: short-range filler and Triple Slash were held, while Tiger Strike, Overwhelm, Shadowsmite, Charge, and Whirlwind Slash succeeded only inside their legal ranges. Automated effect-radius boundaries retain 5.00/5.01 m coverage for Whirlwind Slash and 9.00/9.01 m for Sunder Earth.
 - Passed a 3.042 m Primeval close-target sample: Snare and Backdrop fired legally, a single tangent-dominant escape destination produced 17.445 m of lateral travel versus 4.573 m outward, and the bot settled at 19.182 m. Endless Arrows then supplied 11 of 15 damaging shots (73.3%) with zero cast failures, tick errors, runtime overlaps, or path requests.
+- Fixed Daggerspell burst rows starving its Fireball baseline during AAEmu's asynchronous plot-cooldown window. One shared 4-second special-damage throttle retained the Fireball default lane without adding per-tick work; the corrected 26.024-second physical pass held 18.970 m and produced 8 Fireballs in 11 damaging casts (72.7%), with zero cast failures, tick errors, runtime overlaps, or path requests.
 
 ### Next combat pass
 

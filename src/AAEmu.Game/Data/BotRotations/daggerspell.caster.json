@@ -36,9 +36,21 @@
     { "when": { "kind": "enemyCount", "min": 3, "radius": 8 }, "then": [{ "action": "castAoe", "skill": "fearShout", "rel": 27.0, "as": "aoe:fearShout" }] },
     { "when": { "kind": "enemyCount", "min": 3, "radius": 8 }, "then": [{ "action": "castAoe", "skill": "dahutasBreath", "rel": 26.0, "as": "aoe:dahutasBreath" }] },
     { "when": { "kind": "enemyCount", "min": 3, "radius": 10 }, "then": [{ "action": "castAoe", "skill": "meteorStrike", "rel": 25.0, "as": "aoe:meteorStrike" }] },
-    { "when": { "kind": "cooldownReady", "skill": "meteorStrike" }, "then": [{ "action": "cast", "skill": "meteorStrike", "rel": 21.0, "as": "damage:meteorStrike" }] },
-    { "when": { "kind": "cooldownReady", "skill": "arcLightning" }, "then": [{ "action": "cast", "skill": "arcLightning", "rel": 20.0, "as": "damage:arcLightning" }] },
-    { "when": { "kind": "cooldownReady", "skill": "freezingArrow" }, "then": [{ "action": "cast", "skill": "freezingArrow", "rel": 19.0, "as": "damage:freezingArrow" }] },
-    { "when": { "kind": "cooldownReady", "skill": "chainLightning" }, "then": [{ "action": "cast", "skill": "chainLightning", "rel": 18.0, "as": "damage:chainLightning" }] }
+    { "when": { "kind": "all", "children": [
+      { "kind": "cooldownReady", "skill": "meteorStrike" },
+      { "kind": "groupCooldown", "group": "daggerspellSpecialDamage", "ms": 4000 }
+    ] }, "then": [{ "action": "cast", "skill": "meteorStrike", "rel": 21.0, "as": "damage:meteorStrike" }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "cooldownReady", "skill": "arcLightning" },
+      { "kind": "groupCooldown", "group": "daggerspellSpecialDamage", "ms": 4000 }
+    ] }, "then": [{ "action": "cast", "skill": "arcLightning", "rel": 20.0, "as": "damage:arcLightning" }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "cooldownReady", "skill": "freezingArrow" },
+      { "kind": "groupCooldown", "group": "daggerspellSpecialDamage", "ms": 4000 }
+    ] }, "then": [{ "action": "cast", "skill": "freezingArrow", "rel": 19.0, "as": "damage:freezingArrow" }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "cooldownReady", "skill": "chainLightning" },
+      { "kind": "groupCooldown", "group": "daggerspellSpecialDamage", "ms": 4000 }
+    ] }, "then": [{ "action": "cast", "skill": "chainLightning", "rel": 18.0, "as": "damage:chainLightning" }] }
   ]
 }

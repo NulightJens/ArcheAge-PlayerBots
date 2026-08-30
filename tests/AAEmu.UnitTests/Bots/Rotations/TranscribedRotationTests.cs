@@ -620,6 +620,31 @@ public sealed class TranscribedRotationTests
     }
 
     [Test]
+    public async Task DaggerspellSpecialDamageSharesOneFourSecondThrottle()
+    {
+        var path = BotTestFixture.FindRepoFile("AAEmu.Game/Data/BotRotations/daggerspell.caster.json");
+        var document = JObject.Parse(File.ReadAllText(path));
+        var specialNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "damage:meteorStrike", "damage:arcLightning", "damage:freezingArrow", "damage:chainLightning"
+        };
+        var specialRules = document["rules"]?.Children()
+            .Where(rule => rule["then"]?.Children()
+                .Any(row => specialNames.Contains(row["as"]?.Value<string>() ?? string.Empty)) == true)
+            .ToArray() ?? [];
+
+        await Assert.That(specialRules).Count().IsEqualTo(4);
+        foreach (var rule in specialRules)
+        {
+            var throttle = rule["when"]?["children"]?.Children()
+                .Single(child => string.Equals(child["kind"]?.Value<string>(), "groupCooldown",
+                    StringComparison.OrdinalIgnoreCase));
+            await Assert.That(throttle?["group"]?.Value<string>()).IsEqualTo("daggerspellSpecialDamage");
+            await Assert.That(throttle?["ms"]?.Value<int>()).IsEqualTo(4000);
+        }
+    }
+
+    [Test]
     public async Task PrimevalHomeEnvelope_ReplacesTheLegacyFleeRows()
     {
         var path = BotTestFixture.FindRepoFile("AAEmu.Game/Data/BotRotations/primeval.archer.json");
