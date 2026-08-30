@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <PlayerBotsModuleRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</PlayerBotsModuleRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(PlayerBotsModuleRoot)tests\AAEmu.UnitTests\**\*.cs"
+             Link="PlayerBots.Tests\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

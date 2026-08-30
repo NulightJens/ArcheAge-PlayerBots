@@ -1,0 +1,309 @@
+{
+  "id": "templar.support",
+  "archetype": "Templar",
+  "meta": {
+    "role": "support",
+    "range": "melee"
+  },
+  "skills": {
+    "antithesis": 10534,
+    "mirrorLight": 11379,
+    "resurgence": 10547,
+    "shieldSlam": 10399,
+    "refreshment": 10645,
+    "skewer": 13286,
+    "toughen": 11365,
+    "mend": 10720,
+    "thwart": 16486,
+    "infuse": 16783,
+    "revitalizingCheer": 12046,
+    "teleportation": 10152,
+    "aranzebsBoon": 16004,
+    "renewal": 17412,
+    "redoubt": 10375,
+    "mockingHowl": 10436,
+    "ferventHealing": 14929,
+    "invincibility": 10372
+  },
+  "default": [],
+  "rules": [
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "refreshment"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "refreshment",
+          "rel": 29.0,
+          "weight": 1.0,
+          "as": "buffMissing:refreshment",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "toughen"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "toughen",
+          "rel": 28.0,
+          "weight": 1.0,
+          "as": "buffMissing:toughen",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "aranzebsBoon"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "aranzebsBoon",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "buffMissing:aranzebsBoon",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "mirrorLight"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "mirrorLight",
+          "rel": 26.0,
+          "weight": 1.0,
+          "as": "buffMissing:mirrorLight",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "renewal"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "renewal",
+          "rel": 25.0,
+          "weight": 1.0,
+          "as": "buffMissing:renewal",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "redoubt"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "redoubt",
+          "rel": 24.0,
+          "weight": 1.0,
+          "as": "buffMissing:redoubt",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "resurgence"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "resurgence",
+          "rel": 23.0,
+          "weight": 1.0,
+          "as": "buffMissing:resurgence",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "debuffMissing",
+        "children": [],
+        "spell": "thwart"
+      },
+      "then": [
+        {
+          "action": "castDebuff",
+          "skill": "thwart",
+          "rel": 28.0,
+          "weight": 1.0,
+          "as": "debuffMissing:thwart",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "debuffMissing",
+        "children": [],
+        "spell": "mockingHowl"
+      },
+      "then": [
+        {
+          "action": "castDebuff",
+          "skill": "mockingHowl",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "debuffMissing:mockingHowl",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 7
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "mockingHowl",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:mockingHowl",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 20
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "mend",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:mend",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 5
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "skewer",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:skewer",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 6
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "thwart",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:thwart",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "skewer"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "skewer",
+          "rel": 22.0,
+          "weight": 1.0,
+          "as": "cooldownReady:skewer",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "shieldSlam"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "shieldSlam",
+          "rel": 21.0,
+          "weight": 1.0,
+          "as": "cooldownReady:shieldSlam",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "range",
+        "children": [],
+        "to": "target",
+        "min": 0,
+        "max": 4
+      },
+      "then": [
+        {
+          "action": "reachAndCast",
+          "skill": "antithesis",
+          "rel": 31.0,
+          "weight": 1.0,
+          "as": "range:antithesis",
+          "castWhileControlled": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaemu.example/schemas/t021-scale-run.schema.json",
+  "title": "AAEmu PlayerBots live scale run",
+  "type": "object",
+  "required": [
+    "schemaVersion", "runId", "verdict", "provenance", "startedAtUtc",
+    "completedAtUtc", "databaseName", "hardware", "build", "scenario",
+    "stages", "recovery", "shutdownCleanup", "highestStablePopulation",
+    "firstBottleneck", "incompleteReasons"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "t021.scale-run.v1" },
+    "runId": { "type": "string", "minLength": 1 },
+    "verdict": { "enum": ["PASS", "FAIL", "INCOMPLETE"] },
+    "provenance": { "const": "live-server" },
+    "databaseName": { "type": "string", "pattern": "^aaemu_(t021|playerbots)_[a-z0-9_]*v[0-9]+$" },
+    "scenario": {
+      "type": "object",
+      "required": ["loads", "warmupSeconds", "steadySeconds", "recoverySeconds", "botIds"],
+      "properties": {
+        "loads": { "const": [0, 10, 50, 100] },
+        "botIds": { "type": "array", "minItems": 100, "maxItems": 100, "uniqueItems": true }
+      }
+    },
+    "stages": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["load", "steady", "budget"],
+        "properties": {
+          "load": { "enum": [0, 10, 50, 100] },
+          "steady": {
+            "type": "object",
+            "required": ["expectedBots", "exactBotCount", "durationSeconds", "metrics", "process", "processSamples", "database"]
+          },
+          "budget": {
+            "type": "object",
+            "required": ["status", "breaches"],
+            "properties": { "status": { "enum": ["PASS", "FAIL", "INCOMPLETE"] } }
+          }
+        }
+      }
+    },
+    "shutdownCleanup": {
+      "type": "object",
+      "required": ["status", "remainingBots", "remainingRuntimes", "evidenceLine"],
+      "properties": { "status": { "enum": ["PENDING", "PASS", "FAIL"] } }
+    },
+    "highestStablePopulation": { "type": ["integer", "null"], "enum": [null, 0, 10, 50, 100] },
+    "incompleteReasons": { "type": "array", "items": { "type": "string" } }
+  }
+}

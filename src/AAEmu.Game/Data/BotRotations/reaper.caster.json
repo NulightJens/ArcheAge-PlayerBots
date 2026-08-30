@@ -1,0 +1,388 @@
+{
+  "id": "reaper.caster",
+  "archetype": "Reaper",
+  "meta": {
+    "role": "damage",
+    "range": "ranged"
+  },
+  "skills": {
+    "flamebolt": 10752,
+    "freezingArrow": 10667,
+    "cripplingMire": 10201,
+    "insulatingLens": 10153,
+    "dropBack": 12049,
+    "hellSpear": 10135,
+    "arcLightning": 10670,
+    "freezingEarth": 10151,
+    "summonCrows": 11395,
+    "stealth": 10082,
+    "frigidTracks": 11314,
+    "magicCircle": 12796,
+    "chainLightning": 11967,
+    "searingRain": 11939,
+    "freerunner": 10189,
+    "manaForce": 12759,
+    "meteorStrike": 10664,
+    "flameBarrier": 14774,
+    "shadowStep": 12075
+  },
+  "default": [
+    {
+      "action": "cast",
+      "skill": "flamebolt",
+      "rel": 11.0,
+      "weight": 81.818184,
+      "as": null,
+      "castWhileControlled": false
+    }
+  ],
+  "rules": [
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "stealth"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "stealth",
+          "rel": 29.0,
+          "weight": 1.0,
+          "as": "buffMissing:stealth",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "freerunner"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "freerunner",
+          "rel": 28.0,
+          "weight": 1.0,
+          "as": "buffMissing:freerunner",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "frigidTracks"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "frigidTracks",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "buffMissing:frigidTracks",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "shadowStep"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "shadowStep",
+          "rel": 26.0,
+          "weight": 1.0,
+          "as": "buffMissing:shadowStep",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "debuffMissing",
+        "children": [],
+        "spell": "meteorStrike"
+      },
+      "then": [
+        {
+          "action": "castDebuff",
+          "skill": "meteorStrike",
+          "rel": 28.0,
+          "weight": 1.0,
+          "as": "debuffMissing:meteorStrike",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "debuffMissing",
+        "children": [],
+        "spell": "summonCrows"
+      },
+      "then": [
+        {
+          "action": "castDebuff",
+          "skill": "summonCrows",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "debuffMissing:summonCrows",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 6
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "hellSpear",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:hellSpear",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 8
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "freezingEarth",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:freezingEarth",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 5
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "meteorStrike",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:meteorStrike",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 5
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "summonCrows",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:summonCrows",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 10
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "searingRain",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:searingRain",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "meteorStrike"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "meteorStrike",
+          "rel": 22.0,
+          "weight": 1.0,
+          "as": "cooldownReady:meteorStrike",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "arcLightning"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "arcLightning",
+          "rel": 21.0,
+          "weight": 1.0,
+          "as": "cooldownReady:arcLightning",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "hellSpear"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "hellSpear",
+          "rel": 20.0,
+          "weight": 1.0,
+          "as": "cooldownReady:hellSpear",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "freezingEarth"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "freezingEarth",
+          "rel": 19.0,
+          "weight": 1.0,
+          "as": "cooldownReady:freezingEarth",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "freezingArrow"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "freezingArrow",
+          "rel": 18.0,
+          "weight": 1.0,
+          "as": "cooldownReady:freezingArrow",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "chainLightning"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "chainLightning",
+          "rel": 17.0,
+          "weight": 1.0,
+          "as": "cooldownReady:chainLightning",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "cripplingMire"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "cripplingMire",
+          "rel": 16.0,
+          "weight": 1.0,
+          "as": "cooldownReady:cripplingMire",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "searingRain"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "searingRain",
+          "rel": 15.0,
+          "weight": 1.0,
+          "as": "cooldownReady:searingRain",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "range",
+        "children": [],
+        "to": "target",
+        "min": 0,
+        "max": 25
+      },
+      "then": [
+        {
+          "action": "reachAndCast",
+          "skill": "meteorStrike",
+          "rel": 31.0,
+          "weight": 1.0,
+          "as": "range:meteorStrike",
+          "castWhileControlled": false
+        }
+      ]
+    }
+  ]
+}

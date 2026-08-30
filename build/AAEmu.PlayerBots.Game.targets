@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <PlayerBotsModuleRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</PlayerBotsModuleRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(PlayerBotsModuleRoot)src\AAEmu.Game\**\*.cs"
+             Link="PlayerBots\%(RecursiveDir)%(Filename)%(Extension)" />
+
+    <Content Include="$(PlayerBotsModuleRoot)src\AAEmu.Game\Configurations\**\*.json"
+             Link="Configurations\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <Content Include="$(PlayerBotsModuleRoot)src\AAEmu.Game\Data\**\*"
+             Link="Data\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

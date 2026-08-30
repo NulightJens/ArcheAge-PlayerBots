@@ -1,0 +1,65 @@
+{
+  "id": "primeval.archer",
+  "archetype": "Primeval",
+  "meta": { "role": "damage", "range": "ranged", "homeAnchorSkill": "endlessArrows" },
+  "skills": {
+    "chargedBolt": 16210,
+    "piercingShot": 13564,
+    "endlessArrows": 14835,
+    "doubleRecurve": 11368,
+    "thwart": 16486,
+    "deadeye": 15073,
+    "dropBack": 12049,
+    "snare": 12133,
+    "teleportation": 10152,
+    "stalkersMark": 12139,
+    "shrugItOff": 11429,
+    "boneyard": 14760,
+    "concussiveArrow": 11933,
+    "missileRain": 13281,
+    "leech": 10104,
+    "freerunner": 10189,
+    "toxicShot": 10481
+  },
+  "default": [
+    { "action": "cast", "skill": "endlessArrows", "rel": 11.00 }
+  ],
+  "rules": [
+    { "when": { "kind": "buffMissing", "spell": "thwart" }, "then": [{ "action": "castBuff", "skill": "thwart", "rel": 29 }] },
+    { "when": { "kind": "buffMissing", "spell": "freerunner" }, "then": [{ "action": "castBuff", "skill": "freerunner", "rel": 28 }] },
+    { "when": { "kind": "buffMissing", "spell": "deadeye" }, "then": [{ "action": "castBuff", "skill": "deadeye", "rel": 27 }] },
+    { "when": { "kind": "buffMissing", "spell": "doubleRecurve" }, "then": [{ "action": "castBuff", "skill": "doubleRecurve", "rel": 26 }] },
+    { "when": { "kind": "hasCleansableDebuff" }, "then": [{ "action": "castDebuff", "skill": "shrugItOff", "rel": 25 }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "range", "skill": "leech", "min": 0, "max": 5 },
+      { "kind": "pvp" }
+    ] }, "then": [{ "action": "castMelee", "skill": "leech", "rel": 34, "as": "close:leech",
+      "combo": { "opener": "leech", "followUp": "dropBack" }, "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "range", "skill": "snare", "min": 0, "max": 5 }, "then": [{ "action": "castMelee", "skill": "snare", "rel": 33, "as": "close:snare",
+      "combo": { "opener": "snare", "followUp": "dropBack" }, "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "comboActive", "opener": "leech" }, "then": [{ "action": "castMelee", "skill": "dropBack", "rel": 49, "as": "combo:dropBack:leech", "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "comboActive", "opener": "snare" }, "then": [{ "action": "castMelee", "skill": "dropBack", "rel": 48, "as": "combo:dropBack:snare", "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "range", "skill": "dropBack", "min": 0, "max": 5 }, "then": [{ "action": "castMelee", "skill": "dropBack", "rel": 32, "as": "close:dropBack", "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "canCast", "skill": "stalkersMark" }, "then": [{ "action": "castDebuff", "skill": "stalkersMark", "rel": 25 }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "canCast", "skill": "toxicShot" },
+      { "kind": "groupCooldown", "group": "primevalSpecialArrow", "ms": 4000 }
+    ] }, "then": [{ "action": "cast", "skill": "toxicShot", "rel": 24, "as": "damage:toxicShot" }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "canCast", "skill": "piercingShot" },
+      { "kind": "groupCooldown", "group": "primevalSpecialArrow", "ms": 4000 }
+    ] }, "then": [{ "action": "cast", "skill": "piercingShot", "rel": 23, "as": "damage:piercingShot" }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "canCast", "skill": "chargedBolt" },
+      { "kind": "groupCooldown", "group": "primevalSpecialArrow", "ms": 4000 }
+    ] }, "then": [{ "action": "cast", "skill": "chargedBolt", "rel": 22, "as": "damage:chargedBolt" }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "canCast", "skill": "concussiveArrow" },
+      { "kind": "groupCooldown", "group": "primevalSpecialArrow", "ms": 4000 }
+    ] }, "then": [{ "action": "cast", "skill": "concussiveArrow", "rel": 21, "as": "damage:concussiveArrow" }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "pvp" },
+      { "kind": "canCast", "skill": "boneyard" }
+    ] }, "then": [{ "action": "cast", "skill": "boneyard", "rel": 19, "as": "utility:boneyard" }] }
+  ]
+}

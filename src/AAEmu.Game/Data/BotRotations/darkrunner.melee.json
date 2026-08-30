@@ -1,0 +1,123 @@
+{
+  "id": "darkrunner.melee",
+  "archetype": "Darkrunner",
+  "meta": { "role": "damage", "range": "melee", "homeAnchorSkill": "tripleSlash1" },
+  "skills": {
+    "tripleSlash1": 18131,
+    "tripleSlash2": 18132,
+    "tripleSlash3": 18134,
+    "thwart": 16486,
+    "charge": 11918,
+    "overwhelm": 10648,
+    "dropBack": 12049,
+    "whirlwindSlash": 13282,
+    "sunderEarth": 10644,
+    "wallop": 12029,
+    "bondbreaker": 12034,
+    "precisionStrike": 12026,
+    "pinDown": 13344,
+    "battleFocus": 10377,
+    "tigerStrike": 13315,
+    "shadowsmite": 10496,
+    "freerunner": 10189,
+    "shadowStep": 12075,
+    "shrugItOff": 11429,
+    "leech": 10104,
+    "liberation": 11380
+  },
+  "default": [
+    { "action": "cast", "skill": "whirlwindSlash", "rel": 11.00, "weight": 20 },
+    { "action": "cast", "skill": "shadowsmite", "rel": 11.00, "weight": 25 },
+    { "action": "cast", "skill": "precisionStrike", "rel": 11.00, "weight": 25 },
+    { "action": "cast", "skill": "wallop", "rel": 11.00, "weight": 18 },
+    { "action": "cast", "skill": "sunderEarth", "rel": 11.00, "weight": 15 },
+    { "action": "cast", "skill": "pinDown", "rel": 11.00, "weight": 15,
+      "when": { "kind": "pvp" } }
+  ],
+  "rules": [
+    { "when": { "kind": "buffMissing", "spell": "battleFocus" }, "then": [{ "action": "castBuff", "skill": "battleFocus", "rel": 29 }] },
+    { "when": { "kind": "buffMissing", "spell": "thwart" }, "then": [{ "action": "castBuff", "skill": "thwart", "rel": 28 }] },
+    { "when": { "kind": "buffMissing", "spell": "freerunner" }, "then": [{ "action": "castBuff", "skill": "freerunner", "rel": 27 }] },
+    { "when": { "kind": "hasCleansableDebuff" }, "then": [
+      { "action": "castDebuff", "skill": "bondbreaker", "rel": 90, "as": "cleanse:bondbreaker", "castWhileControlled": true },
+      { "action": "castDebuff", "skill": "liberation", "rel": 89, "as": "cleanse:liberation", "castWhileControlled": true }
+    ] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "hasCleansableDebuff" }, { "kind": "stunned" }
+    ] }, "then": [
+      { "action": "castDebuff", "skill": "shrugItOff", "rel": 91, "as": "cleanse:shrugItOff", "castWhileControlled": true }
+    ] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "range", "skill": "tigerStrike", "min": 1.51, "max": 15 },
+      { "kind": "canCast", "skill": "tigerStrike" },
+      { "kind": "groupCooldown", "group": "gapCloser", "ms": 1000 }
+    ] }, "then": [{ "action": "castMelee", "skill": "tigerStrike", "rel": 34, "as": "gap:tigerStrike", "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "range", "skill": "overwhelm", "min": 1.51, "max": 8 },
+      { "kind": "canCast", "skill": "overwhelm" },
+      { "kind": "groupCooldown", "group": "gapCloser", "ms": 1000 }
+    ] }, "then": [{ "action": "castMelee", "skill": "overwhelm", "rel": 33, "as": "gap:overwhelm",
+      "combo": { "opener": "overwhelm", "followUp": "shadowsmite" }, "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "range", "skill": "charge", "min": 1.51, "max": 10 },
+      { "kind": "canCast", "skill": "charge" },
+      { "kind": "groupCooldown", "group": "gapCloser", "ms": 1000 }
+    ] }, "then": [{ "action": "castMelee", "skill": "charge", "rel": 32, "as": "gap:charge",
+      "combo": { "opener": "charge", "followUp": "whirlwindSlash" }, "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "comboActive", "opener": "charge" }, "then": [{ "action": "castMelee", "skill": "whirlwindSlash", "rel": 49, "as": "combo:whirlwindSlash", "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "comboActive", "opener": "overwhelm" }, "then": [{ "action": "castMelee", "skill": "shadowsmite", "rel": 48, "as": "combo:shadowsmite", "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "range", "skill": "overwhelm", "min": 1.51, "max": 15 },
+      { "kind": "canCast", "skill": "overwhelm" },
+      { "kind": "canCast", "skill": "shadowsmite" }
+    ] }, "then": [{ "action": "castMelee", "skill": "overwhelm", "rel": 26, "as": "combo:setupOverwhelm",
+      "combo": { "opener": "overwhelm", "followUp": "shadowsmite" } }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "range", "skill": "charge", "min": 1.51, "max": 15 },
+      { "kind": "canCast", "skill": "charge" },
+      { "kind": "canCast", "skill": "whirlwindSlash" }
+    ] }, "then": [{ "action": "castMelee", "skill": "charge", "rel": 25, "as": "combo:setupCharge",
+      "combo": { "opener": "charge", "followUp": "whirlwindSlash" } }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "pvp" },
+      { "kind": "range", "skill": "shadowStep", "min": 1.51, "max": 15 },
+      { "kind": "canCast", "skill": "shadowStep" },
+      { "kind": "canCast", "skill": "precisionStrike" }
+    ] }, "then": [{ "action": "castMelee", "skill": "shadowStep", "rel": 24, "as": "combo:shadowStep",
+      "combo": { "opener": "shadowStep", "followUp": "precisionStrike" } }] },
+    { "when": { "kind": "comboActive", "opener": "shadowStep" }, "then": [{ "action": "castMelee", "skill": "precisionStrike", "rel": 47, "as": "combo:precisionStrike", "ignoreGlobalDelay": true }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "range", "skill": "tripleSlash1", "min": 1.51, "max": 4 },
+      { "kind": "any", "children": [
+        { "kind": "all", "children": [
+          { "kind": "not", "children": [{ "kind": "pvp" }] },
+          { "kind": "not", "children": [{ "kind": "any", "children": [
+            { "kind": "cooldownReady", "skill": "whirlwindSlash" },
+            { "kind": "cooldownReady", "skill": "shadowsmite" },
+            { "kind": "cooldownReady", "skill": "precisionStrike" },
+            { "kind": "cooldownReady", "skill": "wallop" },
+            { "kind": "cooldownReady", "skill": "sunderEarth" }
+          ] }] }
+        ] },
+        { "kind": "all", "children": [
+          { "kind": "pvp" },
+          { "kind": "not", "children": [{ "kind": "any", "children": [
+            { "kind": "cooldownReady", "skill": "whirlwindSlash" },
+            { "kind": "cooldownReady", "skill": "shadowsmite" },
+            { "kind": "cooldownReady", "skill": "precisionStrike" },
+            { "kind": "cooldownReady", "skill": "wallop" },
+            { "kind": "cooldownReady", "skill": "sunderEarth" },
+            { "kind": "cooldownReady", "skill": "pinDown" }
+          ] }] }
+        ] }
+      ] }
+    ] }, "then": [{ "action": "castMelee", "skill": "tripleSlash1", "rel": 30, "as": "chain:tripleSlash1", "chain": { "id": "tripleSlash", "stage": 1 } }] },
+    { "when": { "kind": "chainStep", "id": "tripleSlash", "steps": 1, "stepDelayMs": 800 }, "then": [{ "action": "castMelee", "skill": "tripleSlash2", "rel": 44, "as": "chain:tripleSlash2", "chain": { "id": "tripleSlash", "stage": 2 } }] },
+    { "when": { "kind": "chainStep", "id": "tripleSlash", "steps": 2, "stepDelayMs": 800 }, "then": [{ "action": "castMelee", "skill": "tripleSlash3", "rel": 44, "as": "chain:tripleSlash3", "chain": { "id": "tripleSlash", "stage": 0 } }] },
+    { "when": { "kind": "all", "children": [
+      { "kind": "pvp" }, { "kind": "targetCasting" }
+    ] }, "then": [{ "action": "cast", "skill": "leech", "rel": 42, "as": "pvp:leech" }] },
+    { "when": { "kind": "range", "skill": "behind", "min": 0, "max": 2 }, "then": [{ "action": "move", "skill": "behind", "rel": 13, "as": "move:behind" }] },
+    { "when": { "kind": "range", "skill": "facing", "min": 0, "max": 2 }, "then": [{ "action": "move", "skill": "facing", "rel": 12, "as": "move:facing" }] }
+  ]
+}

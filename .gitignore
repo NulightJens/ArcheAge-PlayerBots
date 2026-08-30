@@ -1,0 +1,9 @@
+.idea/
+.vs/
+.vscode/
+artifacts/
+bin/
+obj/
+TestResults/
+*.user
+*.suo

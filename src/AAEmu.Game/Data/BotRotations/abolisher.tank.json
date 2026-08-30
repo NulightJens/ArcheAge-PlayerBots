@@ -1,0 +1,380 @@
+{
+  "id": "abolisher.tank",
+  "archetype": "Abolisher",
+  "meta": {
+    "role": "tank",
+    "range": "melee"
+  },
+  "skills": {
+    "tripleSlash": 18131,
+    "shieldSlam": 10399,
+    "thwart": 16486,
+    "charge": 11918,
+    "refreshment": 10645,
+    "whirlwindSlash": 13282,
+    "bullRush": 10501,
+    "boastfulRoar": 12048,
+    "sunderEarth": 10644,
+    "lasso": 12039,
+    "toughen": 11365,
+    "revitalizingCheer": 12046,
+    "redoubt": 10375,
+    "healthLift": 11991,
+    "bondbreaker": 12034,
+    "battleFocus": 10377,
+    "mockingHowl": 10436,
+    "shrugItOff": 11429,
+    "liberation": 11380,
+    "invincibility": 10372
+  },
+  "default": [],
+  "rules": [
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "refreshment"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "refreshment",
+          "rel": 29.0,
+          "weight": 1.0,
+          "as": "buffMissing:refreshment",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "toughen"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "toughen",
+          "rel": 28.0,
+          "weight": 1.0,
+          "as": "buffMissing:toughen",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "healthLift"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "healthLift",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "buffMissing:healthLift",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "redoubt"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "redoubt",
+          "rel": 26.0,
+          "weight": 1.0,
+          "as": "buffMissing:redoubt",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "battleFocus"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "battleFocus",
+          "rel": 25.0,
+          "weight": 1.0,
+          "as": "buffMissing:battleFocus",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "buffMissing",
+        "children": [],
+        "spell": "liberation"
+      },
+      "then": [
+        {
+          "action": "castBuff",
+          "skill": "liberation",
+          "rel": 24.0,
+          "weight": 1.0,
+          "as": "buffMissing:liberation",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "debuffMissing",
+        "children": [],
+        "spell": "thwart"
+      },
+      "then": [
+        {
+          "action": "castDebuff",
+          "skill": "thwart",
+          "rel": 28.0,
+          "weight": 1.0,
+          "as": "debuffMissing:thwart",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "debuffMissing",
+        "children": [],
+        "spell": "mockingHowl"
+      },
+      "then": [
+        {
+          "action": "castDebuff",
+          "skill": "mockingHowl",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "debuffMissing:mockingHowl",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "debuffMissing",
+        "children": [],
+        "spell": "sunderEarth"
+      },
+      "then": [
+        {
+          "action": "castDebuff",
+          "skill": "sunderEarth",
+          "rel": 26.0,
+          "weight": 1.0,
+          "as": "debuffMissing:sunderEarth",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 7
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "mockingHowl",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:mockingHowl",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 9
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "sunderEarth",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:sunderEarth",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 5
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "whirlwindSlash",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:whirlwindSlash",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 6
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "thwart",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:thwart",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "enemyCount",
+        "children": [],
+        "min": 3,
+        "radius": 2
+      },
+      "then": [
+        {
+          "action": "castAoe",
+          "skill": "tripleSlash",
+          "rel": 27.0,
+          "weight": 1.0,
+          "as": "enemyCount:tripleSlash",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "bullRush"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "bullRush",
+          "rel": 22.0,
+          "weight": 1.0,
+          "as": "cooldownReady:bullRush",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "shieldSlam"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "shieldSlam",
+          "rel": 21.0,
+          "weight": 1.0,
+          "as": "cooldownReady:shieldSlam",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "boastfulRoar"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "boastfulRoar",
+          "rel": 20.0,
+          "weight": 1.0,
+          "as": "cooldownReady:boastfulRoar",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "charge"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "charge",
+          "rel": 19.0,
+          "weight": 1.0,
+          "as": "cooldownReady:charge",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "cooldownReady",
+        "children": [],
+        "skill": "whirlwindSlash"
+      },
+      "then": [
+        {
+          "action": "cast",
+          "skill": "whirlwindSlash",
+          "rel": 18.0,
+          "weight": 1.0,
+          "as": "cooldownReady:whirlwindSlash",
+          "castWhileControlled": false
+        }
+      ]
+    },
+    {
+      "when": {
+        "kind": "range",
+        "children": [],
+        "to": "target",
+        "min": 0,
+        "max": 4
+      },
+      "then": [
+        {
+          "action": "reachAndCast",
+          "skill": "tripleSlash",
+          "rel": 31.0,
+          "weight": 1.0,
+          "as": "range:tripleSlash",
+          "castWhileControlled": false
+        }
+      ]
+    }
+  ]
+}

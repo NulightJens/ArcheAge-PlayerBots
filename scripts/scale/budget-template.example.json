@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "t021.scale-budget.v1",
+  "status": "REQUIRES_OPERATOR_INPUT",
+  "provenance": "baseline-plus-desired-server-target",
+  "approvedBy": null,
+  "approvedAtUtc": null,
+  "desiredServerTickTargetMs": null,
+  "baseline": {
+    "sourceRunId": null,
+    "serverWorkP95Ms": null,
+    "serverWorkP99Ms": null,
+    "serverWorkMaxMs": null,
+    "cpuP95Percent": null,
+    "workingSetMaxBytes": null,
+    "allocatedBytesPerSecond": null,
+    "gen2CollectionsPerMinute": null,
+    "databaseQueriesPerSecond": null
+  },
+  "limits": {
+    "serverWorkP95Ms": null,
+    "serverWorkP99Ms": null,
+    "serverWorkMaxMs": null,
+    "cpuP95Percent": null,
+    "workingSetMaxBytes": null,
+    "allocatedBytesPerSecond": null,
+    "gen2CollectionsPerMinute": null,
+    "databaseQueriesPerSecond": null,
+    "skippedTicksPerMinute": null,
+    "runtimeOverlapsPerMinute": null,
+    "recoveryServerWorkP95Ms": null
+  },
+  "rationale": "Populate only from a retained no-bot baseline and an explicit desired whole-server tick target."
+}

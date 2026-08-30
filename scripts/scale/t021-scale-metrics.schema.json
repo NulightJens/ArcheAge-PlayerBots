@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aaemu.example/schemas/t021-scale-metrics.schema.json",
+  "title": "AAEmu in-process PlayerBots metrics snapshot",
+  "type": "object",
+  "required": ["schemaVersion", "provenance", "capturedAtUtc", "runtimeCount", "config", "server", "bots"],
+  "properties": {
+    "schemaVersion": { "const": "t021.scale-metrics.v1" },
+    "provenance": { "const": "live-server" },
+    "runtimeCount": { "type": "integer", "minimum": 0 },
+    "config": {
+      "type": "object",
+      "required": ["activityPercent", "hostTickBudgetMs", "serverTickBudgetMs"]
+    },
+    "server": {
+      "type": "object",
+      "required": ["work", "interval", "workMsEma", "intervalMsEma", "pressureMs"]
+    },
+    "bots": {
+      "type": "object",
+      "required": [
+        "hostTick", "skippedTicks", "runtimeOverlaps", "bots", "activeBots",
+        "configuredActivityPercent", "governorEffectivePercent", "effectiveActivityPercent",
+        "tickErrors", "brainSteps", "moverSteps", "worldScans", "pathRequests",
+        "decisionSteps", "invalidTargets", "castAttempts", "observedKills", "creditedKills",
+        "stuckNudges", "stuckTeleports", "spawn", "despawn", "allocatedBytes",
+        "gen0Collections", "gen1Collections", "gen2Collections", "managedHeapBytes",
+        "workingSetBytes", "privateMemoryBytes", "cpuPercent"
+      ]
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "daggerspell.caster",
+  "archetype": "Daggerspell",
+  "meta": { "role": "damage", "range": "ranged", "homeAnchorSkill": "flamebolt" },
+  "skills": {
+    "flamebolt": 10752,
+    "earthenGrip": 14376,
+    "freezingArrow": 10667,
+    "enervate": 10159,
+    "insulatingLens": 10153,
+    "bubbleTrap": 10154,
+    "arcLightning": 10670,
+    "dropBack": 12049,
+    "fearShout": 12001,
+    "stealth": 10082,
+    "magicCircle": 12796,
+    "dizziness": 10134,
+    "chainLightning": 11967,
+    "innerShock": 11353,
+    "meteorStrike": 10664,
+    "shadowStep": 12075,
+    "dahutasBreath": 11443
+  },
+  "default": [
+    { "action": "cast", "skill": "flamebolt", "rel": 11.0, "as": "filler:flamebolt" }
+  ],
+  "rules": [
+    { "when": { "kind": "buffMissing", "spell": "stealth" }, "then": [{ "action": "castBuff", "skill": "stealth", "rel": 29.0, "as": "buff:stealth" }] },
+    { "when": { "kind": "buffMissing", "spell": "insulatingLens" }, "then": [{ "action": "castBuff", "skill": "insulatingLens", "rel": 28.0, "as": "buff:insulatingLens" }] },
+    { "when": { "kind": "buffMissing", "spell": "magicCircle" }, "then": [{ "action": "castBuff", "skill": "magicCircle", "rel": 27.0, "as": "buff:magicCircle" }] },
+    { "when": { "kind": "canCast", "skill": "earthenGrip" }, "then": [{ "action": "castDebuff", "skill": "earthenGrip", "rel": 26.0, "as": "control:earthenGrip" }] },
+    { "when": { "kind": "canCast", "skill": "enervate" }, "then": [{ "action": "castDebuff", "skill": "enervate", "rel": 25.0, "as": "control:enervate" }] },
+    { "when": { "kind": "canCast", "skill": "bubbleTrap" }, "then": [{ "action": "castDebuff", "skill": "bubbleTrap", "rel": 24.0, "as": "control:bubbleTrap" }] },
+    { "when": { "kind": "canCast", "skill": "dizziness" }, "then": [{ "action": "castDebuff", "skill": "dizziness", "rel": 23.0, "as": "control:dizziness" }] },
+    { "when": { "kind": "canCast", "skill": "innerShock" }, "then": [{ "action": "castDebuff", "skill": "innerShock", "rel": 22.0, "as": "control:innerShock" }] },
+    { "when": { "kind": "enemyCount", "min": 3, "radius": 8 }, "then": [{ "action": "castAoe", "skill": "fearShout", "rel": 27.0, "as": "aoe:fearShout" }] },
+    { "when": { "kind": "enemyCount", "min": 3, "radius": 8 }, "then": [{ "action": "castAoe", "skill": "dahutasBreath", "rel": 26.0, "as": "aoe:dahutasBreath" }] },
+    { "when": { "kind": "enemyCount", "min": 3, "radius": 10 }, "then": [{ "action": "castAoe", "skill": "meteorStrike", "rel": 25.0, "as": "aoe:meteorStrike" }] },
+    { "when": { "kind": "cooldownReady", "skill": "meteorStrike" }, "then": [{ "action": "cast", "skill": "meteorStrike", "rel": 21.0, "as": "damage:meteorStrike" }] },
+    { "when": { "kind": "cooldownReady", "skill": "arcLightning" }, "then": [{ "action": "cast", "skill": "arcLightning", "rel": 20.0, "as": "damage:arcLightning" }] },
+    { "when": { "kind": "cooldownReady", "skill": "freezingArrow" }, "then": [{ "action": "cast", "skill": "freezingArrow", "rel": 19.0, "as": "damage:freezingArrow" }] },
+    { "when": { "kind": "cooldownReady", "skill": "chainLightning" }, "then": [{ "action": "cast", "skill": "chainLightning", "rel": 18.0, "as": "damage:chainLightning" }] }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "cleric.support",
+  "archetype": "Cleric",
+  "meta": { "role": "support", "range": "ranged", "homeAnchorSkill": "antithesis" },
+  "skills": {
+    "antithesis": 10534,
+    "thwart": 16486,
+    "mirrorLight": 11379,
+    "bladeHymn": 11973,
+    "startlingStrain": 11934,
+    "resurgence": 10547,
+    "vacuumExplosion": 10710,
+    "dissonance": 11943,
+    "skewer": 13286,
+    "shrugItOff": 11429,
+    "leech": 10104,
+    "battleHymn": 11961
+  },
+  "default": [
+    { "action": "cast", "skill": "bladeHymn", "rel": 11.0, "as": "filler:bladeHymn" },
+    { "action": "cast", "skill": "dissonance", "rel": 11.0, "as": "filler:dissonance" }
+  ],
+  "rules": [
+    { "when": { "kind": "partyLowest", "min": 0, "max": 85, "radius": 45 }, "then": [{ "action": "castHeal", "skill": "antithesis", "rel": 35.0, "as": "heal:antithesis" }] },
+    { "when": { "kind": "buffMissing", "spell": "shrugItOff" }, "then": [{ "action": "castBuff", "skill": "shrugItOff", "rel": 29.0, "as": "buff:shrugItOff" }] },
+    { "when": { "kind": "canCast", "skill": "startlingStrain" }, "then": [{ "action": "castDebuff", "skill": "startlingStrain", "rel": 24.0, "as": "control:startlingStrain" }] },
+    { "when": { "kind": "canCast", "skill": "thwart" }, "then": [{ "action": "castDebuff", "skill": "thwart", "rel": 23.0, "as": "control:thwart" }] },
+    { "when": { "kind": "enemyCount", "min": 3, "radius": 8 }, "then": [{ "action": "castAoe", "skill": "vacuumExplosion", "rel": 27.0, "as": "aoe:vacuumExplosion" }] },
+    { "when": { "kind": "enemyCount", "min": 3, "radius": 10 }, "then": [{ "action": "castAoe", "skill": "skewer", "rel": 26.0, "as": "aoe:skewer" }] },
+    { "when": { "kind": "cooldownReady", "skill": "skewer" }, "then": [{ "action": "cast", "skill": "skewer", "rel": 21.0, "as": "damage:skewer" }] },
+    { "when": { "kind": "cooldownReady", "skill": "battleHymn" }, "then": [{ "action": "castAoe", "skill": "battleHymn", "rel": 20.0, "as": "aoe:battleHymn" }] },
+    { "when": { "kind": "range", "skill": "leech", "min": 0, "max": 4 }, "then": [{ "action": "castMelee", "skill": "leech", "rel": 31.0, "as": "close:leech" }] },
+    { "when": { "kind": "canCast", "skill": "antithesis" }, "then": [{ "action": "cast", "skill": "antithesis", "rel": 19.0, "as": "damage:antithesis" }] }
+  ]
+}

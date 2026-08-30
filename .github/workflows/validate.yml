@@ -1,0 +1,51 @@
+name: Validate standalone module
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out compatible AAEmu
+        uses: actions/checkout@v4
+        with:
+          repository: AAEmu/AAEmu
+          ref: 62e3eb1d87da01194802ac886cd500134facad28
+          fetch-depth: 0
+          path: aaemu
+
+      - name: Check out PlayerBots as a module
+        uses: actions/checkout@v4
+        with:
+          path: aaemu/modules/archeage-playerbots
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install module
+        shell: pwsh
+        run: ./aaemu/modules/archeage-playerbots/scripts/Install-PlayerBots.ps1 -AAEmuRoot ./aaemu
+
+      - name: Verify installed state
+        shell: pwsh
+        run: ./aaemu/modules/archeage-playerbots/scripts/Install-PlayerBots.ps1 -AAEmuRoot ./aaemu -CheckOnly
+
+      - name: Apply tested host security baseline
+        shell: pwsh
+        run: git -C ./aaemu apply ./modules/archeage-playerbots/compatibility/aaemu-1.2-security-baseline.patch
+
+      - name: Build
+        run: dotnet build ./aaemu/AAEmu.slnx --no-incremental
+
+      - name: Test
+        run: dotnet test ./aaemu/AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build
+
+      - name: Audit vulnerable packages
+        run: dotnet list ./aaemu/AAEmu.slnx package --vulnerable --include-transitive

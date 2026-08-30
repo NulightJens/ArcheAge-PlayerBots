@@ -1,0 +1,743 @@
+using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Core.Managers.Bots;
+using AAEmu.Game.Bots.Kernel;
+using AAEmu.Game.Models.Game.Bots;
+using AAEmu.Game.Models.Game.Skills;
+using AAEmu.Game.Models.Game.Units;
+using AAEmu.Game.Models.Tasks.Bots;
+using AAEmu.UnitTests.Bots.Sim;
+using AAEmu.UnitTests.Utils.Mocks;
+
+namespace AAEmu.UnitTests.Bots.Host;
+
+[NotInParallel]
+public class BotHostBehaviorTests
+{
+    [Test]
+    public async Task IdleBot_BrainDoesNotRunMoreOftenThanOncePerSecond_AndMoverOnlyGroundChecks()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        try
+        {
+            config.ActivityPercent = 100;
+            var sim = new BotSim();
+            var bot = sim.AddBot(10);
+
+            sim.Advance(5000);
+
+            await Assert.That(bot.Brain.FullStepTimes.Count).IsGreaterThan(0);
+            await Assert.That(bot.Brain.FullStepTimes.Zip(bot.Brain.FullStepTimes.Skip(1), (a, b) => b - a)
+                .All(delta => delta >= TimeSpan.FromSeconds(1))).IsTrue();
+            await Assert.That(bot.Mover.StepCount).IsLessThanOrEqualTo(6);
+        }
+        finally
+        {
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task MovingBot_MovesEveryHostTick_AndBrainsAtMovingCadence()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        try
+        {
+            config.ActivityPercent = 100;
+            var sim = new BotSim();
+            var bot = sim.AddBot(10);
+            bot.Runtime.MovementState.Destination = System.Numerics.Vector3.One;
+
+            sim.Advance(2000);
+
+            await Assert.That(bot.Mover.StepCount).IsEqualTo(20);
+            await Assert.That(bot.Brain.FullStepTimes.Count).IsBetween(6, 8);
+            await Assert.That(bot.Brain.FullStepTimes.Zip(bot.Brain.FullStepTimes.Skip(1), (a, b) => b - a)
+                .All(delta => delta >= TimeSpan.FromMilliseconds(300))).IsTrue();
+        }
+        finally
+        {
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task CombatState_EngineCarriesLegacyDefaultAction()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        try
+        {
+            config.ActivityPercent = 100;
+            var sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Combat);
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+
+            await Assert.That(bot.Runtime.Engines[(int)BotEngineKind.Combat].LastActionLog.Any(log =>
+                log.Action == "legacy tick" && log.Result == BotActionResult.Success)).IsTrue();
+        }
+        finally
+        {
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task CombatState_DeadTargetExitsCombatWithinThreeHostTicks()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        BotSim sim = null;
+        try
+        {
+            config.ActivityPercent = 100;
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Combat, runLegacyBrain: true);
+            var target = BotTestFixture.MakeBot(11, System.Numerics.Vector3.One);
+            target.Hp = 0;
+            target.MaxHp = 100;
+            BotTestFixture.SetPrivateField(target, "_parentWorld", bot.Bot.ParentWorld);
+            bot.Runtime.CombatState.Target = target;
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+            sim.Advance(300);
+
+            await Assert.That(bot.Runtime.CombatState.CurrentState).IsNotEqualTo(BotCombatStateType.Combat);
+        }
+        finally
+        {
+            sim?.Reset();
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task CombatState_DeadBotSchedulesRespawn()
+    {
+        BotTestFixture.RegisterTaskManager();
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        BotSim sim = null;
+        try
+        {
+            config.ActivityPercent = 100;
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Combat, runLegacyBrain: true);
+            bot.Bot.Hp = 0;
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+
+            await Assert.That(bot.Runtime.CombatState.RespawnScheduled).IsTrue();
+        }
+        finally
+        {
+            sim?.Reset();
+            config.ActivityPercent = previousPercent;
+            BotTestFixture.ResetTaskManager();
+        }
+    }
+
+    [Test]
+    public async Task CombatState_DeadBotBypassesRotationEngineThatCannotRunLegacyLifecycle()
+    {
+        BotTestFixture.RegisterTaskManager();
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        BotSim sim = null;
+        try
+        {
+            config.ActivityPercent = 0;
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Combat, runLegacyBrain: true);
+            bot.Runtime.Engines[(int)BotEngineKind.Combat] = new BotEngine(BotEngineKind.Combat, config);
+            bot.Bot.Hp = 0;
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+
+            await Assert.That(bot.Runtime.CombatState.RespawnScheduled).IsTrue();
+            await Assert.That(bot.Brain.FullStepTimes.Count).IsEqualTo(1);
+            await Assert.That(bot.Brain.MinimalStepTimes.Count).IsEqualTo(0);
+        }
+        finally
+        {
+            sim?.Reset();
+            config.ActivityPercent = previousPercent;
+            BotTestFixture.ResetTaskManager();
+        }
+    }
+
+    [Test]
+    public async Task DeadBot_DoesNotStepMoverWhileRespawnIsPending()
+    {
+        BotTestFixture.RegisterTaskManager();
+        BotSim sim = null;
+        try
+        {
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Combat, runLegacyBrain: true);
+            bot.Runtime.MovementState.Destination = System.Numerics.Vector3.One;
+            bot.Bot.Hp = 0;
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+
+            await Assert.That(bot.Mover.StepCount).IsEqualTo(0);
+            await Assert.That(bot.Runtime.MovementState.Destination).IsEqualTo(System.Numerics.Vector3.One);
+            await Assert.That(bot.Runtime.CombatState.RespawnScheduled).IsTrue();
+        }
+        finally
+        {
+            sim?.Reset();
+            BotTestFixture.ResetTaskManager();
+        }
+    }
+
+    [Test]
+    public async Task CombatState_ForcedStateRevertsThroughLegacyBrain()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        BotSim sim = null;
+        try
+        {
+            config.ActivityPercent = 100;
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Idle, runLegacyBrain: true);
+            bot.Runtime.CombatState.IsActive = true;
+            bot.Runtime.CombatState.ForcedState = BotCombatStateType.Grinding;
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+
+            await Assert.That(bot.Runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Grinding);
+        }
+        finally
+        {
+            sim?.Reset();
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task DuelingState_DeadOpponentEndsDuelThroughLegacyBrain()
+    {
+        BotTestFixture.RegisterTaskManager();
+        var manager = new BotCombatManager();
+        BotTestFixture.RegisterSingletons(manager);
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        BotSim sim = null;
+        try
+        {
+            config.ActivityPercent = 100;
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Dueling, runLegacyBrain: true);
+            var opponent = BotTestFixture.MakeBot(11, System.Numerics.Vector3.One);
+            opponent.Hp = 0;
+            opponent.MaxHp = 100;
+            BotTestFixture.SetPrivateField(opponent, "_parentWorld", bot.Bot.ParentWorld);
+            bot.Runtime.CombatState.InDuel = true;
+            bot.Runtime.CombatState.DuelOpponent = opponent;
+            BotTestFixture.GetDictionary<BotCombatState>(manager, "_combatStates")[bot.Bot.Id] = bot.Runtime.CombatState;
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+
+            await Assert.That(bot.Runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Idle);
+            await Assert.That(bot.Runtime.CombatState.InDuel).IsFalse();
+        }
+        finally
+        {
+            sim?.Reset();
+            config.ActivityPercent = previousPercent;
+            BotTestFixture.ResetTaskManager();
+        }
+    }
+
+    [Test]
+    public async Task GrindingState_RestsAndReturnsToGrindingThroughLegacyBrain()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        var previousThreshold = config.RestThresholdPercent;
+        var previousInterval = config.RestHealInterval;
+        var previousHeal = config.RestHealPercentPerTick;
+        BotSim sim = null;
+        try
+        {
+            config.ActivityPercent = 100;
+            config.RestThresholdPercent = 50;
+            config.RestHealInterval = 1;
+            config.RestHealPercentPerTick = 50;
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Grinding, runLegacyBrain: true);
+            bot.Bot.Hp = 50;
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Advance(5000);
+
+            await Assert.That(bot.Runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Grinding);
+            await Assert.That(bot.Bot.Hp).IsEqualTo(bot.Bot.MaxHp);
+        }
+        finally
+        {
+            sim?.Reset();
+            config.ActivityPercent = previousPercent;
+            config.RestThresholdPercent = previousThreshold;
+            config.RestHealInterval = previousInterval;
+            config.RestHealPercentPerTick = previousHeal;
+        }
+    }
+
+    [Test]
+    public async Task CombatState_StealthedTargetSearchesAndTimesOutToGrindingThroughLegacyBrain()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        BotSim sim = null;
+        try
+        {
+            config.ActivityPercent = 100;
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Grinding, runLegacyBrain: true);
+            var target = BotTestFixture.MakeBot(11, System.Numerics.Vector3.Zero);
+            target.Hp = 100;
+            target.MaxHp = 100;
+            BotTestFixture.SetPrivateField(target, "_parentWorld", bot.Bot.ParentWorld);
+            var buffs = Mock.Of<IBuffs>();
+            buffs.HasEffectsMatchingCondition(Any<Func<Buff, bool>>()).Returns(true);
+            target.Buffs = buffs.Object;
+            bot.Runtime.CombatState.Target = target;
+            bot.Runtime.CombatState.TransitionTo(BotCombatStateType.Combat);
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Advance(100);
+            await Assert.That(bot.Runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Searching);
+
+            bot.Runtime.CombatState.SearchStartTime = sim.Time.GetUtcNow().UtcDateTime.AddSeconds(-51);
+            sim.Advance(500);
+
+            await Assert.That(bot.Runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Grinding);
+        }
+        finally
+        {
+            sim?.Reset();
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task FollowingState_KeepsFollowTargetAndBandThroughLegacyBrain()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        BotSim sim = null;
+        try
+        {
+            config.ActivityPercent = 100;
+            sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Following, runLegacyBrain: true);
+            var leader = BotTestFixture.MakeBot(11, new System.Numerics.Vector3(2, 0, 0));
+            BotTestFixture.SetPrivateField(leader, "_parentWorld", bot.Bot.ParentWorld);
+            bot.Runtime.MovementState.FollowTarget = leader;
+            bot.Runtime.MovementState.FollowDistance = 2f;
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Advance(1000);
+
+            await Assert.That(bot.Runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Following);
+            await Assert.That(bot.Runtime.MovementState.FollowTarget).IsSameReferenceAs(leader);
+            await Assert.That(bot.Runtime.MovementState.FollowDistance).IsEqualTo(2f);
+        }
+        finally
+        {
+            sim?.Reset();
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task CombatBot_BrainsAtCombatCadence()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        try
+        {
+            config.ActivityPercent = 100;
+            var sim = new BotSim();
+            var bot = sim.AddBot(10, BotCombatStateType.Combat);
+
+            sim.Advance(2000);
+
+            await Assert.That(bot.Brain.FullStepTimes.Count).IsBetween(6, 8);
+        }
+        finally
+        {
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task FirstBrainSchedulesAreStaggeredByBotId()
+    {
+        var sim = new BotSim();
+        for (uint id = 1; id <= 10; id++)
+            sim.AddBot(id);
+
+        await Assert.That(sim.Bots.Select(bot => bot.Runtime.Schedule.NextBrainAt).Distinct().Count()).IsEqualTo(10);
+    }
+
+    [Test]
+    public async Task ActivityRotationRunsFullOrMinimal_AndFollowIsAlwaysFull()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        try
+        {
+            config.ActivityPercent = 10;
+            var sim = new BotSim();
+            foreach (var id in Enumerable.Range(1, 100))
+            {
+                var bot = sim.AddBot((uint)id);
+                bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+            }
+
+            sim.Tick();
+
+            var full = sim.Bots.Count(bot => bot.Brain.FullStepTimes.Count == 1);
+            var minimal = sim.Bots.Count(bot => bot.Brain.MinimalStepTimes.Count == 1);
+            await Assert.That(full).IsBetween(7, 13);
+            await Assert.That(minimal).IsEqualTo(100 - full);
+
+            var follow = sim.AddBot(1001);
+            follow.Runtime.MovementState.FollowTarget = follow.Bot;
+            follow.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+            config.ActivityPercent = 0;
+            sim.Tick();
+            await Assert.That(follow.Brain.FullStepTimes.Count).IsEqualTo(1);
+            await Assert.That(follow.Brain.MinimalStepTimes.Count).IsEqualTo(0);
+        }
+        finally
+        {
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task BrainFailureIsRecorded_AndDoesNotStopOtherBots()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        try
+        {
+            config.ActivityPercent = 100;
+            var sim = new BotSim();
+            var failing = sim.AddBot(10);
+            failing.Brain.ThrowOnFull = true;
+            var healthy = sim.AddBot(11);
+            failing.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+            healthy.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+
+            await Assert.That(failing.Runtime.CombatState.Diagnostics.LastError).IsTypeOf<InvalidOperationException>();
+            await Assert.That(healthy.Brain.FullStepTimes.Count).IsEqualTo(1);
+        }
+        finally
+        {
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task MoverFailureIsRecorded_AndBrainStillRunsAtItsCadence()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        try
+        {
+            config.ActivityPercent = 100;
+            var sim = new BotSim();
+            var bot = sim.AddBot(10);
+            bot.Runtime.Mover = new ThrowingMover(bot.Bot, bot.Runtime.MovementState, bot.Runtime.Broadcaster);
+            var now = sim.Time.GetUtcNow().UtcDateTime;
+            bot.Runtime.Schedule.NextBrainAt = now;
+
+            sim.Tick();
+
+            await Assert.That(bot.Runtime.CombatState.Diagnostics.LastError).IsTypeOf<InvalidOperationException>();
+            await Assert.That(bot.Brain.FullStepTimes.Count).IsEqualTo(1);
+            await Assert.That(bot.Runtime.Schedule.NextBrainAt).IsGreaterThan(now);
+        }
+        finally
+        {
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task SeededBotSims_ProduceIdenticalIdleBrainSchedules()
+    {
+        static List<DateTime> GetSchedule(int seed)
+        {
+            var sim = new BotSim(seed);
+            var bot = sim.AddBot(10);
+            var schedule = new List<DateTime>();
+            for (var i = 0; i < 8; i++)
+            {
+                bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+                sim.Tick();
+                schedule.Add(bot.Runtime.Schedule.NextBrainAt);
+            }
+
+            return schedule;
+        }
+
+        await Assert.That(GetSchedule(12345)).IsEquivalentTo(GetSchedule(12345));
+    }
+
+    [Test]
+    public async Task ActiveBotsMetricReflectsLastDecisionUntilNextDecision()
+    {
+        var config = BotConfig.Instance;
+        var previousPercent = config.ActivityPercent;
+        try
+        {
+            config.ActivityPercent = 100;
+            var sim = new BotSim();
+            var bot = sim.AddBot(10);
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+            var activeAfterDecision = sim.Host.Metrics.ActiveBots;
+            sim.Time.Advance(TimeSpan.FromMilliseconds(100));
+            sim.Tick();
+
+            await Assert.That(activeAfterDecision).IsEqualTo(1);
+            await Assert.That(sim.Host.Metrics.ActiveBots).IsEqualTo(1);
+
+            config.ActivityPercent = 0;
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+            sim.Tick();
+
+            await Assert.That(sim.Host.Metrics.ActiveBots).IsEqualTo(0);
+        }
+        finally
+        {
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
+    public async Task TickMetrics_TickMsEmaMovesForSlowBrain()
+    {
+        var sim = new BotSim();
+        var bot = sim.AddBot(10);
+        bot.Brain.SpinMilliseconds = 5;
+        bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+        var before = sim.Host.Metrics.TickMsEma;
+
+        sim.Tick();
+
+        await Assert.That(sim.Host.Metrics.TickMsEma).IsGreaterThan(before);
+    }
+
+    [Test]
+    public async Task OverlappingHostTickIsSkippedAndCounted()
+    {
+        var sim = new BotSim();
+        var bot = sim.AddBot(10);
+        bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+        bot.Brain.Release.Reset();
+
+        var first = System.Threading.Tasks.Task.Run(sim.Tick);
+        await Assert.That(bot.Brain.Entered.Wait(TimeSpan.FromSeconds(2))).IsTrue();
+        sim.Tick();
+        bot.Brain.Release.Set();
+        await first;
+
+        await Assert.That(sim.Host.Metrics.SkippedTicks).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task UnregisterStopsStepsAndInvokesCancellationCallbacksOnce()
+    {
+        var sim = new BotSim();
+        var bot = sim.AddBot(10);
+        sim.Host.Unregister(bot.Bot.Id);
+        sim.Tick();
+        sim.Host.Unregister(bot.Bot.Id);
+
+        await Assert.That(bot.Mover.CancelCount).IsEqualTo(1);
+        await Assert.That(bot.Brain.CancelCount).IsEqualTo(1);
+        await Assert.That(bot.Mover.StepCount).IsEqualTo(0);
+        await Assert.That(bot.Brain.FullStepTimes.Count).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task UnscheduledMoverSelfRetirement_UnregistersOnNextTickAndCancelsOnce()
+    {
+        var sim = new BotSim();
+        var bot = sim.AddBot(10);
+        var cancelCount = 0;
+        bot.Runtime.Brain = null;
+        bot.Runtime.Mover = new BotMovementTask(
+            bot.Bot,
+            bot.Runtime.MovementState,
+            bot.Runtime.Broadcaster,
+            _ => cancelCount++);
+        BotTestFixture.SetPrivateField<AAEmu.Game.Models.Game.World.WorldInstance>(bot.Bot, "_parentWorld", null);
+
+        sim.Tick();
+        sim.Tick();
+
+        await Assert.That(bot.Runtime.Mover.Cancelled).IsTrue();
+        await Assert.That(cancelCount).IsEqualTo(1);
+        await Assert.That(sim.Host.GetRuntime(bot.Bot.Id)).IsNull();
+    }
+
+    [Test]
+    public async Task UnscheduledBrainSelfRetirement_UnregistersOnNextTickAndCancelsOnce()
+    {
+        var sim = new BotSim();
+        var bot = sim.AddBot(11);
+        var cancelCount = 0;
+        bot.Runtime.Mover = null;
+        bot.Runtime.Brain = new BotCombatTask(
+            bot.Bot,
+            bot.Runtime.CombatState,
+            bot.Runtime.Broadcaster,
+            _ => cancelCount++,
+            timeProvider: sim.Time);
+        bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+        BotTestFixture.SetPrivateField<AAEmu.Game.Models.Game.World.WorldInstance>(bot.Bot, "_parentWorld", null);
+
+        sim.Tick();
+        sim.Tick();
+
+        await Assert.That(bot.Runtime.Brain.Cancelled).IsTrue();
+        await Assert.That(cancelCount).IsEqualTo(1);
+        await Assert.That(sim.Host.GetRuntime(bot.Bot.Id)).IsNull();
+    }
+
+    [Test]
+    public async Task TickMetricsHaveNonNegativeEmaAndMaxAtLeastEma()
+    {
+        var sim = new BotSim();
+        var bot = sim.AddBot(10);
+        bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+        sim.Tick();
+
+        await Assert.That(sim.Host.Metrics.TickMsEma).IsGreaterThanOrEqualTo(0d);
+        await Assert.That(sim.Host.Metrics.MaxTickMs).IsGreaterThanOrEqualTo(sim.Host.Metrics.TickMsEma);
+    }
+
+    [Test]
+    public async Task DisableCombatDuringBrainStep_KeepsRuntimeAndMoverRegistered()
+    {
+        BotTestFixture.RegisterTaskManager();
+        try
+        {
+            var botManager = new BotManager(_ => null, onlineLookup: _ => null);
+            BotTestFixture.RegisterSingletons(botManager);
+            var manager = new BotCombatManager();
+            var host = BotHost.Instance;
+            var bot = BotTestFixture.MakeBot(10, default);
+            var movementState = new BotMovementState();
+            var combatState = new BotCombatState { BotId = bot.Id, IsActive = true };
+            var broadcaster = new BotMovementBroadcaster(bot);
+            var mover = new BotSim.SimMover(bot, movementState, broadcaster);
+            var brain = new BlockingBrain(bot, combatState, broadcaster);
+            var runtime = new BotRuntime(bot, movementState, combatState, broadcaster, mover, brain);
+            BotTestFixture.GetDictionary<BotCombatState>(manager, "_combatStates")[bot.Id] = combatState;
+            BotTestFixture.GetDictionary<BotCombatTask>(manager, "_combatTasks")[bot.Id] = brain;
+            host.Register(runtime);
+            runtime.Schedule.NextBrainAt = host.TimeProvider.GetUtcNow().UtcDateTime;
+
+            var tick = System.Threading.Tasks.Task.Run(host.HostTask.Execute);
+            await Assert.That(brain.Entered.Wait(TimeSpan.FromSeconds(2))).IsTrue();
+
+            var disable = System.Threading.Tasks.Task.Run(() => manager.DisableCombat(bot));
+            brain.Release.Set();
+            await System.Threading.Tasks.Task.WhenAll(tick, disable);
+
+            await Assert.That(host.GetRuntime(bot.Id)).IsSameReferenceAs(runtime);
+            await Assert.That(mover.Cancelled).IsFalse();
+        }
+        finally
+        {
+            BotTestFixture.ResetTaskManager();
+        }
+    }
+
+    [Test]
+    public async Task EndDuelDuringBrainStep_WhenCombatWasInactive_KeepsRuntimeAndMoverRegistered()
+    {
+        BotTestFixture.RegisterTaskManager();
+        try
+        {
+            var botManager = new BotManager(_ => null, onlineLookup: _ => null);
+            BotTestFixture.RegisterSingletons(botManager);
+            var manager = new BotCombatManager();
+            var host = BotHost.Instance;
+            var bot = BotTestFixture.MakeBot(11, default);
+            var movementState = new BotMovementState();
+            var combatState = new BotCombatState
+            {
+                BotId = bot.Id,
+                IsActive = true,
+                WasCombatActive = false,
+                InDuel = true,
+                CurrentState = BotCombatStateType.Dueling
+            };
+            var broadcaster = new BotMovementBroadcaster(bot);
+            var mover = new BotSim.SimMover(bot, movementState, broadcaster);
+            var brain = new BlockingBrain(bot, combatState, broadcaster);
+            var runtime = new BotRuntime(bot, movementState, combatState, broadcaster, mover, brain);
+            BotTestFixture.GetDictionary<BotCombatState>(manager, "_combatStates")[bot.Id] = combatState;
+            BotTestFixture.GetDictionary<BotCombatTask>(manager, "_combatTasks")[bot.Id] = brain;
+            host.Register(runtime);
+            runtime.Schedule.NextBrainAt = host.TimeProvider.GetUtcNow().UtcDateTime;
+
+            var tick = System.Threading.Tasks.Task.Run(host.HostTask.Execute);
+            await Assert.That(brain.Entered.Wait(TimeSpan.FromSeconds(2))).IsTrue();
+
+            var endDuel = System.Threading.Tasks.Task.Run(() => manager.EndDuel(bot));
+            brain.Release.Set();
+            await System.Threading.Tasks.Task.WhenAll(tick, endDuel);
+
+            await Assert.That(host.GetRuntime(bot.Id)).IsSameReferenceAs(runtime);
+            await Assert.That(mover.Cancelled).IsFalse();
+        }
+        finally
+        {
+            BotTestFixture.ResetTaskManager();
+        }
+    }
+
+    private sealed class ThrowingMover(AAEmu.Game.Models.Game.Char.Character bot, BotMovementState state, BotMovementBroadcaster broadcaster)
+        : BotMovementTask(bot, state, broadcaster)
+    {
+        internal override void Step() => throw new InvalidOperationException("simulated mover failure");
+    }
+
+    private sealed class BlockingBrain(AAEmu.Game.Models.Game.Char.Character bot, BotCombatState state, BotMovementBroadcaster broadcaster)
+        : BotCombatTask(bot, state, broadcaster)
+    {
+        public ManualResetEventSlim Entered { get; } = new(false);
+        public ManualResetEventSlim Release { get; } = new(false);
+
+        internal override void Step()
+        {
+            Entered.Set();
+            Release.Wait();
+        }
+    }
+}
