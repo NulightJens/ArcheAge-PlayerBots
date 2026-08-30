@@ -15,10 +15,11 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Passed a 3.042 m Primeval close-target sample: Snare and Backdrop fired legally, a single tangent-dominant escape destination produced 17.445 m of lateral travel versus 4.573 m outward, and the bot settled at 19.182 m. Endless Arrows then supplied 11 of 15 damaging shots (73.3%) with zero cast failures, tick errors, runtime overlaps, or path requests.
 - Fixed Daggerspell burst rows starving its Fireball baseline during AAEmu's asynchronous plot-cooldown window. One shared 4-second special-damage throttle retained the Fireball default lane without adding per-tick work; the corrected 26.024-second physical pass held 18.970 m and produced 8 Fireballs in 11 damaging casts (72.7%), with zero cast failures, tick errors, runtime overlaps, or path requests.
 - Passed the native-party Cleric recipient gate while follow and attack orders competed. The Cleric retained the human party owner as its follow target, selected a 76.24%-health party member at 35.061 m, moved to a 24.047 m Antithesis standoff, healed the recipient to 100%, and resumed owner-relative movement. The 16.858-second instrumented pass had seven successful casts, zero failures, zero tick errors, zero runtime overlaps, and zero path requests.
+- Passed Primeval's moving-hostile gate against a level-50 melee fixture. The target moved 18.13 m, Primeval reported movement in 10 of 24 retained samples, and Endless Arrows starts overlapped the moving segment. A companion 30-second sample kept Endless Arrows at 16 of 22 offensive casts (72.73%); the isolated resource repeat completed 12/12 casts with a 0.7 ms bot-host p95 and no scans, path requests, skipped ticks, overlaps, or tick errors.
+- Tightened the physical-test protocol: mortal fixtures must be staged away from the human observer and unrelated respawning hostiles. A post-measurement cleanup caused observer and melee-bot deaths and is explicitly excluded from the accepted ranged result.
 
 ### Next combat pass
 
-- Validate Primeval's accepted range and lateral-escape behavior against a moving hostile target.
 - Extend the accepted Cleric recipient behavior to a continuously moving owner.
 - Add observable stealth loss, search, release, and reacquisition states.
 
