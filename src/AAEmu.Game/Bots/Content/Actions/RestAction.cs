@@ -44,7 +44,11 @@ public sealed class RestAction : IBotAction
             {
                 var healAmount = Math.Max(1, (int)(context.Bot.MaxHp * restHealPercent / 100f));
                 context.Bot.Hp = Math.Min(context.Bot.MaxHp, context.Bot.Hp + healAmount);
-                context.Bot.BroadcastPacket(new SCUnitPointsPacket(context.Bot.ObjId, context.Bot.Hp, context.Bot.Mp), true);
+                context.Bot.BroadcastPacket(new SCUnitPointsPacket(context.Bot.ObjId, context.Bot.Hp, context.Bot.Mp
+#if PLAYERBOTS_AAEMU_3_0
+                    , context.Bot.HighAbilityRsc
+#endif
+                ), true);
             }
 
             state.LastRestHealTick = context.Now;

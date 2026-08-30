@@ -37,7 +37,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
     private readonly ConcurrentDictionary<uint, Character> ActiveBots = new();
     private readonly ConcurrentDictionary<uint, BotMovementState> _botStates = new();
     private readonly ConcurrentDictionary<uint, BotMovementBroadcaster> _broadcasters = new();
-    private readonly ConcurrentDictionary<uint, AAEmu.Game.Models.Tasks.Task> _movementTasks = new();
+    private readonly ConcurrentDictionary<uint, global::AAEmu.Game.Models.Tasks.Task> _movementTasks = new();
     private readonly Func<uint, Character> _characterLoader;
     private readonly Func<uint, Character> _onlineLookup;
     private readonly Action<Character> _fullLoader;
@@ -591,7 +591,9 @@ public class BotManager : Singleton<BotManager>, IBotManager
         }
 
         character.Buffs.AddBuff((uint)BuffConstants.LoggedOn, character);
+#if !PLAYERBOTS_AAEMU_3_0
         character.Buffs.LoadActiveBuffs(character);
+#endif
         character.CheckWantedThreshold();
         character.UpdateGearBonuses(null, null);
         character.RestoreSavedHpMp();

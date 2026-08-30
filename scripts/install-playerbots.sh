@@ -1,17 +1,32 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -lt 1 || $# -gt 2 ]]; then
-  echo "Usage: $0 /path/to/AAEmu [--check-only]" >&2
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $0 /path/to/AAEmu [--track aaemu12|aaemu30] [--allow-experimental] [--check-only]" >&2
   exit 2
 fi
 
 aaemu_root="$(cd "$1" && pwd)"
-check_only="${2:-}"
+shift
+check_only=false
+allow_experimental=false
+track=auto
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --check-only) check_only=true; shift ;;
+    --allow-experimental) allow_experimental=true; shift ;;
+    --track)
+      [[ $# -ge 2 ]] || { echo "--track requires aaemu12 or aaemu30" >&2; exit 2; }
+      track="$2"
+      shift 2
+      ;;
+    *) echo "Unknown option: $1" >&2; exit 2 ;;
+  esac
+done
 module_root="$(cd "$(dirname "$0")/.." && pwd)"
 expected_module_root="$aaemu_root/modules/archeage-playerbots"
-supported_base="62e3eb1d87da01194802ac886cd500134facad28"
-patch_path="$module_root/compatibility/aaemu-1.2-r208022-v2.patch"
+base_12="62e3eb1d87da01194802ac886cd500134facad28"
+base_30="8c1c943bb2309eefffb9da2aa99a408d0acbb095"
 sql_source="$module_root/sql/2026-08-25_aaemu_game_bot_archetype_plans.sql"
 sql_destination="$aaemu_root/SQL/updates/2026-08-25_aaemu_game_bot_archetype_plans.sql"
 
@@ -24,14 +39,46 @@ for required in AAEmu.Game/AAEmu.Game.csproj AAEmu.UnitTests/AAEmu.UnitTests.csp
   [[ -e "$aaemu_root/$required" ]] || { echo "Incomplete AAEmu checkout: missing $required" >&2; exit 1; }
 done
 
-git -C "$aaemu_root" cat-file -e "$supported_base^{commit}" 2>/dev/null || {
-  echo "The supported AAEmu base commit is not present. Fetch AAEmu history and retry." >&2
+is_track() {
+  local base="$1"
+  git -C "$aaemu_root" cat-file -e "$base^{commit}" 2>/dev/null &&
+    git -C "$aaemu_root" merge-base --is-ancestor "$base" HEAD
+}
+
+if [[ "$track" == auto ]]; then
+  matches=()
+  is_track "$base_12" && matches+=(aaemu12)
+  is_track "$base_30" && matches+=(aaemu30)
+  [[ ${#matches[@]} -eq 1 ]] || {
+    echo "Could not identify exactly one supported AAEmu lineage; pass --track aaemu12 or --track aaemu30." >&2
+    exit 1
+  }
+  track="${matches[0]}"
+fi
+
+case "$track" in
+  aaemu12)
+    supported_base="$base_12"
+    patch_path="$module_root/compatibility/aaemu-1.2-r208022-v2.patch"
+    status=supported
+    ;;
+  aaemu30)
+    supported_base="$base_30"
+    patch_path="$module_root/compatibility/aaemu-3.0.4.2-r336598-alpha.patch"
+    status=compile-validated
+    ;;
+  *) echo "Unknown track '$track'; expected aaemu12 or aaemu30." >&2; exit 2 ;;
+esac
+
+is_track "$supported_base" || {
+  echo "The checkout is not a descendant of the $track tested base $supported_base." >&2
   exit 1
 }
-git -C "$aaemu_root" merge-base --is-ancestor "$supported_base" HEAD || {
-  echo "This module currently supports AAEmu 1.2 descendants of $supported_base." >&2
+
+if [[ "$status" != supported && "$allow_experimental" != true ]]; then
+  echo "$track is compile-validated but awaits matching-client runtime acceptance; pass --allow-experimental only for isolated 3.0 development." >&2
   exit 1
-}
+fi
 
 already_patched=false
 can_apply=false
@@ -47,17 +94,14 @@ if [[ -e "$sql_destination" ]] && ! cmp -s "$sql_source" "$sql_destination"; the
   exit 1
 fi
 
-if [[ "$check_only" == "--check-only" ]]; then
+if [[ "$check_only" == true ]]; then
   [[ "$already_patched" == true ]] && state=installed || state=ready
-  echo "ArcheAge PlayerBots validation passed; state: $state."
+  echo "ArcheAge PlayerBots validation passed; track: $track; state: $state; status: $status."
   exit 0
-elif [[ -n "$check_only" ]]; then
-  echo "Unknown option: $check_only" >&2
-  exit 2
 fi
 
 if [[ "$can_apply" == true ]]; then
-  git -C "$aaemu_root" diff --quiet --no-ext-diff || {
+  [[ -z "$(git -C "$aaemu_root" status --porcelain=v1 --untracked-files=no)" ]] || {
     echo "AAEmu has tracked local changes. Commit or move those changes before installation." >&2
     exit 1
   }
@@ -65,4 +109,4 @@ if [[ "$can_apply" == true ]]; then
 fi
 
 [[ -e "$sql_destination" ]] || cp "$sql_source" "$sql_destination"
-echo "ArcheAge PlayerBots is installed. Rebuild AAEmu and apply the SQL updater before starting the game server."
+echo "ArcheAge PlayerBots is installed for $track. Rebuild AAEmu and apply the SQL updater before starting the game server."

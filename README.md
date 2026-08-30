@@ -10,12 +10,12 @@ This repository is **not an AAEmu fork**. AAEmu is a required host dependency. T
 
 ## Compatibility
 
-| Component | Supported |
+| Component | Status |
 | --- | --- |
-| AAEmu | ArcheAge 1.2 line based on `62e3eb1d87da01194802ac886cd500134facad28` |
-| Game/client data | 1.2 `r208022` |
-| ArcheAge 3.0 | Not yet supported |
-| Module release | `0.1.0-rc.2` |
+| ArcheAge 1.2 | Supported on AAEmu base `62e3eb1d87da01194802ac886cd500134facad28` with `r208022` data |
+| ArcheAge 3.0 | Compile-validated alpha on NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095`, client `3.0.4.2 r336598` |
+| 3.0 runtime acceptance | Blocked until matching `game_pak`, `compact.sqlite3`, and `compact.server.table.sqlite3` are supplied and isolated login/lifecycle tests pass |
+| Module version | `0.2.0-alpha.1` |
 
 ## Install
 
@@ -38,6 +38,15 @@ dotnet build AAEmu.slnx --no-incremental
 ```
 
 The installer is deliberately fail-closed: it validates the host lineage and patch before editing AAEmu, refuses conflicting local changes, and will not overwrite a different SQL migration. See [Installation](docs/INSTALLATION.md) for database and upgrade details.
+
+The commands above select the supported 1.2 track automatically. The compile-validated 3.0 adapter is intentionally opt-in while runtime acceptance is outstanding:
+
+```powershell
+& .\modules\archeage-playerbots\scripts\Install-PlayerBots.ps1 -AAEmuRoot $PWD -Track AAEmu30 -AllowExperimental
+dotnet build AAEmu.sln --no-incremental
+```
+
+Do not run the 3.0 track with 1.2 client data or against a live 1.2 database.
 
 The pinned upstream AAEmu revision currently resolves two high-severity transitive dependency advisories. A separate, optional and reviewable [host security baseline patch](compatibility/README.md) upgrades only the affected centrally managed packages; it is kept outside the PlayerBots installer because dependency policy belongs to the server operator.
 
@@ -85,8 +94,8 @@ See [Commands](docs/COMMANDS.md) for every operator command and [Testing](docs/T
 | --- | --- |
 | `src/AAEmu.Game/` | PlayerBots runtime code, commands, configuration, and content |
 | `tests/AAEmu.UnitTests/` | Module unit and host-integration tests |
-| `build/` | MSBuild imports that compile module source into the AAEmu host |
-| `compatibility/` | Reviewed AAEmu 1.2 host-hook patch |
+| `build/` | Versioned MSBuild imports that compile module source into the AAEmu host |
+| `compatibility/` | Reviewed AAEmu 1.2 and compile-validated 3.0 host-hook patches |
 | `sql/` | Module database migration |
 | `scripts/scale/` | Repeatable population/resource harness |
 | `docs/` | Human installation, command, architecture, development, and testing guides |

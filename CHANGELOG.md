@@ -4,6 +4,14 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ## Unreleased
 
+### ArcheAge 3.0 compile adapter
+
+- Added a standalone, opt-in adapter for NL0bP/AAEmu client `3.0.4.2 r336598`, pinned to base `8c1c943bb2309eefffb9da2aa99a408d0acbb095`.
+- Added version-specific build/test compatibility plus a reviewed 21-file host patch covering lifecycle, startup/shutdown, party events, world lookup, tick metrics, combat attribution, persistence, and operator command registration.
+- Added fail-closed dual-track PowerShell and Bash installation. The 3.0 path requires an explicit experimental flag while runtime acceptance is outstanding.
+- Passed non-incremental 3.0 Game and full-solution compilation with zero errors and passed the combined host/adapter unit suite 151/151. The four adapter regressions cover persisted HP/MP clamping, aggro cleanup, kill attribution, and tick-metric maxima.
+- Runtime 3.0 support is not claimed: matching `game_pak`, `compact.sqlite3`, and `compact.server.table.sqlite3` are not present on the development machine, so login/serializer and PlayerBots lifecycle acceptance remain open.
+
 ### Lifecycle and control
 
 - Fixed an inactive-duel lifecycle hole that could leave a bot in Combat state with no scheduled brain, presenting physically as only half of a party fighting.

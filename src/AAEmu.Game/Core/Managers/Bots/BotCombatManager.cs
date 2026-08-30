@@ -34,6 +34,9 @@ namespace AAEmu.Game.Core.Managers.Bots
 
         private readonly ConcurrentDictionary<uint, BotCombatState> _combatStates = new();
         private readonly ConcurrentDictionary<uint, BotCombatTask> _combatTasks = new();
+#if PLAYERBOTS_AAEMU_3_0
+        private readonly ConcurrentDictionary<uint, EventHandler<OnDamagedArgs>> _damageHandlers = new();
+#endif
         private readonly ITaskManager _taskManager;
         private readonly IDuelManager _duelManager;
         private readonly Lazy<IBotManager> _botManager;
@@ -77,6 +80,9 @@ namespace AAEmu.Game.Core.Managers.Bots
             var runtime = Host.GetRuntime(bot.Id);
             var state = _combatStates.GetOrAdd(bot.Id, _ => runtime?.CombatState ?? new BotCombatState { BotId = bot.Id });
             state.WasCombatActive = state.IsActive;
+#if PLAYERBOTS_AAEMU_3_0
+            StartDamageTracking(bot);
+#endif
             EnsureTask(bot, state);
         }
 
@@ -89,9 +95,36 @@ namespace AAEmu.Game.Core.Managers.Bots
             {
                 task.Cancelled = true;
             }
+#if PLAYERBOTS_AAEMU_3_0
+            StopDamageTracking(bot);
+#endif
             Host.Unregister(bot.Id);
             _combatStates.TryRemove(bot.Id, out _);
         }
+
+#if PLAYERBOTS_AAEMU_3_0
+        private void StartDamageTracking(Character bot)
+        {
+            var handler = _damageHandlers.GetOrAdd(bot.Id, _ => (_, args) =>
+            {
+                if (args?.Attacker == null || ReferenceEquals(args.Attacker, bot))
+                    return;
+
+                var aggro = bot.AggroTable.GetOrAdd(args.Attacker.ObjId,
+                    _ => new Aggro(args.Attacker));
+                aggro.AddAggro(AggroKind.Damage, Math.Max(1, args.Amount));
+            });
+            bot.Events.OnDamaged -= handler;
+            bot.Events.OnDamaged += handler;
+        }
+
+        private void StopDamageTracking(Character bot)
+        {
+            if (_damageHandlers.TryRemove(bot.Id, out var handler))
+                bot.Events.OnDamaged -= handler;
+            bot.AggroTable.Clear();
+        }
+#endif
 
         public void EnableCombat(Character bot, uint? targetTypeFilter = null, int? killGoal = null)
         {
@@ -386,7 +419,7 @@ namespace AAEmu.Game.Core.Managers.Bots
         }
 
         // ---- Internal Duel Accept Task ----
-        internal sealed class DuelAcceptTask : AAEmu.Game.Models.Tasks.Task
+        internal sealed class DuelAcceptTask : global::AAEmu.Game.Models.Tasks.Task
         {
             private readonly Character _bot;
             private readonly Character _challenger;

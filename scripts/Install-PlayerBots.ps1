@@ -3,11 +3,27 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $AAEmuRoot,
 
-    [switch] $CheckOnly
+    [switch] $CheckOnly,
+
+    [ValidateSet('Auto', 'AAEmu12', 'AAEmu30')]
+    [string] $Track = 'Auto',
+
+    [switch] $AllowExperimental
 )
 
 $ErrorActionPreference = 'Stop'
-$supportedBase = '62e3eb1d87da01194802ac886cd500134facad28'
+$tracks = @{
+    'AAEmu12' = @{
+        Base = '62e3eb1d87da01194802ac886cd500134facad28'
+        Patch = 'compatibility\aaemu-1.2-r208022-v2.patch'
+        Status = 'supported'
+    }
+    'AAEmu30' = @{
+        Base = '8c1c943bb2309eefffb9da2aa99a408d0acbb095'
+        Patch = 'compatibility\aaemu-3.0.4.2-r336598-alpha.patch'
+        Status = 'compile-validated'
+    }
+}
 $moduleRoot = Split-Path -Parent $PSScriptRoot
 $moduleRoot = (Resolve-Path -LiteralPath $moduleRoot).Path
 $aaemuRoot = (Resolve-Path -LiteralPath $AAEmuRoot).Path
@@ -23,17 +39,30 @@ foreach ($required in @('AAEmu.Game\AAEmu.Game.csproj', 'AAEmu.UnitTests\AAEmu.U
     }
 }
 
-& git -C $aaemuRoot cat-file -e "$supportedBase^{commit}" 2>$null
-if ($LASTEXITCODE -ne 0) {
-    throw "The supported AAEmu base commit is not present. Fetch AAEmu history and retry."
+function Test-Track([string] $name) {
+    $base = $tracks[$name].Base
+    & git -C $aaemuRoot cat-file -e "$base^{commit}" 2>$null
+    if ($LASTEXITCODE -ne 0) { return $false }
+    & git -C $aaemuRoot merge-base --is-ancestor $base HEAD
+    return $LASTEXITCODE -eq 0
 }
 
-& git -C $aaemuRoot merge-base --is-ancestor $supportedBase HEAD
-if ($LASTEXITCODE -ne 0) {
-    throw "This module currently supports AAEmu 1.2 descendants of $supportedBase."
+if ($Track -eq 'Auto') {
+    $matches = @($tracks.Keys | Where-Object { Test-Track $_ })
+    if ($matches.Count -ne 1) {
+        throw "Could not identify exactly one supported AAEmu lineage. Pass -Track AAEmu12 or -Track AAEmu30 after verifying the checkout."
+    }
+    $Track = $matches[0]
+}
+elseif (-not (Test-Track $Track)) {
+    throw "The selected checkout is not a descendant of the $Track tested base $($tracks[$Track].Base)."
 }
 
-$patchPath = Join-Path $moduleRoot 'compatibility\aaemu-1.2-r208022-v2.patch'
+if ($tracks[$Track].Status -ne 'supported' -and -not $AllowExperimental) {
+    throw "$Track is compile-validated but still awaits matching-client runtime acceptance. Re-run with -AllowExperimental only for isolated 3.0 development."
+}
+
+$patchPath = Join-Path $moduleRoot $tracks[$Track].Patch
 $sqlSource = Join-Path $moduleRoot 'sql\2026-08-25_aaemu_game_bot_archetype_plans.sql'
 $sqlDestination = Join-Path $aaemuRoot 'SQL\updates\2026-08-25_aaemu_game_bot_archetype_plans.sql'
 
@@ -56,13 +85,13 @@ if (Test-Path -LiteralPath $sqlDestination) {
 
 if ($CheckOnly) {
     $state = if ($alreadyPatched) { 'installed' } else { 'ready' }
-    Write-Host "ArcheAge PlayerBots validation passed; state: $state."
+    Write-Host "ArcheAge PlayerBots validation passed; track: $Track; state: $state; status: $($tracks[$Track].Status)."
     exit 0
 }
 
 if ($canApply) {
-    & git -C $aaemuRoot diff --quiet --no-ext-diff
-    if ($LASTEXITCODE -ne 0) {
+    $trackedChanges = @(& git -C $aaemuRoot status --porcelain=v1 --untracked-files=no)
+    if ($LASTEXITCODE -ne 0 -or $trackedChanges.Count -ne 0) {
         throw 'AAEmu has tracked local changes. Commit or move those changes before installation.'
     }
 
@@ -76,4 +105,4 @@ if (-not (Test-Path -LiteralPath $sqlDestination)) {
     Copy-Item -LiteralPath $sqlSource -Destination $sqlDestination
 }
 
-Write-Host 'ArcheAge PlayerBots is installed. Rebuild AAEmu and apply the SQL updater before starting the game server.'
+Write-Host "ArcheAge PlayerBots is installed for $Track. Rebuild AAEmu and apply the SQL updater before starting the game server."

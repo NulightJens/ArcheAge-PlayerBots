@@ -10,6 +10,9 @@ using AAEmu.Game.Models.Game.Models;
 using AAEmu.Game.Models.Game.Units.Movements;
 using AAEmu.Game.Models.StaticValues;
 using NLog;
+#if PLAYERBOTS_AAEMU_3_0
+using ModelManager = AAEmu.Game.Core.Managers.AAEmu.Game.Core.Managers.ModelManager;
+#endif
 
 namespace AAEmu.Game.Models.Tasks.Bots;
 

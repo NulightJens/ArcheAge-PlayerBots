@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);PLAYERBOTS_AAEMU_3_0</DefineConstants>
+  </PropertyGroup>
+
+  <Import Project="AAEmu.PlayerBots.Game.targets" />
+
+  <ItemGroup>
+    <Compile Remove="$(PlayerBotsModuleRoot)src\AAEmu.Game\Scripts\Commands\ExportWorldCommand.cs" />
+  </ItemGroup>
+</Project>

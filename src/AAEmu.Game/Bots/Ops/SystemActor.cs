@@ -23,7 +23,11 @@ internal sealed class SystemActor : Character
         WorldSpawnPosition spawnPosition = null;
         try
         {
+#if PLAYERBOTS_AAEMU_3_0
+            spawnPosition = WorldManager.Instance.GetWorld(WorldManager.DefaultInstanceId)?.SpawnPosition;
+#else
             spawnPosition = WorldManager.Instance.MainWorld?.Template?.SpawnPosition;
+#endif
         }
         catch (Exception)
         {

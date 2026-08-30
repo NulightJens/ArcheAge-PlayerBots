@@ -87,7 +87,10 @@ public sealed class BotBuffCommand : ICommand
         }
 
         var caster = new SkillCasterUnit(bot.ObjId);
-        var buff = new Buff(bot, bot, caster, template, null, DateTime.UtcNow) { AbLevel = abLevel };
+        var buff = new Buff(bot, bot, caster, template, null, DateTime.UtcNow)
+        {
+            AbLevel = checked((ushort)Math.Min(abLevel, ushort.MaxValue))
+        };
         bot.Buffs.AddBuff(buff);
         CommandManager.SendNormalText(this, messageOutput,
             $"Applied buff {buffId} to bot '{bot.Name}' (stealth={template.Stealth}, abLevel={abLevel}).");

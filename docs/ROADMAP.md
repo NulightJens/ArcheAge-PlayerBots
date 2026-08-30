@@ -45,7 +45,14 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 
 ## ArcheAge 3.0
 
-Blocked on provenance-recorded 3.0.4.2 assets, serializer compatibility, login smoke testing, and a one-bot lifecycle proof. The 1.2 module does not claim 3.0 support through configuration alone.
+- Completed: pinned NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` for client `3.0.4.2 r336598`.
+- Completed: compile-time compatibility layer, version-specific Game/test MSBuild targets, and reviewed 21-file host patch.
+- Completed: non-incremental Game and full-solution builds with zero compiler errors; combined host/adapter unit tests passed 151/151.
+- Completed: fail-closed dual-track installers and machine-readable compatibility metadata. The 3.0 track requires an explicit experimental flag.
+- Blocked: stage provenance-recorded 3.0.4.2 `game_pak`, `compact.sqlite3`, and `compact.server.table.sqlite3`. No verified matching set is present on this machine.
+- Then: isolated server startup, matching launcher login, and serializer smoke test.
+- Then: one-bot spawn/save/logout/restart proof, followed by four-role party/combat and 0/10/50/100 resource/recovery gates.
+- Promotion rule: 3.0 remains compile-validated alpha until every runtime gate passes; configuration or a successful build alone is not a support claim.
 
 ## Shelved experiments
 

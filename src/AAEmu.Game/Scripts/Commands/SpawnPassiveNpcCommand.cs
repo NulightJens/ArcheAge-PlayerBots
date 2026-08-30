@@ -64,8 +64,11 @@ public sealed class SpawnPassiveNpcCommand : ICommand
         var groundZ = WorldManager.Instance.GetHeight(
             spawnPosition.ZoneId,
             spawnPosition.X,
-            spawnPosition.Y,
-            spawnPosition.Z);
+            spawnPosition.Y
+#if !PLAYERBOTS_AAEMU_3_0
+            , spawnPosition.Z
+#endif
+        );
         if (float.IsFinite(groundZ) && groundZ != 0f)
             spawnPosition.Z = groundZ;
 
@@ -77,14 +80,20 @@ public sealed class SpawnPassiveNpcCommand : ICommand
         var spawnerTemplate = new NpcSpawnerTemplate(0, templateId);
         var spawner = new NpcSpawner
         {
+#if !PLAYERBOTS_AAEMU_3_0
             ParentWorld = character.ParentWorld,
+#endif
             Id = 0,
+#if !PLAYERBOTS_AAEMU_3_0
             SpawnerId = 0,
+#endif
             UnitId = templateId,
             Position = spawnPosition,
             Template = spawnerTemplate
         };
+#if !PLAYERBOTS_AAEMU_3_0
         spawner.SpawnableNpcs = [.. spawnerTemplate.Npcs];
+#endif
 
         Npc npc;
         try

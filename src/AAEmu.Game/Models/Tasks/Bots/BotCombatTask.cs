@@ -475,7 +475,11 @@ public class BotCombatTask : Task
             {
                 var healAmount = Math.Max(1, (int)(_bot.MaxHp * restHealPercent / 100f));
                 _bot.Hp = Math.Min(_bot.MaxHp, _bot.Hp + healAmount);
-                _bot.BroadcastPacket(new SCUnitPointsPacket(_bot.ObjId, _bot.Hp, _bot.Mp), true);
+                _bot.BroadcastPacket(new SCUnitPointsPacket(_bot.ObjId, _bot.Hp, _bot.Mp
+#if PLAYERBOTS_AAEMU_3_0
+                    , _bot.HighAbilityRsc
+#endif
+                ), true);
             }
             _lastHealTick = Now;
         }
@@ -587,7 +591,11 @@ public class BotCombatTask : Task
             _bot.Hp = _bot.MaxHp;
             _bot.Mp = _bot.MaxMp;
             _bot.PostUpdateCurrentHp(_bot, 0, _bot.Hp, KillReason.Unknown);
-            _bot.BroadcastPacket(new SCUnitPointsPacket(_bot.ObjId, _bot.Hp, _bot.Mp), true);
+            _bot.BroadcastPacket(new SCUnitPointsPacket(_bot.ObjId, _bot.Hp, _bot.Mp
+#if PLAYERBOTS_AAEMU_3_0
+                , _bot.HighAbilityRsc
+#endif
+            ), true);
             _bot.BroadcastPacket(new SCCharacterResurrectedPacket(
                 _bot.ObjId,
                 _bot.Transform.World.Position.X,
@@ -595,9 +603,11 @@ public class BotCombatTask : Task
                 _bot.Transform.World.Position.Z,
                 _bot.Transform.World.Rotation.Z
             ), true);
+#if !PLAYERBOTS_AAEMU_3_0
             _bot.Buffs.RemoveBuff((uint)BuffConstants.WeakenedBody);
             _bot.Buffs.RemoveBuff((uint)BuffConstants.RespawnCooldown);
             _bot.Buffs.RemoveBuff((uint)BuffConstants.WarZoneLeech);
+#endif
             _bot.DiedInPvp = false;
             _bot.DiedInPvpWarZone = false;
             _bot.ClearAllAggro();
