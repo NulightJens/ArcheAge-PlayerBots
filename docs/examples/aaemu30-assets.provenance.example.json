@@ -1,0 +1,10 @@
+{
+  "track": "ArcheAge 3.0.4.2 r336598",
+  "sourceUrl": "https://record-the-actual-source-used.example/",
+  "clientArchiveSha256": "replace-with-64-hexadecimal-characters",
+  "gamePakSha256": "replace-with-64-hexadecimal-characters",
+  "compactSha256": "replace-with-64-hexadecimal-characters",
+  "serverTableSha256": "replace-with-64-hexadecimal-characters",
+  "acquiredAt": "YYYY-MM-DDTHH:MM:SSZ",
+  "notes": "Record extraction directory and any upstream release or FAQ identifier."
+}

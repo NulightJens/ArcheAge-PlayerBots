@@ -11,6 +11,7 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Added fail-closed dual-track PowerShell and Bash installation. The 3.0 path requires an explicit experimental flag while runtime acceptance is outstanding.
 - Passed non-incremental 3.0 Game and full-solution compilation with zero errors and passed the combined host/adapter unit suite 151/151. The four adapter regressions cover persisted HP/MP clamping, aggro cleanup, kill attribution, and tick-metric maxima.
 - Runtime 3.0 support is not claimed: matching `game_pak`, `compact.sqlite3`, and `compact.server.table.sqlite3` are not present on the development machine, so login/serializer and PlayerBots lifecycle acceptance remain open.
+- Added a read-only 3.0 asset-provenance preflight that verifies the pinned emulator lineage, all three required files, SQLite headers, recorded SHA-256 hashes, and explicit rejection of known 1.2 compact databases before runtime startup.
 
 ### Lifecycle and control
 

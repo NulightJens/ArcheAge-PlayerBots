@@ -52,6 +52,17 @@ dotnet test .\AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-build
 
 Runtime acceptance additionally requires the matching `3.0.4.2 r336598` `game_pak`, `compact.sqlite3`, and `compact.server.table.sqlite3`. The retained build passed with zero errors and the combined host/adapter unit suite passed 151/151, but login, serializer, one-bot lifecycle, party, combat, and shutdown recovery remain blocked until those assets are available.
 
+Before starting the 3.0 server, copy `docs/examples/aaemu30-assets.provenance.example.json` outside the repository, replace every placeholder with the acquired files' hashes and source record, and run the read-only preflight:
+
+```powershell
+& .\modules\archeage-playerbots\scripts\Test-AAEmu30Assets.ps1 `
+    -AAEmuRoot $PWD `
+    -ClientRoot 'D:\path\to\ArcheAge-3.0.4.2-r336598' `
+    -ProvenancePath 'D:\path\to\aaemu30-assets.provenance.json'
+```
+
+The preflight pins the emulator lineage, requires all three files, validates SQLite headers and recorded SHA-256 hashes, and rejects the known 1.2 compact-database hashes. It does not prove client/server serializer compatibility; that remains a live login gate.
+
 ## What installation changes
 
 The module remains a separate Git repository. Installation selects a reviewed compatibility patch for the detected track and copies one migration into `SQL/updates/`. The 1.2 patch updates 26 host files; the 3.0 alpha patch updates 21 host files. The patches:
