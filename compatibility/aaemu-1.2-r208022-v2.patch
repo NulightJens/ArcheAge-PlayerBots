@@ -39,13 +39,16 @@ index 06130ba2..d4edbc3b 100644
          "addbuff": 100,
          "addgold": 100,
          "additem": 100,
-@@ -37,13 +46,31 @@
+@@ -37,13 +46,34 @@
          "addxp": 100,
          "around": 100,
          "build": 100,
 +        "botarchetype": 100,
 +        "botbuff": 100,
 +        "botclass": 100,
++        "botequip": 100,
++        "botgear": 100,
++        "botsetclass": 100,
 +        "botdebug": 100,
 +        "botmetrics": 100,
 +        "botduel": 100,
@@ -71,7 +74,7 @@ index 06130ba2..d4edbc3b 100644
          "moveto": 100,
          "nloc": 100,
          "nwrite": 100,
-@@ -51,8 +78,14 @@
+@@ -51,11 +81,19 @@
          "pingpos": 100,
          "position": 100,
          "proc": 100,
@@ -86,7 +89,12 @@ index 06130ba2..d4edbc3b 100644
          "rotate": 100,
          "scripts": 100,
          "setfaction": 100,
-@@ -72,10 +105,11 @@
++        "setarchetype": 100,
++        "setclass": 100,
+         "setlevel": 100,
+         "settitle": 100,
+         "snow": 100,
+@@ -72,10 +110,11 @@
          "tickdoodad": 100,
          "tower_def": 100,
          "useskill": 100,
@@ -1185,3 +1193,40 @@ index c7919db9..5a45d7b5 100644
 +    }
 +
  }
+diff --git a/AAEmu.Game/Scripts/Commands/Kit.cs b/AAEmu.Game/Scripts/Commands/Kit.cs
+index e5034ef58..c0fb913bd 100644
+--- a/AAEmu.Game/Scripts/Commands/Kit.cs
++++ b/AAEmu.Game/Scripts/Commands/Kit.cs
+@@ -1,6 +1,7 @@
+ ﻿using System.Drawing;
+ using AAEmu.Commons.IO;
+ using AAEmu.Game.Core.Managers;
++using AAEmu.Game.Core.Managers.Bots;
+ using AAEmu.Game.Models.Game;
+ using AAEmu.Game.Models.Game.Char;
+ using AAEmu.Game.Models.Game.Items.Actions;
+@@ -147,6 +148,24 @@ public class AddKit : ICommand
+ 
+         if (itemsAdded > 0)
+         {
++            var targetBot = BotManager.Instance.GetBot(targetPlayer.Id);
++            if (targetBot != null)
++            {
++                var archetypeState = BotArchetypeManager.Instance.GetState(targetBot);
++                if (archetypeState is { IsInitialized: true })
++                {
++                    BotArchetypeManager.Instance.ForceReevaluate(targetBot);
++                    targetBot.SaveDirectlyToDatabase();
++                    CommandManager.SendNormalText(this, messageOutput,
++                        $"Bot '{targetBot.Name}' automatically evaluated and equipped the best compatible items from kit '{kitName}'.");
++                }
++                else
++                {
++                    CommandManager.SendErrorText(this, messageOutput,
++                        $"Kit items were added, but bot '{targetBot.Name}' has no initialized archetype. Run /setclass {targetBot.Id} <archetype>, then /botgear {targetBot.Id} equip.");
++                }
++            }
++
+             if (character.Id != targetPlayer.Id)
+             {
+                 character.SendMessage($"[Items] added {itemsAdded} items to {targetPlayer.Name}'s inventory");

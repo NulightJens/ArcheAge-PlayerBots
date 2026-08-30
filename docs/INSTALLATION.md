@@ -19,7 +19,7 @@ This guide covers a clean ArcheAge PlayerBots installation and updating an exist
 | Track | AAEmu base | Status |
 | --- | --- | --- |
 | ArcheAge 1.2 `r208022` | `AAEmu/AAEmu` commit `62e3eb1d87da01194802ac886cd500134facad28` | Supported |
-| ArcheAge 3.0.4.2 `r336598` | `NL0bP/AAEmu` commit `8c1c943bb2309eefffb9da2aa99a408d0acbb095` | Experimental; server startup only |
+| ArcheAge 3.0.4.2 `r336598` | `NL0bP/AAEmu` commit `8c1c943bb2309eefffb9da2aa99a408d0acbb095` | Experimental; partial runtime acceptance |
 
 You also need:
 
@@ -112,7 +112,7 @@ Continue with [Configuration](CONFIGURATION.md) or the full [Command Guide](COMM
 
 ## Experimental ArcheAge 3.0 track
 
-The 3.0 adapter is available for isolated development only. Matching assets and server startup have been validated, but client login, bot lifecycle, party behavior, combat, and population recovery are still awaiting acceptance.
+The 3.0 adapter is available for isolated development only. Matching assets, server startup, native login/world entry, and one-bot lifecycle/follow/combat/class/gear paths have been exercised. Four-role behavior and population recovery still await acceptance.
 
 Use the exact NL0bP/AAEmu base from the requirements table and opt in explicitly:
 

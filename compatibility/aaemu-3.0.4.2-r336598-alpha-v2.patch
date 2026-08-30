@@ -40,7 +40,7 @@ index 06130ba25c21f601e1411b09da455b0d87e42278..3dfd605f080e1a789ab7df87dea97ce1
          "addgold": 100,
          "additem": 100,
          "addlabor": 100,
-@@ -37,6 +46,22 @@
+@@ -37,6 +46,25 @@
          "addxp": 100,
          "around": 100,
          "build": 100,
@@ -50,6 +50,9 @@ index 06130ba25c21f601e1411b09da455b0d87e42278..3dfd605f080e1a789ab7df87dea97ce1
 +        "botattackobject": 100,
 +        "botbuff": 100,
 +        "botclass": 100,
++        "botequip": 100,
++        "botgear": 100,
++        "botsetclass": 100,
 +        "botdebug": 100,
 +        "botduel": 100,
 +        "botfollow": 100,
@@ -63,7 +66,7 @@ index 06130ba25c21f601e1411b09da455b0d87e42278..3dfd605f080e1a789ab7df87dea97ce1
          "clearcombat": 100,
          "damage": 100,
          "despawnall": 100,
-@@ -44,6 +69,7 @@
+@@ -44,6 +72,7 @@
          "echo": 100,
          "housebindingmove": 100,
          "move_all": 100,
@@ -71,7 +74,7 @@ index 06130ba25c21f601e1411b09da455b0d87e42278..3dfd605f080e1a789ab7df87dea97ce1
          "moveto": 100,
          "nloc": 100,
          "nwrite": 100,
-@@ -52,7 +78,13 @@
+@@ -52,10 +81,18 @@
          "position": 100,
          "proc": 100,
          "reloadauction": 100,
@@ -85,7 +88,12 @@ index 06130ba25c21f601e1411b09da455b0d87e42278..3dfd605f080e1a789ab7df87dea97ce1
          "rotate": 100,
          "scripts": 100,
          "setfaction": 100,
-@@ -72,10 +104,11 @@
++        "setarchetype": 100,
++        "setclass": 100,
+         "setlevel": 100,
+         "settitle": 100,
+         "snow": 100,
+@@ -72,10 +109,11 @@
          "tickdoodad": 100,
          "tower_def": 100,
          "useskill": 100,
@@ -746,3 +754,40 @@ index a3937b1b81231649028eb85eb179b8d1d16bbd79..ac86d18a4d570c0e07cfc0aa3777374a
    <PropertyGroup>
      <OutputType>Exe</OutputType>
      <TargetFramework>$(TargetFramework)</TargetFramework>
+diff --git a/AAEmu.Game/Scripts/Commands/Kit.cs b/AAEmu.Game/Scripts/Commands/Kit.cs
+index d00cd466..2c728c75 100644
+--- a/AAEmu.Game/Scripts/Commands/Kit.cs
++++ b/AAEmu.Game/Scripts/Commands/Kit.cs
+@@ -4,6 +4,7 @@ using System.Collections.Generic;
+ using System.Drawing;
+ using AAEmu.Commons.IO;
+ using AAEmu.Game.Core.Managers;
++using AAEmu.Game.Core.Managers.Bots;
+ using AAEmu.Game.Models.Game;
+ using AAEmu.Game.Models.Game.Char;
+ using AAEmu.Game.Models.Game.Items.Actions;
+@@ -151,6 +152,24 @@ public class AddKit : ICommand
+ 
+         if (itemsAdded > 0)
+         {
++            var targetBot = BotManager.Instance.GetBot(targetPlayer.Id);
++            if (targetBot != null)
++            {
++                var archetypeState = BotArchetypeManager.Instance.GetState(targetBot);
++                if (archetypeState is { IsInitialized: true })
++                {
++                    BotArchetypeManager.Instance.ForceReevaluate(targetBot);
++                    targetBot.SaveDirectlyToDatabase();
++                    CommandManager.SendNormalText(this, messageOutput,
++                        $"Bot '{targetBot.Name}' automatically evaluated and equipped the best compatible items from kit '{kitname}'.");
++                }
++                else
++                {
++                    CommandManager.SendErrorText(this, messageOutput,
++                        $"Kit items were added, but bot '{targetBot.Name}' has no initialized archetype. Run /setclass {targetBot.Id} <archetype>, then /botgear {targetBot.Id} equip.");
++                }
++            }
++
+             if (character.Id != targetPlayer.Id)
+             {
+                 character.SendMessage($"[Items] added {itemsAdded} items to {targetPlayer.Name}'s inventory");

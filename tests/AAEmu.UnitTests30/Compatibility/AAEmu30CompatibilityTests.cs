@@ -5,8 +5,10 @@ using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.UnitManagers;
 using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Units.Static;
+using AAEmu.Game.Scripts.Commands;
 using AAEmu.Game.Services.WebApi.Controllers;
 using NetCoreServer;
 using Xunit;
@@ -15,6 +17,20 @@ namespace AAEmu.UnitTests.PlayerBots.Compatibility;
 
 public sealed class AAEmu30CompatibilityTests
 {
+    [Fact]
+    public void HumanClassAndGearCommandsRemainAvailableOnThe30Adapter()
+    {
+        var setClass = new SetBotClass();
+        var gear = new BotGearCommand();
+
+        Assert.Contains("setclass", setClass.CommandNames);
+        Assert.Contains("botsetclass", setClass.CommandNames);
+        Assert.Equal("Battlerage", SetBotClass.TreeName(AbilityType.Fight));
+        Assert.Equal("Auramancy", SetBotClass.TreeName(AbilityType.Will));
+        Assert.Contains("botgear", gear.CommandNames);
+        Assert.Contains("botequip", gear.CommandNames);
+    }
+
     [Fact]
     public void RestoreSavedHpMpClampsPersistedValuesToTheCurrentMaximums()
     {
@@ -30,6 +46,29 @@ public sealed class AAEmu30CompatibilityTests
 
         Assert.Equal(100, character.Hp);
         Assert.Equal(0, character.Mp);
+    }
+
+    [Fact]
+    public void RestoreSavedHpMpUsesValuesCapturedBeforeEarlyHostClamping()
+    {
+        var character = new TestCharacter
+        {
+            MaxHp = 370,
+            Hp = 720,
+            MaxMp = 320,
+            Mp = 670
+        };
+
+        character.CaptureSavedHpMpForBotLoad();
+        character.Hp = character.MaxHp;
+        character.Mp = character.MaxMp;
+        character.MaxHp = 720;
+        character.MaxMp = 670;
+
+        character.RestoreSavedHpMp();
+
+        Assert.Equal(720, character.Hp);
+        Assert.Equal(670, character.Mp);
     }
 
     [Fact]

@@ -51,7 +51,8 @@ public class BotAccessLevelsTests
             .GetTypes()
             .Where(type => typeof(ICommand).IsAssignableFrom(type) && !type.IsAbstract)
             .Where(type => type.Name.StartsWith("Bot", StringComparison.Ordinal) ||
-                           type.Name is nameof(AddBot) or nameof(RemoveBot) or nameof(MoveBot) or nameof(ExportWorldCommand))
+                           type.Name is nameof(AddBot) or nameof(RemoveBot) or nameof(MoveBot) or
+                               nameof(ExportWorldCommand) or nameof(SetBotClass))
             .Select(type => (ICommand)Activator.CreateInstance(type)!)
             .ToList();
     }

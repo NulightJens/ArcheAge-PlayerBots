@@ -6,9 +6,9 @@ The patches are intentionally visible and reviewable. They are applied to an AAE
 
 ## ArcheAge 1.2 host hooks
 
-`aaemu-1.2-r208022-v2.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and adds the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs. Version 2 also registers the GM-only `/botbuff` development command in the host access table.
+`aaemu-1.2-r208022-v2.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and adds the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs. Version 2 also registers the GM-only development commands and connects the host `/kit` command to PlayerBots equipment evaluation.
 
-SHA-256: `5c174a63bbdf94e4e49421787558bf8224407d36748d560fdf9643f6c9c188c3`
+SHA-256: `edabf16963d53d58ff6cb1244611b09ed3589d94b1e4825d60494a1bd67b4802`
 
 The released `aaemu-1.2-r208022.patch` remains unchanged for `0.1.0-rc.2`; it is not the active Unreleased installer contract.
 
@@ -16,11 +16,11 @@ Use the installer rather than applying this patch manually; it validates lineage
 
 ## ArcheAge 3.0 alpha host hooks
 
-`aaemu-3.0.4.2-r336598-alpha-v2.patch` targets exact base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` from NL0bP/AAEmu's `client_version/3.0_client_(2017_04_20)+` branch. It adds the older host-line equivalents of PlayerBots lifecycle, party, world-query, tick-metric, character, command, service-startup, and build hooks. Version 2 also gives the loopback Web API its connectionless `@system` actor and bypasses account lookup only for that concrete actor type.
+`aaemu-3.0.4.2-r336598-alpha-v2.patch` targets exact base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` from NL0bP/AAEmu's `client_version/3.0_client_(2017_04_20)+` branch. It adds the older host-line equivalents of PlayerBots lifecycle, party, world-query, tick-metric, character, command, service-startup, and build hooks. Version 2 also gives the loopback Web API its connectionless `@system` actor, bypasses account lookup only for that actor type, and connects `/kit` to PlayerBots equipment evaluation.
 
-SHA-256: `a9d51a4d3965006aae86da3e5724c452e25b15fc80990934016af1a3d053f164`
+SHA-256: `3a27f1b481eef981f589a259d94171b679dd1fd3faa8472f55c376573d68c07f`
 
-This track is server-start-validated, not runtime-supported. An isolated server accepted the matching `game_pak`, both compact databases, all 94 PlayerBots skill IDs, all 38 passive-buff IDs, the module migration, unique network ports, `@system` metrics, and graceful zero-bot shutdown/restart. The focused 3.0 adapter suite now passes 6/6. Install it only with the explicit experimental flag and an isolated matching-client environment. Runtime promotion still requires client login/serializer acceptance, one-bot lifecycle, four-role party/combat behavior, scale/resource gates, and clean populated recovery.
+This track remains experimental, not runtime-supported. In addition to server-start acceptance, native account/character creation, login/world entry, and one-bot spawn/follow/combat/class/gear paths have passed once. The 3.0 suite now passes 155/155. Install it only with the explicit experimental flag and an isolated matching-client environment. Runtime promotion still requires clean-start repeats, four-role party/combat behavior, scale/resource gates, and clean populated recovery.
 
 The earlier `aaemu-3.0.4.2-r336598-alpha.patch` remains unchanged as the compile-only alpha contract; it is not the active installer patch.
 

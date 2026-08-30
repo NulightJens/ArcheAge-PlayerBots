@@ -54,6 +54,29 @@ public class BotCommandsTests
     }
 
     [Test]
+    public async Task SetBotClass_ExposesRecoveredHumanFacingAliases()
+    {
+        var command = new SetBotClass();
+
+        await Assert.That(command.CommandNames).Contains("setclass");
+        await Assert.That(command.CommandNames).Contains("botsetclass");
+        await Assert.That(command.CommandNames).Contains("setarchetype");
+        await Assert.That(SetBotClass.TreeName(AbilityType.Fight)).IsEqualTo("Battlerage");
+        await Assert.That(SetBotClass.TreeName(AbilityType.Will)).IsEqualTo("Auramancy");
+        await Assert.That(SetBotClass.TreeName(AbilityType.Vocation)).IsEqualTo("Shadowplay");
+    }
+
+    [Test]
+    public async Task BotGear_ExposesShowEquipAndInspectWorkflow()
+    {
+        var command = new BotGearCommand();
+
+        await Assert.That(command.CommandNames).Contains("botgear");
+        await Assert.That(command.CommandNames).Contains("botequip");
+        await Assert.That(command.GetCommandLineHelp()).Contains("show|equip|inspect");
+    }
+
+    [Test]
     public async Task BotState_NonNumeric_SendsHelp()
     {
         var output = Execute(new BotStateCommand(), "x");

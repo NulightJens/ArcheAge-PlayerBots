@@ -355,6 +355,80 @@ namespace AAEmu.Game.Core.Managers.Bots
             return definitions;
         }
 
+        /// <summary>
+        /// Deterministically assigns all three ability trees for an archetype, persists the final plan,
+        /// synchronizes the requested level, then rebuilds the bot's learned skills and equipment.
+        /// </summary>
+        public bool SetArchetype(Character bot, string archetypeName, byte targetLevel, out string resolvedName)
+        {
+            resolvedName = null;
+            if (bot == null || string.IsNullOrWhiteSpace(archetypeName))
+                return false;
+
+            var definition = GetDefinitionsSnapshot().Values.FirstOrDefault(candidate =>
+                string.Equals(candidate.Name, archetypeName, StringComparison.OrdinalIgnoreCase));
+            if (definition?.RequiredAbilities == null || definition.RequiredAbilities.Count != 3)
+                return false;
+
+            resolvedName = definition.Name;
+            bot.Ability1 = definition.RequiredAbilities[0];
+            bot.Ability2 = definition.RequiredAbilities[1];
+            bot.Ability3 = definition.RequiredAbilities[2];
+
+#if PLAYERBOTS_AAEMU_3_0
+            var maxLevel = ExperienceManager.MaxPlayerLevel;
+#else
+            var experienceManager = _experienceManager ?? ExperienceManager.Instance;
+            var maxLevel = experienceManager.MaxPlayerLevel;
+#endif
+            if (targetLevel >= 2 && targetLevel <= maxLevel)
+            {
+#if PLAYERBOTS_AAEMU_3_0
+                var characterExp = ExperienceManager.Instance.GetExpNeededToGivenLevel(bot.Experience, targetLevel);
+#else
+                var characterExp = experienceManager.GetExpNeededToGivenLevel(bot.Experience, targetLevel);
+#endif
+                if (characterExp > 0)
+                    bot.AddExp(characterExp, false);
+
+                foreach (var ability in ActiveAbilities(bot))
+                {
+                    if (IsEmptyAbility(ability) || !bot.Abilities.Abilities.TryGetValue(ability, out var abilityData))
+                        continue;
+
+#if PLAYERBOTS_AAEMU_3_0
+                    var abilityExp = ExperienceManager.Instance.GetExpNeededToGivenLevel(abilityData.Exp, targetLevel);
+#else
+                    var abilityExp = experienceManager.GetExpNeededToGivenLevel(abilityData.Exp, targetLevel);
+#endif
+                    if (abilityExp > 0)
+                        bot.Abilities.AddExp(ability, abilityExp);
+                }
+            }
+
+            var state = _archetypeStates.GetOrAdd(bot.Id, _ => new BotArchetypeState());
+            state.ArchetypeName = definition.Name;
+            state.PlannedArchetype = null;
+            state.IsInitialized = true;
+            state.LastKnownLevel = bot.Level;
+            SaveArchetype(bot.Id, definition.Name, true);
+
+            ReapplyArchetype(bot, state);
+            state.LastGearCheck = DateTime.UtcNow;
+            bot.SaveDirectlyToDatabase();
+            Logger.Info(
+                $"BOT id={bot.Id} ev=archetype_set name={definition.Name} abilities={bot.Ability1}/{bot.Ability2}/{bot.Ability3} level={bot.Level}");
+            return true;
+        }
+
+        public IReadOnlyList<string> GetArchetypeNames()
+        {
+            return GetDefinitionsSnapshot().Values
+                .Select(definition => definition.Name)
+                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
+
         // ---- Database helpers ----
         private (string archetypeName, bool isFinal) GetArchetypeFromDb(uint characterId)
         {

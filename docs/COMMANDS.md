@@ -81,6 +81,7 @@ The optional values are rear distance, column count (`auto` allowed), and spacin
 
 | Command | Purpose |
 | --- | --- |
+| `/setclass [id] <archetype> [level]` | Replace all three skill trees, refresh skills and equipment, save, and respawn the bot. Omit `id` when targeting a live bot |
 | `/botarchetype <id>` | Show the bot's assigned archetype |
 | `/botarchetype <id> force` | Re-evaluate the character and apply its plan |
 | `/botarchetype <id> reroll` | Choose a new eligible archetype |
@@ -91,6 +92,27 @@ The optional values are rear distance, column count (`auto` allowed), and spacin
 | `/reloadbotconfig` | Reload `Configurations/BotConfig.json` |
 
 See [Configuration](CONFIGURATION.md) before editing runtime data.
+
+`/setclass` is also the repair command when a bot's persisted trees or learned skills do not match its intended role. With no arguments it lists the available archetypes. Omit the level to retain the current one:
+
+```text
+/setclass 2 Darkrunner 55
+/setclass 3 Primeval 55
+/setclass 4 Daggerspell 55
+/setclass 5 Cleric 55
+```
+
+## Bot equipment
+
+The normal AAEmu `/kit <characterName> <kitName>` command now asks PlayerBots to equip the best compatible items immediately after placing a kit in a live bot's bag.
+
+| Command | Purpose |
+| --- | --- |
+| `/botgear <id> show` | List equipped slots and equipment candidates in the bag |
+| `/botgear <id> equip` | Re-evaluate and equip the best compatible bag items |
+| `/botgear <id> inspect` | Open the bot's read-only remote character-detail sheet in the GM client |
+
+`/botequip` is an alias for `/botgear`. ArcheAge's remote-detail protocol is read-only: the stock client cannot safely drag equipment into another character's inventory. Use `/kit` and `/botgear ... equip` for server-authoritative changes.
 
 ## Diagnostics
 

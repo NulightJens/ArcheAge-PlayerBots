@@ -19,7 +19,7 @@
       "testedBaseCommit": "62e3eb1d87da01194802ac886cd500134facad28",
       "status": "supported",
       "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v2.patch",
-      "compatibilityPatchSha256": "5c174a63bbdf94e4e49421787558bf8224407d36748d560fdf9643f6c9c188c3"
+      "compatibilityPatchSha256": "edabf16963d53d58ff6cb1244611b09ed3589d94b1e4825d60494a1bd67b4802"
     },
     {
       "id": "AAEmu30",
@@ -28,12 +28,12 @@
       "testedBaseCommit": "8c1c943bb2309eefffb9da2aa99a408d0acbb095",
       "status": "server-start-validated",
       "compatibilityPatch": "compatibility/aaemu-3.0.4.2-r336598-alpha-v2.patch",
-      "compatibilityPatchSha256": "a9d51a4d3965006aae86da3e5724c452e25b15fc80990934016af1a3d053f164"
+      "compatibilityPatchSha256": "3a27f1b481eef981f589a259d94171b679dd1fd3faa8472f55c376573d68c07f"
     }
   ],
   "install": {
     "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v2.patch",
-    "compatibilityPatchSha256": "5c174a63bbdf94e4e49421787558bf8224407d36748d560fdf9643f6c9c188c3",
+    "compatibilityPatchSha256": "edabf16963d53d58ff6cb1244611b09ed3589d94b1e4825d60494a1bd67b4802",
     "optionalHostSecurityPatch": "compatibility/aaemu-1.2-security-baseline.patch",
     "optionalHostSecurityPatchSha256": "64d0fb4ba543a86670a4e8d9fa5859548fe23217b842f4b1660852e4131371ae",
     "gameTargets": "build/AAEmu.PlayerBots.Game.targets",
