@@ -46,14 +46,16 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 ## ArcheAge 3.0
 
 - Completed: pinned NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` for client `3.0.4.2 r336598`.
-- Completed: compile-time compatibility layer, version-specific Game/test MSBuild targets, and reviewed 21-file host patch.
-- Completed: non-incremental Game and full-solution builds with zero compiler errors; combined host/adapter unit tests passed 151/151.
+- Completed: compile-time compatibility layer, version-specific Game/test MSBuild targets, and reviewed 22-file host patch.
+- Completed: non-incremental Game and full-solution builds with zero compiler errors; combined host/adapter unit tests passed 153/153, including the 6/6 focused adapter group.
 - Completed: fail-closed dual-track installers and machine-readable compatibility metadata. The 3.0 track requires an explicit experimental flag.
-- Completed: acquired and integrity-tested the upstream option-1 client archive; `archeage.exe` reports `3.0.4.2`, and the 36.81 GB `game_pak` has a retained SHA-256 provenance record.
-- Blocked: acquire the matching decrypted `compact.sqlite3` and `compact.server.table.sqlite3` published through the upstream AAEmu Discord FAQ. Embedded client compact payloads are encrypted and are not accepted as server databases.
-- Then: isolated server startup, matching launcher login, and serializer smoke test.
+- Completed: acquired and integrity-tested the matching client, 36.81 GB `game_pak`, decrypted `compact.sqlite3`, and `compact.server.table.sqlite3`; retained provenance includes every SHA-256.
+- Completed: isolated MySQL schemas and unique Login/Game/Stream/Web API ports; server startup loaded 491,683 translations, 257 zones, 6,606 quests, 36,694 item templates, and 24,175 skills.
+- Completed: all 94 PlayerBots rotation/learn-order skill IDs and all 38 passive-buff IDs resolve. The four home anchors retain 4 m Triple Slash, 20 m Endless Arrows, 20 m Flamebolt, and 25 m Antithesis ranges. Thirty-six audited skills have data changes from 1.2 and five rotation skills have target-semantics changes, so physical role validation remains mandatory.
+- Completed: 3.0 Web API `@system` control, module schema application, zero-bot metrics, graceful cleanup, and clean restart. The server-start baseline used about 6.35 GB working set and 6.40 GB private memory, so 3.0 gets its own resource budget rather than inheriting the 1.2 scale claim.
+- Next: matching launcher login and serializer smoke test.
 - Then: one-bot spawn/save/logout/restart proof, followed by four-role party/combat and 0/10/50/100 resource/recovery gates.
-- Promotion rule: 3.0 remains compile-validated alpha until every runtime gate passes; configuration or a successful build alone is not a support claim.
+- Promotion rule: 3.0 remains server-start-validated alpha until every runtime gate passes; configuration, a successful build, or server startup alone is not a support claim.
 
 ## Shelved experiments
 

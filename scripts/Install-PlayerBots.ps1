@@ -20,8 +20,8 @@ $tracks = @{
     }
     'AAEmu30' = @{
         Base = '8c1c943bb2309eefffb9da2aa99a408d0acbb095'
-        Patch = 'compatibility\aaemu-3.0.4.2-r336598-alpha.patch'
-        Status = 'compile-validated'
+        Patch = 'compatibility\aaemu-3.0.4.2-r336598-alpha-v2.patch'
+        Status = 'server-start-validated'
     }
 }
 $moduleRoot = Split-Path -Parent $PSScriptRoot
@@ -59,7 +59,7 @@ elseif (-not (Test-Track $Track)) {
 }
 
 if ($tracks[$Track].Status -ne 'supported' -and -not $AllowExperimental) {
-    throw "$Track is compile-validated but still awaits matching-client runtime acceptance. Re-run with -AllowExperimental only for isolated 3.0 development."
+    throw "$Track is $($tracks[$Track].Status) but still awaits complete matching-client runtime acceptance. Re-run with -AllowExperimental only for isolated 3.0 development."
 }
 
 $patchPath = Join-Path $moduleRoot $tracks[$Track].Patch

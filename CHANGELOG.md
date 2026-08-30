@@ -4,13 +4,14 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ## Unreleased
 
-### ArcheAge 3.0 compile adapter
+### ArcheAge 3.0 server-start adapter
 
 - Added a standalone, opt-in adapter for NL0bP/AAEmu client `3.0.4.2 r336598`, pinned to base `8c1c943bb2309eefffb9da2aa99a408d0acbb095`.
-- Added version-specific build/test compatibility plus a reviewed 21-file host patch covering lifecycle, startup/shutdown, party events, world lookup, tick metrics, combat attribution, persistence, and operator command registration.
+- Added version-specific build/test compatibility plus a reviewed 22-file host patch covering lifecycle, startup/shutdown, party events, world lookup, tick metrics, combat attribution, persistence, operator command registration, and the loopback `@system` actor.
 - Added fail-closed dual-track PowerShell and Bash installation. The 3.0 path requires an explicit experimental flag while runtime acceptance is outstanding.
-- Passed non-incremental 3.0 Game and full-solution compilation with zero errors and passed the combined host/adapter unit suite 151/151. The four adapter regressions cover persisted HP/MP clamping, aggro cleanup, kill attribution, and tick-metric maxima.
-- Runtime 3.0 support is not claimed. The matching `3.0.4.2` client executable and `game_pak` are now version/hash verified, but decrypted `compact.sqlite3` and `compact.server.table.sqlite3` are not present, so server startup, login/serializer, and PlayerBots lifecycle acceptance remain open.
+- Passed non-incremental 3.0 Game and full-solution compilation with zero errors and the complete 153/153 unit suite. The focused adapter group is 6/6 and covers persisted HP/MP clamping, aggro cleanup, kill attribution, tick-metric maxima, connectionless administrative access, and Web API actor resolution.
+- Acquired and integrity-checked the matching compact databases, then passed isolated 3.0 Login/Game startup, module migration, loopback status/metrics, zero-bot graceful cleanup, and clean restart on non-1.2 ports. Runtime support is not claimed until client login, one-bot lifecycle, four-role combat, and scale/recovery gates pass.
+- Audited all 94 configured skill IDs and 38 passive-buff IDs against 3.0 data. The four role anchors retain their expected ranges; 36 skills differ from 1.2 and five rotation skills changed target semantics, which are explicit physical-test gates rather than assumed parity.
 - Added a read-only 3.0 asset-provenance preflight that verifies the pinned emulator lineage, all three required files, SQLite headers, recorded SHA-256 hashes, and explicit rejection of known 1.2 compact databases before runtime startup.
 
 ### Lifecycle and control

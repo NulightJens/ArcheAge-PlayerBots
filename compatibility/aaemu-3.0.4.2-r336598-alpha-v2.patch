@@ -1,0 +1,748 @@
+diff --git a/AAEmu.Game/AAEmu.Game.csproj b/AAEmu.Game/AAEmu.Game.csproj
+index 9f1a5d848f1183aeb1359c330b90c697890ad391..eeae35f1d0c1ba89822f21ee777ee3e63ba7fd44 100644
+--- a/AAEmu.Game/AAEmu.Game.csproj
++++ b/AAEmu.Game/AAEmu.Game.csproj
+@@ -155,4 +155,6 @@
+         <LinkBase>$([MSBuild]::EnsureTrailingSlash(%(LinkBase)))</LinkBase>
+       </None>
+     </ItemGroup>
++    <Import Project="..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Game.3_0.targets"
++            Condition="Exists('..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Game.3_0.targets')" />
+ </Project>
+diff --git a/AAEmu.Game/Configurations/AccessLevels.json b/AAEmu.Game/Configurations/AccessLevels.json
+index 06130ba25c21f601e1411b09da455b0d87e42278..3dfd605f080e1a789ab7df87dea97ce1af02282b 100644
+--- a/AAEmu.Game/Configurations/AccessLevels.json
++++ b/AAEmu.Game/Configurations/AccessLevels.json
+@@ -8,6 +8,10 @@
+         "online": 0,
+         "soloparty": 0,
+         "teleport": 0,
++        "botcontrol": 0,
++        "bot": 0,
++        "bots": 0,
++        "bothelp": 0,
+         
+         // Moderaters
+         "announce": 50,
+@@ -26,10 +30,15 @@
+         "revive": 50,
+         "showinv": 50,
+         "spawn": 50,
++        "spawnpassive": 100,
++        "passivenpc": 100,
++        "passiveboss": 100,
+         "coffer": 50,
+         
+         // Admin
+         "addbuff": 100,
++        "addbot": 100,
++        "add_bot": 100,
+         "addgold": 100,
+         "additem": 100,
+         "addlabor": 100,
+@@ -37,6 +46,22 @@
+         "addxp": 100,
+         "around": 100,
+         "build": 100,
++        "botactions": 100,
++        "botarchetype": 100,
++        "botattacknpc": 100,
++        "botattackobject": 100,
++        "botbuff": 100,
++        "botclass": 100,
++        "botdebug": 100,
++        "botduel": 100,
++        "botfollow": 100,
++        "botjump": 100,
++        "botmetrics": 100,
++        "botreset": 100,
++        "botrotation": 100,
++        "botstate": 100,
++        "botstrategy": 100,
++        "botvalues": 100,
+         "clearcombat": 100,
+         "damage": 100,
+         "despawnall": 100,
+@@ -44,6 +69,7 @@
+         "echo": 100,
+         "housebindingmove": 100,
+         "move_all": 100,
++        "movebot": 100,
+         "moveto": 100,
+         "nloc": 100,
+         "nwrite": 100,
+@@ -52,7 +78,13 @@
+         "position": 100,
+         "proc": 100,
+         "reloadauction": 100,
++        "reloadarchetype": 100,
++        "reloadbotarchetype": 100,
++        "reloadbotconfig": 100,
++        "rbc": 100,
+         "reloadconfig": 100,
++        "removebot": 100,
++        "remove_bot": 100,
+         "rotate": 100,
+         "scripts": 100,
+         "setfaction": 100,
+@@ -72,10 +104,11 @@
+         "tickdoodad": 100,
+         "tower_def": 100,
+         "useskill": 100,
++        "walkbot": 100,
+         "wipeauctionhouse": 100,
+         "zonestate": 100,
+         
+         // Disabled
+         "testtransfer": 999
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/AAEmu.Game/Core/Managers/DuelManager.cs b/AAEmu.Game/Core/Managers/DuelManager.cs
+index c7da9e9b99affc8a942be817bd1166abd0ef35a9..d0ee2d7ecf7a3939400f2e1eacaa545712e44871 100644
+--- a/AAEmu.Game/Core/Managers/DuelManager.cs
++++ b/AAEmu.Game/Core/Managers/DuelManager.cs
+@@ -19,7 +19,7 @@ using NLog;
+ 
+ namespace AAEmu.Game.Core.Managers;
+ 
+-public class DuelManager : Singleton<DuelManager>
++public class DuelManager : Singleton<DuelManager>, IDuelManager
+ {
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+ 
+@@ -57,6 +57,11 @@ public class DuelManager : Singleton<DuelManager>
+         _duels.TryRemove(duel.Challenged.Id, out _);
+     }
+ 
++    internal bool TryGetDuel(uint characterId, out Duel duel)
++    {
++        return _duels.TryGetValue(characterId, out duel);
++    }
++
+     public void DuelRequest(Character challenger, uint challengedId)
+     {
+         // приходит ID того, кого вызвали на дуэль
+diff --git a/AAEmu.Game/Core/Managers/ExperienceManager.cs b/AAEmu.Game/Core/Managers/ExperienceManager.cs
+index f61dbe29a3717d2196223851e878517625d14b0a..c41291c170df5e14addedabd40a25ec94a762aa8 100644
+--- a/AAEmu.Game/Core/Managers/ExperienceManager.cs
++++ b/AAEmu.Game/Core/Managers/ExperienceManager.cs
+@@ -6,7 +6,7 @@ using NLog;
+ 
+ namespace AAEmu.Game.Core.Managers;
+ 
+-public class ExperienceManager : Singleton<ExperienceManager>
++public class ExperienceManager : Singleton<ExperienceManager>, IExperienceManager
+ {
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+ 
+diff --git a/AAEmu.Game/Core/Managers/Id/ObjectIdManager.cs b/AAEmu.Game/Core/Managers/Id/ObjectIdManager.cs
+index 3e9619e2a0b4116bc4abe52f1d8b54c82986d083..28547723d6a24a0781c322c7fdfc6793a3438f61 100644
+--- a/AAEmu.Game/Core/Managers/Id/ObjectIdManager.cs
++++ b/AAEmu.Game/Core/Managers/Id/ObjectIdManager.cs
+@@ -2,7 +2,7 @@
+ 
+ namespace AAEmu.Game.Core.Managers.Id;
+ 
+-public class ObjectIdManager : IdManager
++public class ObjectIdManager : IdManager, IObjectIdManager
+ {
+     private static ObjectIdManager _instance;
+     private const uint FirstId = 0x00000100;
+diff --git a/AAEmu.Game/Core/Managers/TeamManager.cs b/AAEmu.Game/Core/Managers/TeamManager.cs
+index 77bbaae4e6a5e5df6461ed60cf23f7217f53d8a7..cfdf02baf9b4e1e816e94153c5f62911437b2d11 100644
+--- a/AAEmu.Game/Core/Managers/TeamManager.cs
++++ b/AAEmu.Game/Core/Managers/TeamManager.cs
+@@ -13,7 +13,7 @@ using AAEmu.Game.Models.Game.World.Transform;
+ 
+ namespace AAEmu.Game.Core.Managers;
+ 
+-public class TeamManager : Singleton<TeamManager>
++public class TeamManager : Singleton<TeamManager>, ITeamManager
+ {
+     /*
+      * TODO:
+@@ -183,6 +183,8 @@ public class TeamManager : Singleton<TeamManager>
+                 target.InParty = true;
+                 target.SendPacket(new SCTeamPingPosPacket(activeTeam.PingPosition));
+                 activeTeam.BroadcastPacket(new SCTeamMemberJoinedPacket(activeTeam.Id, newTeamMember, party), target.Id);
++                target.Events?.OnTeamJoin(target, new OnTeamJoinArgs { Team = activeTeam, Player = target });
++                NotifyTeamChanged(activeTeam);
+             }
+         }
+ 
+@@ -208,6 +210,7 @@ public class TeamManager : Singleton<TeamManager>
+                 ChatManager.Instance.GetPartyChat(activeTeam, t1).JoinChannel(t1);
+             if (t2 != null)
+                 ChatManager.Instance.GetPartyChat(activeTeam, t2).JoinChannel(t2);
++            NotifyTeamChanged(activeTeam);
+         }
+     }
+ 
+@@ -280,6 +283,11 @@ public class TeamManager : Singleton<TeamManager>
+         }
+         ChatManager.Instance.GetPartyChat(newTeam, activeInvitation.Owner).JoinChannel(activeInvitation.Owner);
+         ChatManager.Instance.GetPartyChat(newTeam, activeInvitation.Target).JoinChannel(activeInvitation.Target);
++        activeInvitation.Owner.Events?.OnTeamJoin(activeInvitation.Owner,
++            new OnTeamJoinArgs { Team = newTeam, Player = activeInvitation.Owner });
++        activeInvitation.Target.Events?.OnTeamJoin(activeInvitation.Target,
++            new OnTeamJoinArgs { Team = newTeam, Player = activeInvitation.Target });
++        NotifyTeamChanged(newTeam);
+     }
+ 
+     public void CreateSoloTeam(Character character, bool asParty)
+@@ -308,6 +316,8 @@ public class TeamManager : Singleton<TeamManager>
+         if (!newTeam.IsParty)
+             ChatManager.Instance.GetRaidChat(newTeam).JoinChannel(character);
+         ChatManager.Instance.GetPartyChat(newTeam, character).JoinChannel(character);
++        character.Events?.OnTeamJoin(character, new OnTeamJoinArgs { Team = newTeam, Player = character });
++        NotifyTeamChanged(newTeam);
+     }
+ 
+     public void AskRiskyTeam(Character unit, uint teamId, uint targetId, RiskyAction riskyAction)
+@@ -353,6 +363,11 @@ public class TeamManager : Singleton<TeamManager>
+             {
+                 target.InParty = false;
+                 target.SendPacket(new SCLeavedTeamPacket(teamId, riskyAction == RiskyAction.Kick, false));
++                var leaveArgs = new OnTeamLeaveArgs { Id = targetId, Team = activeTeam, Player = target };
++                if (riskyAction == RiskyAction.Kick)
++                    target.Events?.OnTeamKick(target, leaveArgs);
++                else
++                    target.Events?.OnTeamLeave(target, leaveArgs);
+             }
+         }
+ 
+@@ -383,11 +398,17 @@ public class TeamManager : Singleton<TeamManager>
+                         member.Character.SendPacket(new SCLeavedTeamPacket(teamId, false, true));
+                         member.Character.InParty = false;
+                     }
++                    member.Character.Events?.OnTeamLeave(member.Character,
++                        new OnTeamLeaveArgs { Id = member.Character.Id, Team = activeTeam, Player = member.Character });
+                 }
+             }
+ 
+             _activeTeams.Remove(teamId);
+         }
++        else
++        {
++            NotifyTeamChanged(activeTeam);
++        }
+         // TODO: Add this to a timer or trigger instead of calling on a party/raid disband. But is good enough and functional for now
+         ChatManager.Instance.CleanUpChannels();
+     }
+@@ -399,6 +420,7 @@ public class TeamManager : Singleton<TeamManager>
+ 
+         if (activeTeam.IsMember(memberId)) activeTeam.OwnerId = memberId;
+         activeTeam.BroadcastPacket(new SCTeamOwnerChangedPacket(activeTeam.Id, activeTeam.OwnerId));
++        NotifyTeamChanged(activeTeam);
+     }
+ 
+     public void ConvertToRaid(Character owner, uint teamId)
+@@ -423,6 +445,7 @@ public class TeamManager : Singleton<TeamManager>
+         if (activeTeam.ChangeRole(memberId, role))
+         {
+             activeTeam.BroadcastPacket(new SCTeamMemberRoleChangedPacket(activeTeam.Id, memberId, role));
++            NotifyTeamChanged(activeTeam);
+         }
+     }
+ 
+@@ -483,6 +506,7 @@ public class TeamManager : Singleton<TeamManager>
+         }
+ 
+         activeTeam.BroadcastPacket(new SCTeamMemberDisconnectedPacket(activeTeam.Id, unit.Id, memberInfo));
++        NotifyTeamChanged(activeTeam);
+     }
+ 
+     public void MemberRemoveFromTeam(Character unit, Character source, RiskyAction leaveType)
+@@ -529,6 +553,20 @@ public class TeamManager : Singleton<TeamManager>
+         if (!activeTeam.IsParty)
+             ChatManager.Instance.GetRaidChat(activeTeam).JoinChannel(unit);
+         ChatManager.Instance.GetPartyChat(activeTeam, unit).JoinChannel(unit);
++        NotifyTeamChanged(activeTeam);
++    }
++
++    private static void NotifyTeamChanged(Team team)
++    {
++        if (team == null)
++            return;
++
++        foreach (var member in team.Members)
++        {
++            var character = member?.Character;
++            character?.Events?.OnTeamChanged(character,
++                new OnTeamChangedArgs { Team = team, Player = character });
++        }
+     }
+ 
+     public void Load()
+diff --git a/AAEmu.Game/Core/Managers/TickManager.cs b/AAEmu.Game/Core/Managers/TickManager.cs
+index 2f33de1780044b9e3eca578bb4487663f67a21d4..29bce08313aac9552b88c6d79864b702b6352778 100644
+--- a/AAEmu.Game/Core/Managers/TickManager.cs
++++ b/AAEmu.Game/Core/Managers/TickManager.cs
+@@ -11,11 +11,13 @@ using NLog;
+ 
+ namespace AAEmu.Game.Core.Managers;
+ 
+-public class TickManager : Singleton<TickManager>
++public class TickManager : Singleton<TickManager>, ITickManager
+ {
++    internal const int TickSleepMilliseconds = 20;
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+     public delegate void OnTickEvent(TimeSpan delta);
+     public TickEventHandler OnTick = new();
++    public ServerTickMetrics Metrics { get; } = new();
+     private bool DoTickLoop = true;
+     private Thread TickThread;
+ 
+@@ -23,14 +25,21 @@ public class TickManager : Singleton<TickManager>
+     {
+         var sw = new Stopwatch();
+         sw.Start();
++        var previousTickStarted = 0L;
+         while (DoTickLoop)
+         {
++            var tickStarted = Stopwatch.GetTimestamp();
++            var intervalMs = previousTickStarted == 0
++                ? TickSleepMilliseconds
++                : Stopwatch.GetElapsedTime(previousTickStarted, tickStarted).TotalMilliseconds;
++            previousTickStarted = tickStarted;
+             var before = sw.Elapsed;
+             OnTick.Invoke();
+             var time = sw.Elapsed - before;
++            Metrics.RecordTick(time.TotalMilliseconds, intervalMs);
+             if (time > TimeSpan.FromMilliseconds(100))
+                 Logger.Warn("Tick took {0}ms to finish", time.TotalMilliseconds);
+-            Thread.Sleep(20);
++            Thread.Sleep(TickSleepMilliseconds);
+         }
+         sw.Stop();
+     }
+diff --git a/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs b/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
+index ce0315320596a11d5c4fa508bfc9a87d13a8cb61..54a2a126c3fc5453bc9d3acb96d2c83860e4f174 100644
+--- a/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
++++ b/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
+@@ -34,7 +34,7 @@ using NLog;
+ 
+ namespace AAEmu.Game.Core.Managers.UnitManagers;
+ 
+-public class CharacterManager : Singleton<CharacterManager>
++public class CharacterManager : Singleton<CharacterManager>, ICharacterManager
+ {
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+ 
+@@ -414,6 +414,9 @@ public class CharacterManager : Singleton<CharacterManager>
+ 
+     public int GetEffectiveAccessLevel(Character character)
+     {
++        if (character is global::AAEmu.Game.Bots.Ops.SystemActor)
++            return character.AccessLevel;
++
+         var accountDetails = AccountManager.Instance.GetAccountDetails(character.AccountId);
+         return Math.Max(character.AccessLevel, accountDetails.AccessLevel);
+     }
+diff --git a/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs b/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs
+index 7a847b48a9a8c8e1eeeb6e68cb562157fe18ff7c..e197c8c8cf6090a4c583e57a101f677d8ad7c31d 100644
+--- a/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs
++++ b/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs
+@@ -1,5 +1,6 @@
+ ﻿using System;
+ using System.Collections.Generic;
++using System.Linq;
+ using AAEmu.Commons.Utils;
+ using AAEmu.Game.Models.Game.World;
+ using NLog;
+@@ -17,6 +18,18 @@ public class AreaTriggerManager : Singleton<AreaTriggerManager>
+     private object _addLock = new();
+     private object _remLock = new();
+ 
++    internal IReadOnlyCollection<AreaTrigger> Active
++    {
++        get
++        {
++            lock (_addLock)
++            lock (_remLock)
++            {
++                return _areaTriggers.ToArray();
++            }
++        }
++    }
++
+     public AreaTriggerManager()
+     {
+         _areaTriggers = new List<AreaTrigger>();
+diff --git a/AAEmu.Game/Core/Managers/World/EnterWorldManager.cs b/AAEmu.Game/Core/Managers/World/EnterWorldManager.cs
+index d6b1ec9221c17a0802275bb52f6b219ec8a5031f..78a57d4df3ffbcdd644d6dc05165a5da80a763b2 100644
+--- a/AAEmu.Game/Core/Managers/World/EnterWorldManager.cs
++++ b/AAEmu.Game/Core/Managers/World/EnterWorldManager.cs
+@@ -10,6 +10,7 @@ using AAEmu.Game.Core.Packets.G2C;
+ using AAEmu.Game.Core.Packets.G2L;
+ using AAEmu.Game.Core.Packets.Proxy;
+ using AAEmu.Game.Models;
++using AAEmu.Game.Models.Game.Char;
+ using AAEmu.Game.Models.Game.Chat;
+ using AAEmu.Game.Models.Game.DoodadObj.Static;
+ using AAEmu.Game.Models.Game.Team;
+@@ -18,7 +19,7 @@ using NLog;
+ 
+ namespace AAEmu.Game.Core.Managers.World;
+ 
+-public class EnterWorldManager : Singleton<EnterWorldManager>
++public class EnterWorldManager : Singleton<EnterWorldManager>, IEnterWorldManager
+ {
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+ 
+@@ -130,6 +131,35 @@ public class EnterWorldManager : Singleton<EnterWorldManager>
+         }
+     }
+ 
++    public void LeaveWorldTask(GameConnection connection, LeaveWorldTargetType target, Character activeChar)
++    {
++        if (connection != null)
++        {
++            connection.ActiveChar ??= activeChar;
++            LeaveWorldTask(connection, (byte)target);
++            return;
++        }
++
++        if (activeChar == null)
++            return;
++
++        activeChar.DisabledSetPosition = true;
++        activeChar.IsOnline = false;
++        activeChar.LeaveTime = DateTime.UtcNow;
++        QuestManager.Instance.RemoveQuestTimer(activeChar.Id, 0);
++        MateManager.Instance.RemoveAndDespawnAllActiveOwnedMates(activeChar);
++        SlaveManager.Instance.RemoveAndDespawnAllActiveOwnedSlaves(activeChar);
++        activeChar.ForceDismount(AttachUnitReason.PrefabChanged);
++        ChatManager.Instance.LeaveAllChannels(activeChar);
++        if (activeChar.Family > 0)
++            FamilyManager.Instance.OnCharacterLogout(activeChar);
++        activeChar.Expedition?.OnCharacterLogout(activeChar);
++        activeChar.BuyBackItems.Wipe();
++        foreach (var subscriber in activeChar.Subscribers)
++            subscriber.Dispose();
++        GameConnection.SaveAndRemoveFromWorld(activeChar);
++    }
++
+     public static void LeaveWorldTask(GameConnection connection, byte target)
+     {
+         if (connection.ActiveChar != null)
+diff --git a/AAEmu.Game/Core/Managers/World/IWorldManager.cs b/AAEmu.Game/Core/Managers/World/IWorldManager.cs
+index a2fca055c02f6af90e38e399366af39a7c91aad9..51878becb64c17cf797b8cdc8e29932baa7a04e8 100644
+--- a/AAEmu.Game/Core/Managers/World/IWorldManager.cs
++++ b/AAEmu.Game/Core/Managers/World/IWorldManager.cs
+@@ -4,6 +4,7 @@ namespace AAEmu.Game.Core.Managers.World;
+ 
+ public interface IWorldManager
+ {
+-
++    global::AAEmu.Game.Models.Game.Char.Character GetCharacterById(uint id);
++    global::AAEmu.Game.Models.Game.World.World GetWorld(uint worldId);
+     Npc GetNpcByTemplateId(uint templateId);
+ }
+diff --git a/AAEmu.Game/Core/Network/Connections/GameConnection.cs b/AAEmu.Game/Core/Network/Connections/GameConnection.cs
+index 3df2d4964fe195237f6ca6ecb87d45f33bd3abcb..9430019d35a705aff864abbb35ab2805db97b0f9 100644
+--- a/AAEmu.Game/Core/Network/Connections/GameConnection.cs
++++ b/AAEmu.Game/Core/Network/Connections/GameConnection.cs
+@@ -158,21 +158,26 @@ public class GameConnection
+     /// Called when closing a connection
+     /// </summary>
+     public void SaveAndRemoveFromWorld()
++    {
++        SaveAndRemoveFromWorld(ActiveChar);
++    }
++
++    public static void SaveAndRemoveFromWorld(Character activeChar)
+     {
+         // TODO: this needs a rewrite
+-        if (ActiveChar == null)
++        if (activeChar == null)
+             return;
+ 
+         // Remove Radars
+-        RadarManager.Instance.UnRegister(ActiveChar);
++        RadarManager.Instance.UnRegister(activeChar);
+ 
+-        ActiveChar.Delete();
++        activeChar.Delete();
+         // Removed ReleaseId here to try and fix party/raid disconnect and reconnect issues. Replaced with saving the data
+         //ObjectIdManager.Instance.ReleaseId(ActiveChar.ObjId);
+ 
+         // Do a manual save here as it's no longer in _characters at this point
+         // TODO: might need a better option like saving this transaction for later to be used by the SaveMananger
+-        ActiveChar.SaveDirectlyToDatabase();
+-        ResidentManager.Instance.UpdateAtExit(ActiveChar);
++        activeChar.SaveDirectlyToDatabase();
++        ResidentManager.Instance.UpdateAtExit(activeChar);
+     }
+ }
+diff --git a/AAEmu.Game/GameService.cs b/AAEmu.Game/GameService.cs
+index d14beef3c0c0397d8b8dd82e3ddd0d2fcacfc395..889dd2b864e5074eb1ac20a743ba36f86c5155ad 100644
+--- a/AAEmu.Game/GameService.cs
++++ b/AAEmu.Game/GameService.cs
+@@ -6,7 +6,10 @@ using System.Threading.Tasks;
+ using AAEmu.Commons.Cryptography;
+ using AAEmu.Commons.Utils.DB;
+ using AAEmu.Commons.Utils.Updater;
++using AAEmu.Game.Bots.Content.Rotations;
++using AAEmu.Game.Bots.Ops;
+ using AAEmu.Game.Core.Managers;
++using AAEmu.Game.Core.Managers.Bots;
+ using AAEmu.Game.Core.Managers.AAEmu.Game.Core.Managers;
+ using AAEmu.Game.Core.Managers.Id;
+ using AAEmu.Game.Core.Managers.Stream;
+@@ -19,6 +22,7 @@ using AAEmu.Game.GameData.Framework;
+ using AAEmu.Game.IO;
+ using AAEmu.Game.Models;
+ using AAEmu.Game.Models.Game;
++using AAEmu.Game.Models.Game.Bots;
+ using AAEmu.Game.Utils.Scripts;
+ 
+ using Microsoft.Extensions.Hosting;
+@@ -30,6 +34,7 @@ namespace AAEmu.Game;
+ public sealed class GameService : IHostedService, IDisposable
+ {
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
++    private BotAutoSpawnTask _autoSpawnTask;
+ 
+     public async Task StartAsync(CancellationToken cancellationToken)
+     {
+@@ -125,6 +130,10 @@ public sealed class GameService : IHostedService, IDisposable
+         AnimationManager.Instance.Load();
+         PlotManager.Instance.Load();
+         SkillManager.Instance.Load();
++        BotConfig.Instance.Load();
++        BotArchetypeManager.Instance.Load();
++        BotRotationManager.Instance.Load();
++        BotArchetypeManager.Instance.EnsureSchema();
+         CraftManager.Instance.Load();
+         MateManager.Instance.Load();
+         SlaveManager.Instance.Load();
+@@ -229,12 +238,30 @@ public sealed class GameService : IHostedService, IDisposable
+ 
+         stopWatch.Stop();
+         Logger.Info($"Server started! Took {stopWatch.Elapsed}");
++        ScheduleAutoSpawn();
++    }
++
++    private void ScheduleAutoSpawn()
++    {
++        if (BotConfig.Instance.AutoSpawnCharacterIds is not { Count: > 0 })
++            return;
++
++        _autoSpawnTask = new BotAutoSpawnTask(
++            BotConfig.Instance.AutoSpawnCharacterIds,
++            BotConfig.Instance.AutoSpawnState,
++            BotManager.Instance,
++            BotCombatManager.Instance);
++        TaskManager.Instance.Schedule(
++            _autoSpawnTask,
++            TimeSpan.FromMilliseconds(BotConfig.Instance.AutoSpawnDelayMs));
+     }
+ 
+     public async Task StopAsync(CancellationToken cancellationToken)
+     {
+         Logger.Info("Stopping daemon...");
+ 
++        _autoSpawnTask?.Cancel();
++        BotManager.Instance.Stop();
+         await SaveManager.Instance.StopAsync();
+ 
+         SpawnManager.Instance.Stop();
+diff --git a/AAEmu.Game/Models/Game/AI/v2/Framework/NpcAi.cs b/AAEmu.Game/Models/Game/AI/v2/Framework/NpcAi.cs
+index fdcfef66d891d117cb59a25afa51c25ac90789b1..c977ef6ae9efe9b4bf9595b1e087946d5e4e61a2 100644
+--- a/AAEmu.Game/Models/Game/AI/v2/Framework/NpcAi.cs
++++ b/AAEmu.Game/Models/Game/AI/v2/Framework/NpcAi.cs
+@@ -29,7 +29,7 @@ public abstract class NpcAi
+     public bool ShouldTick { get; set; }
+     public bool AlreadyTargeted { get; set; }
+ 
+-    public Npc Owner { get; init; }
++    public Npc Owner { get; set; }
+     public Vector3 IdlePosition { get; set; }
+     public Vector3 HomePosition { get; set; }
+     public AiParams Param { get; set; }
+diff --git a/AAEmu.Game/Models/Game/Char/CharacterEvents.cs b/AAEmu.Game/Models/Game/Char/CharacterEvents.cs
+index 629d316b18cf935e278e8b05f7017948fb83fd6d..0edd3ae0371105b680b3cf06b79338c75c7670d4 100644
+--- a/AAEmu.Game/Models/Game/Char/CharacterEvents.cs
++++ b/AAEmu.Game/Models/Game/Char/CharacterEvents.cs
+@@ -10,6 +10,7 @@ public class CharacterEvents : UnitEvents
+     public EventHandler<OnTeamLeaveArgs> OnTeamLeave = delegate { };
+     public EventHandler<OnDungeonLeaveArgs> OnDungeonLeave = delegate { };
+     public EventHandler<OnTeamLeaveArgs> OnTeamKick = delegate { };
++    public EventHandler<OnTeamChangedArgs> OnTeamChanged = delegate { };
+     public EventHandler<OnDisconnectArgs> OnDisconnect = delegate { };
+ }
+ 
+@@ -26,6 +27,12 @@ public class OnTeamLeaveArgs : EventArgs
+     public Team.Team Team { get; set; }
+ }
+ 
++public class OnTeamChangedArgs : EventArgs
++{
++    public Character Player { get; set; }
++    public Team.Team Team { get; set; }
++}
++
+ public class OnDungeonLeaveArgs : EventArgs
+ {
+     public Character Player { get; set; }
+diff --git a/AAEmu.Game/Models/Game/NPChar/Npc.cs b/AAEmu.Game/Models/Game/NPChar/Npc.cs
+index 859987ec56a3d30886980e5ed5fb621e40f5b3be..83a91c770038dcfd6c92cd0bcbc96eada80ea215 100644
+--- a/AAEmu.Game/Models/Game/NPChar/Npc.cs
++++ b/AAEmu.Game/Models/Game/NPChar/Npc.cs
+@@ -28,6 +28,7 @@ namespace AAEmu.Game.Models.Game.NPChar;
+ 
+ public partial class Npc : Unit
+ {
++    public bool SuppressActorDisplacement { get; set; }
+     public override UnitTypeFlag TypeFlag { get; } = UnitTypeFlag.Npc;
+     public override BaseUnitType BaseUnitType => BaseUnitType.Npc;
+     public override ModelPostureType ModelPostureType { get => AnimActionId > 0 ? ModelPostureType.ActorModelState : ModelPostureType.None; }
+diff --git a/AAEmu.Game/Models/Game/Units/Unit.cs b/AAEmu.Game/Models/Game/Units/Unit.cs
+index efc9547bb6b93e9019e2465e99e6a66a7af2762b..189530cdd1ebbb45095af6fef211918a0eac4502 100644
+--- a/AAEmu.Game/Models/Game/Units/Unit.cs
++++ b/AAEmu.Game/Models/Game/Units/Unit.cs
+@@ -395,11 +395,16 @@ public class Unit : BaseUnit, IUnit
+ 
+         if (attackerBase is Unit attackerUnit)
+         {
+-            attackerUnit.Events.OnKill(attackerUnit, new OnKillArgs { Target = attackerUnit });
++            attackerUnit.Events.OnKill(this, new OnKillArgs
++            {
++                Target = this,
++                Killer = attackerUnit,
++                Victim = this
++            });
+ 
+-            var world = WorldManager.Instance.GetWorld(Transform.WorldId);
+             if (Transform.WorldId > 0)
+             {
++                var world = WorldManager.Instance.GetWorld(Transform.WorldId);
+                 var dungeon = IndunManager.Instance.GetDungeonByWorldId(Transform.WorldId);
+                 if (dungeon is not null)
+                 {
+diff --git a/AAEmu.Game/Models/Game/Units/UnitEvents.cs b/AAEmu.Game/Models/Game/Units/UnitEvents.cs
+index c0477498f2f2c798d198ecfbcc5919f106c369fd..216683c31afbe23f838938a442c13ff1a6750b4c 100644
+--- a/AAEmu.Game/Models/Game/Units/UnitEvents.cs
++++ b/AAEmu.Game/Models/Game/Units/UnitEvents.cs
+@@ -323,6 +323,8 @@ public class OnUnmountArgs : EventArgs
+ public class OnKillArgs : EventArgs
+ {
+     public Unit Target { get; set; }
++    public Unit Killer { get; set; }
++    public Unit Victim { get; set; }
+ }
+ 
+ public class OnDamagedCollisionArgs : EventArgs
+diff --git a/AAEmu.Game/Models/Game/World/GameObject.cs b/AAEmu.Game/Models/Game/World/GameObject.cs
+index 3b8c0bd842fd1d67596347453bf6801648a8ebd4..a54f176946371d8e0fd6b7e7080fd5b2a967e897 100644
+--- a/AAEmu.Game/Models/Game/World/GameObject.cs
++++ b/AAEmu.Game/Models/Game/World/GameObject.cs
+@@ -18,6 +18,10 @@ public class GameObject : IGameObject
+     public uint InstanceId { get; set; } = WorldManager.DefaultInstanceId;
+     public bool DisabledSetPosition { get; set; }
+     /// <summary>
++    /// Suppresses transient world broadcasts while a server-owned actor is being prepared.
++    /// </summary>
++    public bool SuppressBroadcastPackets { get; set; }
++    /// <summary>
+     /// Contains position, rotation, zone and instance information
+     /// </summary>
+     public Transform.Transform Transform { get; set; }
+@@ -26,6 +30,19 @@ public class GameObject : IGameObject
+     /// When not null, this is the location where the character last entered a instance from
+     /// </summary>
+     public Transform.Transform MainWorldPosition { get; set; }
++    private World _parentWorld;
++    public World ParentWorld
++    {
++        get
++        {
++            if (_parentWorld?.Id == Transform?.WorldId)
++                return _parentWorld;
++
++            _parentWorld = Transform == null ? null : WorldManager.Instance.GetWorld(Transform.WorldId);
++            return _parentWorld;
++        }
++        set => _parentWorld = value;
++    }
+     public Region Region { get; set; }
+     public DateTime Respawn { get; set; }
+     public DateTime Despawn { get; set; }
+@@ -93,6 +110,9 @@ public class GameObject : IGameObject
+     /// <param name="self">Include sending to self (only for if called from Character)</param>
+     public virtual void BroadcastPacket(GamePacket packet, bool self)
+     {
++        if (SuppressBroadcastPackets)
++            return;
++
+         foreach (var character in WorldManager.GetAround<Character>(this))
+             character.SendPacket(packet);
+         if ((self) && (this is Character chr))
+diff --git a/AAEmu.Game/Models/Game/World/World.cs b/AAEmu.Game/Models/Game/World/World.cs
+index 15d990c0c0e994c510769d97832998aebebe9271..f782c9ff6c040ab4bb32c2317f886784bde12b1f 100644
+--- a/AAEmu.Game/Models/Game/World/World.cs
++++ b/AAEmu.Game/Models/Game/World/World.cs
+@@ -4,6 +4,9 @@ using System.Collections.Generic;
+ using System.Numerics;
+ 
+ using AAEmu.Game.Core.Managers.World;
++using AAEmu.Game.Models.Game.Char;
++using AAEmu.Game.Models.Game.NPChar;
++using AAEmu.Game.Models.Game.Units;
+ using AAEmu.Game.Models.Game.World.Transform;
+ using AAEmu.Game.Models.Game.World.Xml;
+ using AAEmu.Game.Models.Game.World.Zones;
+@@ -100,6 +103,14 @@ public class World
+         return height;
+     }
+ 
++    public GameObject GetGameObject(uint objId) => WorldManager.Instance.GetGameObject(objId);
++
++    public Unit GetUnit(uint objId) => WorldManager.Instance.GetUnit(objId);
++
++    public Npc GetNpc(uint objId) => WorldManager.Instance.GetNpc(objId);
++
++    public Character GetCharacterById(uint characterId) => WorldManager.Instance.GetCharacterById(characterId);
++
+     /// <summary>
+     /// Get Sector at specific offset
+     /// </summary>
+diff --git a/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs b/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs
+index d4cce9fced3043f188b8a5f605fe732469004f14..49cc34f9746dcee5d1939530278b047f1f0dafcb 100644
+--- a/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs
++++ b/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs
+@@ -2,6 +2,7 @@
+ using System.Text.Json;
+ using System.Text.RegularExpressions;
+ using AAEmu.Game.Core.Managers.World;
++using AAEmu.Game.Bots.Ops;
+ using NetCoreServer;
+ using AAEmu.Game.Services.WebApi.Models;
+ 
+@@ -29,7 +30,9 @@ internal class CommandController : BaseController
+ 
+         var commandLine = $"{commandName} {commandArguments}";
+ 
+-        var character = WorldManager.Instance.GetCharacter(commandCharacter);
++        var character = commandCharacter == SystemActor.ActorName
++            ? SystemActor.Create()
++            : WorldManager.Instance.GetCharacter(commandCharacter);
+         if (character == null)
+             return BadRequestJson(new ErrorModel($"Character \"{commandCharacter}\" not found"));
+ 
+diff --git a/AAEmu.UnitTests/AAEmu.UnitTests.csproj b/AAEmu.UnitTests/AAEmu.UnitTests.csproj
+index a3937b1b81231649028eb85eb179b8d1d16bbd79..ac86d18a4d570c0e07cfc0aa3777374a2306fbb1 100644
+--- a/AAEmu.UnitTests/AAEmu.UnitTests.csproj
++++ b/AAEmu.UnitTests/AAEmu.UnitTests.csproj
+@@ -1,5 +1,8 @@
+ ﻿<Project Sdk="Microsoft.NET.Sdk">
+ 
++  <Import Project="..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Tests.3_0.targets"
++          Condition="Exists('..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Tests.3_0.targets')" />
++
+   <PropertyGroup>
+     <OutputType>Exe</OutputType>
+     <TargetFramework>$(TargetFramework)</TargetFramework>

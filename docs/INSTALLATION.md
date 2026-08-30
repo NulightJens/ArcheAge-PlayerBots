@@ -4,7 +4,7 @@
 
 - A clean AAEmu checkout containing one tested base:
   - supported 1.2: `62e3eb1d87da01194802ac886cd500134facad28`;
-  - compile-validated 3.0 alpha: `8c1c943bb2309eefffb9da2aa99a408d0acbb095` from NL0bP/AAEmu's `client_version/3.0_client_(2017_04_20)+` branch.
+  - server-start-validated 3.0 alpha: `8c1c943bb2309eefffb9da2aa99a408d0acbb095` from NL0bP/AAEmu's `client_version/3.0_client_(2017_04_20)+` branch.
 - The .NET SDK selected by AAEmu's `global.json`.
 - Matching server and client data for the selected track. Never mix the 1.2 and 3.0 data sets.
 - A versioned, isolated database for first installation and testing.
@@ -39,7 +39,7 @@ Use `-CheckOnly` to validate compatibility without changing the host:
 
 Linux/macOS equivalents are in `scripts/install-playerbots.sh` and use `--check-only`.
 
-### Compile-validated 3.0 alpha
+### Server-start-validated 3.0 alpha
 
 The 3.0 adapter is available for isolated development, but it is not a supported runtime release yet. The explicit flag prevents accidental installation into an unverified production environment:
 
@@ -50,7 +50,7 @@ dotnet build AAEmu.sln --no-incremental
 dotnet test .\AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-build
 ```
 
-Runtime acceptance additionally requires the matching `3.0.4.2 r336598` `game_pak`, `compact.sqlite3`, and `compact.server.table.sqlite3`. The retained build passed with zero errors and the combined host/adapter unit suite passed 151/151, but login, serializer, one-bot lifecycle, party, combat, and shutdown recovery remain blocked until those assets are available.
+Runtime acceptance requires a mutually matching `3.0.4.2 r336598` client, `game_pak`, `compact.sqlite3`, and `compact.server.table.sqlite3`. The retained isolated stack passed database integrity, server startup, module schema, loopback `@system` metrics, and zero-bot graceful restart. Client login, serializer, one-bot lifecycle, party, combat, populated recovery, and scale gates remain open and must not be inferred from server startup.
 
 Before starting the 3.0 server, copy `docs/examples/aaemu30-assets.provenance.example.json` outside the repository, replace every placeholder with the acquired files' hashes and source record, and run the read-only preflight:
 
@@ -58,14 +58,26 @@ Before starting the 3.0 server, copy `docs/examples/aaemu30-assets.provenance.ex
 & .\modules\archeage-playerbots\scripts\Test-AAEmu30Assets.ps1 `
     -AAEmuRoot $PWD `
     -ClientRoot 'D:\path\to\ArcheAge-3.0.4.2-r336598' `
-    -ProvenancePath 'D:\path\to\aaemu30-assets.provenance.json'
+    -ProvenancePath 'D:\path\to\aaemu30-assets.provenance.json' `
+    -OutputPath 'D:\evidence\aaemu30-asset-preflight.json'
 ```
 
 The preflight pins the emulator lineage, requires all three files, validates SQLite headers and recorded SHA-256 hashes, and rejects the known 1.2 compact-database hashes. It does not prove client/server serializer compatibility; that remains a live login gate.
 
+After Login and Game report ready, verify the loopback operator boundary and capture a zero-bot metrics document:
+
+```powershell
+& .\modules\archeage-playerbots\scripts\Test-AAEmu30Runtime.ps1 `
+    -BaseUri 'http://127.0.0.1:1280/api' `
+    -ExpectedRuntimeCount 0 `
+    -OutputPath 'D:\evidence\aaemu30-runtime-smoke.json'
+```
+
+The command refuses non-loopback endpoints because `@system` has administrative access. A passing smoke document proves server status, command resolution, and metrics serialization; it does not prove client login or bot behavior.
+
 ## What installation changes
 
-The module remains a separate Git repository. Installation selects a reviewed compatibility patch for the detected track and copies one migration into `SQL/updates/`. The 1.2 patch updates 26 host files; the 3.0 alpha patch updates 21 host files. The patches:
+The module remains a separate Git repository. Installation selects a reviewed compatibility patch for the detected track and copies one migration into `SQL/updates/`. The 1.2 patch updates 26 host files; the active 3.0 alpha v2 patch updates 22 host files. The patches:
 
 - imports the module's Game and test MSBuild targets;
 - registers bot services and startup/shutdown lifecycle;
@@ -105,5 +117,5 @@ Commit the AAEmu host integration changes and the migration file in your own ser
 - **Tracked local changes:** commit them in your AAEmu server branch before installation.
 - **Different migration exists:** compare both files manually; the installer intentionally refuses to overwrite it.
 - **Commands not discovered:** confirm both MSBuild imports are present, then perform a non-incremental rebuild.
-- **3.0 assets missing:** stop before runtime startup; obtain the exact `3.0.4.2 r336598` data set and stage it with a versioned test database.
+- **3.0 assets missing:** stop before runtime startup; obtain the exact `3.0.4.2 r336598` data set, record hashes and provenance, and stage it with a versioned test database.
 - **3.0 serializer mismatch:** confirm the launcher/client, `game_pak`, compact databases, and emulator revision all belong to the same 3.0 lineage.

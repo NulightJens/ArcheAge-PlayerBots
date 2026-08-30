@@ -7,7 +7,9 @@ param(
     [string] $ClientRoot,
 
     [Parameter(Mandatory = $true)]
-    [string] $ProvenancePath
+    [string] $ProvenancePath,
+
+    [string] $OutputPath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -114,7 +116,7 @@ $results = foreach ($asset in $assets) {
     }
 }
 
-[pscustomobject]@{
+$result = [pscustomobject]@{
     status = 'passed'
     track = $expectedTrack
     aaemuBase = $expectedBase
@@ -122,4 +124,16 @@ $results = foreach ($asset in $assets) {
     clientRoot = $clientRoot
     provenancePath = $provenancePath
     assets = @($results)
-} | ConvertTo-Json -Depth 4
+}
+
+$rendered = $result | ConvertTo-Json -Depth 4
+if ($OutputPath) {
+    $absoluteOutput = [System.IO.Path]::GetFullPath($OutputPath)
+    $parent = Split-Path -Parent $absoluteOutput
+    if (-not (Test-Path -LiteralPath $parent)) {
+        New-Item -ItemType Directory -Path $parent | Out-Null
+    }
+    Set-Content -LiteralPath $absoluteOutput -Value $rendered -Encoding utf8
+}
+
+$rendered

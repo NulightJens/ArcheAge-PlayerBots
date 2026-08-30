@@ -64,8 +64,8 @@ case "$track" in
     ;;
   aaemu30)
     supported_base="$base_30"
-    patch_path="$module_root/compatibility/aaemu-3.0.4.2-r336598-alpha.patch"
-    status=compile-validated
+    patch_path="$module_root/compatibility/aaemu-3.0.4.2-r336598-alpha-v2.patch"
+    status=server-start-validated
     ;;
   *) echo "Unknown track '$track'; expected aaemu12 or aaemu30." >&2; exit 2 ;;
 esac
@@ -76,7 +76,7 @@ is_track "$supported_base" || {
 }
 
 if [[ "$status" != supported && "$allow_experimental" != true ]]; then
-  echo "$track is compile-validated but awaits matching-client runtime acceptance; pass --allow-experimental only for isolated 3.0 development." >&2
+  echo "$track is $status but awaits complete matching-client runtime acceptance; pass --allow-experimental only for isolated 3.0 development." >&2
   exit 1
 fi
 

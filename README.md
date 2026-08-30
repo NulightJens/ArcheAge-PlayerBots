@@ -13,8 +13,8 @@ This repository is **not an AAEmu fork**. AAEmu is a required host dependency. T
 | Component | Status |
 | --- | --- |
 | ArcheAge 1.2 | Supported on AAEmu base `62e3eb1d87da01194802ac886cd500134facad28` with `r208022` data |
-| ArcheAge 3.0 | Compile-validated alpha on NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095`, client `3.0.4.2 r336598` |
-| 3.0 runtime acceptance | Matching client/`game_pak` verified; blocked on decrypted `compact.sqlite3`, `compact.server.table.sqlite3`, and isolated login/lifecycle tests |
+| ArcheAge 3.0 | Server-start-validated alpha on NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095`, client `3.0.4.2 r336598` |
+| 3.0 runtime acceptance | Matching client/data and isolated server startup verified; client login, one-bot lifecycle, four-role combat, and scale/recovery gates remain open |
 | Module version | `0.2.0-alpha.1` |
 
 ## Install
@@ -39,7 +39,7 @@ dotnet build AAEmu.slnx --no-incremental
 
 The installer is deliberately fail-closed: it validates the host lineage and patch before editing AAEmu, refuses conflicting local changes, and will not overwrite a different SQL migration. See [Installation](docs/INSTALLATION.md) for database and upgrade details.
 
-The commands above select the supported 1.2 track automatically. The compile-validated 3.0 adapter is intentionally opt-in while runtime acceptance is outstanding:
+The commands above select the supported 1.2 track automatically. The server-start-validated 3.0 adapter is intentionally opt-in while complete runtime acceptance is outstanding:
 
 ```powershell
 & .\modules\archeage-playerbots\scripts\Install-PlayerBots.ps1 -AAEmuRoot $PWD -Track AAEmu30 -AllowExperimental
@@ -95,12 +95,12 @@ See [Commands](docs/COMMANDS.md) for every operator command and [Testing](docs/T
 | `src/AAEmu.Game/` | PlayerBots runtime code, commands, configuration, and content |
 | `tests/AAEmu.UnitTests/` | Module unit and host-integration tests |
 | `build/` | Versioned MSBuild imports that compile module source into the AAEmu host |
-| `compatibility/` | Reviewed AAEmu 1.2 and compile-validated 3.0 host-hook patches |
+| `compatibility/` | Reviewed AAEmu 1.2 and server-start-validated 3.0 host-hook patches |
 | `sql/` | Module database migration |
 | `scripts/scale/` | Repeatable population/resource harness |
 | `docs/` | Human installation, command, architecture, development, and testing guides |
 
-The architecture and the reason for source-level host integration are documented in [Architecture](docs/ARCHITECTURE.md). Current priorities are in the [Roadmap](docs/ROADMAP.md), and player-facing changes are in the [Changelog](CHANGELOG.md).
+The architecture and the reason for source-level host integration are documented in [Architecture](docs/ARCHITECTURE.md). Current priorities are in the [Roadmap](docs/ROADMAP.md), the [ArcheAge 3.0 acceptance runbook](docs/AAEMU30-ACCEPTANCE.md) tracks promotion gates, and player-facing changes are in the [Changelog](CHANGELOG.md).
 
 ## Known limits
 

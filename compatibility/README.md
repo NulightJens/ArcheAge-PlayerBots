@@ -14,11 +14,13 @@ Use the installer rather than applying this patch manually; it validates lineage
 
 ## ArcheAge 3.0 alpha host hooks
 
-`aaemu-3.0.4.2-r336598-alpha.patch` targets exact base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` from NL0bP/AAEmu's `client_version/3.0_client_(2017_04_20)+` branch. It adds the older host-line equivalents of PlayerBots lifecycle, party, world-query, tick-metric, character, command, service-startup, and build hooks.
+`aaemu-3.0.4.2-r336598-alpha-v2.patch` targets exact base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` from NL0bP/AAEmu's `client_version/3.0_client_(2017_04_20)+` branch. It adds the older host-line equivalents of PlayerBots lifecycle, party, world-query, tick-metric, character, command, service-startup, and build hooks. Version 2 also gives the loopback Web API its connectionless `@system` actor and bypasses account lookup only for that concrete actor type.
 
-SHA-256: `3e7c792a1e77864617bde197ad89c7b7948d420ce12fb15f2a759e39a018acc6`
+SHA-256: `a9d51a4d3965006aae86da3e5724c452e25b15fc80990934016af1a3d053f164`
 
-This track is compile-validated, not runtime-supported. The retained non-incremental Game and full-solution builds passed with zero errors, and the combined host/adapter unit suite passed 151/151. Install it only with the explicit experimental flag and an isolated matching-client environment. Runtime promotion requires matching `3.0.4.2 r336598` data, login/serializer acceptance, one-bot lifecycle, party/combat behavior, metrics, and clean shutdown recovery.
+This track is server-start-validated, not runtime-supported. An isolated server accepted the matching `game_pak`, both compact databases, all 94 PlayerBots skill IDs, all 38 passive-buff IDs, the module migration, unique network ports, `@system` metrics, and graceful zero-bot shutdown/restart. The focused 3.0 adapter suite now passes 6/6. Install it only with the explicit experimental flag and an isolated matching-client environment. Runtime promotion still requires client login/serializer acceptance, one-bot lifecycle, four-role party/combat behavior, scale/resource gates, and clean populated recovery.
+
+The earlier `aaemu-3.0.4.2-r336598-alpha.patch` remains unchanged as the compile-only alpha contract; it is not the active installer patch.
 
 ## Optional host dependency baseline
 

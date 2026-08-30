@@ -108,3 +108,5 @@ Collect an empty-server baseline first. Approve explicit whole-server limits, th
 Retain source/build identity, client/server version, data provenance, bot IDs and archetypes, exact population, start position, target object/template, duration, stop condition, cast/action counts, errors, resource snapshots, cleanup result, and client presentation separately from server truth.
 
 Keep raw logs, videos, snapshots, and databases outside Git; commit stable scripts, anonymized fixtures, schemas, and summarized results only.
+
+For the 3.0 alpha, run `scripts/Test-AAEmu30Runtime.ps1` after each clean startup. Keep its zero-bot result beside the asset-provenance record, then use the same metrics contract for one-bot lifecycle, four-role behavior, and scale gates. Server-start success is a prerequisite, not a substitute for those physical cases.

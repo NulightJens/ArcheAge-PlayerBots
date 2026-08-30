@@ -1,7 +1,7 @@
 {
   "name": "ArcheAge PlayerBots",
   "id": "archeage-playerbots",
-  "version": "0.2.0-alpha.1",
+  "version": "0.2.0-alpha.2",
   "license": "GPL-3.0-or-later",
   "repository": "https://github.com/NulightJens/ArcheAge-PlayerBots",
   "modulePath": "modules/archeage-playerbots",
@@ -26,9 +26,9 @@
       "track": "ArcheAge 3.0.4.2 r336598",
       "repository": "https://github.com/NL0bP/AAEmu",
       "testedBaseCommit": "8c1c943bb2309eefffb9da2aa99a408d0acbb095",
-      "status": "compile-validated",
-      "compatibilityPatch": "compatibility/aaemu-3.0.4.2-r336598-alpha.patch",
-      "compatibilityPatchSha256": "3e7c792a1e77864617bde197ad89c7b7948d420ce12fb15f2a759e39a018acc6"
+      "status": "server-start-validated",
+      "compatibilityPatch": "compatibility/aaemu-3.0.4.2-r336598-alpha-v2.patch",
+      "compatibilityPatchSha256": "a9d51a4d3965006aae86da3e5724c452e25b15fc80990934016af1a3d053f164"
     }
   ],
   "install": {
