@@ -36,7 +36,7 @@ public sealed class BotQuestCommand : ICommand
     public void OnLoad() => CommandManager.Instance.Register(CommandNames, this);
 
     public string GetCommandLineHelp() =>
-        "scan <botId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, report <botId> <questId> [rewardIndex]";
+        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, report <botId> <questId> [rewardIndex]";
 
     public string GetCommandHelpText() =>
         "Scans nearby NPC quest relations, explains a structured quest, or accepts/reports it through AAEmu's normal quest acts. " +
@@ -61,6 +61,9 @@ public sealed class BotQuestCommand : ICommand
         {
             case BotQuestVerb.Scan:
                 Scan(bot, request.Radius, messageOutput);
+                break;
+            case BotQuestVerb.Nearby:
+                Nearby(bot, request.NpcTemplateId, request.Radius, messageOutput);
                 break;
             case BotQuestVerb.Inspect:
                 Inspect(bot, request.QuestId, messageOutput);
@@ -95,7 +98,19 @@ public sealed class BotQuestCommand : ICommand
                     (!float.TryParse(args[2], NumberStyles.Float, CultureInfo.InvariantCulture, out radius) ||
                      radius <= 0f || radius > MaximumScanRadius))
                     return false;
-                request = new BotQuestRequest(verb, botId, 0, radius, 0);
+                request = new BotQuestRequest(verb, botId, 0, 0, radius, 0);
+                return true;
+            case BotQuestVerb.Nearby:
+                if (args.Length is < 3 or > 4 ||
+                    !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out var npcTemplateId) ||
+                    npcTemplateId == 0)
+                    return false;
+                radius = DefaultScanRadius;
+                if (args.Length == 4 &&
+                    (!float.TryParse(args[3], NumberStyles.Float, CultureInfo.InvariantCulture, out radius) ||
+                     radius <= 0f || radius > MaximumScanRadius))
+                    return false;
+                request = new BotQuestRequest(verb, botId, 0, npcTemplateId, radius, 0);
                 return true;
             case BotQuestVerb.Inspect:
             case BotQuestVerb.Status:
@@ -103,7 +118,7 @@ public sealed class BotQuestCommand : ICommand
                 if (args.Length != 3 ||
                     !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out var questId) || questId == 0)
                     return false;
-                request = new BotQuestRequest(verb, botId, questId, 0f, 0);
+                request = new BotQuestRequest(verb, botId, questId, 0, 0f, 0);
                 return true;
             case BotQuestVerb.Report:
                 if (args.Length is < 3 or > 4 ||
@@ -113,7 +128,7 @@ public sealed class BotQuestCommand : ICommand
                 if (args.Length == 4 &&
                     (!int.TryParse(args[3], NumberStyles.None, CultureInfo.InvariantCulture, out selectedReward) || selectedReward < 0))
                     return false;
-                request = new BotQuestRequest(verb, botId, questId, 0f, selectedReward);
+                request = new BotQuestRequest(verb, botId, questId, 0, 0f, selectedReward);
                 return true;
             default:
                 return false;
@@ -147,6 +162,27 @@ public sealed class BotQuestCommand : ICommand
             foreach (var quest in relation.Reports.Where(quest => bot.Quests.HasQuest(quest.Id)))
                 CommandManager.SendNormalText(this, messageOutput,
                     $"  REPORT quest={quest.Id} name='{LocalizedQuestName(quest.Id)}' active=true objective={DescribeObjectiveShape(quest)}");
+        }
+    }
+
+    private void Nearby(Character bot, uint npcTemplateId, float radius, IMessageOutput messageOutput)
+    {
+        var matches = WorldManager.GetAround<Npc>(bot, radius, true)
+            .Where(npc => npc.TemplateId == npcTemplateId)
+            .Select(npc => new { Npc = npc, Distance = Distance(bot, npc) })
+            .OrderBy(candidate => candidate.Distance)
+            .ThenBy(candidate => candidate.Npc.ObjId)
+            .ToList();
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' exact NPC scan: template={npcTemplateId}, radius={radius:F1}m, matches={matches.Count}.");
+        foreach (var match in matches)
+        {
+            var position = match.Npc.Transform.World.Position;
+            CommandManager.SendNormalText(this, messageOutput,
+                $"npc='{LocalizedNpcName(match.Npc)}' template={match.Npc.TemplateId} obj={match.Npc.ObjId} " +
+                $"hp={match.Npc.Hp}/{match.Npc.MaxHp} dead={match.Npc.IsDead.ToString().ToLowerInvariant()} " +
+                $"distance={match.Distance:F1}m position=({position.X:F1},{position.Y:F1},{position.Z:F1})");
         }
     }
 
@@ -427,6 +463,7 @@ public sealed class BotQuestCommand : ICommand
 internal enum BotQuestVerb
 {
     Scan,
+    Nearby,
     Inspect,
     Status,
     Accept,
@@ -437,5 +474,6 @@ internal readonly record struct BotQuestRequest(
     BotQuestVerb Verb,
     uint BotId,
     uint QuestId,
+    uint NpcTemplateId,
     float Radius,
     int SelectedReward);

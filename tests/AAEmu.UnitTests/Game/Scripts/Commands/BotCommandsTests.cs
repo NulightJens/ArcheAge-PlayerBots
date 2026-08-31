@@ -94,6 +94,10 @@ public class BotCommandsTests
         await Assert.That(scan.Verb).IsEqualTo(BotQuestVerb.Scan);
         await Assert.That(scan.BotId).IsEqualTo(2u);
         await Assert.That(scan.Radius).IsEqualTo(40f);
+        await Assert.That(BotQuestCommand.TryParse(["nearby", "2", "3495", "75"], out var nearby)).IsTrue();
+        await Assert.That(nearby.Verb).IsEqualTo(BotQuestVerb.Nearby);
+        await Assert.That(nearby.NpcTemplateId).IsEqualTo(3495u);
+        await Assert.That(nearby.Radius).IsEqualTo(75f);
         await Assert.That(BotQuestCommand.TryParse(["accept", "2", "330"], out var accept)).IsTrue();
         await Assert.That(accept.Verb).IsEqualTo(BotQuestVerb.Accept);
         await Assert.That(accept.QuestId).IsEqualTo(330u);
@@ -105,6 +109,7 @@ public class BotCommandsTests
         await Assert.That(report.SelectedReward).IsEqualTo(1);
         await Assert.That(BotQuestCommand.TryParse(["report", "2", "330", "-1"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.TryParse(["scan", "2", "101"], out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryParse(["nearby", "2", "3495", "101"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.IsValidSelectedReward([], 0)).IsTrue();
         await Assert.That(BotQuestCommand.IsValidSelectedReward([], 1)).IsFalse();
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 0)).IsFalse();

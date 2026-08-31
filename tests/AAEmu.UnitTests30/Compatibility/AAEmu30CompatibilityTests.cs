@@ -54,6 +54,10 @@ public sealed class AAEmu30CompatibilityTests
         Assert.True(BotQuestCommand.TryParse(["scan", "2", "35"], out var scan));
         Assert.Equal(BotQuestVerb.Scan, scan.Verb);
         Assert.Equal(35f, scan.Radius);
+        Assert.True(BotQuestCommand.TryParse(["nearby", "2", "3495", "100"], out var nearby));
+        Assert.Equal(BotQuestVerb.Nearby, nearby.Verb);
+        Assert.Equal(3495u, nearby.NpcTemplateId);
+        Assert.Equal(100f, nearby.Radius);
         Assert.True(BotQuestCommand.TryParse(["inspect", "2", "330"], out var inspect));
         Assert.Equal(BotQuestVerb.Inspect, inspect.Verb);
         Assert.Equal(330u, inspect.QuestId);
@@ -63,6 +67,7 @@ public sealed class AAEmu30CompatibilityTests
         Assert.Equal(BotQuestVerb.Report, report.Verb);
         Assert.Equal(0, report.SelectedReward);
         Assert.False(BotQuestCommand.TryParse(["scan", "2", "100.1"], out _));
+        Assert.False(BotQuestCommand.TryParse(["nearby", "2", "3495", "100.1"], out _));
         Assert.True(BotQuestCommand.IsValidSelectedReward([], 0));
         Assert.False(BotQuestCommand.IsValidSelectedReward([], 1));
         Assert.False(BotQuestCommand.IsValidSelectedReward([1, 2], 0));
