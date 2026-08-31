@@ -401,7 +401,9 @@ try {
 
     $statusBefore = Get-ClientStatus
     Assert-ExactClientStatus -Status $statusBefore
-    $charactersBefore = @(Invoke-RestMethod -Method Get -Uri "$apiBase/character/list")
+    $charactersBefore = @(
+        (Invoke-RestMethod -Method Get -Uri "$apiBase/character/list") |
+            ForEach-Object { $_ })
     $expectedBefore = Get-ExpectedCharacter -Characters $charactersBefore
     if ($expectedBefore.IsOnline) {
         throw "The expected character '$ExpectedCharacterName' is already online; no offline-to-online transition can be proven."
@@ -434,7 +436,9 @@ try {
         try {
             $statusAfter = Get-ClientStatus
             Assert-ExactClientStatus -Status $statusAfter
-            $charactersAfter = @(Invoke-RestMethod -Method Get -Uri "$apiBase/character/list")
+            $charactersAfter = @(
+                (Invoke-RestMethod -Method Get -Uri "$apiBase/character/list") |
+                    ForEach-Object { $_ })
             $expectedAfter = Get-ExpectedCharacter -Characters $charactersAfter
             $freshAuthorized = $null -ne $statusAfter.log.milestones.worldAuthorized -and
                 $statusAfter.log.milestones.worldAuthorized -ne $statusBefore.log.milestones.worldAuthorized
