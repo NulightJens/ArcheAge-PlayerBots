@@ -9,7 +9,9 @@ Before changing files, read only:
 1. `ops/PROJECT.yaml`
 2. `ops/CURRENT.yaml`
 3. `ops/BOARD.yaml`
-4. The assigned `ops/tasks/T-NNN/TASK.yaml` and `CONTRACT.md`
+4. `ops/WORKSPACES.yaml`
+5. `ops/ENVIRONMENT-CONTINGENCY.md`
+6. The assigned `ops/tasks/T-NNN/TASK.yaml` and `CONTRACT.md`
 
 Do not reconstruct current state from old chats, chronological status diaries, raw logs, or `C:\aaemu-playerbots\.planning`. Those are retained evidence, not dispatch authority.
 
@@ -28,12 +30,21 @@ Do not reconstruct current state from old chats, chronological status diaries, r
 - Writer tasks must not modify deployed AAEmu hosts as source trees.
 - Subagents may perform bounded research, test design, log analysis, or review. Independent writers require independent worktrees.
 
+## Workspace routing
+
+- Refer to server, client, module, and evidence locations by the IDs in `ops/WORKSPACES.yaml`; never select a path because its name looks current.
+- Obey each workspace's `access` mode. `read-only`, `evidence-only`, and `frozen` locations are never writer targets.
+- The AAEmu 1.2 reference checkout must remain clean at the pinned commit. Installation and build proofs use the lease-controlled integration checkout.
+- Client fixtures are read-only. Never edit a client or `game_pak` as part of a source task.
+- If a registered path is missing, dirty beyond its declared state, or at the wrong revision, follow `ops/ENVIRONMENT-CONTINGENCY.md` instead of substituting another checkout.
+
 ## Verification and runtime
 
 - Run focused AAEmu 1.2 tests in writer tasks.
 - Run the full 1.2 suite once per integration wave, not once per task.
 - Reuse a green evidence receipt when its complete fingerprint is unchanged.
 - Starting, deploying, controlling, or stopping a live runtime requires the lease in `ops/RUNTIME-LEASE.yaml`.
+- Pure module source work may continue while a runtime or client fixture is unavailable, but physical acceptance must remain explicitly pending.
 - Never force-stop a process. Use the runtime's graceful command or Ctrl+C path and retain shutdown evidence.
 
 ## Handoff

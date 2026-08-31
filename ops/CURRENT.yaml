@@ -27,9 +27,19 @@ runtime:
     observed_pid: 88204
     port: 3307
   aaemu12_clean_runtime:
-    state: not-yet-provisioned
+    state: provisioning-isolated-integration-v1
+    reference_workspace: aaemu12_reference
+    integration_workspace: aaemu12_integration
+    client_workspace: aaemu12_client
+
+control_tower:
+  permanent_task: pending-create
+  saved_project_id: 9cdd642a-c900-4027-8f7b-d369835cef26
+  operating_mode: local-integration-worktree
 
 next_transition:
+  - Complete and receipt the isolated AAEmu 1.2 integration baseline.
+  - Create and pin the permanent PB-000 Control Tower task in the saved PlayerBots project.
   - Resolve the three setup client IDs to final task IDs when worktree setup completes.
   - Monitor T-038, T-039, and T-040 without duplicating their work.
   - Dispatch an independent review/integration wave after all three handoffs exist.

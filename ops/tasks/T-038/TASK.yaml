@@ -10,6 +10,12 @@ branch: assigned-by-codex
 worktree: assigned-by-codex
 owner_client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
 
+inputs:
+  module_source: current-worktree
+  host_reference: aaemu12_reference
+  validation_host: aaemu12_integration
+  client_fixture: aaemu12_client
+
 write_scope:
   - src/AAEmu.Game/Bots/Navigation/**
   - src/AAEmu.Game/Models/Tasks/Bots/BotMovementTask.cs
@@ -23,4 +29,5 @@ runtime:
   required: false
   lease: null
 gates: [focused-aaemu12-tests]
+validation_boundary: Pure source work needs no runtime; final integration proof must use the current aaemu12_integration receipt.
 handoff: ops/tasks/T-038/HANDOFF.md

@@ -3,13 +3,16 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: unassigned
-    owner_task: null
+    status: provisioning
+    owner_task: PB-W00-bootstrap
     owner_thread_id: null
-    host_path: null
+    workspace_id: aaemu12_integration
+    host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
+    reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
+    client_path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: null
-    claimed_at: null
+    claimed_at: 2026-08-31
     released_at: null
     cleanup_receipt: null
 
