@@ -1,5 +1,6 @@
 using System.Numerics;
 using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Bots.Navigation;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Models.Game.Bots;
@@ -70,7 +71,7 @@ public class BotMovementTaskTests
     }
 
     [Test]
-    public async Task Execute_GroundHeightThrows_DoesNotPropagateAndRecordsError()
+    public async Task Execute_GroundHeightThrows_RejectsUnavailableWithoutMovement()
     {
         var bot = BotTestFixture.MakeBot(6, Vector3.Zero);
         BotTestFixture.SetPrivateField(bot, "_parentWorld", BotTestFixture.MakeWorld());
@@ -78,6 +79,8 @@ public class BotMovementTaskTests
         bot.MaxHp = 100;
         var state = new BotMovementState { Destination = new Vector3(0.1f, 0, 0) };
         var broadcaster = new BotMovementBroadcaster(bot);
+        var sent = new List<AAEmu.Game.Models.Game.Units.Movements.UnitMoveType>();
+        broadcaster.MoveTypeSink = sent.Add;
         var task = new BotMovementTask(
             bot,
             state,
@@ -88,8 +91,13 @@ public class BotMovementTaskTests
         task.Execute();
 
         await Assert.That(task.Cancelled).IsFalse();
-        await Assert.That(state.Diagnostics.LastError).IsTypeOf<InvalidOperationException>();
-        await Assert.That(state.Diagnostics.ErrorCount).IsEqualTo(1);
+        await Assert.That(state.Destination).IsNull();
+        await Assert.That(state.LastNavigationDecision.Value.Status)
+            .IsEqualTo(NavigationDecisionStatus.Unavailable);
+        await Assert.That(state.LastNavigationDecision.Value.Reason)
+            .IsEqualTo(NavigationDiagnosticReason.NavigationDataUnavailable);
+        await Assert.That(sent).IsEmpty();
+        await Assert.That(state.Diagnostics.ErrorCount).IsEqualTo(0);
     }
 
     [Test]
@@ -164,6 +172,30 @@ public class BotMovementTaskTests
 
         await Assert.That(setup.Bot.Transform.World.Position.X).IsEqualTo(0.54f).Within(1e-4f);
         await Assert.That(setup.Broadcaster.Calls.Single().Kind).IsEqualTo("Move");
+        await Assert.That(setup.State.LastNavigationDecision.Value.Status)
+            .IsEqualTo(NavigationDecisionStatus.Accepted);
+        await Assert.That(setup.State.LastNavigationDecision.Value.Reason)
+            .IsEqualTo(NavigationDiagnosticReason.SameSurfaceDirectTraversalCompatibility);
+    }
+
+    [Test]
+    public async Task Execute_UnreachableDestination_IssuesNoMovementAndExposesBoundedReason()
+    {
+        var decision = new NavigationDecision(
+            NavigationDecisionStatus.Unreachable,
+            NavigationDiagnosticReason.ReachabilityRejected);
+        var setup = CreateTask(Vector3.Zero, navigationBoundary: new FixedNavigationBoundary(decision));
+        setup.State.Destination = new Vector3(10f, 0f, 0f);
+
+        setup.Task.Execute();
+
+        await Assert.That(setup.Bot.Transform.World.Position).IsEqualTo(Vector3.Zero);
+        await Assert.That(setup.Broadcaster.Calls).IsEmpty();
+        await Assert.That(setup.State.Destination).IsNull();
+        await Assert.That(setup.State.LastNavigationDecision.Value.Status)
+            .IsEqualTo(NavigationDecisionStatus.Unreachable);
+        await Assert.That(setup.State.LastNavigationDecision.Value.Reason)
+            .IsEqualTo(NavigationDiagnosticReason.ReachabilityRejected);
     }
 
     [Test]
@@ -426,7 +458,8 @@ public class BotMovementTaskTests
         Vector3 position,
         bool running = true,
         BotConfig config = null,
-        TimeProvider time = null)
+        TimeProvider time = null,
+        INavigationDecisionBoundary navigationBoundary = null)
     {
         var bot = new MovementCharacterMock { Id = 20, ObjId = 1020, Name = "bot20" };
         bot.Transform.Local.SetPosition(position);
@@ -443,7 +476,8 @@ public class BotMovementTaskTests
             baseSpeed: isRunning => isRunning ? 5.4f : 1.8f,
             groundHeight: (_, _) => 0f,
             config: config,
-            time: time);
+            time: time,
+            navigationBoundary: navigationBoundary);
         return (bot, state, broadcaster, task);
     }
 
@@ -452,6 +486,11 @@ public class BotMovementTaskTests
         public override void Execute()
         {
         }
+    }
+
+    private sealed class FixedNavigationBoundary(NavigationDecision decision) : INavigationDecisionBoundary
+    {
+        public NavigationDecision Evaluate(Vector3 start, Vector3 destination) => decision;
     }
 
     private sealed class MovementCharacterMock : CharacterMock

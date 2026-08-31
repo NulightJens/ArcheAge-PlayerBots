@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using System.Threading;
 using AAEmu.Game.Bots.Body;
+using AAEmu.Game.Bots.Navigation;
 using AAEmu.Game.Bots.Social;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Models.Game.Bots;
@@ -25,6 +26,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
     private readonly Action<BotMovementTask> _onCancel;
     private readonly Func<bool, float> _baseSpeed;
     private readonly Func<float, float, float> _groundHeight;
+    private readonly INavigationDecisionBoundary _navigationBoundary;
     private readonly BotConfig _config;
     private readonly TimeProvider _time;
     private BotCombatState _combatState;
@@ -39,7 +41,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
     private GameStanceType _cachedStance = GameStanceType.Combat;
 
     public BotMovementTask(Character bot, BotMovementState state, BotMovementBroadcaster broadcaster)
-        : this(bot, state, broadcaster, null, null, null, null, null)
+        : this(bot, state, broadcaster, null, null, null, null, null, null)
     {
     }
 
@@ -50,8 +52,9 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         Func<bool, float> baseSpeed,
         Func<float, float, float> groundHeight,
         BotConfig config = null,
-        TimeProvider time = null)
-        : this(bot, state, broadcaster, null, baseSpeed, groundHeight, config, time)
+        TimeProvider time = null,
+        INavigationDecisionBoundary navigationBoundary = null)
+        : this(bot, state, broadcaster, null, baseSpeed, groundHeight, config, time, navigationBoundary)
     {
     }
 
@@ -61,7 +64,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         BotMovementBroadcaster broadcaster,
         Action<BotMovementTask> onCancel,
         Func<float, float, float> groundHeight = null)
-        : this(bot, state, broadcaster, onCancel, null, groundHeight, null, null)
+        : this(bot, state, broadcaster, onCancel, null, groundHeight, null, null, null)
     {
     }
 
@@ -73,7 +76,8 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         Func<bool, float> baseSpeed,
         Func<float, float, float> groundHeight,
         BotConfig config,
-        TimeProvider time)
+        TimeProvider time,
+        INavigationDecisionBoundary navigationBoundary)
     {
         _bot = bot ?? throw new ArgumentNullException(nameof(bot));
         _state = state ?? throw new ArgumentNullException(nameof(state));
@@ -81,6 +85,8 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         _onCancel = onCancel;
         _baseSpeed = baseSpeed ?? (running => GetBaseSpeed(running));
         _groundHeight = groundHeight ?? ((x, y) => _bot.ParentWorld.GetHeight(x, y));
+        _navigationBoundary = navigationBoundary ??
+                              NavigationDecisionBoundary.CreateSameSurfaceGroundCompatibility(_groundHeight);
         _config = config ?? BotConfig.Instance;
         _time = time ?? TimeProvider.System;
     }
@@ -103,6 +109,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
             return;
 
         _state.Destination = position;
+        _state.ApprovedNavigationDestination = null;
         _state.IsRunning = run;
         _state.FallVelocity = 0;
         Logger.Trace($"BOT id={bot.Id} obj={bot.ObjId} ev=destination pos=({position.X}, {position.Y}, {position.Z}) run={run}");
@@ -270,12 +277,17 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
                 targetPosition,
                 _state.FormationSlot >= 0 ? 0.35f : _state.FollowDistance);
             _state.Destination = follow.Destination;
+            if (_state.ApprovedNavigationDestination != follow.Destination)
+                _state.ApprovedNavigationDestination = null;
             if (follow.Destination.HasValue)
                 _state.IsRunning = follow.Run;
         }
 
         var now = _time.GetUtcNow().UtcDateTime;
         var currentPosition = _bot.Transform.World.Position;
+        if (!AuthorizeDestination(currentPosition))
+            return;
+
         var groundZ = GetGroundHeight(currentPosition.X, currentPosition.Y);
         TryStartJump(now, currentPosition, groundZ, _state.Destination);
 
@@ -555,9 +567,41 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         return _groundHeight(x, y);
     }
 
+    private bool AuthorizeDestination(Vector3 currentPosition)
+    {
+        if (_state.Destination is not { } destination)
+        {
+            _state.ApprovedNavigationDestination = null;
+            return true;
+        }
+
+        if (_state.ApprovedNavigationDestination == destination)
+            return true;
+
+        var decision = _navigationBoundary.Evaluate(currentPosition, destination);
+        _state.LastNavigationDecision = decision;
+        if (decision.IsAccepted)
+        {
+            _state.ApprovedNavigationDestination = destination;
+            Logger.Trace(
+                $"BOT id={_bot.Id} obj={_bot.ObjId} ev=navigation_decision status={decision.Status} reason={decision.Reason}");
+            return true;
+        }
+
+        _state.Destination = null;
+        _state.ApprovedNavigationDestination = null;
+        Logger.Warn(
+            $"BOT id={_bot.Id} obj={_bot.ObjId} ev=navigation_decision status={decision.Status} reason={decision.Reason}");
+        if (_state.IsMoving || _state.IsFalling || _state.IsJumping || _state.JumpRequested)
+            StopAndClear(currentPosition, forceFinalize: true);
+
+        return false;
+    }
+
     private void StopAndClear(Vector3 position, bool forceFinalize)
     {
         _state.Destination = null;
+        _state.ApprovedNavigationDestination = null;
         _state.IsMoving = false;
         _state.IsFalling = false;
         _state.FallVelocity = 0;
@@ -573,6 +617,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
     private static void ResetMovementState(BotMovementState state)
     {
         state.Destination = null;
+        state.ApprovedNavigationDestination = null;
         state.IsMoving = false;
         state.IsFalling = false;
         state.FallVelocity = 0;

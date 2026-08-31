@@ -1,4 +1,5 @@
 using System.Numerics;
+using AAEmu.Game.Bots.Navigation;
 using AAEmu.Game.Models.Game.Char;
 
 namespace AAEmu.Game.Models.Game.Bots
@@ -6,6 +7,8 @@ namespace AAEmu.Game.Models.Game.Bots
     public class BotMovementState
     {
         public Vector3? Destination { get; set; }
+        public NavigationDecision? LastNavigationDecision { get; internal set; }
+        internal Vector3? ApprovedNavigationDestination { get; set; }
         public bool IsRunning { get; set; } = true;
         public float FallVelocity { get; set; }
         public bool IsMoving { get; set; }
