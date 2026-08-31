@@ -5,6 +5,7 @@ using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.NPChar;
 using AAEmu.Game.Utils.Scripts;
 
 namespace AAEmu.Game.Scripts.Commands;
@@ -15,6 +16,9 @@ namespace AAEmu.Game.Scripts.Commands;
 /// </summary>
 public sealed class BotAttackObjectCommand : ICommand
 {
+    internal static Func<IEnumerable<Character>, uint, Npc> NpcResolver { get; set; } = (bots, objId) =>
+        bots.Select(bot => bot.ParentWorld?.GetNpc(objId)).FirstOrDefault(npc => npc != null);
+
     public string[] CommandNames { get; set; } = ["botattackobject", "botattacknpc"];
 
     public void OnLoad()
@@ -32,7 +36,7 @@ public sealed class BotAttackObjectCommand : ICommand
         if (args is { Length: 2 } && args[0].Equals("status", StringComparison.OrdinalIgnoreCase) &&
             uint.TryParse(args[1], NumberStyles.None, CultureInfo.InvariantCulture, out var statusObjId))
         {
-            var statusTarget = character?.ParentWorld?.GetNpc(statusObjId);
+            var statusTarget = NpcResolver(BotManager.Instance.GetAllBots(), statusObjId);
             if (statusTarget == null)
             {
                 CommandManager.SendErrorText(this, messageOutput, $"NPC object {statusObjId} was not found.");
@@ -56,10 +60,10 @@ public sealed class BotAttackObjectCommand : ICommand
             return;
         }
 
-        var target = character?.ParentWorld?.GetNpc(npcObjId);
+        var target = NpcResolver(bots, npcObjId);
         if (target == null || target.IsDead)
         {
-            CommandManager.SendErrorText(this, messageOutput, $"Living NPC object {npcObjId} was not found in the command character's world.");
+            CommandManager.SendErrorText(this, messageOutput, $"Living NPC object {npcObjId} was not found in the selected bot worlds.");
             return;
         }
 

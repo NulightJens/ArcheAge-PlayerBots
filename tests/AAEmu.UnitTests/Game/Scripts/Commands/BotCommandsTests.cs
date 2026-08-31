@@ -8,6 +8,7 @@ using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Expeditions;
 using AAEmu.Game.Models.Game.Items;
+using AAEmu.Game.Models.Game.NPChar;
 using AAEmu.Game.Models.Game.Quests;
 using AAEmu.Game.Models.Game.Quests.Acts;
 using AAEmu.Game.Models.Game.Quests.Templates;
@@ -28,6 +29,7 @@ public class BotCommandsTests
     private BotArchetypeManager _previousArchetypeManager;
     private Func<IDuelManager> _previousDuelManagerResolver;
     private Func<uint, BuffTemplate> _previousBuffTemplateResolver;
+    private Func<IEnumerable<Character>, uint, Npc> _previousAttackObjectNpcResolver;
     private BotManager _botManager;
     private FakeBotCombatManager _combatManager;
     private FakeBotArchetypeManager _archetypeManager;
@@ -41,6 +43,7 @@ public class BotCommandsTests
         _previousArchetypeManager = BotArchetypeManager.Instance;
         _previousDuelManagerResolver = BotDuelCommand.DuelManagerResolver;
         _previousBuffTemplateResolver = BotBuffCommand.BuffTemplateResolver;
+        _previousAttackObjectNpcResolver = BotAttackObjectCommand.NpcResolver;
 
         _botManager = new BotManager(_ => null, onlineLookup: _ => null);
         _combatManager = new FakeBotCombatManager();
@@ -55,6 +58,7 @@ public class BotCommandsTests
         BotTestFixture.RegisterSingletons(_previousBotManager, _previousCombatManager, _previousArchetypeManager);
         BotDuelCommand.DuelManagerResolver = _previousDuelManagerResolver;
         BotBuffCommand.BuffTemplateResolver = _previousBuffTemplateResolver;
+        BotAttackObjectCommand.NpcResolver = _previousAttackObjectNpcResolver;
     }
 
     [Test]
@@ -115,6 +119,24 @@ public class BotCommandsTests
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 0)).IsFalse();
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 2)).IsTrue();
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 3)).IsFalse();
+    }
+
+    [Test]
+    public async Task BotAttackObject_StatusUsesBotWorldLookupForSystemCommands()
+    {
+        var requestedObjId = 0u;
+        BotAttackObjectCommand.NpcResolver = (_, objId) =>
+        {
+            requestedObjId = objId;
+            return null;
+        };
+        var requester = new CharacterMock();
+        var output = new CharacterMessageOutput(requester);
+
+        new BotAttackObjectCommand().Execute(requester, ["status", "4242"], output);
+
+        await Assert.That(requestedObjId).IsEqualTo(4242u);
+        await Assert.That(output.Messages.Single()).Contains("NPC object 4242 was not found");
     }
 
     [Test]
