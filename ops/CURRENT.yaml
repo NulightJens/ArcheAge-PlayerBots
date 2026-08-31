@@ -1,11 +1,11 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-0-control-plane
-verdict: active
+phase: wave-0-ready-to-dispatch
+verdict: ready
 
 source:
   integration_branch: integration/aaemu12-world
-  integration_head: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
+  integration_head: 89c0cd433dda5b1d6fa7b8761873bcc4d43dc91c
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
   checkpointed_wip:
@@ -30,6 +30,20 @@ runtime:
     state: not-yet-provisioned
 
 next_transition:
-  - Commit and verify the Wave 0 control plane.
   - Add the canonical Git repository as the primary Codex project.
-  - Create isolated worktrees/tasks for T-038, T-039, and T-040.
+  - Open separate Codex tasks for the prepared T-038, T-039, and T-040 worktrees.
+  - Keep this task as Control Tower and wait while the three writers execute.
+
+prepared_workstreams:
+  - task: T-038
+    branch: task/T-038-navigation-boundary
+    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-038-navigation'
+    base: 89c0cd433dda5b1d6fa7b8761873bcc4d43dc91c
+  - task: T-039
+    branch: task/T-039-life-state-fsm
+    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-039-life-state'
+    base: 89c0cd433dda5b1d6fa7b8761873bcc4d43dc91c
+  - task: T-040
+    branch: task/T-040-persistent-roster
+    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-040-roster'
+    base: 89c0cd433dda5b1d6fa7b8761873bcc4d43dc91c
