@@ -7,6 +7,9 @@ param(
     [string] $EvidenceDirectory,
 
     [Parameter(Mandatory)]
+    [string] $GameplayAssertionSpec,
+
+    [Parameter(Mandatory)]
     [int] $ProcessId,
 
     [Parameter(Mandatory)]
@@ -46,6 +49,7 @@ $moduleRoot = Split-Path -Parent $PSScriptRoot
 $project = Join-Path $moduleRoot 'tools\AAEmu.ClientDriver\AAEmu.ClientDriver.csproj'
 $driver = Join-Path $moduleRoot 'tools\AAEmu.ClientDriver\bin\Debug\net10.0\AAEmu.ClientDriver.dll'
 $profilePath = [System.IO.Path]::GetFullPath($LauncherProfile)
+$gameplayAssertionSpecPath = [System.IO.Path]::GetFullPath($GameplayAssertionSpec)
 $evidenceRoot = [System.IO.Path]::GetFullPath($EvidenceDirectory)
 $hostPath = [System.IO.Path]::GetFullPath($HostRoot)
 $embeddedModulePath = Join-Path $hostPath 'modules\archeage-playerbots'
@@ -70,6 +74,8 @@ $selectionAudit = $null
 $gameplayAudit = $null
 $metricsCommand = $null
 $metrics = $null
+$gameplayAssertion = $null
+$freshWorldLoadedObserved = $false
 
 function Write-NewUtf8File {
     param(
@@ -129,7 +135,7 @@ function Invoke-BoundedJsonProcess {
         $stdout = $process.StandardOutput.ReadToEnd()
         $stderr = $process.StandardError.ReadToEnd()
         if ($process.ExitCode -ne 0) {
-            throw "A client-driver subprocess exited with code $($process.ExitCode): $stderr"
+            throw "A client-driver subprocess exited with code $($process.ExitCode): $stderr $stdout"
         }
         if ([string]::IsNullOrWhiteSpace($stdout)) {
             throw "A client-driver subprocess returned no JSON: $stderr"
@@ -346,6 +352,9 @@ try {
     if (-not (Test-Path -LiteralPath $profilePath -PathType Leaf)) {
         throw "The launch profile does not exist: $profilePath"
     }
+    if (-not (Test-Path -LiteralPath $gameplayAssertionSpecPath -PathType Leaf)) {
+        throw "The gameplay assertion spec does not exist: $gameplayAssertionSpecPath"
+    }
     if (-not (Test-Path -LiteralPath $hostPath -PathType Container)) {
         throw "The retained host root does not exist: $hostPath"
     }
@@ -434,6 +443,7 @@ try {
     $deadline = [DateTimeOffset]::UtcNow.AddSeconds($TimeoutSeconds)
     $transitionProved = $false
     $lastObservationError = $null
+    $freshWorldLoadingObservedAt = $null
     while ([DateTimeOffset]::UtcNow -lt $deadline) {
         Start-Sleep -Milliseconds 750
         try {
@@ -451,8 +461,14 @@ try {
             $sameLogSession = $statusAfter.log.sessionStartedAt -eq $statusBefore.log.sessionStartedAt
             $logAdvanced = $statusAfter.log.bytes -gt $statusBefore.log.bytes -and
                 ([DateTimeOffset]$statusAfter.log.lastWriteUtc) -gt ([DateTimeOffset]$statusBefore.log.lastWriteUtc)
-            if ($sameLogSession -and $authorizationPresent -and $logAdvanced -and $freshLoading -and $freshLoaded -and
-                $statusAfter.state -eq 'world_loaded' -and $expectedAfter.IsOnline) {
+            if ($freshLoading -and $null -eq $freshWorldLoadingObservedAt) {
+                $freshWorldLoadingObservedAt = [DateTimeOffset]::UtcNow
+            }
+            $fallbackRenderWaitElapsed = $null -ne $freshWorldLoadingObservedAt -and
+                ([DateTimeOffset]::UtcNow - $freshWorldLoadingObservedAt).TotalSeconds -ge 15
+            if ($sameLogSession -and $authorizationPresent -and $logAdvanced -and $freshLoading -and
+                $expectedAfter.IsOnline -and ($freshLoaded -or $fallbackRenderWaitElapsed)) {
+                $freshWorldLoadedObserved = $freshLoaded
                 $transitionProved = $true
                 break
             }
@@ -491,6 +507,19 @@ try {
     }
     finally {
         Complete-InputLease -InputLease $gameplayLease -ExpectedActions 1
+    }
+
+    $gameplayAssertion = Invoke-BoundedJsonProcess -Arguments @(
+        $driver,
+        'assert-image',
+        '--capture', $gameplayCapturePath,
+        '--spec', $gameplayAssertionSpecPath)
+    if ($gameplayAssertion.status -ne 'passed' -or
+        $gameplayAssertion.summary.assertionCount -lt 2 -or
+        $gameplayAssertion.summary.passedCount -ne $gameplayAssertion.summary.assertionCount -or
+        $gameplayAssertion.summary.ocrUsed -or
+        $gameplayAssertion.summary.comparison -ne 'exact_rgb') {
+        throw 'The gameplay capture did not satisfy at least two exact RGB gameplay anchors.'
     }
 
     $selectionAudit = @(Get-Content -LiteralPath $selectionAuditPath | ForEach-Object { $_ | ConvertFrom-Json })
@@ -536,7 +565,12 @@ try {
             after = $statusAfter
             authorizationEstablishedBeforeSelection = $true
             freshWorldLoading = $true
-            freshWorldLoaded = $true
+            freshWorldLoaded = $freshWorldLoadedObserved
+            worldLoadedEvidence = if ($freshWorldLoadedObserved) {
+                'fresh_log_marker_and_exact_gameplay_anchors'
+            } else {
+                'server_online_and_exact_gameplay_anchors_after_fresh_loading'
+            }
             logBytesAdvanced = $statusAfter.log.bytes -gt $statusBefore.log.bytes
         }
         server = [ordered]@{
@@ -550,6 +584,7 @@ try {
         captures = [ordered]@{
             characterSelection = $selectionCapture
             gameplayWorld = $gameplayCapture
+            gameplayAssertion = $gameplayAssertion
         }
         safety = [ordered]@{
             exactProcessWindowPathAndHash = $true
@@ -582,6 +617,7 @@ catch {
         target = [ordered]@{ processId = $ProcessId; windowHandle = $WindowHandle }
         lifecycle = [ordered]@{ before = $statusBefore; last = $statusAfter }
         server = [ordered]@{ charactersBefore = $charactersBefore; lastCharacters = $charactersAfter }
+        gameplayAssertion = $gameplayAssertion
         retainedEvidence = [ordered]@{
             summaryPath = $summaryPath
             selectionAuditPath = $selectionAuditPath

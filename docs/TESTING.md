@@ -28,6 +28,7 @@ To prove an already authenticated native character can enter a gameplay world, u
 .\scripts\Test-RealClientWorld.ps1 `
   -LauncherProfile <profile.json> `
   -EvidenceDirectory <new-evidence-directory> `
+  -GameplayAssertionSpec <exact-gameplay-assertions.json> `
   -ProcessId <exact-pid> `
   -WindowHandle <exact-decimal-handle> `
   -ExpectedCharacterName <native-character> `

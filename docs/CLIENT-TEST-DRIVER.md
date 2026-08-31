@@ -120,17 +120,17 @@ Exact image assertions are appropriate only for stable visual anchors. OCR shoul
 
 ### Stage 4: character selection to authoritative world (implemented)
 
-`Test-RealClientWorld.ps1` attaches to one already authenticated client at character selection. It does not receive or persist credentials. The caller supplies the exact profile, PID, decimal main-window handle, expected server character, and retained host root. The runner requires a clean canonical module identity by default, records the retained host and embedded-module Git identities, and validates the profile's pinned client path and SHA-256.
+`Test-RealClientWorld.ps1` attaches to one already authenticated client at character selection. It does not receive or persist credentials. The caller supplies the exact profile, PID, decimal main-window handle, expected server character, retained host root, and an exact gameplay image-assertion spec. The runner requires a clean canonical module identity by default, records the retained host and embedded-module Git identities, and validates the profile's pinned client path and SHA-256.
 
 The scenario first requires the named character to be uniquely present and offline in the loopback AAEmu Web API. A 30-second, three-action input lease focuses the exact window, captures the character-selection frame, clicks the calibrated character slot, and clicks **Start Game**. It then requires all of the following within a bounded wait:
 
 - the same log session advances in bytes and last-write time;
 - character-server authorization is already present in the same log session;
-- `worldLoading` and `worldLoaded` differ from their pre-action values;
-- the driver derives `world_loaded` for the exact PID and handle;
+- `worldLoading` differs from its pre-action value;
+- either a fresh `worldLoaded` marker appears or the bounded fallback render wait elapses;
 - the exact named character changes from offline to online in server truth.
 
-After the transition, the runner records `/botmetrics snapshot`, focuses the exact gameplay window with a separate one-action lease, and captures a hash-verified gameplay frame. The immutable JSON summary includes Git/profile/client identity, lifecycle snapshots, character identity, Web API truth, input audits, capture hashes/dimensions, Computer Use counts, and explicit safety declarations. A failure also writes a new retained summary and never closes or force-terminates the client.
+After the transition, the runner records `/botmetrics snapshot`, focuses the exact gameplay window with a separate one-action lease, captures a hash-verified gameplay frame, and requires at least two exact RGB gameplay anchors. Some 3.0 client re-entry paths render the complete gameplay world without emitting another `Loading Complete` line; in that case the fresh loading marker, named server-online transition, bounded render wait, and exact gameplay anchors jointly establish the world-loaded result. The immutable JSON summary records which proof path passed along with Git/profile/client identity, lifecycle snapshots, character identity, Web API truth, input audits, capture hashes/dimensions, Computer Use counts, and explicit safety declarations. A failure also writes a new retained summary and never closes or force-terminates the client.
 
 The default physical coordinates target the calibrated `1920x1080` ArcheAge 3.0 character-selection layout. Supply different expected dimensions and coordinates only after a new visual calibration:
 
@@ -138,13 +138,14 @@ The default physical coordinates target the calibrated `1920x1080` ArcheAge 3.0 
 .\scripts\Test-RealClientWorld.ps1 `
   -LauncherProfile <profile.json> `
   -EvidenceDirectory <new-evidence-directory> `
+  -GameplayAssertionSpec <exact-gameplay-assertions.json> `
   -ProcessId <exact-pid> `
   -WindowHandle <exact-decimal-handle> `
   -ExpectedCharacterName <native-character> `
   -HostRoot <retained-aaemu-host>
 ```
 
-Native fixture creation remains an exploratory setup step because the guarded driver intentionally has no arbitrary-text endpoint. If Computer Use created that fixture, pass `-FixtureCreationComputerUseActions` so the summary distinguishes those setup actions from the repeatable scenario's `scenarioComputerUseActions: 0`. Animated or translucent production screens must not be frozen into brittle exact-region hashes; use the Stage 3 matcher only for demonstrably stable anchors.
+Native fixture creation remains an exploratory setup step because the guarded driver intentionally has no arbitrary-text endpoint. If Computer Use created that fixture, pass `-FixtureCreationComputerUseActions` so the summary distinguishes those setup actions from the repeatable scenario's `scenarioComputerUseActions: 0`. Calibrate gameplay anchors across at least two independent world entries and require multiple opaque HUD/icon regions. Animated or translucent production screens must not be frozen into brittle exact-region hashes.
 
 ## Intended testing split
 
