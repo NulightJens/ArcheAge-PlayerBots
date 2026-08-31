@@ -37,26 +37,47 @@ runtime:
     runtime_boundary: No server process or database was started; physical runtime acceptance remains pending.
 
 control_tower:
-  permanent_task: pending-create
+  permanent_task:
+    thread_id: 01a059ec-2ca2-7320-bd0b-aef296413ef7
+    title: PB-000 PlayerBots Control Tower
+    state: active-pinned
   saved_project_id: 9cdd642a-c900-4027-8f7b-d369835cef26
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Create and pin the permanent PB-000 Control Tower task in the saved PlayerBots project.
-  - Resolve the three setup client IDs to final task IDs when worktree setup completes.
-  - Monitor T-038, T-039, and T-040 without duplicating their work.
-  - Dispatch an independent review/integration wave after all three handoffs exist.
+  - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
+  - Run T-042 as the independent Wave 1 review and integration task.
+  - Advance the integration branch only after review, registered-host focused tests, and the full AAEmu 1.2 suite are green.
+  - Keep live runtime acceptance pending; T-042 does not acquire the aaemu12 runtime lease.
 
 prepared_workstreams:
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
-    codex_worktree: setup-in-progress
+    task_thread_id: pending-task-list-resolution
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\46cf\PB-W00-control'
     base: 4db079de50304dc63885111c6f05bcf205ce5a9b
+    head: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
+    handoff: ready
   - task: T-039
     client_thread_id: client-new-thread:39823200-fca2-4fea-85d1-18d38831d4ee
-    codex_worktree: setup-in-progress
+    task_thread_id: pending-task-list-resolution
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\6e30\PB-W00-control'
     base: 4db079de50304dc63885111c6f05bcf205ce5a9b
+    head: dcc27f42eb5e691d426235b86295a8106c9073b3
+    handoff: ready
   - task: T-040
     client_thread_id: client-new-thread:96ef486b-2a90-4bb6-8c8a-364f3d948c1f
-    codex_worktree: setup-in-progress
+    task_thread_id: 01a059d1-06d6-7fe0-8972-c02c60d535d0
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\035a\PB-W00-control'
     base: 4db079de50304dc63885111c6f05bcf205ce5a9b
+    head: a99663059db71afaa227bdce8f680b5196e36226
+    handoff: ready
+
+integration_wave:
+  task: T-042
+  title: Wave 1 review and AAEmu 1.2 integration
+  state: ready-to-dispatch
+  source_heads:
+    T-038: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
+    T-039: dcc27f42eb5e691d426235b86295a8106c9073b3
+    T-040: a99663059db71afaa227bdce8f680b5196e36226

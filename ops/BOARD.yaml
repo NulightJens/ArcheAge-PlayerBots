@@ -15,26 +15,38 @@ tasks:
   - id: T-038
     title: Navigation boundary and obstacle diagnostics
     track: AAEmu12
-    status: active
+    status: review
     integration: pending
     depends_on: [PB-W00]
     owner_client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
+    source_head: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
 
   - id: T-039
     title: Deterministic life-state FSM and profiles
     track: AAEmu12
-    status: active
+    status: review
     integration: pending
     depends_on: [PB-W00]
     owner_client_thread_id: client-new-thread:39823200-fca2-4fea-85d1-18d38831d4ee
+    source_head: dcc27f42eb5e691d426235b86295a8106c9073b3
 
   - id: T-040
     title: Persistent bot identity and roster
     track: AAEmu12
-    status: active
+    status: review
     integration: pending
     depends_on: [PB-W00]
     owner_client_thread_id: client-new-thread:96ef486b-2a90-4bb6-8c8a-364f3d948c1f
+    owner_thread_id: 01a059d1-06d6-7fe0-8972-c02c60d535d0
+    source_head: a99663059db71afaa227bdce8f680b5196e36226
+
+  - id: T-042
+    title: Wave 1 review and AAEmu 1.2 integration
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-038, T-039, T-040]
+    gate: full-aaemu12-suite
 
   - id: T-007
     title: Evidence and log receipt translator
