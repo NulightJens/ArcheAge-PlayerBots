@@ -8,6 +8,7 @@ outcome: Independently review and integrate T-007, T-043, and T-044, then prove 
 depends_on: [T-007, T-043, T-044]
 branch: assigned-by-codex
 worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:9b37ca27-d9b9-4d74-b76e-005f813e7b76
 
 inputs:
   integration_branch: integration/aaemu12-world

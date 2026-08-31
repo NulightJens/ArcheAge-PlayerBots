@@ -123,6 +123,8 @@ wave_2:
       handoff: ready
   integration_task:
     task: T-045
-    state: ready-to-dispatch
+    state: setup-in-progress
+    client_thread_id: client-new-thread:9b37ca27-d9b9-4d74-b76e-005f813e7b76
+    task_thread_id: pending-task-list-resolution
   runtime_lease: unclaimed
   runtime_start: prohibited-until-integration-and-registration

@@ -84,10 +84,11 @@ tasks:
   - id: T-045
     title: Wave 2 source and database-runway integration
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-007, T-043, T-044]
     gate: full-aaemu12-suite
+    owner_client_thread_id: client-new-thread:9b37ca27-d9b9-4d74-b76e-005f813e7b76
 
   - id: T-036
     title: AAEmu 1.2 mortal-combat and stealth closure
