@@ -71,6 +71,7 @@ public class BotCombatTask : Task
     }
 
     internal uint BotId => _bot.Id;
+    internal BotCombatState State => _state;
     internal BotBlackboard Blackboard => _blackboard;
     internal BotHostMetrics HostMetrics { get; set; }
     private DateTime Now => _timeProvider.GetUtcNow().UtcDateTime;
@@ -342,17 +343,8 @@ public class BotCombatTask : Task
             return;
         }
 
-        if (_state.StopAtTargetHpPercent is { } stopPercent &&
-            HasReachedHpFloor(_state.Target, stopPercent))
-        {
-            var target = _state.Target;
-            _state.Target = null;
-            _bot.CurrentTarget = null;
-            ExitTemporaryState();
-            Logger.Info($"BOT id={_bot.Id} ev=nonlethal_floor target={target.ObjId} " +
-                        $"hp={target.Hp}/{target.MaxHp} floor_pct={stopPercent}");
+        if (TryEnforceNonlethalFloor())
             return;
-        }
 
         if (IsStealthed(_state.Target))
         {
@@ -591,6 +583,25 @@ public class BotCombatTask : Task
     {
         return target != null && target.MaxHp > 0 &&
                (long)target.Hp * 100 <= (long)target.MaxHp * stopPercent;
+    }
+
+    internal bool TryEnforceNonlethalFloor()
+    {
+        if (_state.CurrentState != BotCombatStateType.Combat ||
+            _state.Target == null ||
+            _state.StopAtTargetHpPercent is not { } stopPercent ||
+            !HasReachedHpFloor(_state.Target, stopPercent))
+        {
+            return false;
+        }
+
+        var target = _state.Target;
+        _state.Target = null;
+        _bot.CurrentTarget = null;
+        ExitTemporaryState();
+        Logger.Info($"BOT id={_bot.Id} ev=nonlethal_floor target={target.ObjId} " +
+                    $"hp={target.Hp}/{target.MaxHp} floor_pct={stopPercent}");
+        return true;
     }
 
     private bool TryDefend(out Unit attacker)

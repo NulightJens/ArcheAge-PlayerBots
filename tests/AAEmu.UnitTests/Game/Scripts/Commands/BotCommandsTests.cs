@@ -14,6 +14,7 @@ using AAEmu.Game.Models.Game.Quests;
 using AAEmu.Game.Models.Game.Quests.Acts;
 using AAEmu.Game.Models.Game.Quests.Templates;
 using AAEmu.Game.Models.Game.Skills;
+using AAEmu.Game.Models.Game.Skills.Static;
 using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Scripts.Commands;
@@ -148,6 +149,44 @@ public class BotCommandsTests
     }
 
     [Test]
+    public async Task BotQuest_ItemUseSelectsExactTargetAndRestoresPreviousTargetOnRejection()
+    {
+        var bot = AddBot(2);
+        var previousTarget = AddBot(3);
+        var questTarget = new Npc { ObjId = 4242, TemplateId = 3460 };
+        bot.CurrentTarget = previousTarget;
+        var exactTargetWasSelected = false;
+
+        var result = BotQuestCommand.UseWithSelectedTarget(bot, questTarget, () =>
+        {
+            exactTargetWasSelected = ReferenceEquals(bot.CurrentTarget, questTarget);
+            return SkillResult.UnitReqsOrFail;
+        });
+
+        await Assert.That(exactTargetWasSelected).IsTrue();
+        await Assert.That(result).IsEqualTo(SkillResult.UnitReqsOrFail);
+        await Assert.That(bot.CurrentTarget).IsSameReferenceAs(previousTarget);
+    }
+
+    [Test]
+    public async Task BotQuest_ItemUseRetainsExactTargetForSuccessfulNativeChannel()
+    {
+        var bot = AddBot(2);
+        var questTarget = new Npc { ObjId = 4242, TemplateId = 3460 };
+        var exactTargetWasSelected = false;
+
+        var result = BotQuestCommand.UseWithSelectedTarget(bot, questTarget, () =>
+        {
+            exactTargetWasSelected = ReferenceEquals(bot.CurrentTarget, questTarget);
+            return SkillResult.Success;
+        });
+
+        await Assert.That(exactTargetWasSelected).IsTrue();
+        await Assert.That(result).IsEqualTo(SkillResult.Success);
+        await Assert.That(bot.CurrentTarget).IsSameReferenceAs(questTarget);
+    }
+
+    [Test]
     public async Task BotAttackObject_StatusUsesBotWorldLookupForSystemCommands()
     {
         var requestedObjId = 0u;
@@ -173,6 +212,19 @@ public class BotCommandsTests
         await Assert.That(BotAttackObjectCommand.TryParseStopAtHpPercent("0", out _)).IsFalse();
         await Assert.That(BotAttackObjectCommand.TryParseStopAtHpPercent("100", out _)).IsFalse();
         await Assert.That(BotAttackObjectCommand.TryParseStopAtHpPercent("half", out _)).IsFalse();
+    }
+
+    [Test]
+    public async Task BotAttackObject_ArmsCombatManagersAuthoritativeState()
+    {
+        var bot = AddBot(2);
+        var authoritative = new BotCombatState { BotId = bot.Id };
+        _combatManager.States[bot.Id] = authoritative;
+
+        var resolved = BotAttackObjectCommand.EnsureAuthoritativeCombatState(bot);
+
+        await Assert.That(resolved).IsSameReferenceAs(authoritative);
+        await Assert.That(_combatManager.StartListeningCalls).Contains(bot.Id);
     }
 
     [Test]
@@ -450,6 +502,30 @@ public class BotCommandsTests
         await Assert.That(state.KillCount).IsEqualTo(7);
         await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Idle);
         await Assert.That(output.Messages.Single()).Contains("positive kill goal");
+    }
+
+    [Test]
+    public async Task BotState_StatusReportsArmedNonLethalFloor()
+    {
+        var bot = new FixedHealthCharacterMock
+        {
+            Id = 2,
+            ObjId = 1002,
+            Name = "bot2",
+            FixedMaxHp = 100,
+            Hp = 100
+        };
+        BotTestFixture.GetPrivateField<ConcurrentDictionary<uint, Character>>(_botManager, "ActiveBots")[bot.Id] = bot;
+        BotTestFixture.GetPrivateField<ConcurrentDictionary<uint, BotMovementState>>(_botManager, "_botStates")[bot.Id] = new BotMovementState();
+        _combatManager.States[bot.Id] = new BotCombatState
+        {
+            CurrentState = BotCombatStateType.Combat,
+            StopAtTargetHpPercent = 80
+        };
+
+        var output = Execute(new BotStateCommand(), "2");
+
+        await Assert.That(output.Messages.Single()).Contains("StopAtHP: 80%");
     }
 
     [Test]

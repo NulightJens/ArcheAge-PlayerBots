@@ -112,6 +112,29 @@ public class BotCombatManagerTests
     }
 
     [Test]
+    public async Task StartListening_ReplacesBrainBoundToStaleCombatState()
+    {
+        var manager = new BotCombatManager();
+        var bot = BotTestFixture.MakeBot(32, default);
+
+        manager.StartListening(bot);
+        var runtime = BotHost.Instance.GetRuntime(bot.Id);
+        var originalBrain = (BotCombatTask)runtime.Brain;
+        var replacementState = new BotCombatState { BotId = bot.Id };
+        BotTestFixture.GetDictionary<BotCombatState>(manager, "_combatStates")[bot.Id] = replacementState;
+
+        manager.StartListening(bot);
+
+        var replacementBrain = (BotCombatTask)runtime.Brain;
+        await Assert.That(replacementBrain).IsNotSameReferenceAs(originalBrain);
+        await Assert.That(replacementBrain.State).IsSameReferenceAs(replacementState);
+        await Assert.That(originalBrain.Cancelled).IsTrue();
+        await Assert.That(BotHost.Instance.GetRuntime(bot.Id)).IsSameReferenceAs(runtime);
+
+        manager.StopListening(bot);
+    }
+
+    [Test]
     public async Task ResetBot_WasActive_ReEnablesAndKeepsForcedState()
     {
         var previousBotManager = BotManager.Instance;

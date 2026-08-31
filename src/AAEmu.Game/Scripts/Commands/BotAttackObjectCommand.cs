@@ -85,26 +85,34 @@ public sealed class BotAttackObjectCommand : ICommand
                 continue;
             }
 
+            // The combat manager owns the state consumed by BotCombatTask. A
+            // retained movement runtime can temporarily carry a different combat
+            // state after a bot is despawned and respawned (for example by
+            // /setclass). Reattach the brain first, then arm the manager's
+            // authoritative state so the health floor cannot be written only to
+            // a stale runtime object.
+            var combatState = EnsureAuthoritativeCombatState(bot);
+            if (combatState == null)
+            {
+                skipped++;
+                continue;
+            }
+
             BotManager.Instance.StopFollow(bot);
             runtime.MovementState.FormationSlot = -1;
             runtime.MovementState.FormationColumns = 0;
             runtime.MovementState.FormationMemberCount = 0;
             runtime.MovementState.Destination = null;
-            runtime.CombatState.TargetTypeFilter = null;
-            runtime.CombatState.LastKnownTargetPosition = null;
-            runtime.CombatState.KillGoal = null;
-            runtime.CombatState.KillCount = 0;
-            runtime.CombatState.StopAtTargetHpPercent = stopAtHpPercent;
-            runtime.CombatState.Target = target;
+            combatState.TargetTypeFilter = null;
+            combatState.LastKnownTargetPosition = null;
+            combatState.KillGoal = null;
+            combatState.KillCount = 0;
+            combatState.StopAtTargetHpPercent = stopAtHpPercent;
+            combatState.Target = target;
             bot.CurrentTarget = target;
-            runtime.CombatState.IsActive = true;
-            runtime.CombatState.SetForcedState(BotCombatStateType.Idle);
-            runtime.CombatState.TransitionTo(BotCombatStateType.Combat);
-            // Inactive duel cleanup deliberately detaches the combat task while
-            // retaining the lightweight movement runtime. Reattach it before
-            // reporting this bot as engaged, otherwise the state changes to
-            // Combat but no brain remains to execute the contained trial.
-            BotCombatManager.Instance.StartListening(bot);
+            combatState.IsActive = true;
+            combatState.SetForcedState(BotCombatStateType.Idle);
+            combatState.TransitionTo(BotCombatStateType.Combat);
             engaged++;
         }
 
@@ -118,6 +126,13 @@ public sealed class BotAttackObjectCommand : ICommand
     {
         return byte.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out percent) &&
                percent is >= 1 and <= 99;
+    }
+
+    internal static BotCombatState EnsureAuthoritativeCombatState(Character bot)
+    {
+        var manager = BotCombatManager.Instance;
+        manager.StartListening(bot);
+        return manager.GetState(bot);
     }
 
     private static bool TryResolveBots(string selector, out List<Character> bots)

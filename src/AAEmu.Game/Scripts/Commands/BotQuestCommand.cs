@@ -465,13 +465,15 @@ public sealed class BotQuestCommand : ICommand
         var objectiveBefore = gather.GetObjective(activeQuest);
         var inventoryBefore = bot.Inventory.GetItemsCount(gather.ItemId);
         var caster = new SkillItem(bot.ObjId, sourceItem.Id, sourceItem.TemplateId);
-        var result = new Skill(skillTemplate).Use(
-            bot,
-            caster,
-            new SkillCastUnitTarget(target.ObjId),
-            null,
-            false,
-            out var resultErrorValue);
+        uint resultErrorValue = 0;
+        var result = UseWithSelectedTarget(bot, target, () =>
+            new Skill(skillTemplate).Use(
+                bot,
+                caster,
+                new SkillCastUnitTarget(target.ObjId),
+                null,
+                false,
+                out resultErrorValue));
         if (result != SkillResult.Success)
         {
             CommandManager.SendErrorText(this, messageOutput,
@@ -601,6 +603,27 @@ public sealed class BotQuestCommand : ICommand
         item.TemplateId == supply.ItemId &&
         item.Template.LootQuestId == questId &&
         item.Template.UseSkillId != 0;
+
+    internal static SkillResult UseWithSelectedTarget(Character bot, Npc target, Func<SkillResult> useSkill)
+    {
+        // AAEmu validates UnitReqs against CurrentTarget before it resolves the
+        // explicit SkillCastUnitTarget. A normal client has already selected the
+        // unit, so reproduce that prerequisite for connectionless characters.
+        var previousTarget = bot.CurrentTarget;
+        bot.CurrentTarget = target;
+        try
+        {
+            var result = useSkill();
+            if (result != SkillResult.Success)
+                bot.CurrentTarget = previousTarget;
+            return result;
+        }
+        catch
+        {
+            bot.CurrentTarget = previousTarget;
+            throw;
+        }
+    }
 
     private static string GetAvailability(Character bot, QuestTemplate quest)
     {

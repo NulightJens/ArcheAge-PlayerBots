@@ -351,8 +351,16 @@ namespace AAEmu.Game.Core.Managers.Bots
 
         private void EnsureTask(Character bot, BotCombatState state)
         {
-            if (_combatTasks.ContainsKey(bot.Id))
-                return;
+            if (_combatTasks.TryGetValue(bot.Id, out var existing))
+            {
+                if (!existing.Cancelled && ReferenceEquals(existing.State, state))
+                    return;
+
+                // A bot respawn can replace the manager/runtime state before an
+                // older brain has been retired. Never leave that brain consuming
+                // stale combat controls (targets, forced state, health floors).
+                DetachCombatTask(bot.Id);
+            }
 
             var broadcaster = Bots.GetBroadcaster(bot.Id);
             var runtime = Host.GetRuntime(bot.Id);

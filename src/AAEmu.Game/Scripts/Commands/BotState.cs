@@ -77,8 +77,11 @@ namespace AAEmu.Game.Scripts.Commands
                         : combatState.Target.Name;
                 var hp = $"{bot.Hp}/{bot.MaxHp}";
                 var following = moveState?.FollowTarget?.Name ?? "None";
+                var healthFloor = combatState.StopAtTargetHpPercent is { } floor
+                    ? $"{floor}%"
+                    : "None";
                 CommandManager.SendNormalText(this, messageOutput,
-                    $"Bot '{bot.Name}' (Id: {bot.Id}) | State: {combatState.CurrentState} | Forced: {forcedStr} | Active: {combatState.IsActive} | Target: {targetName} | HP: {hp} | Following: {following}");
+                    $"Bot '{bot.Name}' (Id: {bot.Id}) | State: {combatState.CurrentState} | Forced: {forcedStr} | Active: {combatState.IsActive} | Target: {targetName} | HP: {hp} | Following: {following} | StopAtHP: {healthFloor}");
                 return;
             }
 

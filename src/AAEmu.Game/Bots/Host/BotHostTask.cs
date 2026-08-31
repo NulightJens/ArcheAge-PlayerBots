@@ -219,6 +219,15 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                 return;
             }
 
+            // Compiled combat rotations can remain continuously useful and
+            // starve LegacyTickAction. Enforce contained-attack floors before
+            // any engine action so a rotation cannot bypass the safety gate.
+            if (brain.TryEnforceNonlethalFloor())
+            {
+                runtime.Metrics.BrainSteps++;
+                return;
+            }
+
             var engineKind = runtime.CombatState.CurrentState is BotCombatStateType.Combat or BotCombatStateType.Dueling
                 ? BotEngineKind.Combat
                 : BotEngineKind.NonCombat;
