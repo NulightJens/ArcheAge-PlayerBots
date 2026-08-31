@@ -22,7 +22,7 @@ dotnet run --project tools\AAEmu.ClientDriver -- status --log "$env:USERPROFILE\
 
 The staged architecture and the boundary between the client driver and Computer Use are documented in [CLIENT-TEST-DRIVER.md](CLIENT-TEST-DRIVER.md).
 
-To prove an already authenticated native character can enter a gameplay world, use the fail-closed Stage 4 runner. It requires an exact PID/HWND and corroborates fresh client lifecycle markers with the loopback Web API's offline-to-online character transition:
+To prove an already authenticated native character can enter a gameplay world, use the fail-closed Stage 4 runner. It requires an exact PID/HWND and corroborates the pre-existing character-server authorization plus fresh world-loading markers with the loopback Web API's offline-to-online character transition:
 
 ```powershell
 .\scripts\Test-RealClientWorld.ps1 `

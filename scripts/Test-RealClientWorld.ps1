@@ -401,6 +401,10 @@ try {
 
     $statusBefore = Get-ClientStatus
     Assert-ExactClientStatus -Status $statusBefore
+    if ($statusBefore.state -ne 'world_authorized' -or
+        $null -eq $statusBefore.log.milestones.worldAuthorized) {
+        throw 'The exact client is not at the authorized pre-world character-selection lifecycle boundary.'
+    }
     $charactersBefore = @(
         (Invoke-RestMethod -Method Get -Uri "$apiBase/character/list") |
             ForEach-Object { $_ })
@@ -440,14 +444,16 @@ try {
                 (Invoke-RestMethod -Method Get -Uri "$apiBase/character/list") |
                     ForEach-Object { $_ })
             $expectedAfter = Get-ExpectedCharacter -Characters $charactersAfter
-            $freshAuthorized = $null -ne $statusAfter.log.milestones.worldAuthorized -and
-                $statusAfter.log.milestones.worldAuthorized -ne $statusBefore.log.milestones.worldAuthorized
+            $sameAuthorization = $statusAfter.log.milestones.worldAuthorized -eq
+                $statusBefore.log.milestones.worldAuthorized
+            $freshLoading = $null -ne $statusAfter.log.milestones.worldLoading -and
+                $statusAfter.log.milestones.worldLoading -ne $statusBefore.log.milestones.worldLoading
             $freshLoaded = $null -ne $statusAfter.log.milestones.worldLoaded -and
                 $statusAfter.log.milestones.worldLoaded -ne $statusBefore.log.milestones.worldLoaded
             $sameLogSession = $statusAfter.log.sessionStartedAt -eq $statusBefore.log.sessionStartedAt
             $logAdvanced = $statusAfter.log.bytes -gt $statusBefore.log.bytes -and
                 ([DateTimeOffset]$statusAfter.log.lastWriteUtc) -gt ([DateTimeOffset]$statusBefore.log.lastWriteUtc)
-            if ($sameLogSession -and $logAdvanced -and $freshAuthorized -and $freshLoaded -and
+            if ($sameLogSession -and $sameAuthorization -and $logAdvanced -and $freshLoading -and $freshLoaded -and
                 $statusAfter.state -eq 'world_loaded' -and $expectedAfter.IsOnline) {
                 $transitionProved = $true
                 break
@@ -458,7 +464,7 @@ try {
         }
     }
     if (-not $transitionProved) {
-        throw "The exact client did not prove fresh world authorization/loading plus server offline-to-online within $TimeoutSeconds seconds. Last observation error: $lastObservationError"
+        throw "The authorized exact client did not prove fresh world loading plus server offline-to-online within $TimeoutSeconds seconds. Last observation error: $lastObservationError"
     }
 
     $requestBody = @{
@@ -530,7 +536,8 @@ try {
         lifecycle = [ordered]@{
             before = $statusBefore
             after = $statusAfter
-            freshWorldAuthorized = $true
+            authorizationEstablishedBeforeSelection = $true
+            freshWorldLoading = $true
             freshWorldLoaded = $true
             logBytesAdvanced = $statusAfter.log.bytes -gt $statusBefore.log.bytes
         }
