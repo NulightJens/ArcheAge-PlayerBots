@@ -9,11 +9,14 @@ using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.GameData;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.Items;
 using AAEmu.Game.Models.Game.NPChar;
 using AAEmu.Game.Models.Game.Quests;
 using AAEmu.Game.Models.Game.Quests.Acts;
 using AAEmu.Game.Models.Game.Quests.Static;
 using AAEmu.Game.Models.Game.Quests.Templates;
+using AAEmu.Game.Models.Game.Skills;
+using AAEmu.Game.Models.Game.Skills.Static;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Utils;
 using AAEmu.Game.Utils.Scripts;
@@ -36,11 +39,11 @@ public sealed class BotQuestCommand : ICommand
     public void OnLoad() => CommandManager.Instance.Register(CommandNames, this);
 
     public string GetCommandLineHelp() =>
-        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, report <botId> <questId> [rewardIndex]";
+        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, use <botId> <questId> <npcObjId>, report <botId> <questId> [rewardIndex]";
 
     public string GetCommandHelpText() =>
-        "Scans nearby NPC quest relations, explains a structured quest, or accepts/talks/reports through AAEmu's normal quest acts. " +
-        "NPC-group starters, team-shared talk acts, and autonomous objective execution are intentionally deferred.";
+        "Scans nearby NPC quest relations, explains a structured quest, or accepts/talks/uses supplied quest items/reports through AAEmu's normal quest and skill machinery. " +
+        "NPC-group starters, team-shared talk acts, and general autonomous objective execution are intentionally deferred.";
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
     {
@@ -77,6 +80,9 @@ public sealed class BotQuestCommand : ICommand
             case BotQuestVerb.Talk:
                 Talk(bot, request.QuestId, messageOutput);
                 break;
+            case BotQuestVerb.Use:
+                Use(bot, request.QuestId, request.TargetObjId, messageOutput);
+                break;
             case BotQuestVerb.Report:
                 Report(bot, request.QuestId, request.SelectedReward, messageOutput);
                 break;
@@ -101,7 +107,7 @@ public sealed class BotQuestCommand : ICommand
                     (!float.TryParse(args[2], NumberStyles.Float, CultureInfo.InvariantCulture, out radius) ||
                      radius <= 0f || radius > MaximumScanRadius))
                     return false;
-                request = new BotQuestRequest(verb, botId, 0, 0, radius, 0);
+                request = new BotQuestRequest(verb, botId, 0, 0, 0, radius, 0);
                 return true;
             case BotQuestVerb.Nearby:
                 if (args.Length is < 3 or > 4 ||
@@ -113,7 +119,7 @@ public sealed class BotQuestCommand : ICommand
                     (!float.TryParse(args[3], NumberStyles.Float, CultureInfo.InvariantCulture, out radius) ||
                      radius <= 0f || radius > MaximumScanRadius))
                     return false;
-                request = new BotQuestRequest(verb, botId, 0, npcTemplateId, radius, 0);
+                request = new BotQuestRequest(verb, botId, 0, npcTemplateId, 0, radius, 0);
                 return true;
             case BotQuestVerb.Inspect:
             case BotQuestVerb.Status:
@@ -122,7 +128,14 @@ public sealed class BotQuestCommand : ICommand
                 if (args.Length != 3 ||
                     !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out var questId) || questId == 0)
                     return false;
-                request = new BotQuestRequest(verb, botId, questId, 0, 0f, 0);
+                request = new BotQuestRequest(verb, botId, questId, 0, 0, 0f, 0);
+                return true;
+            case BotQuestVerb.Use:
+                if (args.Length != 4 ||
+                    !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out questId) || questId == 0 ||
+                    !uint.TryParse(args[3], NumberStyles.None, CultureInfo.InvariantCulture, out var targetObjId) || targetObjId == 0)
+                    return false;
+                request = new BotQuestRequest(verb, botId, questId, 0, targetObjId, 0f, 0);
                 return true;
             case BotQuestVerb.Report:
                 if (args.Length is < 3 or > 4 ||
@@ -132,7 +145,7 @@ public sealed class BotQuestCommand : ICommand
                 if (args.Length == 4 &&
                     (!int.TryParse(args[3], NumberStyles.None, CultureInfo.InvariantCulture, out selectedReward) || selectedReward < 0))
                     return false;
-                request = new BotQuestRequest(verb, botId, questId, 0, 0f, selectedReward);
+                request = new BotQuestRequest(verb, botId, questId, 0, 0, 0f, selectedReward);
                 return true;
             default:
                 return false;
@@ -218,6 +231,20 @@ public sealed class BotQuestCommand : ICommand
             CommandManager.SendNormalText(this, messageOutput,
                 $"Bot '{bot.Name}' quest {questId}: lifecycle=active step={activeQuest.Step} status={activeQuest.Status} " +
                 $"objective={activeQuest.GetQuestObjectiveStatus()} acceptor={activeQuest.QuestAcceptorType}:{activeQuest.AcceptorId}.");
+            if (activeQuest.QuestSteps.TryGetValue(activeQuest.Step, out var currentStep))
+            {
+                foreach (var gatherAct in currentStep.Components.Values
+                             .Where(component => component.IsCurrentlyActive)
+                             .SelectMany(component => component.Acts)
+                             .Where(act => act.Template is QuestActObjItemGather))
+                {
+                    var gather = (QuestActObjItemGather)gatherAct.Template;
+                    CommandManager.SendNormalText(this, messageOutput,
+                        $"item_gather act={gatherAct.Id} item={gather.ItemId} " +
+                        $"objective={gather.GetObjective(activeQuest)}/{gather.Count} " +
+                        $"inventory={bot.Inventory.GetItemsCount(gather.ItemId)} cleanup={gather.Cleanup.ToString().ToLowerInvariant()}.");
+                }
+            }
             return;
         }
 
@@ -361,6 +388,105 @@ public sealed class BotQuestCommand : ICommand
             $"{objectivesAfter.Where((value, index) => value > objectivesBefore[index]).Count()}, native evaluation requested.");
     }
 
+    private void Use(Character bot, uint questId, uint targetObjId, IMessageOutput messageOutput)
+    {
+        if (!bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not active for bot '{bot.Name}'.");
+            return;
+        }
+
+        if (activeQuest.Step != QuestComponentKind.Progress ||
+            !activeQuest.QuestSteps.TryGetValue(QuestComponentKind.Progress, out var progressStep))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not at an active item-gather objective step.");
+            return;
+        }
+
+        var gatherActs = progressStep.Components.Values
+            .Where(component => component.IsCurrentlyActive)
+            .SelectMany(component => component.Acts)
+            .Where(act => act.Template is QuestActObjItemGather)
+            .ToArray();
+        if (gatherActs.Length != 1)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} requires exactly one active item-gather act for scoped item use; found {gatherActs.Length}.");
+            return;
+        }
+
+        var supplyActs = activeQuest.QuestSteps
+            .GetValueOrDefault(QuestComponentKind.Supply)?.Components.Values
+            .SelectMany(component => component.Acts)
+            .Where(act => act.Template is QuestActSupplyItem)
+            .ToArray() ?? [];
+        var sourceItems = new List<Item>();
+        foreach (var supplyAct in supplyActs)
+        {
+            var supply = (QuestActSupplyItem)supplyAct.Template;
+            if (!bot.Inventory.GetAllItemsByTemplate([SlotType.Inventory], supply.ItemId, -1,
+                    out var matchingItems, out _))
+                continue;
+            sourceItems.AddRange(matchingItems.Where(item => IsSupportedQuestUseSource(supply, item, questId)));
+        }
+
+        sourceItems = sourceItems
+            .Where(item => item != null)
+            .DistinctBy(item => item.Id)
+            .ToList();
+        if (sourceItems.Count != 1)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} requires exactly one carried quest-linked supply item with a native use skill; found {sourceItems.Count}.");
+            return;
+        }
+
+        var target = bot.ParentWorld?.GetNpc(targetObjId);
+        if (target == null || target.IsDead || !ReferenceEquals(target.ParentWorld, bot.ParentWorld))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Living NPC object {targetObjId} was not found in bot '{bot.Name}'s world.");
+            return;
+        }
+
+        var sourceItem = sourceItems[0];
+        var skillTemplate = SkillManager.Instance.GetSkillTemplate(sourceItem.Template.UseSkillId);
+        if (skillTemplate == null)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} supply item {sourceItem.TemplateId} references missing skill {sourceItem.Template.UseSkillId}.");
+            return;
+        }
+
+        var gather = (QuestActObjItemGather)gatherActs[0].Template;
+        var distance = Distance(bot, target);
+        var objectiveBefore = gather.GetObjective(activeQuest);
+        var inventoryBefore = bot.Inventory.GetItemsCount(gather.ItemId);
+        var caster = new SkillItem(bot.ObjId, sourceItem.Id, sourceItem.TemplateId);
+        var result = new Skill(skillTemplate).Use(
+            bot,
+            caster,
+            new SkillCastUnitTarget(target.ObjId),
+            null,
+            false,
+            out var resultErrorValue);
+        if (result != SkillResult.Success)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"AAEmu rejected quest {questId} item skill {skillTemplate.Id} for bot '{bot.Name}': " +
+                $"result={result} error={resultErrorValue} target={target.TemplateId}:{target.ObjId} distance={distance:F1}m; no progress was claimed.");
+            return;
+        }
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' started native quest-item skill {skillTemplate.Id} from item={sourceItem.TemplateId}:{sourceItem.Id} " +
+            $"for quest {questId} against npc={target.TemplateId}:{target.ObjId} distance={distance:F1}m " +
+            $"target_hp={target.Hp}/{target.MaxHp} gather_item={gather.ItemId} objective_before={objectiveBefore}/{gather.Count} " +
+            $"inventory_before={inventoryBefore} channel_ms={skillTemplate.ChannelingTime}; verify completion with /botquest status {bot.Id} {questId}.");
+    }
+
     private void Report(Character bot, uint questId, int selectedReward, IMessageOutput messageOutput)
     {
         if (!bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
@@ -470,6 +596,12 @@ public sealed class BotQuestCommand : ICommand
     internal static bool AnyObjectiveAdvanced(IReadOnlyList<int> before, IReadOnlyList<int> after) =>
         before.Count == after.Count && before.Where((value, index) => after[index] > value).Any();
 
+    internal static bool IsSupportedQuestUseSource(QuestActSupplyItem supply, Item item, uint questId) =>
+        supply != null && item?.Template != null &&
+        item.TemplateId == supply.ItemId &&
+        item.Template.LootQuestId == questId &&
+        item.Template.UseSkillId != 0;
+
     private static string GetAvailability(Character bot, QuestTemplate quest)
     {
         if (bot.Quests.HasQuest(quest.Id))
@@ -564,6 +696,7 @@ internal enum BotQuestVerb
     Status,
     Accept,
     Talk,
+    Use,
     Report
 }
 
@@ -572,5 +705,6 @@ internal readonly record struct BotQuestRequest(
     uint BotId,
     uint QuestId,
     uint NpcTemplateId,
+    uint TargetObjId,
     float Radius,
     int SelectedReward);

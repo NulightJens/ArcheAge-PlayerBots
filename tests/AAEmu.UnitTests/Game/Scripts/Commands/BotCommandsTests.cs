@@ -8,6 +8,7 @@ using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Expeditions;
 using AAEmu.Game.Models.Game.Items;
+using AAEmu.Game.Models.Game.Items.Templates;
 using AAEmu.Game.Models.Game.NPChar;
 using AAEmu.Game.Models.Game.Quests;
 using AAEmu.Game.Models.Game.Quests.Acts;
@@ -111,6 +112,12 @@ public class BotCommandsTests
         await Assert.That(talk.Verb).IsEqualTo(BotQuestVerb.Talk);
         await Assert.That(talk.QuestId).IsEqualTo(5304u);
         await Assert.That(BotQuestCommand.TryParse(["talk", "2", "5304", "3567"], out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryParse(["use", "2", "293", "45678"], out var use)).IsTrue();
+        await Assert.That(use.Verb).IsEqualTo(BotQuestVerb.Use);
+        await Assert.That(use.QuestId).IsEqualTo(293u);
+        await Assert.That(use.TargetObjId).IsEqualTo(45678u);
+        await Assert.That(BotQuestCommand.TryParse(["use", "2", "293"], out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryParse(["use", "2", "293", "0"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.TryParse(["report", "2", "330", "1"], out var report)).IsTrue();
         await Assert.That(report.Verb).IsEqualTo(BotQuestVerb.Report);
         await Assert.That(report.QuestId).IsEqualTo(330u);
@@ -126,6 +133,18 @@ public class BotCommandsTests
         await Assert.That(BotQuestCommand.AnyObjectiveAdvanced([0, 0], [0, 1])).IsTrue();
         await Assert.That(BotQuestCommand.AnyObjectiveAdvanced([1], [1])).IsFalse();
         await Assert.That(BotQuestCommand.AnyObjectiveAdvanced([1], [2, 1])).IsFalse();
+
+        var component = new QuestComponentTemplate(new QuestTemplate());
+        var supply = new QuestActSupplyItem(component) { ItemId = 8242 };
+        var sourceItem = new Item
+        {
+            TemplateId = 8242,
+            Template = new ItemTemplate { Id = 8242, LootQuestId = 293, UseSkillId = 11684 }
+        };
+        await Assert.That(BotQuestCommand.IsSupportedQuestUseSource(supply, sourceItem, 293)).IsTrue();
+        await Assert.That(BotQuestCommand.IsSupportedQuestUseSource(supply, sourceItem, 251)).IsFalse();
+        sourceItem.Template.UseSkillId = 0;
+        await Assert.That(BotQuestCommand.IsSupportedQuestUseSource(supply, sourceItem, 293)).IsFalse();
     }
 
     [Test]

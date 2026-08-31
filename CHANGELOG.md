@@ -10,6 +10,9 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Expanded read-only quest inspection with exact NPC, NPC-group, doodad, item, distance, sphere, cleanup, and selective-reward fields so objective fixtures can be chosen from native data without guessing identifiers.
 - Added bounded read-only `/botquest nearby` exact-template inspection for live NPC object IDs, health, distance, and position.
 - Added `/botquest talk` for one selected active quest and exact nearby NPC. It invokes only that quest's live native talk acts, verifies an objective increase, and fails closed on team-shared acts to prevent cross-character broadcasts.
+- Added `/botquest use <botId> <questId> <npcObjId>` for one narrow native item-objective slice. It requires exactly one active gather act and one carried quest-linked Supply item, then asks AAEmu's normal item-skill engine to cast against the exact living NPC; it never mints the result item or broadcasts quest progress.
+- Expanded `/botquest status` with the active gather act, item ID, native objective count, inventory count, and cleanup flag so a completed channel can be verified independently of cast acceptance.
+- Passed fresh dual-track gates for the item-use slice: full solution builds with zero errors, server script compilation with 0 errors and 0 warnings, 1.2 at 1,740 passed plus 4 intentional skips, and 3.0 at 159/159.
 - Added the first read-only `AAEmu.ClientDriver` slice: deterministic client process/window discovery, ArcheAge log lifecycle parsing, and a loopback-only JSON status API with a black-box validation script.
 - Fixed `/botattackobject` object lookup for loopback `@system` commands so exact objects discovered by `/botquest nearby` can be inspected and attacked through the live API.
 - Quest scanning uses lazy NPC-to-quest indexes built once after AAEmu loads quest templates; it does not rescan all 6,606 3.0 quests during bot brain ticks.

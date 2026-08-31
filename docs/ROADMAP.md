@@ -40,7 +40,8 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 
 - Completed once on 3.0: discover and inspect exact-NPC quest relations, accept quest 330 through AAEmu's native lifecycle, persist its ready state through a graceful server restart, reject a remote report, report only the selected quest at the exact NPC, and retain completion through bot logout/re-add.
 - Automated contract: lazy NPC quest indexes, 100-meter scan ceiling, 6-meter interaction ceiling, explicit status, nonnegative reward index, and no support claim for emotion, kill-trigger, or NPC-group starters.
-- Next: repeat the exact-NPC accept/report gate from a clean 3.0 start, then add one kill objective, one talk/emote objective, one delivery/item objective, and one travel objective as separately measured slices.
+- Implemented and clean-gated: one selected active quest can use exactly one carried, quest-linked Supply item against an exact living NPC through AAEmu's native item-skill engine. The command does not mint items or broadcast quest progress; status exposes the native item objective and inventory counts. Physical objective advancement remains the acceptance gate.
+- Next: physically prove quest 293's supplied crystal skill advances its real gather objective, then add corpse acquisition, delivery/report-item policy, one kill objective, one talk/emote objective, and one travel objective as separately measured slices.
 - Autonomous quest selection, routing, and chaining remain deferred until those objective executors and navigation boundaries pass independently.
 
 ## 0.4: population operations
@@ -54,7 +55,7 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 
 - Completed: pinned NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` for client `3.0.4.2 r336598`.
 - Completed: compile-time compatibility layer, version-specific Game/test MSBuild targets, and reviewed 24-file alpha-v4 host patch.
-- Completed: non-incremental Game and full-solution builds with zero compiler errors; the current 3.0 adapter suite passed 158/158, including class/gear command, gear-create restart, equipment-visibility packet, persisted-resource, and bounded quest-command coverage.
+- Completed: non-incremental Game and full-solution builds with zero compiler errors; the current 3.0 adapter suite passed 159/159, including class/gear command, gear-create restart, equipment-visibility packet, persisted-resource, and bounded quest-command coverage.
 - Completed: fail-closed dual-track installers and machine-readable compatibility metadata. The 3.0 track requires an explicit experimental flag.
 - Completed: acquired and integrity-tested the matching client, 36.81 GB `game_pak`, decrypted `compact.sqlite3`, and `compact.server.table.sqlite3`; retained provenance includes every SHA-256.
 - Completed: isolated MySQL schemas and unique Login/Game/Stream/Web API ports; server startup loaded 491,683 translations, 257 zones, 6,606 quests, 36,694 item templates, and 24,175 skills.
