@@ -76,7 +76,9 @@ prepared_workstreams:
 integration_wave:
   task: T-042
   title: Wave 1 review and AAEmu 1.2 integration
-  state: ready-to-dispatch
+  state: setup-in-progress
+  client_thread_id: client-new-thread:f754affe-f4a6-4393-b155-64e7d8cf41b3
+  task_thread_id: pending-task-list-resolution
   source_heads:
     T-038: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
     T-039: dcc27f42eb5e691d426235b86295a8106c9073b3
