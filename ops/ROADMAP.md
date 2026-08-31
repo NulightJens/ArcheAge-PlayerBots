@@ -13,8 +13,12 @@ Accepted 1.2 module baseline
 ├── T-038 navigation boundary ─────────────┐
 ├── T-039 life-state FSM and profiles ─────┤
 ├── T-040 persistent identity and roster ──┤
-├── T-036 combat/stealth closure ─┐         │
-│                                 └─> T-037 scale/recovery
+├── T-043 isolated database ──────┐         │
+├── T-044 combat harness ─────────┼─> T-036 combat/stealth closure ─┐
+│                                 │                                 │
+│                                 └─────────────────────────────────┘
+│                                                                   │
+│                                                                   └─> T-037 scale/recovery
 └── T-007 evidence translator                │
                                              ▼
                               T-041 one-zone Population Director

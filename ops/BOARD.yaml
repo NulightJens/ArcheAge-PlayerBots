@@ -57,7 +57,21 @@ tasks:
   - id: T-007
     title: Evidence and log receipt translator
     track: shared-tooling
-    status: proposed
+    status: active
+    integration: pending
+    depends_on: [PB-W00]
+
+  - id: T-043
+    title: Isolated AAEmu 1.2 public-alpha database runway
+    track: AAEmu12
+    status: active
+    integration: pending
+    depends_on: [PB-W00]
+
+  - id: T-044
+    title: Deterministic combat and stealth qualification harness
+    track: AAEmu12
+    status: active
     integration: pending
     depends_on: [PB-W00]
 
@@ -66,7 +80,7 @@ tasks:
     track: AAEmu12
     status: proposed
     integration: pending
-    depends_on: [PB-W00]
+    depends_on: [T-043, T-044]
     runtime_lease: aaemu12
 
   - id: T-037

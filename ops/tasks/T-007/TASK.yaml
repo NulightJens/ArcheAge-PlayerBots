@@ -2,10 +2,20 @@ schema_version: 1
 id: T-007
 title: Evidence and log receipt translator
 track: shared-tooling
-status: proposed
+status: ready
 integration: pending
 outcome: Convert deterministic test/runtime output into reusable fingerprinted evidence receipts without altering raw evidence.
 depends_on: [PB-W00]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+
+write_scope:
+  - scripts/evidence/**
+  - ops/tasks/T-007/HANDOFF.md
+
 runtime:
   required: false
-activation_requirement: A writer lane is free and exact tools/scripts write scope is assigned.
+gates: [deterministic-evidence-tool-tests]
+validation_boundary: Pure tooling only; no runtime, database, deployed host, raw evidence, or global ledger may be changed.
+handoff: ops/tasks/T-007/HANDOFF.md
+activation_requirement: satisfied-wave-2

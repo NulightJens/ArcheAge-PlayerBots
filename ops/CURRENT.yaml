@@ -1,7 +1,7 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-1-integrated-source-runtime-pending
-verdict: green-source-integration
+phase: wave-2-runtime-runway-parallel-source
+verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
@@ -50,9 +50,10 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Keep T-041 blocked until T-037 and the required serialized AAEmu 1.2 runtime qualifications are complete.
-  - Prepare the next bounded AAEmu 1.2 source/runtime task without reopening the completed Wave 1 outcomes.
-  - Assign an isolated versioned Game database and claim the aaemu12 lease before starting any live Login or Game process.
+  - Monitor T-007, T-043, and T-044 without duplicating their outcomes.
+  - Integrate the Wave 2 source and provisioning receipts after all three handoffs exist.
+  - Register the isolated database, claim the aaemu12 lease, and activate T-036 only after the integrated candidate is green.
+  - Keep T-037 and T-041 blocked until their declared dependencies are accepted.
 
 prepared_workstreams:
   - task: T-038
@@ -95,3 +96,16 @@ integration_wave:
     T-038: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
     T-039: dcc27f42eb5e691d426235b86295a8106c9073b3
     T-040: a99663059db71afaa227bdce8f680b5196e36226
+
+wave_2:
+  state: ready-to-dispatch
+  base: e0350b3ee24352a1d96d81a60f34475fd8e56a45
+  lanes:
+    - task: T-007
+      outcome: deterministic-evidence-receipt-translator
+    - task: T-043
+      outcome: isolated-public-alpha-database-runway
+    - task: T-044
+      outcome: offline-combat-stealth-qualification-harness
+  runtime_lease: unclaimed
+  runtime_start: prohibited-until-integration-and-registration

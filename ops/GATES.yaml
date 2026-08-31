@@ -17,6 +17,21 @@ cadence:
   release_boundary: clean-install-aaemu12-and-aaemu30-adapter-regression
 
 gates:
+  deterministic-evidence-tool-tests:
+    version: 1
+    owner: tooling-writer
+    rule: Prove stable byte-identical translation, source preservation, required fingerprint validation, overwrite refusal, and fail-closed PASS/FAIL/INCOMPLETE verdicts from deterministic fixtures.
+
+  database-provisioning-proof:
+    version: 1
+    owner: database-provisioner
+    rule: Create only absent versioned schemas, retain donor exports, verify exact seed identities and provenance with read-only queries, and commit a sanitized receipt without starting AAEmu.
+
+  deterministic-harness-tests:
+    version: 1
+    owner: harness-writer
+    rule: Exercise evidence parsing and fail-closed verdict logic from deterministic fixtures without starting AAEmu, a client, or a database.
+
   focused-aaemu12-tests:
     version: 1
     owner: writer
