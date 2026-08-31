@@ -44,6 +44,23 @@ function Get-T044Sha256 {
     return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($Bytes)).ToLowerInvariant()
 }
 
+function ConvertTo-T044Timestamp {
+    param($Value)
+
+    if ($null -eq $Value) { return $null }
+    try {
+        if ($Value -is [DateTimeOffset]) { return [DateTimeOffset]$Value }
+        if ($Value -is [DateTime]) { return [DateTimeOffset]::new([DateTime]$Value) }
+        return [DateTimeOffset]::Parse(
+            [string]$Value,
+            [Globalization.CultureInfo]::InvariantCulture,
+            [Globalization.DateTimeStyles]::RoundtripKind)
+    }
+    catch {
+        return $null
+    }
+}
+
 function Get-T044PlanFingerprint {
     param($Plan)
     $copy = $Plan | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
@@ -479,9 +496,9 @@ function Test-T044IdentityAndFixtures {
     if ((Get-T044Property $identity 'sourceDirty') -ne $false) {
         Add-T044Reason $Incomplete 'Source identity is dirty or ambiguous.'
     }
-    $processStart = [DateTimeOffset]::MinValue
+    $processStart = ConvertTo-T044Timestamp (Get-T044Property $identity 'processStartUtc')
     if ([int](Get-T044Property $identity 'processId') -le 0 -or
-        -not [DateTimeOffset]::TryParse("$(Get-T044Property $identity 'processStartUtc')", [ref]$processStart)) {
+        $null -eq $processStart) {
         Add-T044Reason $Incomplete 'Initial process identity is absent or invalid.'
     }
 
@@ -515,16 +532,21 @@ function Test-T044Restart {
     }
     $priorPid = Get-T044Property $Restart 'priorProcessId'
     $newPid = Get-T044Property $Restart 'newProcessId'
-    $priorStart = [DateTimeOffset]::MinValue
-    $newStart = [DateTimeOffset]::MinValue
-    $priorStartValid = [DateTimeOffset]::TryParse("$(Get-T044Property $Restart 'priorProcessStartUtc')", [ref]$priorStart)
-    $newStartValid = [DateTimeOffset]::TryParse("$(Get-T044Property $Restart 'newProcessStartUtc')", [ref]$newStart)
+    $priorStart = ConvertTo-T044Timestamp (Get-T044Property $Restart 'priorProcessStartUtc')
+    $newStart = ConvertTo-T044Timestamp (Get-T044Property $Restart 'newProcessStartUtc')
+    $identityStart = ConvertTo-T044Timestamp (Get-T044Property $Identity 'processStartUtc')
     if ((Get-T044Property $Restart 'gracefulStopRequested') -ne $true -or
         (Get-T044Property $Restart 'priorProcessExited') -ne $true -or
         (Get-T044Property $Restart 'startupReady') -ne $true -or
-        $null -eq $priorPid -or $null -eq $newPid -or [int]$priorPid -eq [int]$newPid -or
-        -not $priorStartValid -or -not $newStartValid -or $newStart -le $priorStart) {
+        $null -eq $priorPid -or $null -eq $newPid -or [int]$priorPid -le 0 -or [int]$newPid -le 0 -or
+        [int]$priorPid -eq [int]$newPid -or
+        $null -eq $priorStart -or $null -eq $newStart -or $newStart -le $priorStart) {
         Add-T044Reason $Incomplete 'Restart did not prove graceful prior exit and a distinct ready process.'
+    }
+    if ($null -eq $identityStart -or
+        [int]$priorPid -ne [int](Get-T044Property $Identity 'processId') -or
+        $priorStart -ne $identityStart) {
+        Add-T044Reason $Incomplete 'Restart prior-process identity does not match the initially qualified process.'
     }
     if ("$(Get-T044Property $Restart 'executableSha256')" -ne "$(Get-T044Property $Identity 'executableSha256')" -or
         "$(Get-T044Property $Restart 'moduleSourceCommit')" -ne "$(Get-T044Property $Identity 'moduleSourceCommit')") {

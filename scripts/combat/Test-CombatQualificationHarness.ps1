@@ -252,6 +252,10 @@ $passEvidence = New-PassEvidence $plan
 $pass = Test-T044QualificationEvidence -Plan $plan -Evidence $passEvidence
 Assert-Equal $pass.verdict 'PASS' 'complete deterministic fixture'
 
+$serializedPlan = Copy-Object $plan
+$serializedEvidence = Copy-Object $passEvidence
+Assert-Equal (Test-T044QualificationEvidence $serializedPlan $serializedEvidence).verdict 'PASS' 'serialized operator artifact round trip'
+
 $idleActivity = Copy-Object $passEvidence
 $idleActivity.cohorts[0].control.metricsEnd.bots.castAttempts = 1
 Assert-Equal (Test-T044QualificationEvidence $plan $idleActivity).verdict 'FAIL' 'matched Idle control activity'
@@ -288,7 +292,12 @@ $restartGap = Copy-Object $passEvidence
 $restartGap.restart.priorProcessExited = $false
 Assert-Equal (Test-T044QualificationEvidence $plan $restartGap).verdict 'INCOMPLETE' 'restart gap'
 
+$restartIdentityGap = Copy-Object $passEvidence
+$restartIdentityGap.restart.priorProcessId = 12003
+$restartIdentityGap.restart.priorProcessStartUtc = '2026-08-31T16:59:00Z'
+Assert-Equal (Test-T044QualificationEvidence $plan $restartIdentityGap).verdict 'INCOMPLETE' 'restart prior-process identity binding'
+
 $partial = [pscustomobject]@{ schemaVersion = 't044.combat-qualification.v1'; gateDefinitionVersion = 1; runId = $plan.runId }
 Assert-Equal (Test-T044QualificationEvidence $plan $partial).verdict 'INCOMPLETE' 'malformed partial evidence'
 
-Write-Output 'T-044 deterministic harness fixtures: PASS (11 verdict scenarios, no sleeps)'
+Write-Output 'T-044 deterministic harness fixtures: PASS (13 verdict scenarios, no sleeps)'
