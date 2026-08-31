@@ -1,0 +1,106 @@
+schema_version: 1
+id: aaemu12-wave1-integration-v1
+recorded_at: 2026-08-31
+verdict: green-review-install-build-focused-full-unit
+
+fingerprint:
+  module_source_commit: 60f574d70c35dce418dc8a9ca53a99bd775bf099
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: afbb6aa2c5d379eb76ad339642c190f4185b4981815aa27c68d0680d28edd046
+  client_provenance_sha256_or_not_applicable: not-applicable-no-client-started
+  database_provenance: not-applicable-no-runtime-or-database-used
+  gate_definition_version: 1
+  command_and_environment_fingerprint: eaf745eeea0cb549698861267c907e8623b49f9f153701de46858911e0170a00
+
+source_review:
+  integration_ancestor: a6ab9a5f32a4599a03374ba8252edef4c179cc9b
+  dispatch_ancestor: 8a956da5cd7ec194ffb0d90470e288bfcd1d74ff
+  source_commits:
+    T-038: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
+    T-039: dcc27f42eb5e691d426235b86295a8106c9073b3
+    T-040: a99663059db71afaa227bdce8f680b5196e36226
+  cherry_picked_commits:
+    T-038: 5592a54bd33fdc32631a669b161de9b1db9bab15
+    T-039: eb5de0570f8dccd1cc3a014da8f41b7b78af950b
+    T-040: 60f574d70c35dce418dc8a9ca53a99bd775bf099
+  contract_review: passed
+  write_scope_review: passed
+  corrections: none
+
+environment:
+  os: windows-10.0.26200-x64
+  dotnet_sdk: 10.0.302
+  dotnet_test_runtime: 10.0.10
+  reference_workspace: aaemu12_reference
+  integration_workspace: aaemu12_integration
+  installed_module_commit: 60f574d70c35dce418dc8a9ca53a99bd775bf099
+  installed_sql_sha256: c5bd4d43fb767837c7042dd2cc968decb69393876e5e5520a74aa721cc4eee5c
+
+command_environment_material: |-
+  gate_definition_version=1
+  os=windows-10.0.26200-x64
+  dotnet_sdk=10.0.302
+  dotnet_test_runtime=10.0.10
+  workspace=aaemu12_integration
+  host_base=62e3eb1d87da01194802ac886cd500134facad28
+  module_source=60f574d70c35dce418dc8a9ca53a99bd775bf099
+  install_check=Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12 -CheckOnly
+  install=Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12
+  build=dotnet build AAEmu.slnx --no-incremental
+  focused_t038=AAEmu.UnitTests.exe --treenode-filter /*/*/(NavigationDecisionBoundaryTests)|(BotMovementTaskTests)/* --minimum-expected-tests 36 --no-progress --no-ansi --output Detailed
+  focused_t039=AAEmu.UnitTests.exe --treenode-filter /*/AAEmu.UnitTests.Bots.Life/*/* --minimum-expected-tests 8 --no-progress --no-ansi --output Detailed
+  focused_t040=AAEmu.UnitTests.exe --treenode-filter /*/AAEmu.UnitTests.Bots.Population.Identity/JsonBotRosterStoreTests/* --minimum-expected-tests 7 --no-progress --no-ansi --output Detailed
+  full=dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+
+commands:
+  install_check: Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12 -CheckOnly
+  install: Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12
+  build: dotnet build AAEmu.slnx --no-incremental
+  focused_T-038: AAEmu.UnitTests.exe --treenode-filter '/*/*/(NavigationDecisionBoundaryTests)|(BotMovementTaskTests)/*' --minimum-expected-tests 36 --no-progress --no-ansi --output Detailed
+  focused_T-039: AAEmu.UnitTests.exe --treenode-filter '/*/AAEmu.UnitTests.Bots.Life/*/*' --minimum-expected-tests 8 --no-progress --no-ansi --output Detailed
+  focused_T-040: AAEmu.UnitTests.exe --treenode-filter '/*/AAEmu.UnitTests.Bots.Population.Identity/JsonBotRosterStoreTests/*' --minimum-expected-tests 7 --no-progress --no-ansi --output Detailed
+  full_unit: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+
+results:
+  installer_check: passed-installed-supported
+  installer: passed-idempotent
+  build_errors: 0
+  build_warnings: 76
+  focused_T-038:
+    total: 36
+    succeeded: 36
+    skipped: 0
+    failed: 0
+  focused_T-039:
+    total: 8
+    succeeded: 8
+    skipped: 0
+    failed: 0
+  focused_T-040:
+    total: 7
+    succeeded: 7
+    skipped: 0
+    failed: 0
+  full_unit:
+    total: 1790
+    succeeded: 1786
+    skipped: 4
+    failed: 0
+  reference_checkout_clean_after_gate: true
+  installed_module_checkout_clean_after_gate: true
+  saved_control_worktree_clean_before_integration: true
+  authoritative_runtime_lease_unchanged: true
+
+retained_failures:
+  product_or_gate_failures: none
+  operator_checks:
+    - A read-only environment check initially used PowerShell's reserved Host variable and stopped before inspecting or changing the workspace; the corrected check passed.
+  warnings:
+    - The build retained 76 dependency, compiler, analyzer, and test-analyzer warnings, including the existing SQLitePCLRaw.lib.e_sqlite3 2.1.11 NU1903 advisory.
+
+retained_boundaries:
+  - No client, Login server, Game server, or database was started.
+  - The aaemu12 runtime lease was not acquired or changed.
+  - AAEmu 3.0 remained frozen and was not tested.
+  - Live movement, lifecycle, roster, logout, restart, and Population Director acceptance remain unproven.
+  - The generated HTML test report remains outside Git in the integration host's TestResults directory.
