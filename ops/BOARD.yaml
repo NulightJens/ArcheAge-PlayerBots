@@ -15,23 +15,26 @@ tasks:
   - id: T-038
     title: Navigation boundary and obstacle diagnostics
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [PB-W00]
+    owner_client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
 
   - id: T-039
     title: Deterministic life-state FSM and profiles
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [PB-W00]
+    owner_client_thread_id: client-new-thread:39823200-fca2-4fea-85d1-18d38831d4ee
 
   - id: T-040
     title: Persistent bot identity and roster
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [PB-W00]
+    owner_client_thread_id: client-new-thread:96ef486b-2a90-4bb6-8c8a-364f3d948c1f
 
   - id: T-007
     title: Evidence and log receipt translator

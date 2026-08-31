@@ -6,8 +6,9 @@ status: ready
 integration: pending
 outcome: Provide a pure deterministic bot life-state machine and data-driven behavior profiles without spawning or runtime integration.
 depends_on: [PB-W00]
-branch: task/T-039-life-state-fsm
-worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-039-life-state'
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:39823200-fca2-4fea-85d1-18d38831d4ee
 
 write_scope:
   - src/AAEmu.Game/Bots/Life/**

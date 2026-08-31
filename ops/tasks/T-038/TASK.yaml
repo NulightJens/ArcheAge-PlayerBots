@@ -6,8 +6,9 @@ status: ready
 integration: pending
 outcome: Add a fail-closed navigation decision boundary with explicit obstacle/unreachable diagnostics before movement is issued.
 depends_on: [PB-W00]
-branch: task/T-038-navigation-boundary
-worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-038-navigation'
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
 
 write_scope:
   - src/AAEmu.Game/Bots/Navigation/**

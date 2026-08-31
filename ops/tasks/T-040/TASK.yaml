@@ -6,8 +6,9 @@ status: ready
 integration: pending
 outcome: Define stable bot identities and a versioned roster store that survives process restart without controlling live spawns.
 depends_on: [PB-W00]
-branch: task/T-040-persistent-roster
-worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-040-roster'
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:96ef486b-2a90-4bb6-8c8a-364f3d948c1f
 
 write_scope:
   - src/AAEmu.Game/Bots/Population/Identity/**

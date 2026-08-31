@@ -1,11 +1,11 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-0-ready-to-dispatch
-verdict: ready
+phase: wave-1-parallel-source
+verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  worker_base_commit: 7b38aa0b38058bed4ddb9ce3ea2d5bce8d01212f
+  worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
   checkpointed_wip:
@@ -30,20 +30,20 @@ runtime:
     state: not-yet-provisioned
 
 next_transition:
-  - Add the canonical Git repository as the primary Codex project.
-  - Open separate Codex tasks for the prepared T-038, T-039, and T-040 worktrees.
-  - Keep this task as Control Tower and wait while the three writers execute.
+  - Resolve the three setup client IDs to final task IDs when worktree setup completes.
+  - Monitor T-038, T-039, and T-040 without duplicating their work.
+  - Dispatch an independent review/integration wave after all three handoffs exist.
 
 prepared_workstreams:
   - task: T-038
-    branch: task/T-038-navigation-boundary
-    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-038-navigation'
-    base: 7b38aa0b38058bed4ddb9ce3ea2d5bce8d01212f
+    client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
+    codex_worktree: setup-in-progress
+    base: 4db079de50304dc63885111c6f05bcf205ce5a9b
   - task: T-039
-    branch: task/T-039-life-state-fsm
-    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-039-life-state'
-    base: 7b38aa0b38058bed4ddb9ce3ea2d5bce8d01212f
+    client_thread_id: client-new-thread:39823200-fca2-4fea-85d1-18d38831d4ee
+    codex_worktree: setup-in-progress
+    base: 4db079de50304dc63885111c6f05bcf205ce5a9b
   - task: T-040
-    branch: task/T-040-persistent-roster
-    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-040-roster'
-    base: 7b38aa0b38058bed4ddb9ce3ea2d5bce8d01212f
+    client_thread_id: client-new-thread:96ef486b-2a90-4bb6-8c8a-364f3d948c1f
+    codex_worktree: setup-in-progress
+    base: 4db079de50304dc63885111c6f05bcf205ce5a9b
