@@ -8,6 +8,9 @@ using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Expeditions;
 using AAEmu.Game.Models.Game.Items;
+using AAEmu.Game.Models.Game.Quests;
+using AAEmu.Game.Models.Game.Quests.Acts;
+using AAEmu.Game.Models.Game.Quests.Templates;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
@@ -107,6 +110,47 @@ public class BotCommandsTests
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 0)).IsFalse();
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 2)).IsTrue();
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 3)).IsFalse();
+    }
+
+    [Test]
+    public async Task BotQuest_InspectActDescriptionsExposeExactNativeFixtureTargets()
+    {
+        var component = new QuestComponentTemplate(new QuestTemplate());
+
+        await Assert.That(BotQuestCommand.DescribeAct(new QuestActObjMonsterHunt(component)
+        {
+            NpcId = 10220,
+            HighlightDoodadId = 443,
+            Count = 3
+        })).IsEqualTo("QuestActObjMonsterHunt npc=10220 highlight_doodad=443 count=3");
+        await Assert.That(BotQuestCommand.DescribeAct(new QuestActObjTalk(component)
+        {
+            NpcId = 145,
+            ItemId = 900,
+            TeamShare = true
+        })).IsEqualTo("QuestActObjTalk npc=145 item=900 team_share=true");
+        await Assert.That(BotQuestCommand.DescribeAct(new QuestActObjItemGather(component)
+        {
+            ItemId = 901,
+            Cleanup = true,
+            Count = 2
+        })).IsEqualTo("QuestActObjItemGather item=901 cleanup=true count=2");
+        await Assert.That(BotQuestCommand.DescribeAct(new QuestActObjDistance(component)
+        {
+            NpcId = 146,
+            Distance = 12,
+            WithIn = true
+        })).IsEqualTo("QuestActObjDistance npc=146 distance=12 within=true");
+        await Assert.That(BotQuestCommand.DescribeAct(new QuestActObjSphere(component)
+        {
+            SphereId = 47,
+            NpcId = 146
+        })).IsEqualTo("QuestActObjSphere sphere=47 npc=146");
+        await Assert.That(BotQuestCommand.DescribeAct(new QuestActSupplyRemoveItem(component)
+        {
+            ItemId = 901,
+            Count = 2
+        })).IsEqualTo("QuestActSupplyRemoveItem item=901 count=2");
     }
 
     [Test]

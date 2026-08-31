@@ -367,7 +367,7 @@ public sealed class BotQuestCommand : ICommand
     private static string LocalizedQuestName(uint questId) =>
         LocalizationManager.Instance.Get("quest_contexts", "name", questId, $"Quest {questId}");
 
-    private static string DescribeAct(QuestActTemplate act)
+    internal static string DescribeAct(QuestActTemplate act)
     {
         var target = act switch
         {
@@ -375,11 +375,38 @@ public sealed class BotQuestCommand : ICommand
             QuestActConAcceptNpcEmotion emotion => $" npc={emotion.NpcId}",
             QuestActConAcceptNpcKill kill => $" npc={kill.NpcId}",
             QuestActConReportNpc report => $" npc={report.NpcId}",
+            QuestActConReportDoodad report => $" doodad={report.DoodadId}",
+            QuestActObjMonsterHunt hunt =>
+                $" npc={hunt.NpcId}{OptionalField("highlight_doodad", hunt.HighlightDoodadId)}",
+            QuestActObjMonsterGroupHunt groupHunt =>
+                $" npc_group={groupHunt.QuestMonsterGroupId}{OptionalField("highlight_doodad", groupHunt.HighlightDoodadId)}",
+            QuestActObjTalk talk =>
+                $" npc={talk.NpcId}{OptionalField("item", talk.ItemId)} team_share={talk.TeamShare.ToString().ToLowerInvariant()}",
+            QuestActObjTalkNpcGroup groupTalk => $" npc_group={groupTalk.NpcGroupId}",
+            QuestActObjItemGather gather =>
+                $" item={gather.ItemId}{OptionalField("highlight_doodad", gather.HighlightDoodadId)} cleanup={gather.Cleanup.ToString().ToLowerInvariant()}",
+            QuestActObjItemUse use =>
+                $" item={use.ItemId}{OptionalField("highlight_doodad", use.HighlightDoodadId)}",
+            QuestActObjInteraction interaction =>
+                $" doodad={interaction.DoodadId} world_interaction={interaction.WorldInteractionId}" +
+                OptionalField("highlight_doodad", interaction.HighlightDoodadId),
+            QuestActObjDistance distance =>
+                $" npc={distance.NpcId} distance={distance.Distance} within={distance.WithIn.ToString().ToLowerInvariant()}" +
+                OptionalField("highlight_doodad", distance.HighlightDoodadId),
+            QuestActObjSphere sphere =>
+                $" sphere={sphere.SphereId}{OptionalField("npc", sphere.NpcId)}" +
+                OptionalField("highlight_doodad", sphere.HighlightDoodadId),
+            QuestActSupplyItem supply => $" item={supply.ItemId} grade={supply.GradeId}",
+            QuestActSupplyRemoveItem remove => $" item={remove.ItemId}",
+            QuestActSupplySelectiveItem selective =>
+                $" item={selective.ItemId} grade={selective.GradeId} selection={selective.ThisSelectiveIndex}",
             _ => string.Empty
         };
         var count = act.Count > 0 ? $" count={act.Count}" : string.Empty;
         return $"{act.GetType().Name}{target}{count}";
     }
+
+    private static string OptionalField(string name, uint value) => value == 0 ? string.Empty : $" {name}={value}";
 
     private static uint GetExactStarterNpcId(QuestActTemplate act) => act switch
     {

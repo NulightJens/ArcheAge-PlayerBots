@@ -7,6 +7,7 @@ Player-facing patch notes come first; developer packaging detail follows.
 ### Staged quest controls
 
 - Added `/botquest scan`, `inspect`, `status`, `accept`, and `report` as bounded GM development controls for exact-NPC quest discovery and one selected quest lifecycle. This is a vertical slice, not an autonomous questing claim.
+- Expanded read-only quest inspection with exact NPC, NPC-group, doodad, item, distance, sphere, cleanup, and selective-reward fields so objective fixtures can be chosen from native data without guessing identifiers.
 - Quest scanning uses lazy NPC-to-quest indexes built once after AAEmu loads quest templates; it does not rescan all 6,606 3.0 quests during bot brain ticks.
 - Acceptance and reporting fail closed unless the bot is within 6 meters of the exact supported NPC. Emotion, kill-trigger, and NPC-group starters remain deferred.
 - Reporting invokes only the selected active quest's live report act. It does not use AAEmu's broadcast report helper, which can advance multiple active quests sharing the same NPC.

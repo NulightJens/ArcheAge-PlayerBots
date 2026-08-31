@@ -133,12 +133,14 @@ These commands expose a deliberately narrow quest vertical slice for GM testing.
 | Command | Purpose |
 | --- | --- |
 | `/botquest scan <id> [radius]` | List nearby exact-NPC quest starters and active reporters, bounded to 100 meters |
-| `/botquest inspect <id> <questId>` | Show the quest's localized name and structured AAEmu acts |
+| `/botquest inspect <id> <questId>` | Show the quest's localized name and structured AAEmu acts, including exact native fixture identifiers |
 | `/botquest status <id> <questId>` | Show active step/status/objective state or completed/inactive lifecycle |
 | `/botquest accept <id> <questId>` | Accept through AAEmu's normal lifecycle while within 6 meters of the exact starter |
 | `/botquest report <id> <questId> [rewardIndex]` | Report only that selected active quest while within 6 meters of its exact reporter |
 
 Only plain exact-NPC starters and reporters are supported in this milestone. NPC groups, item-use, emotion, kill-trigger starters, kill/travel/talk objective automation, and reward-choice policy remain future work. Use `/movebot` to stage the bot between the NPCs during controlled tests.
+
+Inspection is read-only. For supported act types it reports the exact NPC, NPC-group, doodad, item, distance, sphere, cleanup, and selective-reward fields loaded by AAEmu; a printed identifier is evidence about the quest template, not permission to fabricate that fixture or advance the objective.
 
 ## Diagnostics
 

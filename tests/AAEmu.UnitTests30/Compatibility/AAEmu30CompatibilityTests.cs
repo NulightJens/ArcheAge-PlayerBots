@@ -10,9 +10,13 @@ using AAEmu.Game.Core.Packets.G2C;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Items;
 using AAEmu.Game.Models.Game.Bots;
+using AAEmu.Game.Models.Game.Quests;
+using AAEmu.Game.Models.Game.Quests.Acts;
+using AAEmu.Game.Models.Game.Quests.Templates;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Units.Static;
+using AAEmu.Game.Models.Game.World;
 using AAEmu.Game.Scripts.Commands;
 using AAEmu.Game.Services.WebApi.Controllers;
 using NetCoreServer;
@@ -63,6 +67,30 @@ public sealed class AAEmu30CompatibilityTests
         Assert.False(BotQuestCommand.IsValidSelectedReward([], 1));
         Assert.False(BotQuestCommand.IsValidSelectedReward([1, 2], 0));
         Assert.True(BotQuestCommand.IsValidSelectedReward([1, 2], 2));
+    }
+
+    [Fact]
+    public void QuestInspectionExposesExact30FixtureTargetsWithoutMutatingQuestState()
+    {
+        var component = new QuestComponentTemplate(new QuestTemplate());
+
+        Assert.Equal(
+            "QuestActObjMonsterGroupHunt npc_group=72 highlight_doodad=91 count=4",
+            BotQuestCommand.DescribeAct(new QuestActObjMonsterGroupHunt(component)
+            {
+                QuestMonsterGroupId = 72,
+                HighlightDoodadId = 91,
+                Count = 4
+            }));
+        Assert.Equal(
+            "QuestActObjInteraction doodad=93 world_interaction=Looting highlight_doodad=94 count=1",
+            BotQuestCommand.DescribeAct(new QuestActObjInteraction(component)
+            {
+                DoodadId = 93,
+                WorldInteractionId = WorldInteractionType.Looting,
+                HighlightDoodadId = 94,
+                Count = 1
+            }));
     }
 
     [Fact]
