@@ -98,14 +98,20 @@ integration_wave:
     T-040: a99663059db71afaa227bdce8f680b5196e36226
 
 wave_2:
-  state: ready-to-dispatch
+  state: parallel-lanes-active
   base: e0350b3ee24352a1d96d81a60f34475fd8e56a45
   lanes:
     - task: T-007
       outcome: deterministic-evidence-receipt-translator
+      client_thread_id: client-new-thread:ef7ac466-7e88-406d-afaa-ac9f65ffd000
+      task_thread_id: pending-task-list-resolution
     - task: T-043
       outcome: isolated-public-alpha-database-runway
+      client_thread_id: client-new-thread:79f73bc9-6fb3-497f-8e13-1090909474c6
+      task_thread_id: pending-task-list-resolution
     - task: T-044
       outcome: offline-combat-stealth-qualification-harness
+      client_thread_id: client-new-thread:eec3a1e8-c920-4a9c-b140-0b64c5f36a4c
+      task_thread_id: pending-task-list-resolution
   runtime_lease: unclaimed
   runtime_start: prohibited-until-integration-and-registration

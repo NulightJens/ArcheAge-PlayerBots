@@ -8,6 +8,7 @@ outcome: Create and prove new versioned Game and Login database clones for Playe
 depends_on: [PB-W00]
 branch: assigned-by-codex
 worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:79f73bc9-6fb3-497f-8e13-1090909474c6
 
 inputs:
   provisioning_script: scripts/scale/New-IsolatedScaleDatabase.ps1

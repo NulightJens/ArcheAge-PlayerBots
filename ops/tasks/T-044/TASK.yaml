@@ -8,6 +8,7 @@ outcome: Prepare the deterministic offline fixtures and fail-closed harness need
 depends_on: [PB-W00]
 branch: assigned-by-codex
 worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:eec3a1e8-c920-4a9c-b140-0b64c5f36a4c
 
 write_scope:
   - scripts/combat/**

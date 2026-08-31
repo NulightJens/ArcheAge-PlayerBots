@@ -60,6 +60,7 @@ tasks:
     status: active
     integration: pending
     depends_on: [PB-W00]
+    owner_client_thread_id: client-new-thread:ef7ac466-7e88-406d-afaa-ac9f65ffd000
 
   - id: T-043
     title: Isolated AAEmu 1.2 public-alpha database runway
@@ -67,6 +68,7 @@ tasks:
     status: active
     integration: pending
     depends_on: [PB-W00]
+    owner_client_thread_id: client-new-thread:79f73bc9-6fb3-497f-8e13-1090909474c6
 
   - id: T-044
     title: Deterministic combat and stealth qualification harness
@@ -74,6 +76,7 @@ tasks:
     status: active
     integration: pending
     depends_on: [PB-W00]
+    owner_client_thread_id: client-new-thread:eec3a1e8-c920-4a9c-b140-0b64c5f36a4c
 
   - id: T-036
     title: AAEmu 1.2 mortal-combat and stealth closure

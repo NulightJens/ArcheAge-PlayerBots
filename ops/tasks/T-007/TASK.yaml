@@ -8,6 +8,7 @@ outcome: Convert deterministic test/runtime output into reusable fingerprinted e
 depends_on: [PB-W00]
 branch: assigned-by-codex
 worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:ef7ac466-7e88-406d-afaa-ac9f65ffd000
 
 write_scope:
   - scripts/evidence/**
