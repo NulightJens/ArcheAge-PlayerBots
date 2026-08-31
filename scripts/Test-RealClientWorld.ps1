@@ -76,6 +76,7 @@ $metricsCommand = $null
 $metrics = $null
 $gameplayAssertion = $null
 $freshWorldLoadedObserved = $false
+$gameplayCaptureAttempts = @()
 
 function Write-NewUtf8File {
     param(
@@ -121,7 +122,8 @@ function New-DriverStartInfo {
 function Invoke-BoundedJsonProcess {
     param(
         [Parameter(Mandatory)] [string[]] $Arguments,
-        [int] $TimeoutMilliseconds = 15000
+        [int] $TimeoutMilliseconds = 15000,
+        [int[]] $AllowedExitCodes = @(0)
     )
 
     $process = [System.Diagnostics.Process]::Start((New-DriverStartInfo -Arguments $Arguments))
@@ -134,7 +136,7 @@ function Invoke-BoundedJsonProcess {
         }
         $stdout = $process.StandardOutput.ReadToEnd()
         $stderr = $process.StandardError.ReadToEnd()
-        if ($process.ExitCode -ne 0) {
+        if ($process.ExitCode -notin $AllowedExitCodes) {
             throw "A client-driver subprocess exited with code $($process.ExitCode): $stderr $stdout"
         }
         if ([string]::IsNullOrWhiteSpace($stdout)) {
@@ -503,23 +505,44 @@ try {
     try {
         $gameplayFocus = Invoke-InputAction -InputLease $gameplayLease -Path '/v1/focus' -Body '{}'
         if (-not $gameplayFocus.target.foreground) { throw 'The exact gameplay window did not become foreground.' }
-        $gameplayCapture = Capture-ExactClient -OutputPath $gameplayCapturePath
     }
     finally {
         Complete-InputLease -InputLease $gameplayLease -ExpectedActions 1
     }
 
-    $gameplayAssertion = Invoke-BoundedJsonProcess -Arguments @(
-        $driver,
-        'assert-image',
-        '--capture', $gameplayCapturePath,
-        '--spec', $gameplayAssertionSpecPath)
-    if ($gameplayAssertion.status -ne 'passed' -or
-        $gameplayAssertion.summary.assertionCount -lt 2 -or
-        $gameplayAssertion.summary.passedCount -ne $gameplayAssertion.summary.assertionCount -or
-        $gameplayAssertion.summary.ocrUsed -or
-        $gameplayAssertion.summary.comparison -ne 'exact_rgb') {
-        throw 'The gameplay capture did not satisfy at least two exact RGB gameplay anchors.'
+    $gameplayAnchorsPassed = $false
+    for ($captureAttempt = 1; [DateTimeOffset]::UtcNow -lt $deadline; $captureAttempt++) {
+        $attemptCapturePath = if ($captureAttempt -eq 1) {
+            $gameplayCapturePath
+        } else {
+            Join-Path $evidenceRoot "real-client-world-gameplay-$runId-attempt-$captureAttempt.bmp"
+        }
+        $attemptCapture = Capture-ExactClient -OutputPath $attemptCapturePath
+        $attemptAssertion = Invoke-BoundedJsonProcess -Arguments @(
+            $driver,
+            'assert-image',
+            '--capture', $attemptCapturePath,
+            '--spec', $gameplayAssertionSpecPath) -AllowedExitCodes @(0, 3)
+        $gameplayCaptureAttempts += [ordered]@{
+            attempt = $captureAttempt
+            capture = $attemptCapture
+            assertion = $attemptAssertion
+        }
+        if ($attemptAssertion.status -eq 'passed' -and
+            $attemptAssertion.summary.assertionCount -ge 2 -and
+            $attemptAssertion.summary.passedCount -eq $attemptAssertion.summary.assertionCount -and
+            -not $attemptAssertion.summary.ocrUsed -and
+            $attemptAssertion.summary.comparison -eq 'exact_rgb') {
+            $gameplayCapturePath = $attemptCapturePath
+            $gameplayCapture = $attemptCapture
+            $gameplayAssertion = $attemptAssertion
+            $gameplayAnchorsPassed = $true
+            break
+        }
+        Start-Sleep -Seconds 2
+    }
+    if (-not $gameplayAnchorsPassed) {
+        throw 'The gameplay surface did not satisfy at least two exact RGB anchors within the scenario timeout.'
     }
 
     $selectionAudit = @(Get-Content -LiteralPath $selectionAuditPath | ForEach-Object { $_ | ConvertFrom-Json })
@@ -585,6 +608,7 @@ try {
             characterSelection = $selectionCapture
             gameplayWorld = $gameplayCapture
             gameplayAssertion = $gameplayAssertion
+            gameplayAttempts = $gameplayCaptureAttempts
         }
         safety = [ordered]@{
             exactProcessWindowPathAndHash = $true
@@ -618,6 +642,7 @@ catch {
         lifecycle = [ordered]@{ before = $statusBefore; last = $statusAfter }
         server = [ordered]@{ charactersBefore = $charactersBefore; lastCharacters = $charactersAfter }
         gameplayAssertion = $gameplayAssertion
+        gameplayCaptureAttempts = $gameplayCaptureAttempts
         retainedEvidence = [ordered]@{
             summaryPath = $summaryPath
             selectionAuditPath = $selectionAuditPath
