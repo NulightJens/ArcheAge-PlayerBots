@@ -50,8 +50,7 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Monitor T-007, T-043, and T-044 without duplicating their outcomes.
-  - Integrate the Wave 2 source and provisioning receipts after all three handoffs exist.
+  - Run T-045 as the independent Wave 2 source and database-runway integration task.
   - Register the isolated database, claim the aaemu12 lease, and activate T-036 only after the integrated candidate is green.
   - Keep T-037 and T-041 blocked until their declared dependencies are accepted.
 
@@ -98,20 +97,32 @@ integration_wave:
     T-040: a99663059db71afaa227bdce8f680b5196e36226
 
 wave_2:
-  state: parallel-lanes-active
+  state: handoffs-ready-for-integration
   base: e0350b3ee24352a1d96d81a60f34475fd8e56a45
   lanes:
     - task: T-007
       outcome: deterministic-evidence-receipt-translator
       client_thread_id: client-new-thread:ef7ac466-7e88-406d-afaa-ac9f65ffd000
       task_thread_id: pending-task-list-resolution
+      worktree: 'C:\Users\jensh\.codex\worktrees\b9a4\PB-W00-control'
+      head: 43956fb9e6f1c3cc88cff0f8385f7dd7ef1ebb4e
+      handoff: ready
     - task: T-043
       outcome: isolated-public-alpha-database-runway
       client_thread_id: client-new-thread:79f73bc9-6fb3-497f-8e13-1090909474c6
       task_thread_id: pending-task-list-resolution
+      worktree: 'C:\Users\jensh\.codex\worktrees\cbbe\PB-W00-control'
+      head: e0e0825c35b5f0863e43b677a416c4f819419716
+      handoff: ready
     - task: T-044
       outcome: offline-combat-stealth-qualification-harness
       client_thread_id: client-new-thread:eec3a1e8-c920-4a9c-b140-0b64c5f36a4c
       task_thread_id: pending-task-list-resolution
+      worktree: 'C:\Users\jensh\.codex\worktrees\a9a5\PB-W00-control'
+      head: 9ba012805124e667185257449d7ec15ce147406f
+      handoff: ready
+  integration_task:
+    task: T-045
+    state: ready-to-dispatch
   runtime_lease: unclaimed
   runtime_start: prohibited-until-integration-and-registration
