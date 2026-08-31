@@ -108,6 +108,10 @@ Use a verified stealth buff ID from the active client data; never assume a templ
 
 An automated trigger/search/metrics pass is necessary but does not substitute for client-visible loss and reacquisition evidence.
 
+## Deterministic client image assertions
+
+Use `AAEmu.ClientDriver assert-image` for stable screenshot anchors. The command compares exact top-down RGB region hashes and exact BMP templates from a strict JSON spec; it deliberately has no fuzzy tolerance or OCR fallback. A mismatch returns structured evidence with exit code `3`, while an invalid or ambiguous spec fails closed. See `docs/CLIENT-TEST-DRIVER.md` for the schema and safety bounds.
+
 ## Population/resource gate
 
 The harness under `scripts/scale/` measures exact 0/10/50/100 populations, process CPU/memory, allocation/GC, server and bot-host latency, scans, casts, cadence, lifecycle, and recovery. Run it only against task-owned runtime paths and new versioned test databases.

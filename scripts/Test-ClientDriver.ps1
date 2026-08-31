@@ -113,6 +113,10 @@ if ($LauncherProfile -ne '') {
     $fixtureProfilePath = Join-Path $artifactRoot "input-fixture-$runId.json"
     $inputAuditPath = Join-Path $artifactRoot "input-audit-$runId.jsonl"
     $fixtureCapturePath = Join-Path $artifactRoot "window-capture-$runId.bmp"
+    $fixtureTemplatePath = Join-Path $artifactRoot "accent-template-$runId.bmp"
+    $imageAssertionSpecPath = Join-Path $artifactRoot "image-assertions-$runId.json"
+    $failingAssertionSpecPath = Join-Path $artifactRoot "image-assertions-failing-$runId.json"
+    $unknownAssertionSpecPath = Join-Path $artifactRoot "image-assertions-unknown-$runId.json"
     $sourceProfile = Get-Content -LiteralPath $LauncherProfile -Raw | ConvertFrom-Json
     $fixtureProfile = [ordered]@{
         schemaVersion = 1
@@ -250,25 +254,150 @@ if ($LauncherProfile -ne '') {
             throw 'The verified fixture-window capture did not complete under the exact-target contract.'
         }
 
-        function Get-BmpPixel {
-            param([string] $Path, [int] $X, [int] $Y)
-            $bytes = [System.IO.File]::ReadAllBytes($Path)
-            $pixelOffset = [BitConverter]::ToInt32($bytes, 10)
-            $width = [BitConverter]::ToInt32($bytes, 18)
-            $signedHeight = [BitConverter]::ToInt32($bytes, 22)
-            $height = [Math]::Abs($signedHeight)
-            if ($X -lt 0 -or $Y -lt 0 -or $X -ge $width -or $Y -ge $height) {
-                throw 'Requested BMP assertion pixel is outside the capture.'
+        function Write-SolidBmp32 {
+            param(
+                [Parameter(Mandatory)] [string] $Path,
+                [Parameter(Mandatory)] [int] $Width,
+                [Parameter(Mandatory)] [int] $Height,
+                [Parameter(Mandatory)] [byte] $Red,
+                [Parameter(Mandatory)] [byte] $Green,
+                [Parameter(Mandatory)] [byte] $Blue
+            )
+            [byte[]]$pixels = [byte[]]::new($Width * $Height * 4)
+            for ($index = 0; $index -lt $pixels.Length; $index += 4) {
+                $pixels[$index] = $Blue
+                $pixels[$index + 1] = $Green
+                $pixels[$index + 2] = $Red
             }
-            $row = if ($signedHeight -lt 0) { $Y } else { $height - 1 - $Y }
-            $index = $pixelOffset + (($row * $width + $X) * 4)
-            return '{0},{1},{2}' -f $bytes[$index + 2], $bytes[$index + 1], $bytes[$index]
+            $stream = [System.IO.FileStream]::new(
+                $Path,
+                [System.IO.FileMode]::CreateNew,
+                [System.IO.FileAccess]::Write,
+                [System.IO.FileShare]::Read)
+            $writer = [System.IO.BinaryWriter]::new($stream)
+            try {
+                $writer.Write([uint16]0x4D42)
+                $writer.Write([int](54 + $pixels.Length))
+                $writer.Write([uint32]0)
+                $writer.Write([int]54)
+                $writer.Write([uint32]40)
+                $writer.Write([int]$Width)
+                $writer.Write([int](-$Height))
+                $writer.Write([uint16]1)
+                $writer.Write([uint16]32)
+                $writer.Write([uint32]0)
+                $writer.Write([uint32]$pixels.Length)
+                $writer.Write([int]0)
+                $writer.Write([int]0)
+                $writer.Write([uint32]0)
+                $writer.Write([uint32]0)
+                $writer.Write($pixels)
+            }
+            finally {
+                $writer.Dispose()
+            }
         }
 
-        if ((Get-BmpPixel -Path $fixtureCapturePath -X 20 -Y 20) -ne '17,34,51' -or
-            (Get-BmpPixel -Path $fixtureCapturePath -X 60 -Y 70) -ne '34,204,102') {
-            throw 'The exact fixture-window pixel assertions did not match the painted reference pattern.'
+        Write-SolidBmp32 -Path $fixtureTemplatePath -Width 10 -Height 10 -Red 221 -Green 68 -Blue 85
+        $imageAssertionSpec = [ordered]@{
+            schemaVersion = 1
+            regionAssertions = @(
+                [ordered]@{
+                    name = 'background-region'
+                    rectangle = [ordered]@{ x = 10; y = 10; width = 16; height = 16 }
+                    expectedRgbSha256 = 'B26E76AF265678AD797661503BFD83FB17397D927C4D056C5C62A20941893DDA'
+                },
+                [ordered]@{
+                    name = 'accent-region'
+                    rectangle = [ordered]@{ x = 90; y = 90; width = 10; height = 10 }
+                    expectedRgbSha256 = '1BBD69086C14C478BD78F9154071DF142E3B1FB0D765914EF967FEE116ED3972'
+                }
+            )
+            templateAssertions = @(
+                [ordered]@{
+                    name = 'unique-accent-template'
+                    templatePath = [System.IO.Path]::GetFileName($fixtureTemplatePath)
+                    searchRectangle = [ordered]@{ x = 50; y = 60; width = 100; height = 80 }
+                    expectedMatches = @([ordered]@{ x = 90; y = 90 })
+                }
+            )
         }
+        [System.IO.File]::WriteAllText(
+            $imageAssertionSpecPath,
+            ($imageAssertionSpec | ConvertTo-Json -Depth 8),
+            [System.Text.UTF8Encoding]::new($false))
+
+        $imageAssertionResult = (& dotnet $driver assert-image `
+            --capture $fixtureCapturePath `
+            --spec $imageAssertionSpecPath | ConvertFrom-Json)
+        if ($LASTEXITCODE -ne 0 -or $imageAssertionResult.status -ne 'passed' -or
+            $imageAssertionResult.summary.assertionCount -ne 3 -or
+            $imageAssertionResult.summary.passedCount -ne 3 -or
+            $imageAssertionResult.summary.ocrUsed -or
+            $imageAssertionResult.summary.comparison -ne 'exact_rgb' -or
+            $imageAssertionResult.templates[0].actualMatches.Count -ne 1 -or
+            $imageAssertionResult.templates[0].actualMatches[0].x -ne 90 -or
+            $imageAssertionResult.templates[0].actualMatches[0].y -ne 90) {
+            throw 'The reusable exact-region/template assertion gate did not pass with the expected evidence.'
+        }
+
+        $failingAssertionSpec = [ordered]@{
+            schemaVersion = 1
+            regionAssertions = @(
+                [ordered]@{
+                    name = 'known-mismatch'
+                    rectangle = [ordered]@{ x = 10; y = 10; width = 16; height = 16 }
+                    expectedRgbSha256 = ('0' * 64)
+                }
+            )
+            templateAssertions = @(
+                [ordered]@{
+                    name = 'wrong-location'
+                    templatePath = [System.IO.Path]::GetFileName($fixtureTemplatePath)
+                    searchRectangle = [ordered]@{ x = 50; y = 60; width = 100; height = 80 }
+                    expectedMatches = @([ordered]@{ x = 91; y = 90 })
+                }
+            )
+        }
+        [System.IO.File]::WriteAllText(
+            $failingAssertionSpecPath,
+            ($failingAssertionSpec | ConvertTo-Json -Depth 8),
+            [System.Text.UTF8Encoding]::new($false))
+        $failingAssertionResult = (& dotnet $driver assert-image `
+            --capture $fixtureCapturePath `
+            --spec $failingAssertionSpecPath | ConvertFrom-Json)
+        if ($LASTEXITCODE -ne 3 -or $failingAssertionResult.status -ne 'failed' -or
+            $failingAssertionResult.summary.failedCount -ne 2 -or
+            $failingAssertionResult.regions[0].passed -or
+            $failingAssertionResult.templates[0].passed) {
+            throw 'The reusable image assertion command did not return explicit mismatch evidence and exit code 3.'
+        }
+        $global:LASTEXITCODE = 0
+
+        $unknownAssertionSpec = [ordered]@{
+            schemaVersion = 1
+            regionAssertions = @(
+                [ordered]@{
+                    name = 'unknown-field'
+                    rectangle = [ordered]@{ x = 10; y = 10; width = 1; height = 1 }
+                    expectedRgbSha256 = 'B26E76AF265678AD797661503BFD83FB17397D927C4D056C5C62A20941893DDA'
+                    tolerance = 1
+                }
+            )
+            templateAssertions = @()
+        }
+        [System.IO.File]::WriteAllText(
+            $unknownAssertionSpecPath,
+            ($unknownAssertionSpec | ConvertTo-Json -Depth 8),
+            [System.Text.UTF8Encoding]::new($false))
+        $unknownAssertionRejection = (& dotnet $driver assert-image `
+            --capture $fixtureCapturePath `
+            --spec $unknownAssertionSpecPath 2>&1 | Out-String)
+        if ($LASTEXITCODE -eq 0 -or $unknownAssertionRejection -notmatch 'tolerance') {
+            throw 'The image assertion spec did not fail closed for an unknown tolerance field.'
+        }
+        $global:LASTEXITCODE = 0
+
         $captureHashBeforeOverwriteAttempt = (Get-FileHash -LiteralPath $fixtureCapturePath -Algorithm SHA256).Hash
         $captureOverwriteRejection = (& dotnet $driver capture-window `
             --profile $fixtureProfilePath `
@@ -364,4 +493,4 @@ if ($LauncherProfile -ne '') {
     }
 }
 
-Write-Host 'AAEmu.ClientDriver validation passed: build, lifecycle parser, loopback status, secret rejection, optional launcher probe, exact-window guarded input/capture, exact pixels, redacted audit, fail-closed cases, and graceful close.'
+Write-Host 'AAEmu.ClientDriver validation passed: build, lifecycle parser, loopback status, secret rejection, optional launcher probe, exact-window guarded input/capture, reusable exact-region/template assertions, redacted audit, fail-closed cases, and graceful close.'

@@ -80,19 +80,45 @@ That gate proves positive focus/key/click/chat delivery, four fail-closed cases,
 .\scripts\Test-RealClientInput.ps1 -LauncherProfile <profile.json> -EvidenceDirectory <evidence-directory>
 ```
 
-### Stage 3: verified capture (capture implemented; scenario assertions next)
+### Stage 3: verified capture and image assertions (implemented)
 
 `capture-window` writes one new BMP from the exact verified foreground client area. It uses the same profile/PID/current-visible-main-window/path/SHA-256 boundary as input, rejects a background target, checks five client-area points for top-level-window occlusion, caps each dimension at 16,384 pixels and memory at 512 MiB, and refuses to overwrite an existing output. The driver and native fixture opt into per-monitor DPI awareness so client-relative input and physical capture pixels share one coordinate system.
 
-The deterministic fixture paints a fixed two-color client pattern. `Test-ClientDriver.ps1` captures only that client area and asserts exact RGB values in both regions. `Test-RealClientInput.ps1` captures the SHA-pinned real client after verified focus, checks file size/hash/identity/dimensions, then continues with Escape and graceful close.
+The deterministic fixture paints a fixed three-color client pattern. `Test-ClientDriver.ps1` captures only that client area and exercises the reusable assertion command against two exact regions and one uniquely located template. It also proves that mismatches produce a structured failed verdict and exit code `3`, and that an undeclared tolerance field is rejected. `Test-RealClientInput.ps1` captures the SHA-pinned real client after verified focus, checks file size/hash/identity/dimensions, then continues with Escape and graceful close.
 
 ```powershell
 dotnet run --project tools\AAEmu.ClientDriver -- capture-window --profile <profile.json> --process-id <pid> --window-handle <handle> --output <capture.bmp>
+dotnet run --project tools\AAEmu.ClientDriver -- assert-image --capture <capture.bmp> --spec <image-assertions.json>
 ```
 
-Next, add reusable exact-region/template assertions before OCR. OCR should be used only where text is the acceptance subject. Retain Computer Use for exploratory calibration, animation/quality review, and unexpected states.
+An assertion spec uses this strict, versioned shape:
 
-### Stage 4: scenario runner
+```json
+{
+  "schemaVersion": 1,
+  "regionAssertions": [
+    {
+      "name": "character-screen-anchor",
+      "rectangle": { "x": 40, "y": 40, "width": 32, "height": 32 },
+      "expectedRgbSha256": "<SHA-256 of top-down row-major RGB bytes>"
+    }
+  ],
+  "templateAssertions": [
+    {
+      "name": "enter-world-button",
+      "templatePath": "templates/enter-world.bmp",
+      "searchRectangle": { "x": 900, "y": 700, "width": 800, "height": 300 },
+      "expectedMatches": [{ "x": 1420, "y": 850 }]
+    }
+  ]
+}
+```
+
+Template paths may be absolute or relative to the spec. Inputs are bounded uncompressed 24-bit or 32-bit BMP files. Regions hash canonical top-down RGB bytes; template matches are exact RGB matches and expected coordinates are client-capture coordinates. Specs contain 1–64 uniquely named assertions, searches are capped at 100,000,000 pixel comparisons, and evidence retains at most 16 template matches. Unknown fields, out-of-bounds rectangles, unsupported BMP encodings, oversized inputs, and ambiguous excessive matches fail closed. A completed comparison emits capture/spec/template hashes, dimensions, every expected and actual result, `ocrUsed: false`, and an explicit verdict.
+
+Exact image assertions are appropriate only for stable visual anchors. OCR should be introduced only where text is itself the acceptance subject. Retain Computer Use for exploratory calibration, animation/quality review, and unexpected states.
+
+### Stage 4: scenario runner (next)
 
 Compose client operations with AAEmu Web API commands and explicit assertions. Each scenario should emit source/build identity, client/server version, fixture IDs, timestamps, server truth, client lifecycle, screenshots, and a pass/fail reason. Replays must fail closed when the expected process, window, log generation, world, or character is ambiguous.
 

@@ -119,6 +119,7 @@ internal static class Program
             return;
         var backgroundBrush = IntPtr.Zero;
         var markerBrush = IntPtr.Zero;
+        var accentBrush = IntPtr.Zero;
         try
         {
             _ = GetClientRect(windowHandle, out var clientRectangle);
@@ -127,9 +128,13 @@ internal static class Program
             _ = FillRect(deviceContext, ref clientRectangle, backgroundBrush);
             var markerRectangle = new NativeRectangle { Left = 50, Top = 60, Right = 150, Bottom = 140 };
             _ = FillRect(deviceContext, ref markerRectangle, markerBrush);
+            accentBrush = CreateSolidBrush(ColorReference(221, 68, 85));
+            var accentRectangle = new NativeRectangle { Left = 90, Top = 90, Right = 100, Bottom = 100 };
+            _ = FillRect(deviceContext, ref accentRectangle, accentBrush);
         }
         finally
         {
+            if (accentBrush != IntPtr.Zero) _ = DeleteObject(accentBrush);
             if (markerBrush != IntPtr.Zero) _ = DeleteObject(markerBrush);
             if (backgroundBrush != IntPtr.Zero) _ = DeleteObject(backgroundBrush);
             _ = EndPaint(windowHandle, ref paint);
