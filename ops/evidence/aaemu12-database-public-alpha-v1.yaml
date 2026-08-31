@@ -1,0 +1,174 @@
+schema_version: 1
+id: aaemu12-database-public-alpha-v1
+recorded_at: 2026-08-31
+verdict: green-database-provisioning-proof
+
+fingerprint:
+  module_source_commit: b564ea55dbc21ade081b8ae15b22e5f38f0abd14
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: 9c877d395b7f6dc7dc47dbf1bd4927af3a5d08392434c758cea364385a6ba15e
+  client_provenance_sha256_or_not_applicable: not-applicable-no-client-started
+  database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+  gate_definition_version: 1
+  command_and_environment_fingerprint: 9a5eb51aa33c0e6c61d6dd5accaa76e1c125158268137bee3b0c5cae2cfe7428
+
+source:
+  task: T-043
+  task_starting_head: b564ea55dbc21ade081b8ae15b22e5f38f0abd14
+  wave_2_base_ancestor: e0350b3ee24352a1d96d81a60f34475fd8e56a45
+  donor_workspace: aaemu12_legacy_t022
+  donor_head: 72fd2cc70bba3887e093e8a3800f13fed9b3e111
+  donor_state: clean
+  donor_game_database: aaemu_game
+  donor_login_database: aaemu_login
+  validation_workspace: aaemu12_integration
+  validation_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  validation_module_head: 60f574d70c35dce418dc8a9ca53a99bd775bf099
+  provisioning_script: scripts/scale/New-IsolatedScaleDatabase.ps1
+  provisioning_script_sha256: d8998de1927ecfe7c08b927f1979dd2de3783c41debbb4eeafd6159e756bcdab
+
+environment:
+  os: windows-10.0.26200.0-x64
+  powershell: 7.6.4
+  mysql: 8.0.43-win64-x86_64
+  mysqldump: 8.0.43-win64-x86_64
+  output_directory: 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1'
+  provider_credentials_recorded: false
+  connection_strings_recorded: false
+
+preflight:
+  worktree_clean: true
+  wave_2_base_is_ancestor: true
+  donor_path_matched_registry: true
+  donor_revision_matched_registry: true
+  donor_clean: true
+  mysql_available: true
+  mysqldump_available: true
+  output_directory_absent: true
+  game_destination_absent: true
+  login_destination_absent: true
+  donor_game_present: true
+  donor_login_present: true
+  aaemu12_or_unregistered_runtime_process_count: 0
+  retained_unrelated_runtime: aaemu30_runtime_frozen-login
+
+database_provenance_material: |-
+  donor_workspace=aaemu12_legacy_t022
+  donor_head=72fd2cc70bba3887e093e8a3800f13fed9b3e111
+  donor_game_schema=aaemu_game
+  donor_login_schema=aaemu_login
+  game_schema=aaemu_playerbots_game_public_alpha_v1
+  login_schema=aaemu_playerbots_login_public_alpha_v1
+  game_dump=aaemu_game-20260831T225958Z.sql
+  game_dump_sha256=b28d6d8462961d1d76118fad299679ed5ab9f17bca769659704f6031c8fb0c0c
+  login_dump=aaemu_login-20260831T225958Z.sql
+  login_dump_sha256=95fecd268a8b26712cdcbf8a53bb2a4194420af8b00e222cb630bf43c4ddd943
+  seed_evidence_sha256=890db05931c77f2f51524bcc54dcb59866f914414c575f8c5a9f36725a49bdb0
+  retained_bot_ids_sha256=4990553caca2e0843b3a063e3ebd804f34eac75da58b97901982141e756b6203
+  game_columns_sha256=8ffa78acb66396df544f26bd4b438ff8cbd1fea265296cf4ecfd4a2e58b07400
+  login_columns_sha256=549be588f16e8bf085e4596a4707a88dbf2c4cd44689618548e68632342f0b53
+  login_exact_row_counts_sha256=57b9daeba57280cd16cc82e5573437fb26054f5c2a0e1e617709609097df66f4
+  manifest_count=100
+  distinct_bot_ids=100
+  distinct_bot_names=100
+  bot_id_range=20001-20100
+  template_character_id=2
+  seed_version=t021-seed-v1
+  missing_or_invalid_characters=0
+
+command_environment_material: |-
+  gate_definition_version=1
+  os=windows-10.0.26200.0-x64
+  powershell=7.6.4
+  mysql=8.0.43-win64-x86_64
+  mysqldump=8.0.43-win64-x86_64
+  workspace_start=b564ea55dbc21ade081b8ae15b22e5f38f0abd14
+  donor_workspace=aaemu12_legacy_t022
+  donor_head=72fd2cc70bba3887e093e8a3800f13fed9b3e111
+  validation_workspace=aaemu12_integration
+  validation_host_head=62e3eb1d87da01194802ac886cd500134facad28
+  validation_module_head=60f574d70c35dce418dc8a9ca53a99bd775bf099
+  provisioning_script_sha256=d8998de1927ecfe7c08b927f1979dd2de3783c41debbb4eeafd6159e756bcdab
+  task_sha256=0cc653e4b21ad580f7cca08255832f164c9d0706628c051ee7d7d2817214aad8
+  contract_sha256=1a10112a004dfc381cca5385974bfff8e9b718362a89e4ac5a557da7ecdc044a
+  gates_sha256=b841263c534f420be9588837ccdc44923ff0f791f2834075629bed7f88335344
+  output_directory=D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1
+  game_schema=aaemu_playerbots_game_public_alpha_v1
+  login_schema=aaemu_playerbots_login_public_alpha_v1
+  template_character_id=2
+  bot_count=100
+  preflight_output_absent=true
+  preflight_game_schema_absent=true
+  preflight_login_schema_absent=true
+  preflight_aaemu12_or_unregistered_runtime_count=0
+  provision=New-IsolatedScaleDatabase.ps1 -GameDonorConfigPath <aaemu12_legacy_t022-game-local-config> -LoginDonorConfigPath <aaemu12_legacy_t022-login-local-config> -GameDatabaseName aaemu_playerbots_game_public_alpha_v1 -LoginDatabaseName aaemu_playerbots_login_public_alpha_v1 -OutputDirectory <registered-t043-output> -TemplateCharacterId 2 -BotCount 100
+  verification=t043-read-only-verification-v1
+
+artifacts:
+  retained_bot_ids:
+    file: retained-bot-ids.json
+    count: 100
+    distinct: 100
+    minimum: 20001
+    maximum: 20100
+    sha256: 4990553caca2e0843b3a063e3ebd804f34eac75da58b97901982141e756b6203
+  seed_evidence:
+    file: seed-evidence.json
+    schema: t021.database-seed.v2
+    sha256: 890db05931c77f2f51524bcc54dcb59866f914414c575f8c5a9f36725a49bdb0
+  donor_game_dump:
+    file: aaemu_game-20260831T225958Z.sql
+    bytes: 80197
+    sha256: b28d6d8462961d1d76118fad299679ed5ab9f17bca769659704f6031c8fb0c0c
+  donor_login_dump:
+    file: aaemu_login-20260831T225958Z.sql
+    bytes: 4883
+    sha256: 95fecd268a8b26712cdcbf8a53bb2a4194420af8b00e222cb630bf43c4ddd943
+  dump_count: 2
+  prohibited_dump_statement_matches: 0
+
+results:
+  game_database: aaemu_playerbots_game_public_alpha_v1
+  login_database: aaemu_playerbots_login_public_alpha_v1
+  template_character_id: 2
+  seed_version: t021-seed-v1
+  manifest_count: 100
+  distinct_bot_ids: 100
+  distinct_bot_names: 100
+  bot_id_range: [20001, 20100]
+  active_character_count: 100
+  distinct_character_ids: 100
+  distinct_character_names: 100
+  missing_or_invalid_characters: 0
+  name_mismatches: 0
+  bot_account_cardinality: 1
+  copied_abilities: 1000
+  copied_skills: 4000
+  copied_containers: 700
+  copied_items: 1400
+  game_donor_and_target_column_count: 411
+  game_schema_definitions_match: true
+  login_donor_and_target_column_count: 24
+  login_donor_and_target_table_count: 3
+  login_schema_definitions_match: true
+  login_exact_row_counts_match: true
+  destructive_operations: none
+
+runtime:
+  login_started: false
+  game_started: false
+  client_started: false
+  aaemu12_lease_claimed_or_changed: false
+  retained_aaemu30_login_touched: false
+
+retained_failures:
+  product_or_gate_failures: none
+  operator_checks:
+    - The first read-only probe selected tracked template configs whose provider fields are placeholders; it stopped before any write. The resolved local configs inside the exact registered donor workspace passed.
+    - Several report and audit formatting attempts encountered PowerShell type, expression, or parser errors; all were read-only, and the corrected independent queries and audit passed.
+
+retained_boundaries:
+  - The schemas and output directory are retained and must never be reset, dropped, truncated, overwritten, or reused as provisioning targets.
+  - No Login, Game, or client acceptance is claimed.
+  - No live population, combat, stealth, logout, cleanup, restart, or scale budget was exercised.
+  - PB-000 must register this database identity before any later lease-controlled AAEmu 1.2 runtime starts.
