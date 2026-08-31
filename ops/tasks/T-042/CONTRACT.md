@@ -7,7 +7,7 @@ Wave 1 has one independently reviewed integration commit containing T-038, T-039
 ## Pass
 
 - Review each source commit and handoff against its task contract, declared write scope, and the active AAEmu 1.2 target; correct only defects inside T-042's union write scope.
-- Build a candidate from integration base `167895d4054359aee76be86bb7f5a30afc78c8be` and exact source heads `c89b77b6e`, `dcc27f42`, and `a9966305` without modifying any worker checkout.
+- Build the candidate from the dispatched `integration/aaemu12-world` HEAD, verify that it descends from dispatch commit `8a956da5`, and apply exact source heads `c89b77b6e`, `dcc27f42`, and `a9966305` without modifying any worker checkout.
 - Re-run all three focused regression groups through workspace `aaemu12_integration`; legacy or preview checkouts are not proof inputs.
 - Run the full AAEmu 1.2 suite once for the merged candidate and retain a complete version-1 receipt fingerprint.
 - Do not start a client, Login, Game, or database and do not acquire the runtime lease.
