@@ -112,6 +112,7 @@ if ($LauncherProfile -ne '') {
     $fixtureExecutable = Join-Path $moduleRoot 'tools\AAEmu.ClientDriver.WindowFixture\bin\Debug\net10.0\AAEmu.ClientDriver.WindowFixture.exe'
     $fixtureProfilePath = Join-Path $artifactRoot "input-fixture-$runId.json"
     $inputAuditPath = Join-Path $artifactRoot "input-audit-$runId.jsonl"
+    $fixtureCapturePath = Join-Path $artifactRoot "window-capture-$runId.bmp"
     $sourceProfile = Get-Content -LiteralPath $LauncherProfile -Raw | ConvertFrom-Json
     $fixtureProfile = [ordered]@{
         schemaVersion = 1
@@ -237,6 +238,49 @@ if ($LauncherProfile -ne '') {
             throw 'The guarded-input focus action did not establish verified foreground ownership.'
         }
 
+        $captureResult = (& dotnet $driver capture-window `
+            --profile $fixtureProfilePath `
+            --process-id $fixtureProcess.Id `
+            --window-handle $fixtureProcess.MainWindowHandle.ToInt64() `
+            --output $fixtureCapturePath | ConvertFrom-Json)
+        if ($LASTEXITCODE -ne 0 -or $captureResult.status -ne 'captured' -or
+            $captureResult.captureMethod -ne 'foreground_desktop_bitblt' -or
+            $captureResult.occlusionSampleCount -ne 5 -or
+            -not (Test-Path -LiteralPath $fixtureCapturePath)) {
+            throw 'The verified fixture-window capture did not complete under the exact-target contract.'
+        }
+
+        function Get-BmpPixel {
+            param([string] $Path, [int] $X, [int] $Y)
+            $bytes = [System.IO.File]::ReadAllBytes($Path)
+            $pixelOffset = [BitConverter]::ToInt32($bytes, 10)
+            $width = [BitConverter]::ToInt32($bytes, 18)
+            $signedHeight = [BitConverter]::ToInt32($bytes, 22)
+            $height = [Math]::Abs($signedHeight)
+            if ($X -lt 0 -or $Y -lt 0 -or $X -ge $width -or $Y -ge $height) {
+                throw 'Requested BMP assertion pixel is outside the capture.'
+            }
+            $row = if ($signedHeight -lt 0) { $Y } else { $height - 1 - $Y }
+            $index = $pixelOffset + (($row * $width + $X) * 4)
+            return '{0},{1},{2}' -f $bytes[$index + 2], $bytes[$index + 1], $bytes[$index]
+        }
+
+        if ((Get-BmpPixel -Path $fixtureCapturePath -X 20 -Y 20) -ne '17,34,51' -or
+            (Get-BmpPixel -Path $fixtureCapturePath -X 60 -Y 70) -ne '34,204,102') {
+            throw 'The exact fixture-window pixel assertions did not match the painted reference pattern.'
+        }
+        $captureHashBeforeOverwriteAttempt = (Get-FileHash -LiteralPath $fixtureCapturePath -Algorithm SHA256).Hash
+        $captureOverwriteRejection = (& dotnet $driver capture-window `
+            --profile $fixtureProfilePath `
+            --process-id $fixtureProcess.Id `
+            --window-handle $fixtureProcess.MainWindowHandle.ToInt64() `
+            --output $fixtureCapturePath 2>&1 | Out-String)
+        if ($LASTEXITCODE -eq 0 -or $captureOverwriteRejection -notmatch 'already exists' -or
+            (Get-FileHash -LiteralPath $fixtureCapturePath -Algorithm SHA256).Hash -ne $captureHashBeforeOverwriteAttempt) {
+            throw 'The capture command did not fail closed without changing pre-existing evidence.'
+        }
+        $global:LASTEXITCODE = 0
+
         $keyResult = Invoke-InputAction -Path '/v1/key' -Body '{"key":"f6"}' -ExpectedStatus 200
         for ($attempt = 0; $attempt -lt 20; $attempt++) {
             $fixtureProcess.Refresh()
@@ -320,4 +364,4 @@ if ($LauncherProfile -ne '') {
     }
 }
 
-Write-Host 'AAEmu.ClientDriver validation passed: build, lifecycle parser, loopback status, secret rejection, optional launcher probe, exact-window guarded input, redacted audit, fail-closed cases, and graceful close.'
+Write-Host 'AAEmu.ClientDriver validation passed: build, lifecycle parser, loopback status, secret rejection, optional launcher probe, exact-window guarded input/capture, exact pixels, redacted audit, fail-closed cases, and graceful close.'

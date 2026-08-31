@@ -12,6 +12,7 @@ internal static class Program
     private const int SwShow = 5;
     private const uint WmClose = 0x0010;
     private const uint WmDestroy = 0x0002;
+    private const uint WmPaint = 0x000F;
     private const uint WmKeyDown = 0x0100;
     private const uint WmChar = 0x0102;
     private const uint WmLeftButtonDown = 0x0201;
@@ -29,6 +30,7 @@ internal static class Program
     {
         if (!OperatingSystem.IsWindows())
             return 2;
+        _ = SetProcessDpiAwarenessContext(new IntPtr(-4));
 
         var instance = GetModuleHandle(null);
         var windowClass = new WindowClass
@@ -89,6 +91,9 @@ internal static class Program
                 _lastClick = (unchecked((short)(packed & 0xffff)), unchecked((short)(packed >> 16)));
                 UpdateTitle();
                 return IntPtr.Zero;
+            case WmPaint:
+                PaintFixture(windowHandle);
+                return IntPtr.Zero;
             case WmClose:
                 DestroyWindow(windowHandle);
                 return IntPtr.Zero;
@@ -106,6 +111,33 @@ internal static class Program
         var click = _lastClick is { } point ? $"{point.X},{point.Y}" : "none";
         SetWindowText(_windowHandle, $"{TitlePrefix} | key={key} | click={click} | text={TypedText}");
     }
+
+    private static void PaintFixture(IntPtr windowHandle)
+    {
+        var deviceContext = BeginPaint(windowHandle, out var paint);
+        if (deviceContext == IntPtr.Zero)
+            return;
+        var backgroundBrush = IntPtr.Zero;
+        var markerBrush = IntPtr.Zero;
+        try
+        {
+            _ = GetClientRect(windowHandle, out var clientRectangle);
+            backgroundBrush = CreateSolidBrush(ColorReference(17, 34, 51));
+            markerBrush = CreateSolidBrush(ColorReference(34, 204, 102));
+            _ = FillRect(deviceContext, ref clientRectangle, backgroundBrush);
+            var markerRectangle = new NativeRectangle { Left = 50, Top = 60, Right = 150, Bottom = 140 };
+            _ = FillRect(deviceContext, ref markerRectangle, markerBrush);
+        }
+        finally
+        {
+            if (markerBrush != IntPtr.Zero) _ = DeleteObject(markerBrush);
+            if (backgroundBrush != IntPtr.Zero) _ = DeleteObject(backgroundBrush);
+            _ = EndPaint(windowHandle, ref paint);
+        }
+    }
+
+    private static uint ColorReference(byte red, byte green, byte blue) =>
+        red | ((uint)green << 8) | ((uint)blue << 16);
 
     private delegate IntPtr WindowProcedure(IntPtr windowHandle, uint message, IntPtr wordParameter, IntPtr longParameter);
 
@@ -143,6 +175,27 @@ internal static class Program
     {
         public int X;
         public int Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativeRectangle
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct PaintStructure
+    {
+        public IntPtr DeviceContext;
+        public int Erase;
+        public NativeRectangle PaintRectangle;
+        public int Restore;
+        public int IncrementalUpdate;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+        public byte[] Reserved;
     }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
@@ -200,4 +253,29 @@ internal static class Program
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr LoadCursor(IntPtr instance, IntPtr cursorName);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetProcessDpiAwarenessContext(IntPtr dpiContext);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr BeginPaint(IntPtr windowHandle, out PaintStructure paint);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool EndPaint(IntPtr windowHandle, ref PaintStructure paint);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetClientRect(IntPtr windowHandle, out NativeRectangle rectangle);
+
+    [DllImport("user32.dll")]
+    private static extern int FillRect(IntPtr deviceContext, ref NativeRectangle rectangle, IntPtr brush);
+
+    [DllImport("gdi32.dll")]
+    private static extern IntPtr CreateSolidBrush(uint colorReference);
+
+    [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool DeleteObject(IntPtr graphicsObject);
 }

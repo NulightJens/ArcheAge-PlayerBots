@@ -29,6 +29,7 @@ $null = New-Item -ItemType Directory -Path $evidenceRoot -Force
 $runId = '{0}-{1}' -f [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssfffZ'), [Guid]::NewGuid().ToString('N')
 $auditPath = Join-Path $evidenceRoot "real-client-input-$runId.jsonl"
 $summaryPath = Join-Path $evidenceRoot "real-client-input-$runId.json"
+$capturePath = Join-Path $evidenceRoot "real-client-window-$runId.bmp"
 $launcherProcess = $null
 $inputServer = $null
 $clientProcess = $null
@@ -196,6 +197,43 @@ try {
     }
 
     $focusResult = Invoke-RealInputAction -Path '/v1/focus' -Body '{}'
+    $captureStart = New-DriverStartInfo -Arguments @(
+        $driver,
+        'capture-window',
+        '--profile', $profilePath,
+        '--process-id', [string]$clientProcessId,
+        '--window-handle', [string]$windowHandle,
+        '--output', $capturePath
+    )
+    $captureProcess = [System.Diagnostics.Process]::Start($captureStart)
+    if ($null -eq $captureProcess) {
+        throw 'The verified-window capture process did not start.'
+    }
+    try {
+        if (-not $captureProcess.WaitForExit(15000)) {
+            throw 'The verified-window capture exceeded its bounded wait and was left running rather than force-terminated.'
+        }
+        $captureOutput = $captureProcess.StandardOutput.ReadToEnd()
+        $captureError = $captureProcess.StandardError.ReadToEnd()
+        if ($captureProcess.ExitCode -ne 0) {
+            throw "The real-client verified-window capture failed: $captureError"
+        }
+        $captureResult = $captureOutput | ConvertFrom-Json
+        if ($captureResult.status -ne 'captured' -or
+            $captureResult.target.processId -ne $clientProcessId -or
+            $captureResult.target.windowHandle -ne $windowHandle -or
+            $captureResult.target.executableSha256 -ne $profile.clientExecutableSha256 -or
+            $captureResult.occlusionSampleCount -ne 5 -or
+            $captureResult.outputBytes -lt 100000 -or
+            -not (Test-Path -LiteralPath $capturePath) -or
+            (Get-FileHash -LiteralPath $capturePath -Algorithm SHA256).Hash -ne $captureResult.outputSha256) {
+            throw 'The real-client capture did not preserve exact target, size, sample, file, and hash assertions.'
+        }
+    }
+    finally {
+        $captureProcess.Dispose()
+    }
+
     $keyResult = Invoke-RealInputAction -Path '/v1/key' -Body '{"key":"escape"}'
     if (-not $focusResult.accepted -or -not $focusResult.target.foreground -or
         -not $keyResult.accepted -or $keyResult.key -ne 'escape') {
@@ -293,6 +331,7 @@ try {
             stopReason = 'max_actions'
         }
         acceptedActions = @('focus', 'escape')
+        capture = $captureResult
         auditPath = $auditPath
         gracefulClose = $closeResult
         processAbsentAfterClose = $processAbsentAfterClose

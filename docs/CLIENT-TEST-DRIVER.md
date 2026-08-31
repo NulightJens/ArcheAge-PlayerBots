@@ -80,9 +80,17 @@ That gate proves positive focus/key/click/chat delivery, four fail-closed cases,
 .\scripts\Test-RealClientInput.ps1 -LauncherProfile <profile.json> -EvidenceDirectory <evidence-directory>
 ```
 
-### Stage 3: visual evidence
+### Stage 3: verified capture (capture implemented; scenario assertions next)
 
-Capture the verified client window directly. Prefer exact pixel/template assertions for stable widgets and OCR only where text is the acceptance subject. Retain Computer Use for exploratory calibration, animation/quality review, and unexpected states.
+`capture-window` writes one new BMP from the exact verified foreground client area. It uses the same profile/PID/current-visible-main-window/path/SHA-256 boundary as input, rejects a background target, checks five client-area points for top-level-window occlusion, caps each dimension at 16,384 pixels and memory at 512 MiB, and refuses to overwrite an existing output. The driver and native fixture opt into per-monitor DPI awareness so client-relative input and physical capture pixels share one coordinate system.
+
+The deterministic fixture paints a fixed two-color client pattern. `Test-ClientDriver.ps1` captures only that client area and asserts exact RGB values in both regions. `Test-RealClientInput.ps1` captures the SHA-pinned real client after verified focus, checks file size/hash/identity/dimensions, then continues with Escape and graceful close.
+
+```powershell
+dotnet run --project tools\AAEmu.ClientDriver -- capture-window --profile <profile.json> --process-id <pid> --window-handle <handle> --output <capture.bmp>
+```
+
+Next, add reusable exact-region/template assertions before OCR. OCR should be used only where text is the acceptance subject. Retain Computer Use for exploratory calibration, animation/quality review, and unexpected states.
 
 ### Stage 4: scenario runner
 
