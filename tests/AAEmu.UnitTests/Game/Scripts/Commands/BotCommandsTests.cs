@@ -107,6 +107,10 @@ public class BotCommandsTests
         await Assert.That(accept.QuestId).IsEqualTo(330u);
         await Assert.That(BotQuestCommand.TryParse(["status", "2", "330"], out var status)).IsTrue();
         await Assert.That(status.Verb).IsEqualTo(BotQuestVerb.Status);
+        await Assert.That(BotQuestCommand.TryParse(["talk", "2", "5304"], out var talk)).IsTrue();
+        await Assert.That(talk.Verb).IsEqualTo(BotQuestVerb.Talk);
+        await Assert.That(talk.QuestId).IsEqualTo(5304u);
+        await Assert.That(BotQuestCommand.TryParse(["talk", "2", "5304", "3567"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.TryParse(["report", "2", "330", "1"], out var report)).IsTrue();
         await Assert.That(report.Verb).IsEqualTo(BotQuestVerb.Report);
         await Assert.That(report.QuestId).IsEqualTo(330u);
@@ -119,6 +123,9 @@ public class BotCommandsTests
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 0)).IsFalse();
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 2)).IsTrue();
         await Assert.That(BotQuestCommand.IsValidSelectedReward([1, 2], 3)).IsFalse();
+        await Assert.That(BotQuestCommand.AnyObjectiveAdvanced([0, 0], [0, 1])).IsTrue();
+        await Assert.That(BotQuestCommand.AnyObjectiveAdvanced([1], [1])).IsFalse();
+        await Assert.That(BotQuestCommand.AnyObjectiveAdvanced([1], [2, 1])).IsFalse();
     }
 
     [Test]

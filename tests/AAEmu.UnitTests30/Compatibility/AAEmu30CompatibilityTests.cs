@@ -63,6 +63,9 @@ public sealed class AAEmu30CompatibilityTests
         Assert.Equal(330u, inspect.QuestId);
         Assert.True(BotQuestCommand.TryParse(["status", "2", "330"], out var status));
         Assert.Equal(BotQuestVerb.Status, status.Verb);
+        Assert.True(BotQuestCommand.TryParse(["talk", "2", "5304"], out var talk));
+        Assert.Equal(BotQuestVerb.Talk, talk.Verb);
+        Assert.Equal(5304u, talk.QuestId);
         Assert.True(BotQuestCommand.TryParse(["report", "2", "330"], out var report));
         Assert.Equal(BotQuestVerb.Report, report.Verb);
         Assert.Equal(0, report.SelectedReward);
@@ -72,6 +75,8 @@ public sealed class AAEmu30CompatibilityTests
         Assert.False(BotQuestCommand.IsValidSelectedReward([], 1));
         Assert.False(BotQuestCommand.IsValidSelectedReward([1, 2], 0));
         Assert.True(BotQuestCommand.IsValidSelectedReward([1, 2], 2));
+        Assert.True(BotQuestCommand.AnyObjectiveAdvanced([0, 0], [1, 0]));
+        Assert.False(BotQuestCommand.AnyObjectiveAdvanced([1], [1]));
     }
 
     [Fact]

@@ -9,6 +9,8 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Added `/botquest scan`, `inspect`, `status`, `accept`, and `report` as bounded GM development controls for exact-NPC quest discovery and one selected quest lifecycle. This is a vertical slice, not an autonomous questing claim.
 - Expanded read-only quest inspection with exact NPC, NPC-group, doodad, item, distance, sphere, cleanup, and selective-reward fields so objective fixtures can be chosen from native data without guessing identifiers.
 - Added bounded read-only `/botquest nearby` exact-template inspection for live NPC object IDs, health, distance, and position.
+- Added `/botquest talk` for one selected active quest and exact nearby NPC. It invokes only that quest's live native talk acts, verifies an objective increase, and fails closed on team-shared acts to prevent cross-character broadcasts.
+- Added the first read-only `AAEmu.ClientDriver` slice: deterministic client process/window discovery, ArcheAge log lifecycle parsing, and a loopback-only JSON status API with a black-box validation script.
 - Fixed `/botattackobject` object lookup for loopback `@system` commands so exact objects discovered by `/botquest nearby` can be inspected and attacked through the live API.
 - Quest scanning uses lazy NPC-to-quest indexes built once after AAEmu loads quest templates; it does not rescan all 6,606 3.0 quests during bot brain ticks.
 - Acceptance and reporting fail closed unless the bot is within 6 meters of the exact supported NPC. Emotion, kill-trigger, and NPC-group starters remain deferred.

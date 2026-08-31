@@ -137,9 +137,10 @@ These commands expose a deliberately narrow quest vertical slice for GM testing.
 | `/botquest inspect <id> <questId>` | Show the quest's localized name and structured AAEmu acts, including exact native fixture identifiers |
 | `/botquest status <id> <questId>` | Show active step/status/objective state or completed/inactive lifecycle |
 | `/botquest accept <id> <questId>` | Accept through AAEmu's normal lifecycle while within 6 meters of the exact starter |
+| `/botquest talk <id> <questId>` | Advance only that active quest's exact-NPC talk acts within 6 meters; team-shared acts fail closed |
 | `/botquest report <id> <questId> [rewardIndex]` | Report only that selected active quest while within 6 meters of its exact reporter |
 
-Only plain exact-NPC starters and reporters are supported in this milestone. NPC groups, item-use, emotion, kill-trigger starters, kill/travel/talk objective automation, and reward-choice policy remain future work. Use `/movebot` to stage the bot between the NPCs during controlled tests.
+Only plain exact-NPC starters, talk objectives, and reporters are supported in this milestone. NPC groups, team-shared talk acts, item-use, emotion, kill-trigger starters, autonomous kill/travel/item objectives, and reward-choice policy remain future work. Use `/movebot` to stage the bot between the NPCs during controlled tests.
 
 Inspection is read-only. For supported act types it reports the exact NPC, NPC-group, doodad, item, distance, sphere, cleanup, and selective-reward fields loaded by AAEmu; a printed identifier is evidence about the quest template, not permission to fabricate that fixture or advance the objective.
 The `nearby` verb is also read-only and is intended to resolve exact live object IDs for native fixtures instead of guessing object allocation order.

@@ -11,6 +11,17 @@ dotnet test AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-build
 
 Also run `scripts/Install-PlayerBots.ps1 -CheckOnly` after installation to verify idempotent compatibility detection.
 
+## Deterministic client observation
+
+Use the read-only loopback client driver for repeatable process, window, and client-log lifecycle assertions:
+
+```powershell
+.\scripts\Test-ClientDriver.ps1
+dotnet run --project tools\AAEmu.ClientDriver -- status --log "$env:USERPROFILE\Documents\AAClassic\ArcheAge.log"
+```
+
+The staged architecture and the boundary between the client driver and Computer Use are documented in [CLIENT-TEST-DRIVER.md](CLIENT-TEST-DRIVER.md).
+
 ## One-bot smoke test
 
 1. Start Login and Game and log in one GM character.

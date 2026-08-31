@@ -36,11 +36,11 @@ public sealed class BotQuestCommand : ICommand
     public void OnLoad() => CommandManager.Instance.Register(CommandNames, this);
 
     public string GetCommandLineHelp() =>
-        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, report <botId> <questId> [rewardIndex]";
+        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, report <botId> <questId> [rewardIndex]";
 
     public string GetCommandHelpText() =>
-        "Scans nearby NPC quest relations, explains a structured quest, or accepts/reports it through AAEmu's normal quest acts. " +
-        "NPC-group starters and autonomous objective execution are intentionally deferred.";
+        "Scans nearby NPC quest relations, explains a structured quest, or accepts/talks/reports through AAEmu's normal quest acts. " +
+        "NPC-group starters, team-shared talk acts, and autonomous objective execution are intentionally deferred.";
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
     {
@@ -73,6 +73,9 @@ public sealed class BotQuestCommand : ICommand
                 break;
             case BotQuestVerb.Accept:
                 Accept(bot, request.QuestId, messageOutput);
+                break;
+            case BotQuestVerb.Talk:
+                Talk(bot, request.QuestId, messageOutput);
                 break;
             case BotQuestVerb.Report:
                 Report(bot, request.QuestId, request.SelectedReward, messageOutput);
@@ -115,6 +118,7 @@ public sealed class BotQuestCommand : ICommand
             case BotQuestVerb.Inspect:
             case BotQuestVerb.Status:
             case BotQuestVerb.Accept:
+            case BotQuestVerb.Talk:
                 if (args.Length != 3 ||
                     !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out var questId) || questId == 0)
                     return false;
@@ -268,6 +272,95 @@ public sealed class BotQuestCommand : ICommand
             $"Bot '{bot.Name}' accepted quest {questId} from npc template={starter.Npc.TemplateId} obj={starter.Npc.ObjId} distance={starter.Distance:F1}m.");
     }
 
+    private void Talk(Character bot, uint questId, IMessageOutput messageOutput)
+    {
+        if (!bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not active for bot '{bot.Name}'.");
+            return;
+        }
+
+        if (activeQuest.Step != QuestComponentKind.Progress ||
+            !activeQuest.QuestSteps.TryGetValue(QuestComponentKind.Progress, out var progressStep))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not at an active talk-objective step.");
+            return;
+        }
+
+        var talkActs = progressStep.Components.Values
+            .Where(component => component.IsCurrentlyActive)
+            .SelectMany(component => component.Acts)
+            .Where(act => act.Template is QuestActObjTalk)
+            .ToList();
+        if (talkActs.Count == 0)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} has no active exact-NPC talk objective.");
+            return;
+        }
+
+        var target = WorldManager.GetAround<Npc>(bot, InteractionRadius, true)
+            .Select(npc => new { Npc = npc, Distance = Distance(bot, npc) })
+            .Where(candidate => candidate.Distance <= InteractionRadius && talkActs.Any(act =>
+                act.Template is QuestActObjTalk talk && talk.NpcId == candidate.Npc.TemplateId))
+            .OrderBy(candidate => candidate.Distance)
+            .ThenBy(candidate => candidate.Npc.ObjId)
+            .FirstOrDefault();
+        if (target == null)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Bot '{bot.Name}' is not within {InteractionRadius:F1}m of the exact NPC talk target for quest {questId}.");
+            return;
+        }
+
+        var matchingTalkActs = talkActs.Where(act =>
+                act.Template is QuestActObjTalk talk && talk.NpcId == target.Npc.TemplateId)
+            .ToArray();
+        if (matchingTalkActs.Any(act => ((QuestActObjTalk)act.Template).TeamShare))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} uses a team-shared talk act at npc template={target.Npc.TemplateId}; " +
+                "the scoped talk milestone refuses cross-character quest broadcasts.");
+            return;
+        }
+
+        var objectivesBefore = matchingTalkActs
+            .Select(act => act.Template.GetObjective(activeQuest))
+            .ToArray();
+
+        // AAEmu's generic talk method broadcasts to every active quest. Invoke only
+        // this selected quest's exact live acts so unrelated quests cannot advance.
+        foreach (var talkAct in matchingTalkActs)
+        {
+            talkAct.OnTalkMade(bot, new OnTalkMadeArgs
+            {
+                QuestId = questId,
+                NpcId = target.Npc.TemplateId,
+                QuestComponentId = talkAct.QuestComponent.Template.Id,
+                QuestActId = talkAct.Id,
+                Transform = target.Npc.Transform,
+                SourcePlayer = bot
+            });
+        }
+
+        var objectivesAfter = matchingTalkActs
+            .Select(act => act.Template.GetObjective(activeQuest))
+            .ToArray();
+        if (!AnyObjectiveAdvanced(objectivesBefore, objectivesAfter))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"AAEmu rejected quest {questId} talk progress for bot '{bot.Name}'; no objective increase was claimed.");
+            return;
+        }
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' talked for quest {questId} to npc template={target.Npc.TemplateId} " +
+            $"obj={target.Npc.ObjId} distance={target.Distance:F1}m; advanced_acts=" +
+            $"{objectivesAfter.Where((value, index) => value > objectivesBefore[index]).Count()}, native evaluation requested.");
+    }
+
     private void Report(Character bot, uint questId, int selectedReward, IMessageOutput messageOutput)
     {
         if (!bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
@@ -374,6 +467,9 @@ public sealed class BotQuestCommand : ICommand
     internal static bool IsValidSelectedReward(IReadOnlyCollection<int> selectiveRewardIndexes, int selectedReward) =>
         selectiveRewardIndexes.Count == 0 ? selectedReward == 0 : selectiveRewardIndexes.Contains(selectedReward);
 
+    internal static bool AnyObjectiveAdvanced(IReadOnlyList<int> before, IReadOnlyList<int> after) =>
+        before.Count == after.Count && before.Where((value, index) => after[index] > value).Any();
+
     private static string GetAvailability(Character bot, QuestTemplate quest)
     {
         if (bot.Quests.HasQuest(quest.Id))
@@ -467,6 +563,7 @@ internal enum BotQuestVerb
     Inspect,
     Status,
     Accept,
+    Talk,
     Report
 }
 
