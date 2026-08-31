@@ -125,7 +125,7 @@ Exact image assertions are appropriate only for stable visual anchors. OCR shoul
 The scenario first requires the named character to be uniquely present and offline in the loopback AAEmu Web API. A 30-second, three-action input lease focuses the exact window, captures the character-selection frame, clicks the calibrated character slot, and clicks **Start Game**. It then requires all of the following within a bounded wait:
 
 - the same log session advances in bytes and last-write time;
-- the pre-action state is `world_authorized` in the same log session;
+- character-server authorization is already present in the same log session;
 - `worldLoading` and `worldLoaded` differ from their pre-action values;
 - the driver derives `world_loaded` for the exact PID and handle;
 - the exact named character changes from offline to online in server truth.

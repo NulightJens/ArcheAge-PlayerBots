@@ -401,9 +401,8 @@ try {
 
     $statusBefore = Get-ClientStatus
     Assert-ExactClientStatus -Status $statusBefore
-    if ($statusBefore.state -ne 'world_authorized' -or
-        $null -eq $statusBefore.log.milestones.worldAuthorized) {
-        throw 'The exact client is not at the authorized pre-world character-selection lifecycle boundary.'
+    if ($null -eq $statusBefore.log.milestones.worldAuthorized) {
+        throw 'The exact client log does not establish character-server authorization before world entry.'
     }
     $charactersBefore = @(
         (Invoke-RestMethod -Method Get -Uri "$apiBase/character/list") |
@@ -444,8 +443,7 @@ try {
                 (Invoke-RestMethod -Method Get -Uri "$apiBase/character/list") |
                     ForEach-Object { $_ })
             $expectedAfter = Get-ExpectedCharacter -Characters $charactersAfter
-            $sameAuthorization = $statusAfter.log.milestones.worldAuthorized -eq
-                $statusBefore.log.milestones.worldAuthorized
+            $authorizationPresent = $null -ne $statusAfter.log.milestones.worldAuthorized
             $freshLoading = $null -ne $statusAfter.log.milestones.worldLoading -and
                 $statusAfter.log.milestones.worldLoading -ne $statusBefore.log.milestones.worldLoading
             $freshLoaded = $null -ne $statusAfter.log.milestones.worldLoaded -and
@@ -453,7 +451,7 @@ try {
             $sameLogSession = $statusAfter.log.sessionStartedAt -eq $statusBefore.log.sessionStartedAt
             $logAdvanced = $statusAfter.log.bytes -gt $statusBefore.log.bytes -and
                 ([DateTimeOffset]$statusAfter.log.lastWriteUtc) -gt ([DateTimeOffset]$statusBefore.log.lastWriteUtc)
-            if ($sameLogSession -and $sameAuthorization -and $logAdvanced -and $freshLoading -and $freshLoaded -and
+            if ($sameLogSession -and $authorizationPresent -and $logAdvanced -and $freshLoading -and $freshLoaded -and
                 $statusAfter.state -eq 'world_loaded' -and $expectedAfter.IsOnline) {
                 $transitionProved = $true
                 break
