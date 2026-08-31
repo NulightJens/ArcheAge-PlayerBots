@@ -136,6 +136,7 @@ namespace AAEmu.Game.Core.Managers.Bots
             state.KillGoal = killGoal;
             state.KillCount = 0;
             state.Target = null;
+            state.LostTarget = null;
             state.ShouldRespawn = false;
             state.LastCombatTime = DateTime.UtcNow;
             state.LastFacingAngle = float.MinValue;
@@ -155,6 +156,11 @@ namespace AAEmu.Game.Core.Managers.Bots
             {
                 state.IsActive = false;
                 state.Target = null;
+                state.LostTarget = null;
+                state.LastKnownTargetPosition = null;
+                state.IsSearching = false;
+                state.SearchRadius = 0f;
+                state.SearchAngle = 0f;
                 state.IsResting = false;
                 state.SetForcedState(null);
                 state.TransitionTo(BotCombatStateType.Idle);
@@ -194,6 +200,7 @@ namespace AAEmu.Game.Core.Managers.Bots
             state.LastFacingAngle = float.MinValue;
             state.LastCombatTime = DateTime.UtcNow;
             state.LastKnownTargetPosition = null;
+            state.LostTarget = null;
             state.IsSearching = false;
             state.SearchRadius = 0f;
             state.SearchAngle = 0f;
@@ -273,6 +280,7 @@ namespace AAEmu.Game.Core.Managers.Bots
                     state.Target = null;
                     Host.GetRuntime(bot.Id)?.Blackboard.InvalidateAll();
                     state.LastKnownTargetPosition = null;
+                    state.LostTarget = null;
                     state.IsSearching = false;
                     state.SearchRadius = 0f;
                     state.SearchAngle = 0f;

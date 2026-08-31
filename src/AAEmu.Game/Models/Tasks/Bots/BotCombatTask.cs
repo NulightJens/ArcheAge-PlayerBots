@@ -389,6 +389,7 @@ public class BotCombatTask : Task
 
         if (IsStealthed(_state.Target))
         {
+            _state.LostTarget = _state.Target;
             _state.LastKnownTargetPosition = _state.Target.Transform.World.Position;
             _state.Target = null;
             BeginSearch(_state.LastKnownTargetPosition.Value);
@@ -431,6 +432,7 @@ public class BotCombatTask : Task
 
         if (IsStealthed(_state.DuelOpponent))
         {
+            _state.LostTarget = _state.DuelOpponent;
             _state.LastKnownTargetPosition = _state.DuelOpponent.Transform.World.Position;
             _state.Target = null;
             BeginSearch(_state.LastKnownTargetPosition.Value);
@@ -447,6 +449,7 @@ public class BotCombatTask : Task
         if (!_state.LastKnownTargetPosition.HasValue)
         {
             _state.IsSearching = false;
+            _state.LostTarget = null;
             _state.SearchRadius = 0f;
             _state.SearchAngle = 0f;
             ExitTemporaryState(resetRelaxedAfterCombat: false);
@@ -458,6 +461,7 @@ public class BotCombatTask : Task
             Logger.Trace($"BOT id={_bot.Id} ev=search_give_up");
             _state.LastKnownTargetPosition = null;
             _state.IsSearching = false;
+            _state.LostTarget = null;
             _state.SearchRadius = 0f;
             _state.SearchAngle = 0f;
             ExitTemporaryState(resetRelaxedAfterCombat: false);
@@ -468,10 +472,33 @@ public class BotCombatTask : Task
         var currentPosition = _bot.Transform.World.Position;
         var distanceToLast = Vector3.Distance(currentPosition, targetPosition);
         HostMetrics?.RecordWorldScan(BotWorldScanKind.Search);
-        var nearbyCharacters = WorldManager.GetAround<Character>(_bot, 30f, true);
         Unit foundTarget = null;
 
-        foreach (var character in nearbyCharacters)
+        // A contained NPC trial must reacquire the exact supplied object after
+        // stealth clears. Retaining the lost Unit also prevents an unrelated
+        // nearby character from satisfying the qualification accidentally.
+        var lostTarget = _state.LostTarget;
+        if (lostTarget?.IsDead == true)
+        {
+            _state.LastKnownTargetPosition = null;
+            _state.LostTarget = null;
+            _state.IsSearching = false;
+            _state.SearchRadius = 0f;
+            _state.SearchAngle = 0f;
+            ExitTemporaryState(resetRelaxedAfterCombat: false);
+            return;
+        }
+
+        if (lostTarget != null)
+        {
+            var distanceToTarget = Vector3.Distance(currentPosition, lostTarget.Transform.World.Position);
+            if (distanceToTarget <= 30f && (distanceToTarget <= 2f || !IsStealthed(lostTarget)))
+                foundTarget = lostTarget;
+        }
+
+        foreach (var character in foundTarget == null && lostTarget == null
+                     ? WorldManager.GetAround<Character>(_bot, 30f, true)
+                     : [])
         {
             if (character == _bot)
                 continue;
@@ -490,6 +517,7 @@ public class BotCombatTask : Task
         {
             _state.Target = foundTarget;
             _state.LastKnownTargetPosition = null;
+            _state.LostTarget = null;
             _state.IsSearching = false;
             _state.SearchRadius = 0f;
             _state.SearchAngle = 0f;
@@ -503,7 +531,7 @@ public class BotCombatTask : Task
                 _state.TransitionTo(BotCombatStateType.Combat);
             }
 
-            if (UpdateFight(foundTarget, useInjectedHandler: false))
+            if (UpdateFight(foundTarget, useInjectedHandler: true))
                 _state.LastSkillTime = Now;
             Logger.Trace($"BOT id={_bot.Id} ev=target_found target={foundTarget.ObjId}");
             return;
@@ -610,6 +638,7 @@ public class BotCombatTask : Task
     {
         _state.StopAtTargetHpPercent = null;
         _state.NonlethalFloorReached = null;
+        _state.LostTarget = null;
         _state.RestorePreviousState();
         _state.RevertToForcedState();
         BotManager.Instance.StopImmediately(_bot);

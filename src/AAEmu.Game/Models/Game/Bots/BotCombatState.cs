@@ -87,6 +87,7 @@ namespace AAEmu.Game.Models.Game.Bots
         public string ActiveArchetype { get; set; }
 
         // ---- Stealth search ----
+        public Unit LostTarget { get; set; }
         public Vector3? LastKnownTargetPosition { get; set; }
         public DateTime SearchStartTime { get; set; }
         public bool IsSearching { get; set; }

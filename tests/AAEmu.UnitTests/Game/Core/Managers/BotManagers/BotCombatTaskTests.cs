@@ -2,8 +2,12 @@ using System.Numerics;
 using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Models.Game.Bots;
+using AAEmu.Game.Models.Game.NPChar;
+using AAEmu.Game.Models.Game.Skills;
+using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Tasks.Bots;
 using AAEmu.UnitTests.Utils.Mocks;
+using Microsoft.Extensions.Time.Testing;
 
 namespace AAEmu.UnitTests.Game.Core.Managers.BotManagers;
 
@@ -473,5 +477,94 @@ public class BotCombatTaskTests
         await Assert.That(state.Target).IsNull();
         await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Questing);
         await Assert.That(state.KillCount).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task Step_StealthedNpc_ReacquiresTheExactLostObjectWhenVisibleInRadius()
+    {
+        var bot = BotTestFixture.MakeBot(30, Vector3.Zero);
+        var world = BotTestFixture.MakeWorld();
+        BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+        bot.Hp = 100;
+        bot.MaxHp = 100;
+        var target = new Npc
+        {
+            ObjId = 9301,
+            TemplateId = 7301,
+            Template = new NpcTemplate { Scale = 1f },
+            Hp = 100,
+            MaxHp = 100
+        };
+        target.Transform.Local.SetPosition(new Vector3(5, 0, 0));
+        world.SetNpc(target.ObjId, target);
+        var stealthed = true;
+        var buffs = Mock.Of<IBuffs>();
+        buffs.HasEffectsMatchingCondition(Any<Func<Buff, bool>>()).Returns(_ => stealthed);
+        target.Buffs = buffs.Object;
+        var state = new BotCombatState { BotId = bot.Id, IsActive = true, Target = target };
+        state.SetForcedState(BotCombatStateType.Idle);
+        state.TransitionTo(BotCombatStateType.Combat);
+        var task = new BotCombatTask(bot, state, new BotMovementBroadcaster(bot), onCancel: null,
+            handler: _ => true);
+
+        task.Step();
+        await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Searching);
+        await Assert.That(state.LostTarget).IsSameReferenceAs(target);
+        await Assert.That(state.Target).IsNull();
+
+        stealthed = false;
+        task.Step();
+
+        await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Combat);
+        await Assert.That(state.Target).IsSameReferenceAs(target);
+        await Assert.That(state.LostTarget).IsNull();
+        await Assert.That(state.IsSearching).IsFalse();
+    }
+
+    [Test]
+    public async Task Step_SearchTimeout_ReleasesExactLostNpcToIdleWithoutSleeping()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 8, 31, 18, 0, 0, TimeSpan.Zero));
+        var bot = BotTestFixture.MakeBot(31, Vector3.Zero);
+        var world = BotTestFixture.MakeWorld();
+        BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+        bot.Hp = 100;
+        bot.MaxHp = 100;
+        var target = new Npc
+        {
+            ObjId = 9302,
+            TemplateId = 7302,
+            Template = new NpcTemplate { Scale = 1f },
+            Hp = 100,
+            MaxHp = 100
+        };
+        target.Transform.Local.SetPosition(new Vector3(5, 0, 0));
+        var buffs = Mock.Of<IBuffs>();
+        buffs.HasEffectsMatchingCondition(Any<Func<Buff, bool>>()).Returns(true);
+        target.Buffs = buffs.Object;
+        var state = new BotCombatState
+        {
+            BotId = bot.Id,
+            IsActive = true,
+            LostTarget = target,
+            LastKnownTargetPosition = target.Transform.World.Position,
+            SearchStartTime = time.GetUtcNow().UtcDateTime,
+            IsSearching = true
+        };
+        state.SetForcedState(BotCombatStateType.Idle);
+        state.TransitionTo(BotCombatStateType.Combat);
+        state.TransitionTo(BotCombatStateType.Searching);
+        var task = new BotCombatTask(bot, state, new BotMovementBroadcaster(bot), onCancel: null,
+            timeProvider: time);
+
+        time.Advance(TimeSpan.FromSeconds(51));
+        task.Step();
+
+        await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Idle);
+        await Assert.That(state.Target).IsNull();
+        await Assert.That(state.LostTarget).IsNull();
+        await Assert.That(state.LastKnownTargetPosition).IsNull();
+        await Assert.That(state.IsSearching).IsFalse();
+        await Assert.That(state.SearchRadius).IsEqualTo(0f);
     }
 }

@@ -55,7 +55,14 @@ public class BotCombatManagerTests
     {
         var manager = new BotCombatManager();
         var bot = BotTestFixture.MakeBot(2, default);
-        var state = new BotCombatState { IsActive = true };
+        var state = new BotCombatState
+        {
+            IsActive = true,
+            LostTarget = bot,
+            IsSearching = true,
+            SearchRadius = 12f,
+            SearchAngle = 1f
+        };
         BotTestFixture.GetDictionary<BotCombatState>(manager, "_combatStates").TryAdd(bot.Id, state);
 
         manager.DisableCombat(bot);
@@ -63,6 +70,9 @@ public class BotCombatManagerTests
         await Assert.That(manager.GetState(bot)).IsSameReferenceAs(state);
         await Assert.That(state.IsActive).IsFalse();
         await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Idle);
+        await Assert.That(state.LostTarget).IsNull();
+        await Assert.That(state.IsSearching).IsFalse();
+        await Assert.That(state.SearchRadius).IsEqualTo(0f);
     }
 
     [Test]

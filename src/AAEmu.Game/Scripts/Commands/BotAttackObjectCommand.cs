@@ -146,6 +146,7 @@ public sealed class BotAttackObjectCommand : ICommand
         runtime.MovementState.Destination = null;
         combatState.TargetTypeFilter = null;
         combatState.LastKnownTargetPosition = null;
+        combatState.LostTarget = null;
         combatState.KillGoal = null;
         combatState.KillCount = 0;
         combatState.StopAtTargetHpPercent = stopAtHpPercent;

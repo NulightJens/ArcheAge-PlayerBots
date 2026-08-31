@@ -33,6 +33,7 @@ public class BotCommandsTests
     private BotArchetypeManager _previousArchetypeManager;
     private Func<IDuelManager> _previousDuelManagerResolver;
     private Func<uint, BuffTemplate> _previousBuffTemplateResolver;
+    private Func<Character, uint, Npc> _previousBuffNpcResolver;
     private Func<IEnumerable<Character>, uint, Npc> _previousAttackObjectNpcResolver;
     private BotManager _botManager;
     private FakeBotCombatManager _combatManager;
@@ -47,6 +48,7 @@ public class BotCommandsTests
         _previousArchetypeManager = BotArchetypeManager.Instance;
         _previousDuelManagerResolver = BotDuelCommand.DuelManagerResolver;
         _previousBuffTemplateResolver = BotBuffCommand.BuffTemplateResolver;
+        _previousBuffNpcResolver = BotBuffNpcCommand.NpcResolver;
         _previousAttackObjectNpcResolver = BotAttackObjectCommand.NpcResolver;
 
         _botManager = new BotManager(_ => null, onlineLookup: _ => null);
@@ -62,6 +64,7 @@ public class BotCommandsTests
         BotTestFixture.RegisterSingletons(_previousBotManager, _previousCombatManager, _previousArchetypeManager);
         BotDuelCommand.DuelManagerResolver = _previousDuelManagerResolver;
         BotBuffCommand.BuffTemplateResolver = _previousBuffTemplateResolver;
+        BotBuffNpcCommand.NpcResolver = _previousBuffNpcResolver;
         BotAttackObjectCommand.NpcResolver = _previousAttackObjectNpcResolver;
     }
 
@@ -883,6 +886,50 @@ public class BotCommandsTests
 
         await Assert.That(bot.Buffs.CheckBuff(999999)).IsFalse();
         await Assert.That(output.Messages.Single()).Contains("Unknown buff id 999999");
+    }
+
+    [Test]
+    public async Task BotBuffNpc_AppliesAndRemovesStealthOnExactSuppliedObject()
+    {
+        var bot = AddBot(2);
+        var active = false;
+        Buff appliedBuff = null;
+        var buffs = Mock.Of<IBuffs>();
+        buffs.CheckBuff(599).Returns(_ => active);
+        buffs.AddBuff(Any<Buff>(), Any<uint>(), Any<int>())
+            .Callback((Buff buff, uint index, int forcedDuration) =>
+            {
+                appliedBuff = buff;
+                active = true;
+            });
+        buffs.RemoveBuff(599).Callback(_ => active = false);
+        var npc = new Npc
+        {
+            ObjId = 9901,
+            TemplateId = 7901,
+            Template = new NpcTemplate { Scale = 1f },
+            Hp = 100,
+            MaxHp = 100,
+            Buffs = buffs.Object
+        };
+        BotBuffNpcCommand.NpcResolver = (candidate, objId) =>
+            ReferenceEquals(candidate, bot) && objId == npc.ObjId ? npc : null;
+        BotBuffCommand.BuffTemplateResolver = id => id == 599
+            ? new BuffTemplate { Id = 599, Duration = 45000, Stealth = true }
+            : null;
+
+        var applied = Execute(new BotBuffNpcCommand(), "2", "9901", "599", "1");
+        var wasApplied = npc.Buffs.CheckBuff(599);
+        var removed = Execute(new BotBuffNpcCommand(), "2", "9901", "-599");
+
+        await Assert.That(wasApplied).IsTrue();
+        await Assert.That(npc.Buffs.CheckBuff(599)).IsFalse();
+        await Assert.That(appliedBuff).IsNotNull();
+        await Assert.That(appliedBuff.Owner).IsEqualTo(npc);
+        await Assert.That(appliedBuff.Caster).IsEqualTo(bot);
+        await Assert.That(applied.Messages.Single()).Contains("NPC object 9901");
+        await Assert.That(applied.Messages.Single()).Contains("stealth=True");
+        await Assert.That(removed.Messages.Single()).Contains("Removed buff 599");
     }
 
     [Test]
