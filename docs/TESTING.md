@@ -58,6 +58,19 @@ Use a fresh or still-completable quest with exactly one active `QuestActObjMonst
 
 Also retain one fail-closed vertical case when available. A cave or stacked-world NPC that is close in planar distance but disagrees with the bot's navigation-height surface must be rejected before combat; do not count that rejection as route completion.
 
+## Selected native sphere-travel gate
+
+Use a fresh or still-completable quest with exactly one active static `QuestActObjSphere`. Never reset or repeat a completed nonrepeatable quest just to reuse a fixture.
+
+1. Inspect and accept the quest through its exact native starter, then require `/botquest status` to show one active sphere act at `0/1` and exactly one same-world destination.
+2. Stage the bot only for fixture setup, outside the sphere but no more than 100 meters from its heightmap-projected center. Keep a real player within the configured activity radius so AAEmu evaluates the region normally.
+3. Run `/botquest travel <id> <questId>` once. Require the command to report the exact component, sphere, radius, true 3D distance, surface offset, and destination.
+4. Do not issue movement or quest-progress commands while it runs. Require ordinary bot movement to enter the sphere and `/botquest status` to show native progress, Ready, or completed lifecycle.
+5. Retain the server's `QuestActObjSphere.FinalizeAction` and queued evaluation sequence. For an auto-complete quest, also require native auto-complete finalization and normal quest removal.
+6. Retain fail-closed tests for mixed/multi-act steps, completed objectives, NPC-centered spheres, zero/multiple same-world destinations, non-finite geometry, destination distance above 100 meters, and a projected surface outside the sphere.
+
+This gate proves one local static destination, not obstacle-aware routing. A long-range, dynamic, ambiguous, or vertically unsafe destination must fail before movement and is not a route-completion result.
+
 ## Four-role party
 
 Use one Darkrunner, Primeval, Daggerspell, and Cleric.

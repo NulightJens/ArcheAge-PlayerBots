@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
@@ -22,6 +23,7 @@ using AAEmu.Game.Models.Game.Skills.Static;
 using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Units.Static;
+using AAEmu.Game.Models.Game.World;
 using AAEmu.Game.Models.Tasks.Bots;
 using AAEmu.Game.Utils.Scripts;
 
@@ -38,17 +40,19 @@ public sealed class BotQuestCommand : ICommand
     internal const float MaximumScanRadius = BotCombatTask.MaximumQuestTargetSearchRadius;
     internal const float InteractionRadius = 6f;
     internal const int MaximumLocateResults = 10;
+    internal const float MaximumTravelDistance = BotCombatTask.MaximumQuestTargetSearchRadius;
+    internal const float TravelArrivalMargin = 0.25f;
 
     public string[] CommandNames { get; set; } = ["botquest"];
 
     public void OnLoad() => CommandManager.Instance.Register(CommandNames, this);
 
     public string GetCommandLineHelp() =>
-        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], locate <botId> <npcTemplateId>, inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, hunt <botId> <questId>, use <botId> <questId> <npcObjId>, acquire <botId> <questId> <npcObjId>, loot <botId> <questId> <corpseObjId>, report <botId> <questId> [rewardIndex]";
+        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], locate <botId> <npcTemplateId>, inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, hunt <botId> <questId>, travel <botId> <questId>, use <botId> <questId> <npcObjId>, acquire <botId> <questId> <npcObjId>, loot <botId> <questId> <corpseObjId>, report <botId> <questId> [rewardIndex]";
 
     public string GetCommandHelpText() =>
-        "Locates exact NPC fixtures, explains a structured quest, and accepts/talks/hunts/uses supplied quest items/loots owned corpses/reports through AAEmu's normal quest, combat, skill, and loot machinery. " +
-        "NPC-group starters and hunts, mixed kill objectives, team-shared talk acts, foreign or team-tagged corpses, and general autonomous quest chaining are intentionally deferred.";
+        "Locates exact NPC fixtures, explains a structured quest, and accepts/talks/hunts/travels/uses supplied quest items/loots owned corpses/reports through AAEmu's normal quest, combat, movement, skill, and loot machinery. " +
+        "NPC-group starters and hunts, mixed objectives, dynamic NPC-centered or multi-sphere travel, team-shared talk acts, foreign or team-tagged corpses, and general autonomous quest chaining are intentionally deferred.";
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
     {
@@ -90,6 +94,9 @@ public sealed class BotQuestCommand : ICommand
                 break;
             case BotQuestVerb.Hunt:
                 Hunt(bot, request.QuestId, messageOutput);
+                break;
+            case BotQuestVerb.Travel:
+                Travel(bot, request.QuestId, messageOutput);
                 break;
             case BotQuestVerb.Use:
                 Use(bot, request.QuestId, request.TargetObjId, messageOutput);
@@ -150,6 +157,7 @@ public sealed class BotQuestCommand : ICommand
             case BotQuestVerb.Accept:
             case BotQuestVerb.Talk:
             case BotQuestVerb.Hunt:
+            case BotQuestVerb.Travel:
                 if (args.Length != 3 ||
                     !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out var questId) || questId == 0)
                     return false;
@@ -302,6 +310,22 @@ public sealed class BotQuestCommand : ICommand
                     CommandManager.SendNormalText(this, messageOutput,
                         $"monster_hunt act={huntAct.Id} npc={hunt.NpcId} " +
                         $"objective={hunt.GetObjective(activeQuest)}/{hunt.Count}.");
+                }
+                foreach (var sphereAct in currentStep.Components.Values
+                             .Where(component => component.IsCurrentlyActive)
+                             .SelectMany(component => component.Acts)
+                             .Where(act => act.Template is QuestActObjSphere))
+                {
+                    var sphere = (QuestActObjSphere)sphereAct.Template;
+                    var componentId = sphereAct.QuestComponent.Template.Id;
+                    var sameWorldSpheres = GetQuestSpheres(bot, componentId)
+                        .Count(candidate => string.Equals(
+                            candidate.WorldId,
+                            GetWorldName(bot),
+                            StringComparison.OrdinalIgnoreCase));
+                    CommandManager.SendNormalText(this, messageOutput,
+                        $"sphere_objective act={sphereAct.Id} component={componentId} sphere={sphere.SphereId} " +
+                        $"npc={sphere.NpcId} objective={sphere.GetObjective(activeQuest)}/1 same_world_destinations={sameWorldSpheres}.");
                 }
             }
             return;
@@ -545,6 +569,91 @@ public sealed class BotQuestCommand : ICommand
             $"remaining_kills={remainingKills}, candidates={candidates.Length}, radius={selectionRadius:F1}m. " +
             "The quest executor will select the nearest legal target and repeat until authoritative kill credit reaches the derived goal; " +
             $"verify native progress with /botquest status {bot.Id} {questId}.");
+    }
+
+    private void Travel(Character bot, uint questId, IMessageOutput messageOutput)
+    {
+        if (!bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not active for bot '{bot.Name}'.");
+            return;
+        }
+
+        if (activeQuest.Step != QuestComponentKind.Progress ||
+            !activeQuest.QuestSteps.TryGetValue(QuestComponentKind.Progress, out var progressStep))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not at an active sphere-travel objective step.");
+            return;
+        }
+
+        var activeActs = progressStep.Components.Values
+            .Where(component => component.IsCurrentlyActive)
+            .SelectMany(component => component.Acts)
+            .ToArray();
+        var templates = activeActs.Select(act => act.Template).ToArray();
+        var objectives = activeActs.Select(act => act.Template.GetObjective(activeQuest)).ToArray();
+        var componentIds = activeActs.Select(act => act.QuestComponent.Template.Id).ToArray();
+        var candidateSpheres = componentIds.Length == 1
+            ? GetQuestSpheres(bot, componentIds[0])
+            : [];
+        if (!TryGetStaticSphereTravelContract(
+                templates,
+                objectives,
+                componentIds,
+                candidateSpheres,
+                GetWorldName(bot),
+                bot.Transform.World.Position,
+                (x, y) => bot.ParentWorld.GetHeight(x, y),
+                out var plan,
+                out var error))
+        {
+            CommandManager.SendErrorText(this, messageOutput, $"Quest {questId}: {error}");
+            return;
+        }
+
+        var combatManager = BotCombatManager.Instance;
+        combatManager.StartListening(bot);
+        var combatState = combatManager.GetState(bot);
+        if (combatState == null || combatState.InDuel)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                combatState == null
+                    ? $"Bot '{bot.Name}' has no authoritative combat state."
+                    : $"Bot '{bot.Name}' cannot start quest travel during a duel.");
+            return;
+        }
+
+        BotManager.Instance.StopFollow(bot);
+        if (BotManager.Instance.GetBotState(bot.Id) is { } movementState)
+        {
+            movementState.FormationSlot = -1;
+            movementState.FormationColumns = 0;
+            movementState.FormationMemberCount = 0;
+        }
+
+        combatManager.ResetCombat(bot);
+        combatState.TargetTypeFilter = null;
+        combatState.KillGoal = null;
+        combatState.KillCount = 0;
+        combatState.IsActive = false;
+        bot.CurrentTarget = null;
+        combatState.SetForcedState(BotCombatStateType.Idle);
+        combatState.TransitionTo(BotCombatStateType.Idle);
+        BotManager.Instance.SetBotDestination(
+            bot,
+            plan.Destination.X,
+            plan.Destination.Y,
+            plan.Destination.Z,
+            run: true);
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' started bounded native quest travel {questId}: component={plan.ComponentId}, " +
+            $"sphere={plan.SphereId}, radius={plan.Radius:F1}m, distance={plan.Distance:F1}m, " +
+            $"surface_offset={plan.SurfaceOffset:F1}m, destination=({plan.Destination.X:F1},{plan.Destination.Y:F1},{plan.Destination.Z:F1}). " +
+            "The normal movement task will enter AAEmu's live sphere trigger; combat remains safely forced idle. " +
+            $"Verify native progress with /botquest status {bot.Id} {questId}.");
     }
 
     private void Acquire(Character bot, uint questId, uint targetObjId, IMessageOutput messageOutput)
@@ -1042,6 +1151,154 @@ public sealed class BotQuestCommand : ICommand
         }
     }
 
+    internal static bool TryGetStaticSphereTravelContract(
+        IReadOnlyList<QuestActTemplate> activeTemplates,
+        IReadOnlyList<int> objectives,
+        IReadOnlyList<uint> componentIds,
+        IReadOnlyList<SphereQuest> candidateSpheres,
+        string botWorldName,
+        Vector3 botPosition,
+        Func<float, float, float> groundHeight,
+        out BotQuestTravelPlan plan,
+        out string error)
+    {
+        plan = default;
+        error = null;
+        if (activeTemplates == null || objectives == null || componentIds == null ||
+            activeTemplates.Count != 1 || objectives.Count != 1 || componentIds.Count != 1)
+        {
+            error = "bounded travel requires exactly one active objective act; mixed or multi-act steps are unsupported.";
+            return false;
+        }
+
+        if (activeTemplates[0] is not QuestActObjSphere sphereAct)
+        {
+            error = "the selected step is not an exact sphere-travel objective.";
+            return false;
+        }
+
+        if (objectives[0] < 0)
+        {
+            error = "the native sphere objective counter is invalid.";
+            return false;
+        }
+
+        if (objectives[0] > 0)
+        {
+            error = "the native sphere objective is already satisfied.";
+            return false;
+        }
+
+        if (componentIds[0] == 0)
+        {
+            error = "the active sphere objective has no authoritative component id.";
+            return false;
+        }
+
+        if (sphereAct.NpcId != 0)
+        {
+            error = $"npc-centered sphere travel (npc template={sphereAct.NpcId}) is not supported by the static-route milestone.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(botWorldName))
+        {
+            error = "the bot's current world identity is unavailable.";
+            return false;
+        }
+
+        var sameWorldSpheres = (candidateSpheres ?? [])
+            .Where(candidate => candidate != null && candidate.ComponentId == componentIds[0] &&
+                                string.Equals(candidate.WorldId, botWorldName, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        if (sameWorldSpheres.Length == 0)
+        {
+            error = $"component={componentIds[0]} has no static destination in world '{botWorldName}'.";
+            return false;
+        }
+
+        if (sameWorldSpheres.Length != 1)
+        {
+            error = $"component={componentIds[0]} has {sameWorldSpheres.Length} same-world destinations; multi-sphere route selection is deferred.";
+            return false;
+        }
+
+        var sphere = sameWorldSpheres[0];
+        if (!float.IsFinite(sphere.Radius) || sphere.Radius <= TravelArrivalMargin)
+        {
+            error = $"component={componentIds[0]} has an invalid or too-small sphere radius.";
+            return false;
+        }
+
+        var center = sphere.Xyz;
+        if (!float.IsFinite(center.X) || !float.IsFinite(center.Y) || !float.IsFinite(center.Z))
+        {
+            error = $"component={componentIds[0]} has a non-finite sphere destination.";
+            return false;
+        }
+
+        if (groundHeight == null)
+        {
+            error = "navigation height lookup is unavailable.";
+            return false;
+        }
+
+        var navigationSurfaceZ = groundHeight(center.X, center.Y);
+        if (!float.IsFinite(navigationSurfaceZ))
+        {
+            error = $"component={componentIds[0]} has no finite navigation surface at its destination.";
+            return false;
+        }
+
+        var surfaceOffset = Math.Abs(navigationSurfaceZ - center.Z);
+        var maximumArrivalOffset = Math.Min(
+            BotCombatTask.MaximumQuestTargetSurfaceOffset,
+            sphere.Radius - TravelArrivalMargin);
+        if (surfaceOffset > maximumArrivalOffset)
+        {
+            error = $"component={componentIds[0]} sphere center is {surfaceOffset:F1}m from the navigation surface; " +
+                    $"the safe arrival limit is {maximumArrivalOffset:F1}m.";
+            return false;
+        }
+
+        var destination = new Vector3(center.X, center.Y, navigationSurfaceZ);
+        var distance = Vector3.Distance(botPosition, destination);
+        if (!float.IsFinite(distance) || distance > MaximumTravelDistance)
+        {
+            error = $"the static destination is {distance:F1}m away; bounded travel is limited to {MaximumTravelDistance:F1}m.";
+            return false;
+        }
+
+        plan = new BotQuestTravelPlan(
+            componentIds[0],
+            sphereAct.SphereId,
+            sphere.Radius,
+            destination,
+            distance,
+            surfaceOffset);
+        return true;
+    }
+
+    private static IReadOnlyList<SphereQuest> GetQuestSpheres(Character bot, uint componentId)
+    {
+        if (bot?.ParentWorld == null || componentId == 0)
+            return [];
+#if PLAYERBOTS_AAEMU_3_0
+        return SphereQuestManager.Instance.GetQuestSpheres(componentId) ?? [];
+#else
+        return bot.ParentWorld.SphereQuestManager?.GetQuestSpheres(componentId) ?? [];
+#endif
+    }
+
+    private static string GetWorldName(Character bot)
+    {
+#if PLAYERBOTS_AAEMU_3_0
+        return bot?.ParentWorld?.Name;
+#else
+        return bot?.ParentWorld?.Template?.Name;
+#endif
+    }
+
     private static string GetAvailability(Character bot, QuestTemplate quest)
     {
         if (bot.Quests.HasQuest(quest.Id))
@@ -1137,6 +1394,7 @@ internal enum BotQuestVerb
     Accept,
     Talk,
     Hunt,
+    Travel,
     Use,
     Acquire,
     Loot,
@@ -1151,3 +1409,11 @@ internal readonly record struct BotQuestRequest(
     uint TargetObjId,
     float Radius,
     int SelectedReward);
+
+internal readonly record struct BotQuestTravelPlan(
+    uint ComponentId,
+    uint SphereId,
+    float Radius,
+    Vector3 Destination,
+    float Distance,
+    float SurfaceOffset);

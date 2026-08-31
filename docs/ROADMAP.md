@@ -50,7 +50,9 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 - Completed once on 3.0: quest 620 was accepted from Landlord Oliviano, its native supply step advanced normally, and `/botquest hunt` derived Plains Razorbeak template 7781 plus the remaining 3-kill goal. The executor selected and killed three exact targets through normal combat, advanced the live objective from 0/3 to 3/3, released its target, returned to automatic Idle, and reported the quest at the exact NPC. Metrics recorded three observed and three credited kills with zero tick errors, skipped ticks, or runtime overlaps.
 - Automated contract: a hunt must contain exactly one currently active native `QuestActObjMonsterHunt`, one exact NPC template, a positive remaining count, and at least one living and attackable target inside the lesser of the configured radius and 100 meters. Selection rejects closer wrong-template targets, repeats after each exact kill, stops at the derived native goal, uses true three-dimensional distance, and fails closed when an NPC does not agree with the bot's navigation-height surface.
 - Retained negative evidence: quest 3427's Cave Bat objective is physically inside a cave while the current simple heightmap mover projects to the exterior surface. The first attempt exposed that mismatch; after the safety correction, the same live fixture was rejected before combat instead of stranding the bot above the target.
-- Next: add one talk/emote executor and one travel executor as separately measured slices.
+- Completed once on 3.0: quest 312 started at Apothecary Nestelle with its native sphere objective at 0/1. From an isolated staged point 95.4 meters away, `/botquest travel` derived the one same-world 30-meter sphere and exact heightmap destination, normal bot movement entered it, AAEmu finalized the sphere act, and native auto-complete moved the lifecycle to completed.
+- Automated contract: travel requires exactly one active `QuestActObjSphere`, an unsatisfied native objective, a static rather than NPC-centered sphere, exactly one same-world geometry result, true 3D distance no greater than 100 meters, and a finite heightmap surface that remains at least 0.25 meters inside the sphere. It clears follow/formations/combat, holds safely in forced Idle, and delegates both motion and objective credit to the existing mover and AAEmu sphere trigger.
+- Next: add one separately measured emote objective executor, then define the first bounded objective-transition policy without autonomous quest selection.
 - Autonomous quest selection, routing, and chaining remain deferred until those objective executors and navigation boundaries pass independently.
 
 ## 0.4: population operations
@@ -64,7 +66,7 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 
 - Completed: pinned NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` for client `3.0.4.2 r336598`.
 - Completed: compile-time compatibility layer, version-specific Game/test MSBuild targets, and reviewed 24-file alpha-v4 host patch.
-- Completed: non-incremental Game and full-solution builds with zero compiler errors; the current 3.0 adapter suite passed 159/159, including class/gear command, gear-create restart, equipment-visibility packet, persisted-resource, and bounded quest-command coverage.
+- Completed: non-incremental Game and full-solution builds with zero compiler errors; the current 3.0 adapter suite passed 160/160, including class/gear command, gear-create restart, equipment-visibility packet, persisted-resource, and bounded quest-command coverage.
 - Completed: fail-closed dual-track installers and machine-readable compatibility metadata. The 3.0 track requires an explicit experimental flag.
 - Completed: acquired and integrity-tested the matching client, 36.81 GB `game_pak`, decrypted `compact.sqlite3`, and `compact.server.table.sqlite3`; retained provenance includes every SHA-256.
 - Completed: isolated MySQL schemas and unique Login/Game/Stream/Web API ports; server startup loaded 491,683 translations, 257 zones, 6,606 quests, 36,694 item templates, and 24,175 skills.
@@ -75,6 +77,7 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 - Completed once: `/setclass` refreshed Battlerage/Auramancy/Shadowplay at level 55; `/kit` auto-equipped a grade-5 two-handed weapon, and normal logout/re-add retained class and equipment.
 - Completed once: the staged exact-NPC quest 330 accept/report flow, including graceful-restart and bot-reload persistence plus fail-closed distance and unrelated-quest checks.
 - Completed once: quest 620's selected exact-NPC hunt loop completed three native kills, released combat state at the native goal, and reported normally; a vertically unreachable cave fixture now fails closed during preflight.
+- Completed once: quest 312's selected static sphere objective ran 95.4 meters through the normal mover, finalized through AAEmu's native enter-sphere event, and auto-completed without fabricated progress.
 - Next: repeat the login/lifecycle/class/gear and representative quest gates from a clean start, then run four-role party/combat and 0/10/50/100 resource/recovery gates.
 - Promotion rule: 3.0 remains server-start-validated alpha until every runtime gate passes; configuration, a successful build, or server startup alone is not a support claim.
 

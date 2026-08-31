@@ -18,6 +18,7 @@ using AAEmu.Game.Models.Game.Skills.Static;
 using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Units.Static;
+using AAEmu.Game.Models.Game.World;
 using AAEmu.Game.Scripts.Commands;
 using AAEmu.Game.Utils.Scripts;
 using AAEmu.UnitTests.Utils.Mocks;
@@ -122,6 +123,10 @@ public class BotCommandsTests
         await Assert.That(hunt.Verb).IsEqualTo(BotQuestVerb.Hunt);
         await Assert.That(hunt.QuestId).IsEqualTo(251u);
         await Assert.That(BotQuestCommand.TryParse(["hunt", "2", "251", "3475"], out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryParse(["travel", "2", "137"], out var travel)).IsTrue();
+        await Assert.That(travel.Verb).IsEqualTo(BotQuestVerb.Travel);
+        await Assert.That(travel.QuestId).IsEqualTo(137u);
+        await Assert.That(BotQuestCommand.TryParse(["travel", "2", "137", "3653"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.TryParse(["use", "2", "293", "45678"], out var use)).IsTrue();
         await Assert.That(use.Verb).IsEqualTo(BotQuestVerb.Use);
         await Assert.That(use.QuestId).IsEqualTo(293u);
@@ -194,6 +199,94 @@ public class BotCommandsTests
         await Assert.That(error).IsNull();
         await Assert.That(npcTemplateId).IsEqualTo(3475u);
         await Assert.That(remainingKills).IsEqualTo(2);
+    }
+
+    [Test]
+    public async Task BotQuest_TravelContractDerivesOneSameWorldHeightmapArrival()
+    {
+        var component = new QuestComponentTemplate(new QuestTemplate()) { Id = 3653 };
+        QuestActTemplate[] activeActs =
+        [
+            new QuestActObjSphere(component) { SphereId = 191 }
+        ];
+        SphereQuest[] spheres =
+        [
+            new()
+            {
+                ComponentId = 3653,
+                WorldId = "main_world",
+                Radius = 6,
+                Xyz = new Vector3(10, 0, 105)
+            },
+            new()
+            {
+                ComponentId = 3653,
+                WorldId = "login_world",
+                Radius = 6,
+                Xyz = new Vector3(20, 0, 100)
+            }
+        ];
+
+        var supported = BotQuestCommand.TryGetStaticSphereTravelContract(
+            activeActs,
+            [0],
+            [3653],
+            spheres,
+            "main_world",
+            new Vector3(0, 0, 100),
+            (_, _) => 100,
+            out var plan,
+            out var error);
+
+        await Assert.That(supported).IsTrue();
+        await Assert.That(error).IsNull();
+        await Assert.That(plan.ComponentId).IsEqualTo(3653u);
+        await Assert.That(plan.SphereId).IsEqualTo(191u);
+        await Assert.That(plan.Destination).IsEqualTo(new Vector3(10, 0, 100));
+        await Assert.That(plan.Distance).IsEqualTo(10f);
+        await Assert.That(plan.SurfaceOffset).IsEqualTo(5f);
+    }
+
+    [Test]
+    public async Task BotQuest_TravelContractFailsClosedOnUnsupportedOrUnsafeShapes()
+    {
+        var component = new QuestComponentTemplate(new QuestTemplate()) { Id = 3653 };
+        var sphereAct = new QuestActObjSphere(component) { SphereId = 191 };
+        var sphere = new SphereQuest
+        {
+            ComponentId = 3653,
+            WorldId = "main_world",
+            Radius = 10,
+            Xyz = new Vector3(10, 0, 100)
+        };
+
+        await Assert.That(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct, new QuestActObjTalk(component)], [0, 0], [3653, 3653], [sphere],
+            "main_world", Vector3.Zero, (_, _) => 100, out _, out _)).IsFalse();
+
+        sphereAct.NpcId = 146;
+        await Assert.That(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere],
+            "main_world", Vector3.Zero, (_, _) => 100, out _, out _)).IsFalse();
+        sphereAct.NpcId = 0;
+
+        await Assert.That(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [1], [3653], [sphere],
+            "main_world", Vector3.Zero, (_, _) => 100, out _, out _)).IsFalse();
+
+        await Assert.That(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere, sphere],
+            "main_world", Vector3.Zero, (_, _) => 100, out _, out _)).IsFalse();
+
+        sphere.Xyz = new Vector3(10, 0, 130);
+        await Assert.That(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere],
+            "main_world", Vector3.Zero, (_, _) => 100, out _, out _)).IsFalse();
+
+        sphere.Xyz = new Vector3(101, 0, 100);
+        await Assert.That(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere],
+            "main_world", Vector3.Zero, (_, _) => 100, out _, out _)).IsFalse();
     }
 
     [Test]

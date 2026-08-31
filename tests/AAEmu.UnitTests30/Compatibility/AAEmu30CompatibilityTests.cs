@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using AAEmu.Commons.Network;
@@ -70,6 +71,10 @@ public sealed class AAEmu30CompatibilityTests
         Assert.Equal(BotQuestVerb.Hunt, hunt.Verb);
         Assert.Equal(251u, hunt.QuestId);
         Assert.False(BotQuestCommand.TryParse(["hunt", "2", "251", "3475"], out _));
+        Assert.True(BotQuestCommand.TryParse(["travel", "2", "137"], out var travel));
+        Assert.Equal(BotQuestVerb.Travel, travel.Verb);
+        Assert.Equal(137u, travel.QuestId);
+        Assert.False(BotQuestCommand.TryParse(["travel", "2", "137", "3653"], out _));
         Assert.True(BotQuestCommand.TryParse(["report", "2", "330"], out var report));
         Assert.Equal(BotQuestVerb.Report, report.Verb);
         Assert.Equal(0, report.SelectedReward);
@@ -92,6 +97,43 @@ public sealed class AAEmu30CompatibilityTests
         Assert.Null(huntError);
         Assert.Equal(3475u, npcTemplateId);
         Assert.Equal(2, remainingKills);
+    }
+
+    [Fact]
+    public void StaticSphereTravelContractIsBoundedAndFailClosedOnThe30Adapter()
+    {
+        var component = new QuestComponentTemplate(new QuestTemplate()) { Id = 3653 };
+        var sphereAct = new QuestActObjSphere(component) { SphereId = 191 };
+        var sphere = new SphereQuest
+        {
+            ComponentId = 3653,
+            WorldId = "main_world",
+            Radius = 6,
+            Xyz = new Vector3(10, 0, 105)
+        };
+
+        Assert.True(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere], "main_world", new Vector3(0, 0, 100),
+            (_, _) => 100, out var plan, out var error));
+        Assert.Null(error);
+        Assert.Equal(new Vector3(10, 0, 100), plan.Destination);
+        Assert.Equal(10f, plan.Distance);
+        Assert.Equal(5f, plan.SurfaceOffset);
+
+        sphereAct.NpcId = 146;
+        Assert.False(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere], "main_world", Vector3.Zero,
+            (_, _) => 100, out _, out _));
+        sphereAct.NpcId = 0;
+
+        Assert.False(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere, sphere], "main_world", Vector3.Zero,
+            (_, _) => 100, out _, out _));
+
+        sphere.Xyz = new Vector3(101, 0, 100);
+        Assert.False(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere], "main_world", Vector3.Zero,
+            (_, _) => 100, out _, out _));
     }
 
     [Fact]
