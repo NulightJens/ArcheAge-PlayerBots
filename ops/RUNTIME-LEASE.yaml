@@ -15,7 +15,7 @@ runtimes:
     claimed_at: 2026-08-31
     released_at: 2026-08-31
     cleanup_receipt: no-runtime-started-install-build-unit-only
-    baseline_evidence: ops/evidence/aaemu12-integration-baseline-v1.yaml
+    baseline_evidence: ops/evidence/aaemu12-wave1-integration-v1.yaml
     availability_limit: An isolated versioned Game database must be assigned before starting Login or Game.
 
   aaemu30:

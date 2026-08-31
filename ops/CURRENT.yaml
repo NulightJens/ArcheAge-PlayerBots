@@ -1,10 +1,13 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-1-parallel-source
-verdict: active
+phase: wave-1-integrated-source-runtime-pending
+verdict: green-source-integration
 
 source:
   integration_branch: integration/aaemu12-world
+  integrated_head: 413e3d39c9bde154ae62d51d97421d92cb350ba4
+  tested_module_source: 60f574d70c35dce418dc8a9ca53a99bd775bf099
+  integration_evidence: ops/evidence/aaemu12-wave1-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -31,9 +34,10 @@ runtime:
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-integration-baseline-v1
+    evidence_receipt: aaemu12-wave1-integration-v1
     build: 0-errors-76-warnings
-    unit_tests: 1761-passed-4-intentional-skips-0-failed
+    focused_tests: 51-passed-0-skipped-0-failed
+    unit_tests: 1786-passed-4-intentional-skips-0-failed
     runtime_boundary: No server process or database was started; physical runtime acceptance remains pending.
 
 control_tower:
@@ -46,9 +50,9 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Run T-042 as the independent Wave 1 review and integration task.
-  - Advance the integration branch only after review, registered-host focused tests, and the full AAEmu 1.2 suite are green.
-  - Keep live runtime acceptance pending; T-042 does not acquire the aaemu12 runtime lease.
+  - Keep T-041 blocked until T-037 and the required serialized AAEmu 1.2 runtime qualifications are complete.
+  - Prepare the next bounded AAEmu 1.2 source/runtime task without reopening the completed Wave 1 outcomes.
+  - Assign an isolated versioned Game database and claim the aaemu12 lease before starting any live Login or Game process.
 
 prepared_workstreams:
   - task: T-038
@@ -57,28 +61,36 @@ prepared_workstreams:
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\46cf\PB-W00-control'
     base: 4db079de50304dc63885111c6f05bcf205ce5a9b
     head: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
-    handoff: ready
+    handoff: integrated
+    integrated_commit: 413e3d39c9bde154ae62d51d97421d92cb350ba4
   - task: T-039
     client_thread_id: client-new-thread:39823200-fca2-4fea-85d1-18d38831d4ee
     task_thread_id: pending-task-list-resolution
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\6e30\PB-W00-control'
     base: 4db079de50304dc63885111c6f05bcf205ce5a9b
     head: dcc27f42eb5e691d426235b86295a8106c9073b3
-    handoff: ready
+    handoff: integrated
+    integrated_commit: 413e3d39c9bde154ae62d51d97421d92cb350ba4
   - task: T-040
     client_thread_id: client-new-thread:96ef486b-2a90-4bb6-8c8a-364f3d948c1f
     task_thread_id: 01a059d1-06d6-7fe0-8972-c02c60d535d0
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\035a\PB-W00-control'
     base: 4db079de50304dc63885111c6f05bcf205ce5a9b
     head: a99663059db71afaa227bdce8f680b5196e36226
-    handoff: ready
+    handoff: integrated
+    integrated_commit: 413e3d39c9bde154ae62d51d97421d92cb350ba4
 
 integration_wave:
   task: T-042
   title: Wave 1 review and AAEmu 1.2 integration
-  state: setup-in-progress
+  state: completed
   client_thread_id: client-new-thread:f754affe-f4a6-4393-b155-64e7d8cf41b3
   task_thread_id: pending-task-list-resolution
+  integrated_commit: 413e3d39c9bde154ae62d51d97421d92cb350ba4
+  tested_module_source: 60f574d70c35dce418dc8a9ca53a99bd775bf099
+  evidence_receipt: aaemu12-wave1-integration-v1
+  full_unit: 1786-passed-4-intentional-skips-0-failed
+  runtime: not-started
   source_heads:
     T-038: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
     T-039: dcc27f42eb5e691d426235b86295a8106c9073b3
