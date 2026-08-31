@@ -1,0 +1,20 @@
+schema_version: 1
+id: T-039
+title: Deterministic life-state FSM and profiles
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Provide a pure deterministic bot life-state machine and data-driven behavior profiles without spawning or runtime integration.
+depends_on: [PB-W00]
+branch: task/T-039-life-state-fsm
+worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-039-life-state'
+
+write_scope:
+  - src/AAEmu.Game/Bots/Life/**
+  - tests/AAEmu.UnitTests/Bots/Life/**
+
+runtime:
+  required: false
+  lease: null
+gates: [focused-aaemu12-tests]
+handoff: ops/tasks/T-039/HANDOFF.md

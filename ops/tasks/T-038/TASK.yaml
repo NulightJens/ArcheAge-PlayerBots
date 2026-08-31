@@ -1,0 +1,25 @@
+schema_version: 1
+id: T-038
+title: Navigation boundary and obstacle diagnostics
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Add a fail-closed navigation decision boundary with explicit obstacle/unreachable diagnostics before movement is issued.
+depends_on: [PB-W00]
+branch: task/T-038-navigation-boundary
+worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-038-navigation'
+
+write_scope:
+  - src/AAEmu.Game/Bots/Navigation/**
+  - src/AAEmu.Game/Models/Tasks/Bots/BotMovementTask.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotMovementState.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotMovementMath.cs
+  - tests/AAEmu.UnitTests/Bots/Navigation/**
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotMovementTaskTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotMovementMathTests.cs
+
+runtime:
+  required: false
+  lease: null
+gates: [focused-aaemu12-tests]
+handoff: ops/tasks/T-038/HANDOFF.md

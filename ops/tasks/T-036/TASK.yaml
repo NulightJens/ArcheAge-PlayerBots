@@ -1,0 +1,12 @@
+schema_version: 1
+id: T-036
+title: AAEmu 1.2 mortal-combat and stealth closure
+track: AAEmu12
+status: proposed
+integration: pending
+outcome: Close physical stealth loss/reacquisition and mortal-combat cohorts with isolated fixtures and matched Idle controls.
+depends_on: [PB-W00]
+runtime:
+  required: true
+  lease: aaemu12
+activation_requirement: Clean pinned 1.2 runtime and exact focused write scope assigned by Control Tower.

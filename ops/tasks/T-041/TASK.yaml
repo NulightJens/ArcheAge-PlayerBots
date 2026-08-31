@@ -1,0 +1,12 @@
+schema_version: 1
+id: T-041
+title: One-zone Population Director
+track: AAEmu12
+status: blocked
+integration: pending
+outcome: Maintain configured population density in one zone using persistent identities, lifecycle transitions, qualified navigation, and the approved resource budget.
+depends_on: [T-037, T-038, T-039, T-040]
+runtime:
+  required: true
+  lease: aaemu12
+activation_requirement: All dependencies accepted and integration write scope assigned.

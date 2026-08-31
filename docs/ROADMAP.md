@@ -2,6 +2,10 @@
 
 The goal is believable, useful, lightweight party members and world population. ArcheAge-native systems remain the baseline unless a measured gap requires more logic.
 
+## Active track policy
+
+AAEmu 1.2 r208022 is the sole active feature and runtime target until the one-zone Population Director passes its soak and recovery gate. AAEmu 3.0 is a frozen compatibility checkpoint: preserve its accepted source, patch, assets, and evidence, and run its clean install/build/adapter regression only at major milestone or release boundaries. Current task dispatch and dependencies live in `ops/BOARD.yaml` and `ops/ROADMAP.md`.
+
 ## 0.1 release candidate: foundation
 
 Status: released as `0.1.0-rc.2`; accepted fixes continue under Unreleased.
@@ -63,6 +67,8 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 - Expand only after zone-level resource and player-experience acceptance.
 
 ## ArcheAge 3.0
+
+Status: frozen compatibility checkpoint; no new 3.0 feature or physical acceptance work during the AAEmu 1.2 Population Director milestone.
 
 - Completed: pinned NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` for client `3.0.4.2 r336598`.
 - Completed: compile-time compatibility layer, version-specific Game/test MSBuild targets, and reviewed 24-file alpha-v4 host patch.

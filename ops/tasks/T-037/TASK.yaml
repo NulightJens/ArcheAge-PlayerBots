@@ -1,0 +1,13 @@
+schema_version: 1
+id: T-037
+title: AAEmu 1.2 scale budget and recovery qualification
+track: AAEmu12
+status: blocked
+integration: pending
+outcome: Approve a whole-server population/resource budget and normal-logout recovery envelope from an empty-server baseline.
+depends_on: [T-036]
+runtime:
+  required: true
+  lease: aaemu12
+cohorts: [0, 10, 50, 100, highest-qualified]
+activation_requirement: T-036 accepted and runtime lease available.

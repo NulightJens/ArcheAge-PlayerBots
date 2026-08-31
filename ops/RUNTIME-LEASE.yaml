@@ -1,0 +1,35 @@
+schema_version: 1
+owner: PB-000 Control Tower
+
+runtimes:
+  aaemu12:
+    status: unassigned
+    owner_task: null
+    owner_thread_id: null
+    host_path: null
+    pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
+    database_identity: null
+    claimed_at: null
+    released_at: null
+    cleanup_receipt: null
+
+  aaemu30:
+    status: game-stopped-dependencies-retained
+    owner_task: null
+    owner_thread_id: null
+    host_path: 'D:\Codex-Labs\aaemu-3.0.4.2-r336598-runtime-v1\host'
+    pinned_host_commit: 8c1c943bb2309eefffb9da2aa99a408d0acbb095
+    listeners:
+      game: []
+      login: [1334, 1337]
+      mysql: [3307]
+    claimed_at: null
+    released_at: 2026-08-31
+    cleanup_receipt: graceful-command-scripts-shutdown-now
+
+release_requirements:
+  - Graceful server shutdown or graceful Ctrl+C path.
+  - Zero retained bots and runtimes when a populated gate was run.
+  - Process and listener verification.
+  - Database retained; destructive reset is prohibited.
+  - Evidence receipt written before another task receives the lease.

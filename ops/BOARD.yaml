@@ -1,0 +1,64 @@
+schema_version: 1
+owner: PB-000 Control Tower
+active_track: AAEmu12
+statuses: [proposed, ready, active, review, blocked, paused, done]
+
+tasks:
+  - id: T-035
+    title: Exact native emote executor checkpoint
+    track: AAEmu30
+    status: paused
+    integration: not-requested
+    depends_on: [T-034]
+    reason: Preserved before the AAEmu 1.2 track decision; no further 3.0 feature work.
+
+  - id: T-038
+    title: Navigation boundary and obstacle diagnostics
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [PB-W00]
+
+  - id: T-039
+    title: Deterministic life-state FSM and profiles
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [PB-W00]
+
+  - id: T-040
+    title: Persistent bot identity and roster
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [PB-W00]
+
+  - id: T-007
+    title: Evidence and log receipt translator
+    track: shared-tooling
+    status: proposed
+    integration: pending
+    depends_on: [PB-W00]
+
+  - id: T-036
+    title: AAEmu 1.2 mortal-combat and stealth closure
+    track: AAEmu12
+    status: proposed
+    integration: pending
+    depends_on: [PB-W00]
+    runtime_lease: aaemu12
+
+  - id: T-037
+    title: AAEmu 1.2 scale budget and recovery qualification
+    track: AAEmu12
+    status: blocked
+    integration: pending
+    depends_on: [T-036]
+    runtime_lease: aaemu12
+
+  - id: T-041
+    title: One-zone Population Director
+    track: AAEmu12
+    status: blocked
+    integration: pending
+    depends_on: [T-037, T-038, T-039, T-040]

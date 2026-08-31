@@ -1,0 +1,45 @@
+schema_version: 1
+program_id: archeage-playerbots
+name: ArcheAge PlayerBots
+objective: >-
+  Deliver a shareable, installable PlayerBots module that produces believable,
+  recoverable world population and provides the identity foundation required
+  for governance and social systems.
+
+canonical_source:
+  repository: 'C:\Users\jensh\Documents\Codex\2026-08-29\archeage-playerbots-module'
+  integration_branch: integration/aaemu12-world
+  accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
+
+active_track:
+  id: AAEmu12
+  label: ArcheAge 1.2 r208022
+  host_repository: https://github.com/AAEmu/AAEmu
+  host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  status: sole-feature-target
+
+compatibility_track:
+  id: AAEmu30
+  label: ArcheAge 3.0.4.2 r336598
+  host_repository: https://github.com/NL0bP/AAEmu
+  host_base_commit: 8c1c943bb2309eefffb9da2aa99a408d0acbb095
+  module_checkpoint: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
+  compatibility_patch: compatibility/aaemu-3.0.4.2-r336598-alpha-v4.patch
+  policy: frozen-release-boundary-regression-only
+
+current_milestone:
+  id: M-004
+  name: One-zone Population Director
+  acceptance: >-
+    A configurable one-zone director maintains qualified population density,
+    persistent identities, lifecycle recovery, and bounded navigation during a
+    30-minute soak followed by normal logout and clean restart.
+
+program_rules:
+  one_outcome_per_task: true
+  one_writer_per_worktree: true
+  runtime_proofs_serialized: true
+  full_suite_cadence: integration-wave
+  raw_evidence_in_git: false
+  integration_owner: PB-WXX Integrator
+  global_ledger_owner: PB-000 Control Tower
