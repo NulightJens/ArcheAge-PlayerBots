@@ -53,6 +53,7 @@ internal static partial class Program
                 "probe-launcher" => LauncherCommands.ProbeLauncher(LauncherCommandOptions.Parse(args[1..], false)),
                 "launch" => await LauncherCommands.LaunchAsync(LauncherCommandOptions.Parse(args[1..], true)),
                 "request-close" => await LauncherCommands.RequestCloseAsync(CloseCommandOptions.Parse(args[1..])),
+                "serve-input" => await InputCommands.ServeAsync(InputServerOptions.Parse(args[1..])),
                 _ => throw new ArgumentException($"Unknown command '{args[0]}'.")
             };
         }
@@ -274,6 +275,7 @@ internal static partial class Program
         "  probe-launcher --profile <launch-profile.json>\n" +
         "  launch --profile <launch-profile.json> --wait-for <process_started|login_connected|world_authorized|world_loaded> [--timeout-ms 120000]\n\n" +
         "  request-close --profile <launch-profile.json> --process-id <pid> [--timeout-ms 30000]\n\n" +
+        "  serve-input --profile <launch-profile.json> --process-id <pid> --window-handle <handle> --audit <jsonl> [--port 45832] [--lease-ttl-ms 15000] [--max-actions 8]\n\n" +
         "The status API is read-only and binds only to 127.0.0.1. Launch credentials are read from the console or redirected standard input and are never accepted as command-line options.");
 
     [GeneratedRegex("<(?<time>\\d{2}:\\d{2}:\\d{2})>", RegexOptions.CultureInvariant)]

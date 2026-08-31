@@ -55,9 +55,30 @@ $credentialLines | dotnet run --project tools\AAEmu.ClientDriver -- launch --pro
 dotnet run --project tools\AAEmu.ClientDriver -- request-close --profile <profile.json> --process-id <pid>
 ```
 
-### Stage 2: bounded real-client input
+### Stage 2: bounded real-client input (implemented)
 
-Add semantic operations such as `focus`, `key`, `click-client`, and `type-chat-command` using Win32 input APIs. Every mutating call must require a current process ID and window handle, verify the executable path and foreground window, transform client-relative coordinates through the captured rectangle, use an expiring input lease, and record the action without recording typed secrets. No process injection, memory editing, or general-purpose remote desktop endpoint is permitted.
+`serve-input` is a separate loopback-only mutating API. Startup requires the allowlisted profile, exact PID, exact decimal main-window handle, and an audit path whose parent already exists. It re-verifies the PID, process name, executable path, executable SHA-256, main-window ownership, current main handle, visibility, and client rectangle before issuing a random in-memory bearer lease and again before every action. Leases last at most 30 seconds and allow at most 16 counted actions.
+
+The endpoints are deliberately narrow:
+
+- `POST /v1/focus` accepts an empty body and establishes verified foreground ownership.
+- `POST /v1/key` accepts Enter, Escape, Tab, Space, arrows, or F1-F12 only.
+- `POST /v1/click-client` accepts an in-bounds client-relative point, converts it through Windows, and rejects a point occluded by another top-level window.
+- `POST /v1/type-chat-command` accepts only a 2-160 character printable-ASCII slash command. It rechecks foreground ownership between opening chat, typing, and submitting.
+
+The bearer token exists only in the startup stream and memory; it is never accepted on the command line or written to the audit. Chat audit records contain only the command verb, character count, and SHA-256, never the raw command. There is no arbitrary text endpoint, process injection, memory editing, forced termination, or general-purpose remote-desktop surface.
+
+Run the deterministic native-window gate with an installed launch profile:
+
+```powershell
+.\scripts\Test-ClientDriver.ps1 -LauncherProfile <profile.json>
+```
+
+That gate proves positive focus/key/click/chat delivery, four fail-closed cases, the action cap, raw-text redaction, forbidden-primitive scanning, and graceful fixture close. The real-client smoke waits for one stable titled ArcheAge handle, performs only focus plus Escape, and requests verified graceful close:
+
+```powershell
+.\scripts\Test-RealClientInput.ps1 -LauncherProfile <profile.json> -EvidenceDirectory <evidence-directory>
+```
 
 ### Stage 3: visual evidence
 
