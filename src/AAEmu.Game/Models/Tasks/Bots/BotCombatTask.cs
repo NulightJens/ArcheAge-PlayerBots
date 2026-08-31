@@ -26,6 +26,9 @@ namespace AAEmu.Game.Models.Tasks.Bots;
 
 public class BotCombatTask : Task
 {
+    internal const float MaximumQuestTargetSearchRadius = 100f;
+    internal const float MaximumQuestTargetSurfaceOffset = 15f;
+
     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
     private readonly Character _bot;
     private readonly BotCombatState _state;
@@ -36,10 +39,11 @@ public class BotCombatTask : Task
     private readonly Func<Character, float, List<Npc>> _nearbyNpcs;
     private readonly BotBlackboard _blackboard;
     private readonly TimeProvider _timeProvider;
+    private readonly Func<float, float, float> _heightProvider;
     private DateTime _lastHealTick;
 
     public BotCombatTask(Character bot, BotCombatState state, BotMovementBroadcaster broadcaster)
-        : this(bot, state, broadcaster, null, null, null, null, null)
+        : this(bot, state, broadcaster, null, null, null, null, null, null)
     {
     }
 
@@ -51,7 +55,8 @@ public class BotCombatTask : Task
         Func<Character, bool> handler = null,
         Func<Character, float, List<Npc>> nearbyNpcs = null,
         BotBlackboard blackboard = null,
-        TimeProvider timeProvider = null)
+        TimeProvider timeProvider = null,
+        Func<float, float, float> heightProvider = null)
     {
         _bot = bot;
         _state = state;
@@ -62,6 +67,7 @@ public class BotCombatTask : Task
         _nearbyNpcs = nearbyNpcs ?? ((character, radius) => WorldManager.GetAround<Npc>(character, radius, true));
         _blackboard = blackboard ?? WorldValues.Create(bot, _nearbyNpcs);
         _timeProvider = timeProvider ?? TimeProvider.System;
+        _heightProvider = heightProvider ?? ((x, y) => _bot.ParentWorld.GetHeight(x, y));
         _lastHealTick = Now;
     }
 
@@ -237,7 +243,19 @@ public class BotCombatTask : Task
                     continue;
                 if (IsStealthed(npc))
                     continue;
-                var distance = _bot.GetDistanceTo(npc, true);
+                var botPosition = _bot.Transform.World.Position;
+                var npcPosition = npc.Transform.World.Position;
+                var distance = Vector3.Distance(botPosition, npcPosition);
+                if (_state.TargetTypeFilter.HasValue)
+                {
+                    var navigationSurfaceZ = _heightProvider(npcPosition.X, npcPosition.Y);
+                    if (!IsWithinNavigableQuestTargetVolume(
+                            botPosition,
+                            npcPosition,
+                            navigationSurfaceZ,
+                            QuestTargetSearchRadius()))
+                        continue;
+                }
                 if (distance < closestDistance)
                 {
                     closest = npc;
@@ -343,6 +361,29 @@ public class BotCombatTask : Task
             return;
         }
 
+        if (_state.TargetTypeFilter.HasValue && _state.Target is Npc questTarget)
+        {
+            var botPosition = _bot.Transform.World.Position;
+            var targetPosition = questTarget.Transform.World.Position;
+            var navigationSurfaceZ = _heightProvider(targetPosition.X, targetPosition.Y);
+            if (!IsWithinNavigableQuestTargetVolume(
+                    botPosition,
+                    targetPosition,
+                    navigationSurfaceZ,
+                    QuestTargetSearchRadius()))
+            {
+                Logger.Trace(
+                    $"BOT id={_bot.Id} ev=quest_target_rejected target={questTarget.ObjId} " +
+                    $"distance={Vector3.Distance(botPosition, targetPosition):F1} " +
+                    $"surface_offset={Math.Abs(navigationSurfaceZ - targetPosition.Z):F1}");
+                _state.Target = null;
+                _bot.CurrentTarget = null;
+                _state.TransitionTo(BotCombatStateType.Questing);
+                BotManager.Instance.StopImmediately(_bot);
+                return;
+            }
+        }
+
         if (TryEnforceNonlethalFloor())
             return;
 
@@ -358,6 +399,25 @@ public class BotCombatTask : Task
 
         UpdateFight(_state.Target, useInjectedHandler: true);
     }
+
+    internal static bool IsWithinNavigableQuestTargetVolume(
+        Vector3 botPosition,
+        Vector3 targetPosition,
+        float navigationSurfaceZ,
+        float searchRadius)
+    {
+        if (searchRadius <= 0f || Vector3.Distance(botPosition, targetPosition) > searchRadius)
+            return false;
+
+        // A zero/negative height is the host's sentinel for maps without usable
+        // height data. When height data exists, reject cave/flying fixtures that
+        // the simple heightmap mover would project onto a different surface.
+        return navigationSurfaceZ <= 0f ||
+               Math.Abs(navigationSurfaceZ - targetPosition.Z) <= MaximumQuestTargetSurfaceOffset;
+    }
+
+    private static float QuestTargetSearchRadius() =>
+        Math.Min(MaximumQuestTargetSearchRadius, Math.Max(0f, (float)BotConfig.Instance.SearchRadius));
 
     private void UpdateDueling()
     {

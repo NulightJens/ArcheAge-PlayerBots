@@ -44,6 +44,20 @@ To prove an already authenticated native character can enter a gameplay world, u
 5. Confirm acquisition, movement, facing, legal casts, kill credit, target release, and Idle recovery.
 6. Run `/removebot <id>` and confirm normal logout with no retained runtime.
 
+## Selected native hunt gate
+
+Use a fresh or still-completable quest with exactly one active `QuestActObjMonsterHunt`. Never reset or repeat a completed nonrepeatable quest just to reuse a fixture.
+
+1. Inspect the quest and status, stage the bot within the isolated test runtime, and accept through the exact live starter. Use `/movebot ... teleport` only when fixture staging—not autonomous travel—is under test.
+2. Verify `/botquest status` shows the native Progress step, one exact monster-hunt act, and its current objective count.
+3. Use `/botquest nearby <id> <npcTemplateId>` and require at least one living, attackable candidate within the configured bounded radius and on the bot's navigation-height surface.
+4. Reset metrics and run `/botquest hunt <id> <questId>`. Do not issue manual attack or quest-progress commands during the sample.
+5. Require the live objective to advance through normal kill credit, a new exact target to be selected after each incomplete kill, and the executor to stop at its derived remaining goal.
+6. Require `/botstate` to return to automatic `Idle` with no target and `/botmetrics snapshot` to show observed kills equal credited kills with zero skipped ticks, runtime overlaps, and tick errors.
+7. Report at the exact live reporter and require the quest lifecycle to become completed.
+
+Also retain one fail-closed vertical case when available. A cave or stacked-world NPC that is close in planar distance but disagrees with the bot's navigation-height surface must be rejected before combat; do not count that rejection as route completion.
+
 ## Four-role party
 
 Use one Darkrunner, Primeval, Daggerspell, and Cleric.

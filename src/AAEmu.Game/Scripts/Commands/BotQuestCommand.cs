@@ -9,6 +9,7 @@ using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Compatibility;
 using AAEmu.Game.GameData;
 using AAEmu.Game.Models.Game;
+using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Items;
 using AAEmu.Game.Models.Game.NPChar;
@@ -22,7 +23,6 @@ using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Units.Static;
 using AAEmu.Game.Models.Tasks.Bots;
-using AAEmu.Game.Utils;
 using AAEmu.Game.Utils.Scripts;
 
 namespace AAEmu.Game.Scripts.Commands;
@@ -35,7 +35,7 @@ namespace AAEmu.Game.Scripts.Commands;
 public sealed class BotQuestCommand : ICommand
 {
     internal const float DefaultScanRadius = 35f;
-    internal const float MaximumScanRadius = 100f;
+    internal const float MaximumScanRadius = BotCombatTask.MaximumQuestTargetSearchRadius;
     internal const float InteractionRadius = 6f;
     internal const int MaximumLocateResults = 10;
 
@@ -44,11 +44,11 @@ public sealed class BotQuestCommand : ICommand
     public void OnLoad() => CommandManager.Instance.Register(CommandNames, this);
 
     public string GetCommandLineHelp() =>
-        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], locate <botId> <npcTemplateId>, inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, use <botId> <questId> <npcObjId>, acquire <botId> <questId> <npcObjId>, loot <botId> <questId> <corpseObjId>, report <botId> <questId> [rewardIndex]";
+        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], locate <botId> <npcTemplateId>, inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, hunt <botId> <questId>, use <botId> <questId> <npcObjId>, acquire <botId> <questId> <npcObjId>, loot <botId> <questId> <corpseObjId>, report <botId> <questId> [rewardIndex]";
 
     public string GetCommandHelpText() =>
-        "Locates exact NPC fixtures, explains a structured quest, and accepts/talks/uses supplied quest items/loots owned corpses/reports through AAEmu's normal quest, skill, and loot machinery. " +
-        "NPC-group starters, team-shared talk acts, foreign or team-tagged corpses, and general autonomous objective execution are intentionally deferred.";
+        "Locates exact NPC fixtures, explains a structured quest, and accepts/talks/hunts/uses supplied quest items/loots owned corpses/reports through AAEmu's normal quest, combat, skill, and loot machinery. " +
+        "NPC-group starters and hunts, mixed kill objectives, team-shared talk acts, foreign or team-tagged corpses, and general autonomous quest chaining are intentionally deferred.";
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
     {
@@ -87,6 +87,9 @@ public sealed class BotQuestCommand : ICommand
                 break;
             case BotQuestVerb.Talk:
                 Talk(bot, request.QuestId, messageOutput);
+                break;
+            case BotQuestVerb.Hunt:
+                Hunt(bot, request.QuestId, messageOutput);
                 break;
             case BotQuestVerb.Use:
                 Use(bot, request.QuestId, request.TargetObjId, messageOutput);
@@ -146,6 +149,7 @@ public sealed class BotQuestCommand : ICommand
             case BotQuestVerb.Status:
             case BotQuestVerb.Accept:
             case BotQuestVerb.Talk:
+            case BotQuestVerb.Hunt:
                 if (args.Length != 3 ||
                     !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out var questId) || questId == 0)
                     return false;
@@ -289,6 +293,16 @@ public sealed class BotQuestCommand : ICommand
                         $"objective={gather.GetObjective(activeQuest)}/{gather.Count} " +
                         $"inventory={bot.Inventory.GetItemsCount(gather.ItemId)} cleanup={gather.Cleanup.ToString().ToLowerInvariant()}.");
                 }
+                foreach (var huntAct in currentStep.Components.Values
+                             .Where(component => component.IsCurrentlyActive)
+                             .SelectMany(component => component.Acts)
+                             .Where(act => act.Template is QuestActObjMonsterHunt))
+                {
+                    var hunt = (QuestActObjMonsterHunt)huntAct.Template;
+                    CommandManager.SendNormalText(this, messageOutput,
+                        $"monster_hunt act={huntAct.Id} npc={hunt.NpcId} " +
+                        $"objective={hunt.GetObjective(activeQuest)}/{hunt.Count}.");
+                }
             }
             return;
         }
@@ -431,6 +445,106 @@ public sealed class BotQuestCommand : ICommand
             $"Bot '{bot.Name}' talked for quest {questId} to npc template={target.Npc.TemplateId} " +
             $"obj={target.Npc.ObjId} distance={target.Distance:F1}m; advanced_acts=" +
             $"{objectivesAfter.Where((value, index) => value > objectivesBefore[index]).Count()}, native evaluation requested.");
+    }
+
+    private void Hunt(Character bot, uint questId, IMessageOutput messageOutput)
+    {
+        if (!bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not active for bot '{bot.Name}'.");
+            return;
+        }
+
+        if (activeQuest.Step != QuestComponentKind.Progress ||
+            !activeQuest.QuestSteps.TryGetValue(QuestComponentKind.Progress, out var progressStep))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} is not at an active monster-hunt objective step.");
+            return;
+        }
+
+        var activeActs = progressStep.Components.Values
+            .Where(component => component.IsCurrentlyActive)
+            .SelectMany(component => component.Acts)
+            .ToArray();
+        var templates = activeActs.Select(act => act.Template).ToArray();
+        var objectives = activeActs.Select(act => act.Template.GetObjective(activeQuest)).ToArray();
+        if (!TryGetExactHuntContract(templates, objectives,
+                out var targetNpcTemplateId, out var remainingKills, out var error))
+        {
+            CommandManager.SendErrorText(this, messageOutput, $"Quest {questId}: {error}");
+            return;
+        }
+
+        var selectionRadius = Math.Min(MaximumScanRadius,
+            Math.Max(0f, (float)BotConfig.Instance.SearchRadius));
+        if (selectionRadius <= 0f)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                "The configured bot search radius is zero; exact hunt target selection is disabled.");
+            return;
+        }
+
+        var candidates = WorldManager.GetAround<Npc>(bot, selectionRadius, true)
+            .Where(npc => npc.TemplateId == targetNpcTemplateId && !npc.IsDead &&
+                          ReferenceEquals(npc.ParentWorld, bot.ParentWorld) && bot.CanAttack(npc))
+            .Where(npc => BotCombatTask.IsWithinNavigableQuestTargetVolume(
+                bot.Transform.World.Position,
+                npc.Transform.World.Position,
+                bot.ParentWorld.GetHeight(
+                    npc.Transform.World.Position.X,
+                    npc.Transform.World.Position.Y),
+                selectionRadius))
+            .Select(npc => new { Npc = npc, Distance = Distance(bot, npc) })
+            .OrderBy(candidate => candidate.Distance)
+            .ThenBy(candidate => candidate.Npc.ObjId)
+            .ToArray();
+        if (candidates.Length == 0)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Quest {questId} has no living, attackable, heightmap-reachable npc template={targetNpcTemplateId} " +
+                $"within the bounded {selectionRadius:F1}m hunt radius. " +
+                "Routing and world-wide pursuit remain deferred.");
+            return;
+        }
+
+        var combatManager = BotCombatManager.Instance;
+        combatManager.StartListening(bot);
+        var combatState = combatManager.GetState(bot);
+        if (combatState == null || combatState.InDuel)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                combatState == null
+                    ? $"Bot '{bot.Name}' has no authoritative combat state."
+                    : $"Bot '{bot.Name}' cannot start a quest hunt during a duel.");
+            return;
+        }
+
+        BotManager.Instance.StopFollow(bot);
+        if (BotManager.Instance.GetBotState(bot.Id) is { } movementState)
+        {
+            movementState.FormationSlot = -1;
+            movementState.FormationColumns = 0;
+            movementState.FormationMemberCount = 0;
+            movementState.Destination = null;
+        }
+
+        combatManager.ResetCombat(bot);
+        bot.CurrentTarget = null;
+        combatManager.EnableCombat(bot, targetNpcTemplateId, remainingKills);
+        combatState = combatManager.GetState(bot);
+        combatState.StopAtTargetHpPercent = null;
+        combatState.NonlethalFloorReached = null;
+        combatState.LastKnownTargetPosition = null;
+        combatState.IsSearching = false;
+        combatManager.SetForcedState(bot, BotCombatStateType.Questing);
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' started native quest hunt {questId}: npc_template={targetNpcTemplateId}, " +
+            $"remaining_kills={remainingKills}, candidates={candidates.Length}, radius={selectionRadius:F1}m. " +
+            "The quest executor will select the nearest legal target and repeat until authoritative kill credit reaches the derived goal; " +
+            $"verify native progress with /botquest status {bot.Id} {questId}.");
     }
 
     private void Acquire(Character bot, uint questId, uint targetObjId, IMessageOutput messageOutput)
@@ -702,6 +816,46 @@ public sealed class BotQuestCommand : ICommand
     internal static bool AnyObjectiveAdvanced(IReadOnlyList<int> before, IReadOnlyList<int> after) =>
         before.Count == after.Count && before.Where((value, index) => after[index] > value).Any();
 
+    internal static bool TryGetExactHuntContract(
+        IReadOnlyList<QuestActTemplate> activeActs,
+        IReadOnlyList<int> objectives,
+        out uint targetNpcTemplateId,
+        out int remainingKills,
+        out string error)
+    {
+        targetNpcTemplateId = 0;
+        remainingKills = 0;
+        error = null;
+        if (activeActs == null || objectives == null || activeActs.Count != objectives.Count)
+        {
+            error = "active objective templates and native counters do not match.";
+            return false;
+        }
+
+        if (activeActs.Count != 1 || activeActs[0] is not QuestActObjMonsterHunt hunt)
+        {
+            error = $"scoped hunting requires exactly one active exact-NPC monster-hunt act; found {activeActs.Count}. " +
+                    "NPC groups and mixed objective sets are not selected automatically.";
+            return false;
+        }
+
+        if (hunt.NpcId == 0 || hunt.Count <= 0 || objectives[0] < 0 || objectives[0] > hunt.Count)
+        {
+            error = "the native monster-hunt act has an invalid NPC, count, or objective value.";
+            return false;
+        }
+
+        remainingKills = hunt.Count - objectives[0];
+        if (remainingKills == 0)
+        {
+            error = "the exact monster-hunt objective is already complete.";
+            return false;
+        }
+
+        targetNpcTemplateId = hunt.NpcId;
+        return true;
+    }
+
     internal static bool IsSupportedQuestUseSource(QuestActSupplyItem supply, Item item, uint questId) =>
         supply != null && item?.Template != null &&
         item.TemplateId == supply.ItemId &&
@@ -964,8 +1118,7 @@ public sealed class BotQuestCommand : ICommand
         _ => 0
     };
 
-    private static float Distance(Character bot, Npc npc) =>
-        (float)MathUtil.CalculateDistance(bot.Transform.World.Position, npc.Transform.World.Position);
+    private static float Distance(Character bot, Npc npc) => bot.GetDistanceTo(npc, true);
 
     private sealed record NearbyQuestNpc(
         Npc Npc,
@@ -983,6 +1136,7 @@ internal enum BotQuestVerb
     Status,
     Accept,
     Talk,
+    Hunt,
     Use,
     Acquire,
     Loot,

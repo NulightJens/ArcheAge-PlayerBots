@@ -1,7 +1,7 @@
 {
   "name": "ArcheAge PlayerBots",
   "id": "archeage-playerbots",
-  "version": "0.2.0-alpha.3",
+  "version": "0.2.0-alpha.4",
   "license": "GPL-3.0-or-later",
   "repository": "https://github.com/NulightJens/ArcheAge-PlayerBots",
   "modulePath": "modules/archeage-playerbots",

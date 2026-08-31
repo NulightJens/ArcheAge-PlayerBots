@@ -317,4 +317,161 @@ public class BotCombatTaskTests
         await Assert.That(state.KillGoal).IsNull();
         await Assert.That(state.KillCount).IsEqualTo(1);
     }
+
+    [Test]
+    public async Task Step_QuestingSelectsExactTargetsAndRepeatsUntilKillGoal()
+    {
+        var bot = BotTestFixture.MakeBot(21, Vector3.Zero);
+        var world = BotTestFixture.MakeWorld();
+        BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+        bot.Hp = 100;
+        bot.MaxHp = 100;
+
+        var wrongTemplate = new AAEmu.Game.Models.Game.NPChar.Npc
+        {
+            ObjId = 2101,
+            TemplateId = 99,
+            Template = new AAEmu.Game.Models.Game.NPChar.NpcTemplate { Scale = 1f },
+            Hp = 100,
+            MaxHp = 100
+        };
+        wrongTemplate.Transform.Local.SetPosition(new Vector3(1, 0, 0));
+        var first = new AAEmu.Game.Models.Game.NPChar.Npc
+        {
+            ObjId = 2102,
+            TemplateId = 42,
+            Template = new AAEmu.Game.Models.Game.NPChar.NpcTemplate { Scale = 1f },
+            Hp = 100,
+            MaxHp = 100
+        };
+        first.Transform.Local.SetPosition(new Vector3(2, 0, 0));
+        var second = new AAEmu.Game.Models.Game.NPChar.Npc
+        {
+            ObjId = 2103,
+            TemplateId = 42,
+            Template = new AAEmu.Game.Models.Game.NPChar.NpcTemplate { Scale = 1f },
+            Hp = 100,
+            MaxHp = 100
+        };
+        second.Transform.Local.SetPosition(new Vector3(4, 0, 0));
+        foreach (var npc in new[] { wrongTemplate, first, second })
+            world.SetNpc(npc.ObjId, npc);
+
+        var blackboard = WorldValues.Create(
+            bot,
+            (_, _) => [wrongTemplate, second, first],
+            (_, _) => [],
+            config: new BotConfig());
+        var state = new BotCombatState
+        {
+            BotId = bot.Id,
+            IsActive = true,
+            TargetTypeFilter = 42,
+            KillGoal = 2,
+            InDuel = true
+        };
+        state.TransitionTo(BotCombatStateType.Questing);
+        state.SetForcedState(BotCombatStateType.Questing);
+        var task = new BotCombatTask(
+            bot,
+            state,
+            new BotMovementBroadcaster(bot),
+            onCancel: null,
+            blackboard: blackboard,
+            heightProvider: (_, _) => 0f);
+
+        task.Step();
+        await Assert.That(state.Target).IsSameReferenceAs(first);
+
+        state.KillCount = 1;
+        first.Hp = 0;
+        task.Step();
+        task.Step();
+        await Assert.That(state.Target).IsSameReferenceAs(second);
+
+        state.KillCount = 2;
+        second.Hp = 0;
+        task.Step();
+        task.Step();
+
+        await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Idle);
+        await Assert.That(state.IsActive).IsFalse();
+        await Assert.That(state.KillGoal).IsNull();
+        await Assert.That(state.ForcedState).IsNull();
+    }
+
+    [Test]
+    public async Task QuestTargetVolumeRequiresThreeDimensionalRangeAndHeightmapAgreement()
+    {
+        var botPosition = new Vector3(10, 20, 100);
+
+        await Assert.That(BotCombatTask.IsWithinNavigableQuestTargetVolume(
+            botPosition,
+            new Vector3(13, 24, 100),
+            navigationSurfaceZ: 100,
+            searchRadius: 5)).IsTrue();
+        await Assert.That(BotCombatTask.IsWithinNavigableQuestTargetVolume(
+            botPosition,
+            new Vector3(10, 20, 161),
+            navigationSurfaceZ: 161,
+            searchRadius: 60)).IsFalse();
+        await Assert.That(BotCombatTask.IsWithinNavigableQuestTargetVolume(
+            botPosition,
+            new Vector3(13, 24, 100),
+            navigationSurfaceZ: 130,
+            searchRadius: 60)).IsFalse();
+        await Assert.That(BotCombatTask.IsWithinNavigableQuestTargetVolume(
+            botPosition,
+            new Vector3(121, 20, 100),
+            navigationSurfaceZ: 100,
+            searchRadius: BotCombatTask.MaximumQuestTargetSearchRadius)).IsFalse();
+    }
+
+    [Test]
+    public async Task Step_QuestingRejectsExactTargetOutsideThreeDimensionalSearchRadius()
+    {
+        var bot = BotTestFixture.MakeBot(22, new Vector3(10, 20, 100));
+        var world = BotTestFixture.MakeWorld();
+        BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+        bot.Hp = 100;
+        bot.MaxHp = 100;
+        var verticallyRemote = new AAEmu.Game.Models.Game.NPChar.Npc
+        {
+            ObjId = 2201,
+            TemplateId = 42,
+            Template = new AAEmu.Game.Models.Game.NPChar.NpcTemplate { Scale = 1f },
+            Hp = 100,
+            MaxHp = 100
+        };
+        verticallyRemote.Transform.Local.SetPosition(new Vector3(10, 20, 161));
+        world.SetNpc(verticallyRemote.ObjId, verticallyRemote);
+        var blackboard = WorldValues.Create(
+            bot,
+            (_, _) => [verticallyRemote],
+            (_, _) => [],
+            config: new BotConfig { SearchRadius = 60 });
+        var state = new BotCombatState
+        {
+            BotId = bot.Id,
+            IsActive = true,
+            TargetTypeFilter = 42,
+            KillGoal = 1,
+            InDuel = true
+        };
+        state.TransitionTo(BotCombatStateType.Questing);
+        state.SetForcedState(BotCombatStateType.Questing);
+        var task = new BotCombatTask(
+            bot,
+            state,
+            new BotMovementBroadcaster(bot),
+            onCancel: null,
+            blackboard: blackboard,
+            heightProvider: (_, _) => 0f);
+
+        task.Step();
+
+        await Assert.That(state.Target).IsNull();
+        await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Questing);
+        await Assert.That(state.KillCount).IsEqualTo(0);
+    }
 }

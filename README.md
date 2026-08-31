@@ -96,7 +96,7 @@ Run `/bot` in game for the quick command guide or `/help <command>` for exact ar
 | ArcheAge version | Status |
 | --- | --- |
 | 1.2 `r208022` | Supported on the documented AAEmu base |
-| 3.0.4.2 `r336598` | Experimental; native login/world entry plus one-bot lifecycle, class/gear, combat, exact-NPC quest, item-acquisition, and corpse-delivery paths are verified, but four-role and scale/recovery acceptance remain open |
+| 3.0.4.2 `r336598` | Experimental; native login/world entry plus one-bot lifecycle, class/gear, combat, exact-NPC quest, selected-hunt, item-acquisition, and corpse-delivery paths are verified, but four-role and scale/recovery acceptance remain open |
 
 PlayerBots uses a small, versioned AAEmu compatibility patch because AAEmu does not yet expose every lifecycle and command hook through a module API. The module remains a separate repository and the installer applies the matching integration automatically.
 
@@ -104,6 +104,7 @@ PlayerBots uses a small, versioned AAEmu compatibility patch because AAEmu does 
 
 - PlayerBots controls existing characters you select; it does not generate random bot accounts or claim automated quest, raid, or battleground completion.
 - Bots use direct pursuit and native collision, not navmesh navigation, so obstructed terrain can cause poor paths.
+- A GM can run one bounded selected-quest hunt for an exact nearby NPC template; autonomous quest selection, route planning, mixed objectives, and quest chaining are not implemented.
 - Jump presentation and stealth search behavior are still experimental.
 - No public server-capacity claim is made; measure your own server before increasing bot populations.
 - The 3.0 track is for isolated testing only until its remaining gameplay gates pass.

@@ -118,6 +118,10 @@ public class BotCommandsTests
         await Assert.That(talk.Verb).IsEqualTo(BotQuestVerb.Talk);
         await Assert.That(talk.QuestId).IsEqualTo(5304u);
         await Assert.That(BotQuestCommand.TryParse(["talk", "2", "5304", "3567"], out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryParse(["hunt", "2", "251"], out var hunt)).IsTrue();
+        await Assert.That(hunt.Verb).IsEqualTo(BotQuestVerb.Hunt);
+        await Assert.That(hunt.QuestId).IsEqualTo(251u);
+        await Assert.That(BotQuestCommand.TryParse(["hunt", "2", "251", "3475"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.TryParse(["use", "2", "293", "45678"], out var use)).IsTrue();
         await Assert.That(use.Verb).IsEqualTo(BotQuestVerb.Use);
         await Assert.That(use.QuestId).IsEqualTo(293u);
@@ -172,6 +176,43 @@ public class BotCommandsTests
         await Assert.That(BotQuestCommand.IsSupportedQuestLootSource(gather, lootItem, 293)).IsFalse();
         lootItem.TemplateId = 8243;
         await Assert.That(BotQuestCommand.IsSupportedQuestLootSource(gather, lootItem, 251)).IsFalse();
+    }
+
+    [Test]
+    public async Task BotQuest_HuntContractDerivesExactNpcAndOnlyRemainingNativeCount()
+    {
+        var component = new QuestComponentTemplate(new QuestTemplate());
+        QuestActTemplate[] activeActs =
+        [
+            new QuestActObjMonsterHunt(component) { NpcId = 3475, Count = 3 }
+        ];
+
+        var supported = BotQuestCommand.TryGetExactHuntContract(
+            activeActs, [1], out var npcTemplateId, out var remainingKills, out var error);
+
+        await Assert.That(supported).IsTrue();
+        await Assert.That(error).IsNull();
+        await Assert.That(npcTemplateId).IsEqualTo(3475u);
+        await Assert.That(remainingKills).IsEqualTo(2);
+    }
+
+    [Test]
+    public async Task BotQuest_HuntContractRejectsCompletedGroupedOrMixedObjectives()
+    {
+        var component = new QuestComponentTemplate(new QuestTemplate());
+        var exactHunt = new QuestActObjMonsterHunt(component) { NpcId = 3475, Count = 3 };
+        var groupedHunt = new QuestActObjMonsterGroupHunt(component) { QuestMonsterGroupId = 17, Count = 3 };
+        var talk = new QuestActObjTalk(component) { NpcId = 3512, Count = 1 };
+
+        await Assert.That(BotQuestCommand.TryGetExactHuntContract(
+            [exactHunt], [3], out _, out _, out var completedError)).IsFalse();
+        await Assert.That(completedError).Contains("already complete");
+        await Assert.That(BotQuestCommand.TryGetExactHuntContract(
+            [groupedHunt], [0], out _, out _, out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryGetExactHuntContract(
+            [exactHunt, talk], [0, 0], out _, out _, out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryGetExactHuntContract(
+            [exactHunt], [], out _, out _, out _)).IsFalse();
     }
 
     [Test]
@@ -455,6 +496,36 @@ public class BotCommandsTests
         finally
         {
             CultureInfo.CurrentCulture = previousCulture;
+        }
+    }
+
+    [Test]
+    public async Task MoveBot_TeleportUsesExplicitStagingPathAndClearsDestination()
+    {
+        var bot = AddBot(2);
+        _botManager.SetBotDestination(bot, 9, 9, 9);
+        var previousTeleporter = MoveBot.Teleporter;
+        Character teleportedBot = null;
+        var teleportedPosition = Vector3.Zero;
+        try
+        {
+            MoveBot.Teleporter = (candidate, x, y, z) =>
+            {
+                teleportedBot = candidate;
+                teleportedPosition = new Vector3(x, y, z);
+                _botManager.GetBotState(candidate.Id).Destination = null;
+            };
+
+            var output = Execute(new MoveBot(), "2", "12.5", "2", "3", "teleport");
+
+            await Assert.That(teleportedBot).IsSameReferenceAs(bot);
+            await Assert.That(teleportedPosition).IsEqualTo(new Vector3(12.5f, 2, 3));
+            await Assert.That(_botManager.GetBotState(bot.Id).Destination).IsNull();
+            await Assert.That(output.Messages.Single()).Contains("teleported for GM staging");
+        }
+        finally
+        {
+            MoveBot.Teleporter = previousTeleporter;
         }
     }
 

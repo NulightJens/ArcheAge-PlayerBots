@@ -66,6 +66,10 @@ public sealed class AAEmu30CompatibilityTests
         Assert.True(BotQuestCommand.TryParse(["talk", "2", "5304"], out var talk));
         Assert.Equal(BotQuestVerb.Talk, talk.Verb);
         Assert.Equal(5304u, talk.QuestId);
+        Assert.True(BotQuestCommand.TryParse(["hunt", "2", "251"], out var hunt));
+        Assert.Equal(BotQuestVerb.Hunt, hunt.Verb);
+        Assert.Equal(251u, hunt.QuestId);
+        Assert.False(BotQuestCommand.TryParse(["hunt", "2", "251", "3475"], out _));
         Assert.True(BotQuestCommand.TryParse(["report", "2", "330"], out var report));
         Assert.Equal(BotQuestVerb.Report, report.Verb);
         Assert.Equal(0, report.SelectedReward);
@@ -77,6 +81,17 @@ public sealed class AAEmu30CompatibilityTests
         Assert.True(BotQuestCommand.IsValidSelectedReward([1, 2], 2));
         Assert.True(BotQuestCommand.AnyObjectiveAdvanced([0, 0], [1, 0]));
         Assert.False(BotQuestCommand.AnyObjectiveAdvanced([1], [1]));
+
+        var component = new QuestComponentTemplate(new QuestTemplate());
+        QuestActTemplate[] huntActs =
+        [
+            new QuestActObjMonsterHunt(component) { NpcId = 3475, Count = 3 }
+        ];
+        Assert.True(BotQuestCommand.TryGetExactHuntContract(
+            huntActs, [1], out var npcTemplateId, out var remainingKills, out var huntError));
+        Assert.Null(huntError);
+        Assert.Equal(3475u, npcTemplateId);
+        Assert.Equal(2, remainingKills);
     }
 
     [Fact]

@@ -7,12 +7,12 @@ This runbook promotes the `3.0.4.2 r336598` track by evidence, not by configurat
 | Gate | State | Acceptance evidence |
 |---|---|---|
 | Asset identity | Passed | Client version, `game_pak`, both SQLite databases, SHA-256 provenance, SQLite integrity |
-| Host adapter | Passed | Active alpha-v4 patch, zero-error builds, installed-state checks for both tracks, 1,753 plus 4 skipped 1.2 tests, and 159/159 3.0 adapter tests |
+| Host adapter | Passed | Active alpha-v4 patch, zero-error builds, installed-state checks for both tracks, 1,759 plus 4 skipped 1.2 tests, and 159/159 3.0 adapter tests |
 | Server startup | Passed | Login/Game registration, module schema, unique ports, loopback status and `@system` metrics |
 | Client login/serializer | Passed once | Native account and character creation, character select, and world entry completed without serializer or DLL error |
 | One-bot lifecycle | Passed once | Rendered spawn/follow/combat, clean server restart, normal logout/re-add, zero overlap/error |
 | Class and equipment | Passed once | `/setclass` restored three Darkrunner trees/23 skills; `/kit` auto-equipped a grade-5 weapon and logout/re-add retained it |
-| Quest item and delivery | Passed once | Exact-NPC lifecycle, native item skill, cross-region travel, three owned corpse transfers, cleanup, and full-bag reward mail completed without fabricated state |
+| Quest objectives | Passed once | Exact-NPC lifecycle, three-kill native hunt loop, native item skill, cross-region travel, three owned corpse transfers, cleanup, and full-bag reward mail completed without fabricated state |
 | Four-role behavior | Open | Darkrunner, Primeval, caster, and Cleric perform legal movement/casts/recovery using 3.0 templates |
 | Scale and recovery | Open | 0/10/50/100 cohorts, approved 3.0 budget, normal logout, 60-second recovery, clean shutdown |
 
@@ -40,6 +40,8 @@ For the one-bot gate:
 2. Capture `/botmetrics reset`, then `/addbot <id>` and `/botstate <id> grind`.
 3. Verify world presence, movement, legal cast ranges, persistence, and normal `/removebot <id>` logout.
 4. Restart cleanly and repeat. Require zero `tickErrors`, `runtimeOverlaps`, `spawnFailures`, and `despawnFailures`.
+
+For a selected native hunt gate, use a fresh or still-completable quest with exactly one active exact-NPC monster-hunt act. Stage only in the isolated runtime, run `/botquest hunt <id> <questId>`, and require the live objective to advance by native kill credit, the executor to repeat until its derived goal, and target/state cleanup to automatic Idle. Require observed kills to equal credited kills and require zero skipped ticks, runtime overlaps, and tick errors. A candidate that disagrees with the bot's heightmap surface must fail before combat; this is a safety result, not route completion.
 
 For the four-role gate, explicitly observe skills whose 3.0 target semantics differ from 1.2: Dissonance `11943`, Health Lift `11991`, Shadow Step `12075`, Aranzeb's Boon `16004`, and Infuse `16783`. The role anchors remain Triple Slash `18131` at 4 m, Endless Arrows `14835` at 20 m, Flamebolt `10752` at 20 m, and Antithesis `10534` at 25 m. Runtime skill templates—not copied 1.2 constants—remain authoritative.
 
