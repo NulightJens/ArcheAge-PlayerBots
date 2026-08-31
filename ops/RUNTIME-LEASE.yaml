@@ -3,8 +3,8 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: provisioning
-    owner_task: PB-W00-bootstrap
+    status: available-for-isolated-runtime-provisioning
+    owner_task: null
     owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
@@ -13,8 +13,10 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: null
     claimed_at: 2026-08-31
-    released_at: null
-    cleanup_receipt: null
+    released_at: 2026-08-31
+    cleanup_receipt: no-runtime-started-install-build-unit-only
+    baseline_evidence: ops/evidence/aaemu12-integration-baseline-v1.yaml
+    availability_limit: An isolated versioned Game database must be assigned before starting Login or Game.
 
   aaemu30:
     status: game-stopped-dependencies-retained

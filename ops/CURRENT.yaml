@@ -27,10 +27,14 @@ runtime:
     observed_pid: 88204
     port: 3307
   aaemu12_clean_runtime:
-    state: provisioning-isolated-integration-v1
+    state: install-build-unit-green-runtime-pending
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
+    evidence_receipt: aaemu12-integration-baseline-v1
+    build: 0-errors-76-warnings
+    unit_tests: 1761-passed-4-intentional-skips-0-failed
+    runtime_boundary: No server process or database was started; physical runtime acceptance remains pending.
 
 control_tower:
   permanent_task: pending-create
@@ -38,7 +42,6 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Complete and receipt the isolated AAEmu 1.2 integration baseline.
   - Create and pin the permanent PB-000 Control Tower task in the saved PlayerBots project.
   - Resolve the three setup client IDs to final task IDs when worktree setup completes.
   - Monitor T-038, T-039, and T-040 without duplicating their work.

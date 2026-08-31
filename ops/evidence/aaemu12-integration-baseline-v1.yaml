@@ -1,0 +1,43 @@
+schema_version: 1
+id: aaemu12-integration-baseline-v1
+recorded_at: 2026-08-31
+verdict: green-install-build-unit
+
+fingerprint:
+  module_source_commit: 616b014fc4665edf7eb8eb563567d18ec938f361
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: afbb6aa2c5d379eb76ad339642c190f4185b4981815aa27c68d0680d28edd046
+  client_provenance_sha256_or_not_applicable: not-applicable-no-client-started
+  database_provenance: not-applicable-no-runtime-or-database-used
+  gate_definition_version: 1
+  command_and_environment_fingerprint: 8059afd9b58edc04d4e04da56d6a0f8d19da3f0d24fcc60fcc2e50b6db019bd0
+
+environment:
+  os: windows-10.0.26200-x64
+  dotnet_sdk: 10.0.302
+  reference_workspace: aaemu12_reference
+  integration_workspace: aaemu12_integration
+  installed_sql_sha256: c5bd4d43fb767837c7042dd2cc968decb69393876e5e5520a74aa721cc4eee5c
+
+commands:
+  install_check: Install-PlayerBots.ps1 -Track AAEmu12 -CheckOnly
+  install: Install-PlayerBots.ps1 -Track AAEmu12
+  build: dotnet build AAEmu.slnx --no-incremental
+  unit: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+
+results:
+  installer: passed
+  build_errors: 0
+  build_warnings: 76
+  unit_total: 1765
+  unit_succeeded: 1761
+  unit_skipped: 4
+  unit_failed: 0
+  reference_checkout_clean_after_gate: true
+  installed_module_checkout_clean: true
+
+retained_boundaries:
+  - Dependency and analyzer warnings remain visible; this gate did not alter dependency policy.
+  - No client, Login server, Game server, or database was started.
+  - Physical movement, combat, population, logout, and restart acceptance remain unproven in this receipt.
+  - The raw HTML test report remains outside Git in the integration host's TestResults directory.
