@@ -161,6 +161,67 @@ public class BotCombatTaskTests
     }
 
     [Test]
+    public async Task Step_ContainedCombatAtHealthFloorDisengagesBeforeAnotherAttack()
+    {
+        var bot = BotTestFixture.MakeBot(151, Vector3.Zero);
+        BotTestFixture.SetPrivateField(bot, "_parentWorld", BotTestFixture.MakeWorld());
+        bot.Hp = 100;
+        bot.MaxHp = 100;
+        var target = new FixedHealthCharacterMock
+        {
+            ObjId = 152,
+            Hp = 50,
+            FixedMaxHp = 100
+        };
+        target.Transform.Local.SetPosition(Vector3.One);
+        var handlerCalls = 0;
+        var state = new BotCombatState
+        {
+            BotId = bot.Id,
+            IsActive = true,
+            CurrentState = BotCombatStateType.Combat,
+            PreviousState = BotCombatStateType.Idle,
+            ForcedState = BotCombatStateType.Idle,
+            Target = target,
+            StopAtTargetHpPercent = 50
+        };
+        bot.CurrentTarget = target;
+        var task = new BotCombatTask(
+            bot,
+            state,
+            new BotMovementBroadcaster(bot),
+            onCancel: null,
+            handler: _ =>
+            {
+                handlerCalls++;
+                return true;
+            });
+
+        task.Step();
+
+        await Assert.That(handlerCalls).IsEqualTo(0);
+        await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Idle);
+        await Assert.That(state.Target).IsNull();
+        await Assert.That(bot.CurrentTarget).IsNull();
+        await Assert.That(state.StopAtTargetHpPercent).IsNull();
+    }
+
+    [Test]
+    public async Task HasReachedHpFloorUsesExactIntegerBoundary()
+    {
+        var target = new FixedHealthCharacterMock
+        {
+            ObjId = 153,
+            FixedMaxHp = 18849,
+            Hp = 9425
+        };
+
+        await Assert.That(BotCombatTask.HasReachedHpFloor(target, 50)).IsFalse();
+        target.Hp = 9424;
+        await Assert.That(BotCombatTask.HasReachedHpFloor(target, 50)).IsTrue();
+    }
+
+    [Test]
     public async Task Step_DeadCombatTargetDoesNotCreateCreditAndReturnsToGrinding()
     {
         var bot = BotTestFixture.MakeBot(16, Vector3.Zero);

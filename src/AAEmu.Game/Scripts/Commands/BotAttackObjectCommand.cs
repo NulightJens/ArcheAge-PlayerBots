@@ -12,7 +12,8 @@ namespace AAEmu.Game.Scripts.Commands;
 
 /// <summary>
 /// Starts a contained combat trial against one explicit NPC object. Bots return
-/// to Idle when that object dies instead of selecting another nearby hostile.
+/// to Idle when that object dies or reaches an optional non-lethal health floor
+/// instead of selecting another nearby hostile.
 /// </summary>
 public sealed class BotAttackObjectCommand : ICommand
 {
@@ -26,10 +27,10 @@ public sealed class BotAttackObjectCommand : ICommand
         CommandManager.Instance.Register(CommandNames, this);
     }
 
-    public string GetCommandLineHelp() => "<botId|all> <npcObjId> | status <npcObjId>";
+    public string GetCommandLineHelp() => "<botId|all> <npcObjId> [stopAtHpPercent] | status <npcObjId>";
 
     public string GetCommandHelpText() =>
-        "Directs active bots to one exact NPC object for a contained combat trial; survivors return to Idle when it dies.";
+        "Directs active bots to one exact NPC object for a contained combat trial; an optional 1-99% floor stops attacks non-lethally.";
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
     {
@@ -51,14 +52,19 @@ public sealed class BotAttackObjectCommand : ICommand
             return;
         }
 
-        if (args is not { Length: 2 } ||
+        if (args.Length is < 2 or > 3 ||
             !uint.TryParse(args[1], NumberStyles.None, CultureInfo.InvariantCulture, out var npcObjId) ||
             npcObjId == 0 ||
+            (args.Length == 3 && !TryParseStopAtHpPercent(args[2], out _)) ||
             !TryResolveBots(args[0], out var bots))
         {
             CommandManager.SendDefaultHelpText(this, messageOutput);
             return;
         }
+
+        byte? stopAtHpPercent = args.Length == 3
+            ? byte.Parse(args[2], NumberStyles.None, CultureInfo.InvariantCulture)
+            : null;
 
         var target = NpcResolver(bots, npcObjId);
         if (target == null || target.IsDead)
@@ -88,6 +94,7 @@ public sealed class BotAttackObjectCommand : ICommand
             runtime.CombatState.LastKnownTargetPosition = null;
             runtime.CombatState.KillGoal = null;
             runtime.CombatState.KillCount = 0;
+            runtime.CombatState.StopAtTargetHpPercent = stopAtHpPercent;
             runtime.CombatState.Target = target;
             bot.CurrentTarget = target;
             runtime.CombatState.IsActive = true;
@@ -103,7 +110,14 @@ public sealed class BotAttackObjectCommand : ICommand
 
         CommandManager.SendNormalText(this, messageOutput,
             $"Contained attack started: bots={engaged}, targetObjId={target.ObjId}, template={target.TemplateId}, " +
-            $"targetHp={target.Hp}/{target.MaxHp}, returnState=Idle, skipped={skipped}.");
+            $"targetHp={target.Hp}/{target.MaxHp}, stopAtHp={(stopAtHpPercent.HasValue ? $"{stopAtHpPercent}%" : "death")}, " +
+            $"returnState=Idle, skipped={skipped}.");
+    }
+
+    internal static bool TryParseStopAtHpPercent(string value, out byte percent)
+    {
+        return byte.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out percent) &&
+               percent is >= 1 and <= 99;
     }
 
     private static bool TryResolveBots(string selector, out List<Character> bots)

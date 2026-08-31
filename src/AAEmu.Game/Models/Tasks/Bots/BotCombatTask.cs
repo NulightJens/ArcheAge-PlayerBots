@@ -342,6 +342,18 @@ public class BotCombatTask : Task
             return;
         }
 
+        if (_state.StopAtTargetHpPercent is { } stopPercent &&
+            HasReachedHpFloor(_state.Target, stopPercent))
+        {
+            var target = _state.Target;
+            _state.Target = null;
+            _bot.CurrentTarget = null;
+            ExitTemporaryState();
+            Logger.Info($"BOT id={_bot.Id} ev=nonlethal_floor target={target.ObjId} " +
+                        $"hp={target.Hp}/{target.MaxHp} floor_pct={stopPercent}");
+            return;
+        }
+
         if (IsStealthed(_state.Target))
         {
             _state.LastKnownTargetPosition = _state.Target.Transform.World.Position;
@@ -544,6 +556,7 @@ public class BotCombatTask : Task
 
     private void ExitTemporaryState(bool resetRelaxedAfterCombat)
     {
+        _state.StopAtTargetHpPercent = null;
         _state.RestorePreviousState();
         _state.RevertToForcedState();
         BotManager.Instance.StopImmediately(_bot);
@@ -572,6 +585,12 @@ public class BotCombatTask : Task
     private static int HpPercent(Unit unit)
     {
         return (int)((float)unit.Hp / unit.MaxHp * 100);
+    }
+
+    internal static bool HasReachedHpFloor(Unit target, byte stopPercent)
+    {
+        return target != null && target.MaxHp > 0 &&
+               (long)target.Hp * 100 <= (long)target.MaxHp * stopPercent;
     }
 
     private bool TryDefend(out Unit attacker)

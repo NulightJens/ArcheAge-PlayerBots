@@ -65,9 +65,11 @@ These commands are useful for staging bots outside a normal party:
 | `/botfollow <id\|all> stop` | Stop direct follow |
 | `/botfollow <id\|all> status` | Show direct-follow status |
 | `/movebot <id> <x> <y> <z> [walk\|run]` | Move one bot toward coordinates |
-| `/botattackobject <id\|all> <npcObjId>` | Attack one exact NPC object |
+| `/botattackobject <id\|all> <npcObjId> [stopAtHpPercent]` | Attack one exact NPC object, optionally stopping non-lethally at 1-99% HP |
 | `/botreset <id>` | Clear current combat work and start a fresh target search |
 | `/botduel <id1> <id2>` | Start a duel between two bots |
+
+The optional `stopAtHpPercent` floor on `/botattackobject` is checked before each combat decision. Once the exact target reaches that 1-99% threshold, the bot clears the target and returns to `Idle`; the command does not write target HP directly.
 
 Direct follow accepts optional formation settings:
 

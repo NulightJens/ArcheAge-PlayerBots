@@ -103,6 +103,7 @@ namespace AAEmu.Game.Scripts.Commands
             // Handle "free" – release forced state through the combat manager.
             if (cmd == "free")
             {
+                combatState.StopAtTargetHpPercent = null;
                 BotCombatManager.Instance.SetForcedState(bot, null);
                 if (combatState.IsActive)
                     BotCombatManager.Instance.StartListening(bot);
@@ -128,6 +129,8 @@ namespace AAEmu.Game.Scripts.Commands
                 CommandManager.SendErrorText(this, messageOutput, $"Invalid state. Use: idle, grind, questing, roaming, following, resting, or free.");
                 return;
             }
+
+            combatState.StopAtTargetHpPercent = null;
 
             if (killGoal.HasValue)
             {

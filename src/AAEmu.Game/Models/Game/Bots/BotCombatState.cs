@@ -37,6 +37,12 @@ namespace AAEmu.Game.Models.Game.Bots
 
         // ---- Target ----
         public Unit Target { get; set; }
+        /// <summary>
+        /// Optional non-lethal floor for an explicitly contained attack. The combat
+        /// task disengages before its next decision once the target reaches this
+        /// percentage of maximum health.
+        /// </summary>
+        public byte? StopAtTargetHpPercent { get; set; }
         public bool SentRelaxedAfterCombat { get; set; }
 
         // ---- Rest ----

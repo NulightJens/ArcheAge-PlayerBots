@@ -6,6 +6,7 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ### Staged quest controls
 
+- Added an exact-target non-lethal health floor to `/botattackobject`, allowing normal bot combat to disengage at a requested 1-99% threshold for quest-item interactions without mutating target HP.
 - Added `/botquest scan`, `inspect`, `status`, `accept`, and `report` as bounded GM development controls for exact-NPC quest discovery and one selected quest lifecycle. This is a vertical slice, not an autonomous questing claim.
 - Expanded read-only quest inspection with exact NPC, NPC-group, doodad, item, distance, sphere, cleanup, and selective-reward fields so objective fixtures can be chosen from native data without guessing identifiers.
 - Added bounded read-only `/botquest nearby` exact-template inspection for live NPC object IDs, health, distance, and position.

@@ -166,6 +166,16 @@ public class BotCommandsTests
     }
 
     [Test]
+    public async Task BotAttackObject_NonLethalFloorAcceptsOnlyOneToNinetyNinePercent()
+    {
+        await Assert.That(BotAttackObjectCommand.TryParseStopAtHpPercent("50", out var percent)).IsTrue();
+        await Assert.That(percent).IsEqualTo((byte)50);
+        await Assert.That(BotAttackObjectCommand.TryParseStopAtHpPercent("0", out _)).IsFalse();
+        await Assert.That(BotAttackObjectCommand.TryParseStopAtHpPercent("100", out _)).IsFalse();
+        await Assert.That(BotAttackObjectCommand.TryParseStopAtHpPercent("half", out _)).IsFalse();
+    }
+
+    [Test]
     public async Task BotQuest_InspectActDescriptionsExposeExactNativeFixtureTargets()
     {
         var component = new QuestComponentTemplate(new QuestTemplate());
@@ -452,7 +462,8 @@ public class BotCommandsTests
             CurrentState = BotCombatStateType.Combat,
             ForcedState = BotCombatStateType.Grinding,
             IsActive = true,
-            Target = target
+            Target = target,
+            StopAtTargetHpPercent = 50
         };
         bot.CurrentTarget = target;
         _combatManager.States[bot.Id] = state;
@@ -466,6 +477,7 @@ public class BotCommandsTests
         await Assert.That(state.ForcedState).IsEqualTo(BotCombatStateType.Idle);
         await Assert.That(state.IsActive).IsFalse();
         await Assert.That(state.Target).IsNull();
+        await Assert.That(state.StopAtTargetHpPercent).IsNull();
         await Assert.That(bot.CurrentTarget).IsNull();
         await Assert.That(movement.FollowTarget).IsNull();
         await Assert.That(movement.Destination).IsNull();
