@@ -107,6 +107,7 @@ namespace AAEmu.Game.Scripts.Commands
             if (cmd == "free")
             {
                 combatState.StopAtTargetHpPercent = null;
+                combatState.NonlethalFloorReached = null;
                 BotCombatManager.Instance.SetForcedState(bot, null);
                 if (combatState.IsActive)
                     BotCombatManager.Instance.StartListening(bot);
@@ -134,6 +135,7 @@ namespace AAEmu.Game.Scripts.Commands
             }
 
             combatState.StopAtTargetHpPercent = null;
+            combatState.NonlethalFloorReached = null;
 
             if (killGoal.HasValue)
             {

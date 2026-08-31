@@ -17,7 +17,10 @@ using AAEmu.Game.Models.Game.Quests.Static;
 using AAEmu.Game.Models.Game.Quests.Templates;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Skills.Static;
+using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
+using AAEmu.Game.Models.Game.Units.Static;
+using AAEmu.Game.Models.Tasks.Bots;
 using AAEmu.Game.Utils;
 using AAEmu.Game.Utils.Scripts;
 
@@ -39,7 +42,7 @@ public sealed class BotQuestCommand : ICommand
     public void OnLoad() => CommandManager.Instance.Register(CommandNames, this);
 
     public string GetCommandLineHelp() =>
-        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, use <botId> <questId> <npcObjId>, report <botId> <questId> [rewardIndex]";
+        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, use <botId> <questId> <npcObjId>, acquire <botId> <questId> <npcObjId>, report <botId> <questId> [rewardIndex]";
 
     public string GetCommandHelpText() =>
         "Scans nearby NPC quest relations, explains a structured quest, or accepts/talks/uses supplied quest items/reports through AAEmu's normal quest and skill machinery. " +
@@ -82,6 +85,9 @@ public sealed class BotQuestCommand : ICommand
                 break;
             case BotQuestVerb.Use:
                 Use(bot, request.QuestId, request.TargetObjId, messageOutput);
+                break;
+            case BotQuestVerb.Acquire:
+                Acquire(bot, request.QuestId, request.TargetObjId, messageOutput);
                 break;
             case BotQuestVerb.Report:
                 Report(bot, request.QuestId, request.SelectedReward, messageOutput);
@@ -131,6 +137,7 @@ public sealed class BotQuestCommand : ICommand
                 request = new BotQuestRequest(verb, botId, questId, 0, 0, 0f, 0);
                 return true;
             case BotQuestVerb.Use:
+            case BotQuestVerb.Acquire:
                 if (args.Length != 4 ||
                     !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out questId) || questId == 0 ||
                     !uint.TryParse(args[3], NumberStyles.None, CultureInfo.InvariantCulture, out var targetObjId) || targetObjId == 0)
@@ -388,58 +395,18 @@ public sealed class BotQuestCommand : ICommand
             $"{objectivesAfter.Where((value, index) => value > objectivesBefore[index]).Count()}, native evaluation requested.");
     }
 
-    private void Use(Character bot, uint questId, uint targetObjId, IMessageOutput messageOutput)
+    private void Acquire(Character bot, uint questId, uint targetObjId, IMessageOutput messageOutput)
     {
-        if (!bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
+        if (!TryResolveQuestItemUse(bot, questId, out _, out _, out _, out var skillTemplate, out var error))
         {
-            CommandManager.SendErrorText(this, messageOutput,
-                $"Quest {questId} is not active for bot '{bot.Name}'.");
+            CommandManager.SendErrorText(this, messageOutput, error);
             return;
         }
 
-        if (activeQuest.Step != QuestComponentKind.Progress ||
-            !activeQuest.QuestSteps.TryGetValue(QuestComponentKind.Progress, out var progressStep))
+        if (!TryGetNativeAcquisitionContract(skillTemplate, questId,
+                out var targetNpcTemplateId, out var healthFloor, out error))
         {
-            CommandManager.SendErrorText(this, messageOutput,
-                $"Quest {questId} is not at an active item-gather objective step.");
-            return;
-        }
-
-        var gatherActs = progressStep.Components.Values
-            .Where(component => component.IsCurrentlyActive)
-            .SelectMany(component => component.Acts)
-            .Where(act => act.Template is QuestActObjItemGather)
-            .ToArray();
-        if (gatherActs.Length != 1)
-        {
-            CommandManager.SendErrorText(this, messageOutput,
-                $"Quest {questId} requires exactly one active item-gather act for scoped item use; found {gatherActs.Length}.");
-            return;
-        }
-
-        var supplyActs = activeQuest.QuestSteps
-            .GetValueOrDefault(QuestComponentKind.Supply)?.Components.Values
-            .SelectMany(component => component.Acts)
-            .Where(act => act.Template is QuestActSupplyItem)
-            .ToArray() ?? [];
-        var sourceItems = new List<Item>();
-        foreach (var supplyAct in supplyActs)
-        {
-            var supply = (QuestActSupplyItem)supplyAct.Template;
-            if (!bot.Inventory.GetAllItemsByTemplate([SlotType.Inventory], supply.ItemId, -1,
-                    out var matchingItems, out _))
-                continue;
-            sourceItems.AddRange(matchingItems.Where(item => IsSupportedQuestUseSource(supply, item, questId)));
-        }
-
-        sourceItems = sourceItems
-            .Where(item => item != null)
-            .DistinctBy(item => item.Id)
-            .ToList();
-        if (sourceItems.Count != 1)
-        {
-            CommandManager.SendErrorText(this, messageOutput,
-                $"Quest {questId} requires exactly one carried quest-linked supply item with a native use skill; found {sourceItems.Count}.");
+            CommandManager.SendErrorText(this, messageOutput, error);
             return;
         }
 
@@ -451,16 +418,55 @@ public sealed class BotQuestCommand : ICommand
             return;
         }
 
-        var sourceItem = sourceItems[0];
-        var skillTemplate = SkillManager.Instance.GetSkillTemplate(sourceItem.Template.UseSkillId);
-        if (skillTemplate == null)
+        if (target.TemplateId != targetNpcTemplateId)
         {
             CommandManager.SendErrorText(this, messageOutput,
-                $"Quest {questId} supply item {sourceItem.TemplateId} references missing skill {sourceItem.Template.UseSkillId}.");
+                $"Quest {questId} item skill {skillTemplate.Id} requires npc template={targetNpcTemplateId}; " +
+                $"selected object {target.ObjId} is template={target.TemplateId}.");
             return;
         }
 
-        var gather = (QuestActObjItemGather)gatherActs[0].Template;
+        if (BotCombatTask.HasReachedHpFloor(target, healthFloor))
+        {
+            Use(bot, questId, targetObjId, messageOutput);
+            return;
+        }
+
+        if (!BotAttackObjectCommand.TryStartContainedAttack(
+                bot,
+                target,
+                healthFloor,
+                () => Use(bot, questId, targetObjId, messageOutput),
+                out error))
+        {
+            CommandManager.SendErrorText(this, messageOutput, error);
+            return;
+        }
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' started native acquisition for quest {questId}: npc={target.TemplateId}:{target.ObjId} " +
+            $"hp={target.Hp}/{target.MaxHp}, derived_floor={healthFloor}%, item_skill={skillTemplate.Id}. " +
+            $"Contained combat will disengage and launch the selected quest item once AAEmu's target-health requirement is met; " +
+            $"verify the delayed native result with /botquest status {bot.Id} {questId}.");
+    }
+
+    private void Use(Character bot, uint questId, uint targetObjId, IMessageOutput messageOutput)
+    {
+        if (!TryResolveQuestItemUse(bot, questId, out var activeQuest, out var gather,
+                out var sourceItem, out var skillTemplate, out var error))
+        {
+            CommandManager.SendErrorText(this, messageOutput, error);
+            return;
+        }
+
+        var target = bot.ParentWorld?.GetNpc(targetObjId);
+        if (target == null || target.IsDead || !ReferenceEquals(target.ParentWorld, bot.ParentWorld))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Living NPC object {targetObjId} was not found in bot '{bot.Name}'s world.");
+            return;
+        }
+
         var distance = Distance(bot, target);
         var objectiveBefore = gather.GetObjective(activeQuest);
         var inventoryBefore = bot.Inventory.GetItemsCount(gather.ItemId);
@@ -604,6 +610,136 @@ public sealed class BotQuestCommand : ICommand
         item.Template.LootQuestId == questId &&
         item.Template.UseSkillId != 0;
 
+    private static bool TryResolveQuestItemUse(
+        Character bot,
+        uint questId,
+        out Quest activeQuest,
+        out QuestActObjItemGather gather,
+        out Item sourceItem,
+        out SkillTemplate skillTemplate,
+        out string error)
+    {
+        activeQuest = null;
+        gather = null;
+        sourceItem = null;
+        skillTemplate = null;
+        error = null;
+
+        if (!bot.Quests.ActiveQuests.TryGetValue(questId, out activeQuest))
+        {
+            error = $"Quest {questId} is not active for bot '{bot.Name}'.";
+            return false;
+        }
+
+        if (activeQuest.Step != QuestComponentKind.Progress ||
+            !activeQuest.QuestSteps.TryGetValue(QuestComponentKind.Progress, out var progressStep))
+        {
+            error = $"Quest {questId} is not at an active item-gather objective step.";
+            return false;
+        }
+
+        var gatherActs = progressStep.Components.Values
+            .Where(component => component.IsCurrentlyActive)
+            .SelectMany(component => component.Acts)
+            .Where(act => act.Template is QuestActObjItemGather)
+            .ToArray();
+        if (gatherActs.Length != 1)
+        {
+            error = $"Quest {questId} requires exactly one active item-gather act for scoped item use; found {gatherActs.Length}.";
+            return false;
+        }
+
+        var supplyActs = activeQuest.QuestSteps
+            .GetValueOrDefault(QuestComponentKind.Supply)?.Components.Values
+            .SelectMany(component => component.Acts)
+            .Where(act => act.Template is QuestActSupplyItem)
+            .ToArray() ?? [];
+        var sourceItems = new List<Item>();
+        foreach (var supplyAct in supplyActs)
+        {
+            var supply = (QuestActSupplyItem)supplyAct.Template;
+            if (!bot.Inventory.GetAllItemsByTemplate([SlotType.Inventory], supply.ItemId, -1,
+                    out var matchingItems, out _))
+                continue;
+            sourceItems.AddRange(matchingItems.Where(item => IsSupportedQuestUseSource(supply, item, questId)));
+        }
+
+        sourceItems = sourceItems
+            .Where(item => item != null)
+            .DistinctBy(item => item.Id)
+            .ToList();
+        if (sourceItems.Count != 1)
+        {
+            error = $"Quest {questId} requires exactly one carried quest-linked supply item with a native use skill; found {sourceItems.Count}.";
+            return false;
+        }
+
+        sourceItem = sourceItems[0];
+        skillTemplate = SkillManager.Instance.GetSkillTemplate(sourceItem.Template.UseSkillId);
+        if (skillTemplate == null)
+        {
+            error = $"Quest {questId} supply item {sourceItem.TemplateId} references missing skill {sourceItem.Template.UseSkillId}.";
+            return false;
+        }
+
+        gather = (QuestActObjItemGather)gatherActs[0].Template;
+        return true;
+    }
+
+    internal static bool TryGetNativeAcquisitionContract(
+        SkillTemplate skillTemplate,
+        uint questId,
+        out uint targetNpcTemplateId,
+        out byte healthFloor,
+        out string error)
+    {
+        var requirements = skillTemplate == null
+            ? []
+            : UnitRequirementsGameData.Instance.GetSkillRequirements(skillTemplate.Id);
+        return TryGetNativeAcquisitionContract(
+            skillTemplate, questId, requirements, out targetNpcTemplateId, out healthFloor, out error);
+    }
+
+    internal static bool TryGetNativeAcquisitionContract(
+        SkillTemplate skillTemplate,
+        uint questId,
+        IReadOnlyList<UnitReqs> requirements,
+        out uint targetNpcTemplateId,
+        out byte healthFloor,
+        out string error)
+    {
+        targetNpcTemplateId = 0;
+        healthFloor = 0;
+        error = null;
+        if (skillTemplate == null)
+        {
+            error = "A native skill template is required for item acquisition.";
+            return false;
+        }
+
+        if (skillTemplate.OrUnitReqs)
+        {
+            error = $"Skill {skillTemplate.Id} uses alternative unit-requirement branches; automatic acquisition refuses an ambiguous target contract.";
+            return false;
+        }
+
+        var targetNpc = requirements.Where(requirement => requirement.KindType == UnitReqsKindType.TargetNpc).ToArray();
+        var targetHealth = requirements.Where(requirement => requirement.KindType == UnitReqsKindType.TargetHealthLessThan).ToArray();
+        var questContexts = requirements.Where(requirement => requirement.KindType == UnitReqsKindType.ProgressQuestContext).ToArray();
+        if (targetNpc.Length != 1 || targetNpc[0].Value1 == 0 || targetHealth.Length != 1 ||
+            questContexts.Length != 1 || questContexts[0].Value1 != questId ||
+            targetHealth[0].Value1 > targetHealth[0].Value2 ||
+            targetHealth[0].Value2 is < 1 or > 99)
+        {
+            error = $"Skill {skillTemplate.Id} does not expose one exact NPC, one 1-99% target-health ceiling, and one matching progress-quest context for quest {questId}.";
+            return false;
+        }
+
+        targetNpcTemplateId = targetNpc[0].Value1;
+        healthFloor = (byte)targetHealth[0].Value2;
+        return true;
+    }
+
     internal static SkillResult UseWithSelectedTarget(Character bot, Npc target, Func<SkillResult> useSkill)
     {
         // AAEmu validates UnitReqs against CurrentTarget before it resolves the
@@ -720,6 +856,7 @@ internal enum BotQuestVerb
     Accept,
     Talk,
     Use,
+    Acquire,
     Report
 }
 

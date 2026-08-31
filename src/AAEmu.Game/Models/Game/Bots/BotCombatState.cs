@@ -43,6 +43,7 @@ namespace AAEmu.Game.Models.Game.Bots
         /// percentage of maximum health.
         /// </summary>
         public byte? StopAtTargetHpPercent { get; set; }
+        internal Action NonlethalFloorReached { get; set; }
         public bool SentRelaxedAfterCombat { get; set; }
 
         // ---- Rest ----

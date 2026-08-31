@@ -130,7 +130,7 @@ Some Magnificent families do not contain a literal seven-piece armor set, bow, o
 
 ## Staged quest development
 
-These commands expose a deliberately narrow quest vertical slice for GM testing. They do not enable autonomous quest selection or objective execution.
+These commands expose deliberately narrow quest vertical slices for GM testing. They do not enable autonomous quest selection, routing, or objective chaining.
 
 | Command | Purpose |
 | --- | --- |
@@ -141,11 +141,12 @@ These commands expose a deliberately narrow quest vertical slice for GM testing.
 | `/botquest accept <id> <questId>` | Accept through AAEmu's normal lifecycle while within 6 meters of the exact starter |
 | `/botquest talk <id> <questId>` | Advance only that active quest's exact-NPC talk acts within 6 meters; team-shared acts fail closed |
 | `/botquest use <id> <questId> <npcObjId>` | Use that selected quest's one carried quest-linked supply item against one exact living NPC through AAEmu's native item-skill engine |
+| `/botquest acquire <id> <questId> <npcObjId>` | Derive one exact NPC and health ceiling from the selected quest item's native skill requirements, run contained combat to that ceiling, disengage, and launch the native item skill |
 | `/botquest report <id> <questId> [rewardIndex]` | Report only that selected active quest while within 6 meters of its exact reporter |
 
-Only plain exact-NPC starters, talk objectives, reporters, and the narrow selected-quest supply-item path are supported in this milestone. `use` requires the selected quest to be active at Progress with exactly one active item-gather act and exactly one carried Supply item whose native template links it to that quest and defines a use skill. It asks AAEmu to cast that real item skill; a successful command means the cast started, not that the objective advanced. After any channel time, verify the native result with `/botquest status` and its `item_gather` line.
+Only plain exact-NPC starters, talk objectives, reporters, and the narrow selected-quest supply-item path are supported in this milestone. `use` requires the selected quest to be active at Progress with exactly one active item-gather act and exactly one carried Supply item whose native template links it to that quest and defines a use skill. It asks AAEmu to cast that real item skill; a successful command means the cast started, not that the objective advanced. `acquire` adds one bounded combat executor: the item's skill must expose one non-OR requirement set containing exactly one target NPC template, one 1-99% target-health ceiling, and the matching progress-quest context. The caller still selects the exact live object; ambiguous native requirements fail closed. After any channel time, verify the result with `/botquest status` and its `item_gather` line.
 
-NPC groups, team-shared talk acts, general-purpose item use, corpse looting, delivery/report-item policy, emotion, kill-trigger starters, autonomous kill/travel/item objectives, and reward-choice policy remain future work. Use `/movebot` to stage the bot between exact live objects during controlled tests.
+NPC groups, team-shared talk acts, general-purpose item use, corpse looting, delivery/report-item policy, emotion, kill-trigger starters, autonomous target discovery, kill/travel objectives, objective chaining, and reward-choice policy remain future work. Use `/movebot` to stage the bot between exact live objects during controlled tests.
 
 Inspection is read-only. For supported act types it reports the exact NPC, NPC-group, doodad, item, distance, sphere, cleanup, and selective-reward fields loaded by AAEmu; a printed identifier is evidence about the quest template, not permission to fabricate that fixture or advance the objective.
 The `nearby` verb is also read-only and is intended to resolve exact live object IDs for native fixtures instead of guessing object allocation order.

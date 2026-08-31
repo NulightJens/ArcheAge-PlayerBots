@@ -175,6 +175,7 @@ public class BotCombatTaskTests
         };
         target.Transform.Local.SetPosition(Vector3.One);
         var handlerCalls = 0;
+        var floorCallbackCalls = 0;
         var state = new BotCombatState
         {
             BotId = bot.Id,
@@ -183,7 +184,8 @@ public class BotCombatTaskTests
             PreviousState = BotCombatStateType.Idle,
             ForcedState = BotCombatStateType.Idle,
             Target = target,
-            StopAtTargetHpPercent = 50
+            StopAtTargetHpPercent = 50,
+            NonlethalFloorReached = () => floorCallbackCalls++
         };
         bot.CurrentTarget = target;
         var task = new BotCombatTask(
@@ -200,10 +202,12 @@ public class BotCombatTaskTests
         task.Step();
 
         await Assert.That(handlerCalls).IsEqualTo(0);
+        await Assert.That(floorCallbackCalls).IsEqualTo(1);
         await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Idle);
         await Assert.That(state.Target).IsNull();
         await Assert.That(bot.CurrentTarget).IsNull();
         await Assert.That(state.StopAtTargetHpPercent).IsNull();
+        await Assert.That(state.NonlethalFloorReached == null).IsTrue();
     }
 
     [Test]

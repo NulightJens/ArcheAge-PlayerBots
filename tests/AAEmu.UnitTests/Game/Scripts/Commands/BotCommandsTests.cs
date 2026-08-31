@@ -17,6 +17,7 @@ using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Skills.Static;
 using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
+using AAEmu.Game.Models.Game.Units.Static;
 using AAEmu.Game.Scripts.Commands;
 using AAEmu.Game.Utils.Scripts;
 using AAEmu.UnitTests.Utils.Mocks;
@@ -119,6 +120,11 @@ public class BotCommandsTests
         await Assert.That(use.TargetObjId).IsEqualTo(45678u);
         await Assert.That(BotQuestCommand.TryParse(["use", "2", "293"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.TryParse(["use", "2", "293", "0"], out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryParse(["acquire", "2", "293", "45678"], out var acquire)).IsTrue();
+        await Assert.That(acquire.Verb).IsEqualTo(BotQuestVerb.Acquire);
+        await Assert.That(acquire.QuestId).IsEqualTo(293u);
+        await Assert.That(acquire.TargetObjId).IsEqualTo(45678u);
+        await Assert.That(BotQuestCommand.TryParse(["acquire", "2", "293"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.TryParse(["report", "2", "330", "1"], out var report)).IsTrue();
         await Assert.That(report.Verb).IsEqualTo(BotQuestVerb.Report);
         await Assert.That(report.QuestId).IsEqualTo(330u);
@@ -184,6 +190,45 @@ public class BotCommandsTests
         await Assert.That(exactTargetWasSelected).IsTrue();
         await Assert.That(result).IsEqualTo(SkillResult.Success);
         await Assert.That(bot.CurrentTarget).IsSameReferenceAs(questTarget);
+    }
+
+    [Test]
+    public async Task BotQuest_AcquisitionContractDerivesExactNativeNpcAndHealthFloor()
+    {
+        var skill = new SkillTemplate { Id = 11684, OrUnitReqs = false };
+        UnitReqs[] requirements =
+        [
+            new() { KindType = UnitReqsKindType.TargetHealthLessThan, Value1 = 1, Value2 = 50 },
+            new() { KindType = UnitReqsKindType.TargetNpc, Value1 = 3460 },
+            new() { KindType = UnitReqsKindType.ProgressQuestContext, Value1 = 293 }
+        ];
+
+        var supported = BotQuestCommand.TryGetNativeAcquisitionContract(
+            skill, 293, requirements, out var npcTemplateId, out var healthFloor, out var error);
+
+        await Assert.That(supported).IsTrue();
+        await Assert.That(error).IsNull();
+        await Assert.That(npcTemplateId).IsEqualTo(3460u);
+        await Assert.That(healthFloor).IsEqualTo((byte)50);
+    }
+
+    [Test]
+    public async Task BotQuest_AcquisitionContractRejectsAmbiguousOrMismatchedNativeRequirements()
+    {
+        var skill = new SkillTemplate { Id = 11684, OrUnitReqs = true };
+        UnitReqs[] requirements =
+        [
+            new() { KindType = UnitReqsKindType.TargetHealthLessThan, Value1 = 1, Value2 = 50 },
+            new() { KindType = UnitReqsKindType.TargetNpc, Value1 = 3460 },
+            new() { KindType = UnitReqsKindType.ProgressQuestContext, Value1 = 293 }
+        ];
+
+        await Assert.That(BotQuestCommand.TryGetNativeAcquisitionContract(
+            skill, 293, requirements, out _, out _, out _)).IsFalse();
+
+        skill.OrUnitReqs = false;
+        await Assert.That(BotQuestCommand.TryGetNativeAcquisitionContract(
+            skill, 294, requirements, out _, out _, out _)).IsFalse();
     }
 
     [Test]

@@ -77,42 +77,11 @@ public sealed class BotAttackObjectCommand : ICommand
         var skipped = 0;
         foreach (var bot in bots.OrderBy(candidate => candidate.Id))
         {
-            var runtime = BotHost.Instance.GetRuntime(bot.Id);
-            if (runtime == null || bot.ParentWorld == null ||
-                !ReferenceEquals(bot.ParentWorld, target.ParentWorld) || !bot.CanAttack(target))
+            if (!TryStartContainedAttack(bot, target, stopAtHpPercent, null, out _))
             {
                 skipped++;
                 continue;
             }
-
-            // The combat manager owns the state consumed by BotCombatTask. A
-            // retained movement runtime can temporarily carry a different combat
-            // state after a bot is despawned and respawned (for example by
-            // /setclass). Reattach the brain first, then arm the manager's
-            // authoritative state so the health floor cannot be written only to
-            // a stale runtime object.
-            var combatState = EnsureAuthoritativeCombatState(bot);
-            if (combatState == null)
-            {
-                skipped++;
-                continue;
-            }
-
-            BotManager.Instance.StopFollow(bot);
-            runtime.MovementState.FormationSlot = -1;
-            runtime.MovementState.FormationColumns = 0;
-            runtime.MovementState.FormationMemberCount = 0;
-            runtime.MovementState.Destination = null;
-            combatState.TargetTypeFilter = null;
-            combatState.LastKnownTargetPosition = null;
-            combatState.KillGoal = null;
-            combatState.KillCount = 0;
-            combatState.StopAtTargetHpPercent = stopAtHpPercent;
-            combatState.Target = target;
-            bot.CurrentTarget = target;
-            combatState.IsActive = true;
-            combatState.SetForcedState(BotCombatStateType.Idle);
-            combatState.TransitionTo(BotCombatStateType.Combat);
             engaged++;
         }
 
@@ -133,6 +102,60 @@ public sealed class BotAttackObjectCommand : ICommand
         var manager = BotCombatManager.Instance;
         manager.StartListening(bot);
         return manager.GetState(bot);
+    }
+
+    internal static bool TryStartContainedAttack(
+        Character bot,
+        Npc target,
+        byte? stopAtHpPercent,
+        Action onNonlethalFloorReached,
+        out string error)
+    {
+        error = null;
+        var runtime = BotHost.Instance.GetRuntime(bot.Id);
+        if (runtime == null)
+        {
+            error = $"Bot '{bot.Name}' has no active runtime.";
+            return false;
+        }
+
+        if (bot.ParentWorld == null || target == null || target.IsDead ||
+            !ReferenceEquals(bot.ParentWorld, target.ParentWorld) || !bot.CanAttack(target))
+        {
+            error = $"Bot '{bot.Name}' cannot attack the selected living NPC in its current world.";
+            return false;
+        }
+
+        // The combat manager owns the state consumed by BotCombatTask. A
+        // retained movement runtime can temporarily carry a different combat
+        // state after a bot is despawned and respawned (for example by
+        // /setclass). Reattach the brain first, then arm the manager's
+        // authoritative state so the health floor cannot be written only to
+        // a stale runtime object.
+        var combatState = EnsureAuthoritativeCombatState(bot);
+        if (combatState == null)
+        {
+            error = $"Bot '{bot.Name}' has no authoritative combat state.";
+            return false;
+        }
+
+        BotManager.Instance.StopFollow(bot);
+        runtime.MovementState.FormationSlot = -1;
+        runtime.MovementState.FormationColumns = 0;
+        runtime.MovementState.FormationMemberCount = 0;
+        runtime.MovementState.Destination = null;
+        combatState.TargetTypeFilter = null;
+        combatState.LastKnownTargetPosition = null;
+        combatState.KillGoal = null;
+        combatState.KillCount = 0;
+        combatState.StopAtTargetHpPercent = stopAtHpPercent;
+        combatState.NonlethalFloorReached = onNonlethalFloorReached;
+        combatState.Target = target;
+        bot.CurrentTarget = target;
+        combatState.IsActive = true;
+        combatState.SetForcedState(BotCombatStateType.Idle);
+        combatState.TransitionTo(BotCombatStateType.Combat);
+        return true;
     }
 
     private static bool TryResolveBots(string selector, out List<Character> bots)

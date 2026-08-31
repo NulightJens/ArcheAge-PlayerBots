@@ -549,6 +549,7 @@ public class BotCombatTask : Task
     private void ExitTemporaryState(bool resetRelaxedAfterCombat)
     {
         _state.StopAtTargetHpPercent = null;
+        _state.NonlethalFloorReached = null;
         _state.RestorePreviousState();
         _state.RevertToForcedState();
         BotManager.Instance.StopImmediately(_bot);
@@ -596,11 +597,24 @@ public class BotCombatTask : Task
         }
 
         var target = _state.Target;
+        var onFloorReached = _state.NonlethalFloorReached;
         _state.Target = null;
         _bot.CurrentTarget = null;
         ExitTemporaryState();
         Logger.Info($"BOT id={_bot.Id} ev=nonlethal_floor target={target.ObjId} " +
                     $"hp={target.Hp}/{target.MaxHp} floor_pct={stopPercent}");
+        if (onFloorReached != null)
+        {
+            try
+            {
+                onFloorReached();
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception,
+                    $"BOT id={_bot.Id} ev=nonlethal_floor_callback_failed target={target.ObjId}");
+            }
+        }
         return true;
     }
 
