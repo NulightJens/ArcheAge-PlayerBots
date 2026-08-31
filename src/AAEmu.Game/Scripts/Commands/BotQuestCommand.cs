@@ -6,6 +6,7 @@ using System.Linq;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Core.Managers.World;
+using AAEmu.Game.Compatibility;
 using AAEmu.Game.GameData;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
@@ -36,17 +37,18 @@ public sealed class BotQuestCommand : ICommand
     internal const float DefaultScanRadius = 35f;
     internal const float MaximumScanRadius = 100f;
     internal const float InteractionRadius = 6f;
+    internal const int MaximumLocateResults = 10;
 
     public string[] CommandNames { get; set; } = ["botquest"];
 
     public void OnLoad() => CommandManager.Instance.Register(CommandNames, this);
 
     public string GetCommandLineHelp() =>
-        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, use <botId> <questId> <npcObjId>, acquire <botId> <questId> <npcObjId>, report <botId> <questId> [rewardIndex]";
+        "scan <botId> [radius], nearby <botId> <npcTemplateId> [radius], locate <botId> <npcTemplateId>, inspect <botId> <questId>, status <botId> <questId>, accept <botId> <questId>, talk <botId> <questId>, use <botId> <questId> <npcObjId>, acquire <botId> <questId> <npcObjId>, loot <botId> <questId> <corpseObjId>, report <botId> <questId> [rewardIndex]";
 
     public string GetCommandHelpText() =>
-        "Scans nearby NPC quest relations, explains a structured quest, or accepts/talks/uses supplied quest items/reports through AAEmu's normal quest and skill machinery. " +
-        "NPC-group starters, team-shared talk acts, and general autonomous objective execution are intentionally deferred.";
+        "Locates exact NPC fixtures, explains a structured quest, and accepts/talks/uses supplied quest items/loots owned corpses/reports through AAEmu's normal quest, skill, and loot machinery. " +
+        "NPC-group starters, team-shared talk acts, foreign or team-tagged corpses, and general autonomous objective execution are intentionally deferred.";
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
     {
@@ -71,6 +73,9 @@ public sealed class BotQuestCommand : ICommand
             case BotQuestVerb.Nearby:
                 Nearby(bot, request.NpcTemplateId, request.Radius, messageOutput);
                 break;
+            case BotQuestVerb.Locate:
+                Locate(bot, request.NpcTemplateId, messageOutput);
+                break;
             case BotQuestVerb.Inspect:
                 Inspect(bot, request.QuestId, messageOutput);
                 break;
@@ -88,6 +93,9 @@ public sealed class BotQuestCommand : ICommand
                 break;
             case BotQuestVerb.Acquire:
                 Acquire(bot, request.QuestId, request.TargetObjId, messageOutput);
+                break;
+            case BotQuestVerb.Loot:
+                Loot(bot, request.QuestId, request.TargetObjId, messageOutput);
                 break;
             case BotQuestVerb.Report:
                 Report(bot, request.QuestId, request.SelectedReward, messageOutput);
@@ -127,6 +135,13 @@ public sealed class BotQuestCommand : ICommand
                     return false;
                 request = new BotQuestRequest(verb, botId, 0, npcTemplateId, 0, radius, 0);
                 return true;
+            case BotQuestVerb.Locate:
+                if (args.Length != 3 ||
+                    !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out npcTemplateId) ||
+                    npcTemplateId == 0)
+                    return false;
+                request = new BotQuestRequest(verb, botId, 0, npcTemplateId, 0, 0f, 0);
+                return true;
             case BotQuestVerb.Inspect:
             case BotQuestVerb.Status:
             case BotQuestVerb.Accept:
@@ -138,6 +153,7 @@ public sealed class BotQuestCommand : ICommand
                 return true;
             case BotQuestVerb.Use:
             case BotQuestVerb.Acquire:
+            case BotQuestVerb.Loot:
                 if (args.Length != 4 ||
                     !uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out questId) || questId == 0 ||
                     !uint.TryParse(args[3], NumberStyles.None, CultureInfo.InvariantCulture, out var targetObjId) || targetObjId == 0)
@@ -201,6 +217,28 @@ public sealed class BotQuestCommand : ICommand
         CommandManager.SendNormalText(this, messageOutput,
             $"Bot '{bot.Name}' exact NPC scan: template={npcTemplateId}, radius={radius:F1}m, matches={matches.Count}.");
         foreach (var match in matches)
+        {
+            var position = match.Npc.Transform.World.Position;
+            CommandManager.SendNormalText(this, messageOutput,
+                $"npc='{LocalizedNpcName(match.Npc)}' template={match.Npc.TemplateId} obj={match.Npc.ObjId} " +
+                $"hp={match.Npc.Hp}/{match.Npc.MaxHp} dead={match.Npc.IsDead.ToString().ToLowerInvariant()} " +
+                $"distance={match.Distance:F1}m position=({position.X:F1},{position.Y:F1},{position.Z:F1})");
+        }
+    }
+
+    private void Locate(Character bot, uint npcTemplateId, IMessageOutput messageOutput)
+    {
+        var matches = WorldManager.Instance.GetAllNpcsFromWorld(bot.Transform.WorldId)
+            .Where(npc => npc.TemplateId == npcTemplateId && ReferenceEquals(npc.ParentWorld, bot.ParentWorld))
+            .Select(npc => new { Npc = npc, Distance = Distance(bot, npc) })
+            .OrderBy(candidate => candidate.Distance)
+            .ThenBy(candidate => candidate.Npc.ObjId)
+            .ToList();
+
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' exact world locate: template={npcTemplateId}, matches={matches.Count}, " +
+            $"showing={Math.Min(matches.Count, MaximumLocateResults)}.");
+        foreach (var match in matches.Take(MaximumLocateResults))
         {
             var position = match.Npc.Transform.World.Position;
             CommandManager.SendNormalText(this, messageOutput,
@@ -495,6 +533,66 @@ public sealed class BotQuestCommand : ICommand
             $"inventory_before={inventoryBefore} channel_ms={skillTemplate.ChannelingTime}; verify completion with /botquest status {bot.Id} {questId}.");
     }
 
+    private void Loot(Character bot, uint questId, uint corpseObjId, IMessageOutput messageOutput)
+    {
+        if (!TryResolveQuestGather(bot, questId, out var activeQuest, out var gather, out var error))
+        {
+            CommandManager.SendErrorText(this, messageOutput, error);
+            return;
+        }
+
+        var corpse = bot.ParentWorld?.GetNpc(corpseObjId);
+        if (corpse == null || !corpse.IsDead || !ReferenceEquals(corpse.ParentWorld, bot.ParentWorld))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Dead NPC object {corpseObjId} was not found in bot '{bot.Name}'s world.");
+            return;
+        }
+
+        var distance = Distance(bot, corpse);
+        if (distance > InteractionRadius)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Bot '{bot.Name}' is {distance:F1}m from corpse {corpseObjId}; quest looting requires at most {InteractionRadius:F1}m.");
+            return;
+        }
+
+        if (!IsSupportedSoloLootOwner(bot, corpse))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Corpse {corpseObjId} is not exclusively tagged to bot '{bot.Name}'; scoped quest looting refuses team, unowned, or foreign claims.");
+            return;
+        }
+
+        var corpseLoot = PlayerBotsQuestLootAdapter.GetCorpseLoot(corpse);
+        var questLoot = corpseLoot
+            .Where(item => IsSupportedQuestLootSource(gather, item, questId))
+            .ToArray();
+        if (questLoot.Length != 1)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Corpse {corpseObjId} must contain exactly one native loot entry for quest {questId} item {gather.ItemId}; found {questLoot.Length}.");
+            return;
+        }
+
+        var objectiveBefore = gather.GetObjective(activeQuest);
+        var inventoryBefore = bot.Inventory.GetItemsCount(gather.ItemId);
+        var lootItem = questLoot[0];
+        if (!PlayerBotsQuestLootAdapter.TryTakeCorpseLoot(bot, corpse, lootItem, out var remainingCorpseItems))
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"AAEmu could not move quest {questId} loot item {gather.ItemId}:{lootItem.Id} into bot '{bot.Name}'s inventory; the corpse entry remains available.");
+            return;
+        }
+
+        var objectiveAfter = gather.GetObjective(activeQuest);
+        var inventoryAfter = bot.Inventory.GetItemsCount(gather.ItemId);
+        CommandManager.SendNormalText(this, messageOutput,
+            $"Bot '{bot.Name}' took native quest loot from npc={corpse.TemplateId}:{corpse.ObjId} distance={distance:F1}m " +
+            $"item={gather.ItemId}:{lootItem.Id} count={lootItem.Count} objective={objectiveBefore}->{objectiveAfter}/{gather.Count} " +
+            $"inventory={inventoryBefore}->{inventoryAfter}; remaining_corpse_items={remainingCorpseItems}.");
+    }
+
     private void Report(Character bot, uint questId, int selectedReward, IMessageOutput messageOutput)
     {
         if (!bot.Quests.ActiveQuests.TryGetValue(questId, out var activeQuest))
@@ -610,19 +708,27 @@ public sealed class BotQuestCommand : ICommand
         item.Template.LootQuestId == questId &&
         item.Template.UseSkillId != 0;
 
-    private static bool TryResolveQuestItemUse(
+    internal static bool IsSupportedQuestLootSource(QuestActObjItemGather gather, Item item, uint questId) =>
+        gather != null && item?.Template != null &&
+        item.TemplateId == gather.ItemId &&
+        item.Template.LootQuestId == questId;
+
+    internal static bool IsSupportedSoloLootOwner(Character bot, Npc corpse) =>
+        corpse?.CharacterTagging != null &&
+        IsSupportedSoloLootOwner(bot, corpse.CharacterTagging.Tagger, corpse.CharacterTagging.TagTeam);
+
+    internal static bool IsSupportedSoloLootOwner(Character bot, Character tagger, uint tagTeam) =>
+        bot != null && tagTeam == 0 && ReferenceEquals(tagger, bot);
+
+    private static bool TryResolveQuestGather(
         Character bot,
         uint questId,
         out Quest activeQuest,
         out QuestActObjItemGather gather,
-        out Item sourceItem,
-        out SkillTemplate skillTemplate,
         out string error)
     {
         activeQuest = null;
         gather = null;
-        sourceItem = null;
-        skillTemplate = null;
         error = null;
 
         if (!bot.Quests.ActiveQuests.TryGetValue(questId, out activeQuest))
@@ -645,9 +751,31 @@ public sealed class BotQuestCommand : ICommand
             .ToArray();
         if (gatherActs.Length != 1)
         {
-            error = $"Quest {questId} requires exactly one active item-gather act for scoped item use; found {gatherActs.Length}.";
+            error = $"Quest {questId} requires exactly one active item-gather act for scoped acquisition; found {gatherActs.Length}.";
             return false;
         }
+
+        gather = (QuestActObjItemGather)gatherActs[0].Template;
+        return true;
+    }
+
+    private static bool TryResolveQuestItemUse(
+        Character bot,
+        uint questId,
+        out Quest activeQuest,
+        out QuestActObjItemGather gather,
+        out Item sourceItem,
+        out SkillTemplate skillTemplate,
+        out string error)
+    {
+        activeQuest = null;
+        gather = null;
+        sourceItem = null;
+        skillTemplate = null;
+        error = null;
+
+        if (!TryResolveQuestGather(bot, questId, out activeQuest, out gather, out error))
+            return false;
 
         var supplyActs = activeQuest.QuestSteps
             .GetValueOrDefault(QuestComponentKind.Supply)?.Components.Values
@@ -682,7 +810,6 @@ public sealed class BotQuestCommand : ICommand
             return false;
         }
 
-        gather = (QuestActObjItemGather)gatherActs[0].Template;
         return true;
     }
 
@@ -851,12 +978,14 @@ internal enum BotQuestVerb
 {
     Scan,
     Nearby,
+    Locate,
     Inspect,
     Status,
     Accept,
     Talk,
     Use,
     Acquire,
+    Loot,
     Report
 }
 

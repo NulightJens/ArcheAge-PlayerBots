@@ -31,6 +31,7 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 
 ## 0.3: navigation and sustainability
 
+- Completed: bot movement now refreshes AAEmu spatial-region membership and zone transitions only when crossing a 64-meter region boundary. A live quest run crossed from Mayor Gott's region into the neighboring boar region and back; ordinary bounded nearby discovery, combat, and reporting remained available after both crossings.
 - Establish an ArcheAge-compatible navigation boundary instead of direct coordinate traversal.
 - Add obstacle diagnostics before claiming wall or terrain behavior.
 - Measure natural mana exhaustion, rest, recovery, and re-entry without administrator healing.
@@ -44,7 +45,9 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 - Automated contract: the exact-target non-lethal floor preempts compiled rotations, survives authoritative combat-task replacement after respawn, clears target/follow/destination state atomically, and reports its armed percentage. Native item use selects the exact unit before AAEmu evaluates `UnitReqs`, restores the previous selection on rejection, and retains the selection for a successful delayed effect.
 - Completed once on 3.0: one `/botquest acquire` call derived Nymph template 3460, a 50% health ceiling, and skill 11684 from the carried quest item's native requirements; contained combat stopped object 102886 alive at 8,631/18,849 HP, automatically launched the real item skill, and advanced quest 293 from 1/8 to 2/8 with inventory increasing from one result item to two. No separate item-use command or target/item/objective mutation was used.
 - Automated contract: the acquisition executor refuses alternative (`OR`) or ambiguous requirement sets, requires one exact NPC, one 1-99% target-health ceiling, and the matching quest context, and invokes its floor callback at most once. Explicit combat/state resets clear the callback instead of allowing stale quest actions.
-- Next: add executor-owned exact-target discovery and repetition plus corpse acquisition, delivery/report-item policy, one kill objective, one talk/emote objective, and one travel objective as separately measured slices.
+- Completed once on 3.0: quest 251 was accepted from Mayor Gott with objective/inventory 0/3 and 0, then three normally killed Solzreed Boars were looted through their native corpse containers. The exact transfers advanced objective/inventory 0->1, 1->2, and 2->3; one corpse retained its unrelated loot entry. Native reporting completed the quest, removed all three cleanup items, and delivered reward item 18791 x2 by quest-reward mail because the test bag was full.
+- Automated contract: exact-template world discovery is read-only and capped at ten results. Corpse loot requires a dead NPC within 6 meters, an exclusive solo tag by the bot, and exactly one generated corpse item whose ID and native quest link match the active gather act; AAEmu's host loot path performs the transfer.
+- Next: add executor-owned target selection and repetition, one kill objective, one talk/emote objective, and one travel objective as separately measured slices.
 - Autonomous quest selection, routing, and chaining remain deferred until those objective executors and navigation boundaries pass independently.
 
 ## 0.4: population operations

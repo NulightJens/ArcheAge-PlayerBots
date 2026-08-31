@@ -105,6 +105,10 @@ public class BotCommandsTests
         await Assert.That(nearby.Verb).IsEqualTo(BotQuestVerb.Nearby);
         await Assert.That(nearby.NpcTemplateId).IsEqualTo(3495u);
         await Assert.That(nearby.Radius).IsEqualTo(75f);
+        await Assert.That(BotQuestCommand.TryParse(["locate", "2", "3475"], out var locate)).IsTrue();
+        await Assert.That(locate.Verb).IsEqualTo(BotQuestVerb.Locate);
+        await Assert.That(locate.NpcTemplateId).IsEqualTo(3475u);
+        await Assert.That(BotQuestCommand.TryParse(["locate", "2", "0"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.TryParse(["accept", "2", "330"], out var accept)).IsTrue();
         await Assert.That(accept.Verb).IsEqualTo(BotQuestVerb.Accept);
         await Assert.That(accept.QuestId).IsEqualTo(330u);
@@ -125,6 +129,11 @@ public class BotCommandsTests
         await Assert.That(acquire.QuestId).IsEqualTo(293u);
         await Assert.That(acquire.TargetObjId).IsEqualTo(45678u);
         await Assert.That(BotQuestCommand.TryParse(["acquire", "2", "293"], out _)).IsFalse();
+        await Assert.That(BotQuestCommand.TryParse(["loot", "2", "251", "45678"], out var loot)).IsTrue();
+        await Assert.That(loot.Verb).IsEqualTo(BotQuestVerb.Loot);
+        await Assert.That(loot.QuestId).IsEqualTo(251u);
+        await Assert.That(loot.TargetObjId).IsEqualTo(45678u);
+        await Assert.That(BotQuestCommand.TryParse(["loot", "2", "251"], out _)).IsFalse();
         await Assert.That(BotQuestCommand.TryParse(["report", "2", "330", "1"], out var report)).IsTrue();
         await Assert.That(report.Verb).IsEqualTo(BotQuestVerb.Report);
         await Assert.That(report.QuestId).IsEqualTo(330u);
@@ -152,6 +161,29 @@ public class BotCommandsTests
         await Assert.That(BotQuestCommand.IsSupportedQuestUseSource(supply, sourceItem, 251)).IsFalse();
         sourceItem.Template.UseSkillId = 0;
         await Assert.That(BotQuestCommand.IsSupportedQuestUseSource(supply, sourceItem, 293)).IsFalse();
+
+        var gather = new QuestActObjItemGather(component) { ItemId = 4058 };
+        var lootItem = new Item
+        {
+            TemplateId = 4058,
+            Template = new ItemTemplate { Id = 4058, LootQuestId = 251 }
+        };
+        await Assert.That(BotQuestCommand.IsSupportedQuestLootSource(gather, lootItem, 251)).IsTrue();
+        await Assert.That(BotQuestCommand.IsSupportedQuestLootSource(gather, lootItem, 293)).IsFalse();
+        lootItem.TemplateId = 8243;
+        await Assert.That(BotQuestCommand.IsSupportedQuestLootSource(gather, lootItem, 251)).IsFalse();
+    }
+
+    [Test]
+    public async Task BotQuest_CorpseLootRequiresExclusiveBotTagOwnership()
+    {
+        var bot = AddBot(2);
+        var other = AddBot(3);
+
+        await Assert.That(BotQuestCommand.IsSupportedSoloLootOwner(bot, bot, 0)).IsTrue();
+        await Assert.That(BotQuestCommand.IsSupportedSoloLootOwner(other, bot, 0)).IsFalse();
+        await Assert.That(BotQuestCommand.IsSupportedSoloLootOwner(bot, bot, 42)).IsFalse();
+        await Assert.That(BotQuestCommand.IsSupportedSoloLootOwner(bot, null, 0)).IsFalse();
     }
 
     [Test]
