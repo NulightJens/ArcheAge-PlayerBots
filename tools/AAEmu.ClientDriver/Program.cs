@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -14,7 +15,7 @@ internal static partial class Program
     private const int DefaultIdleTimeoutMs = 30_000;
     private const int MaximumLogBytes = 8 * 1024 * 1024;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    internal static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true
@@ -44,15 +45,18 @@ internal static partial class Program
             }
 
             var command = args[0].ToLowerInvariant();
-            var options = DriverOptions.Parse(args[1..]);
             return command switch
             {
-                "status" => PrintStatus(options),
-                "serve" => await ServeAsync(options),
+                "status" => PrintStatus(DriverOptions.Parse(args[1..])),
+                "serve" => await ServeAsync(DriverOptions.Parse(args[1..])),
+                "verify-profile" => LauncherCommands.VerifyProfile(LauncherCommandOptions.Parse(args[1..], false)),
+                "probe-launcher" => LauncherCommands.ProbeLauncher(LauncherCommandOptions.Parse(args[1..], false)),
+                "launch" => await LauncherCommands.LaunchAsync(LauncherCommandOptions.Parse(args[1..], true)),
+                "request-close" => await LauncherCommands.RequestCloseAsync(CloseCommandOptions.Parse(args[1..])),
                 _ => throw new ArgumentException($"Unknown command '{args[0]}'.")
             };
         }
-        catch (Exception exception) when (exception is ArgumentException or IOException or UnauthorizedAccessException or SocketException)
+        catch (Exception exception)
         {
             Console.Error.WriteLine(JsonSerializer.Serialize(new
             {
@@ -137,7 +141,7 @@ internal static partial class Program
         await stream.WriteAsync(bodyBytes, cancellationToken);
     }
 
-    private static ClientStatus CaptureStatus(DriverOptions options)
+    internal static ClientStatus CaptureStatus(DriverOptions options)
     {
         var process = options.IgnoreProcess
             ? ClientProcessSnapshot.Disabled(options.ProcessName)
@@ -147,7 +151,7 @@ internal static partial class Program
         return new ClientStatus(1, DateTimeOffset.UtcNow, state, process, log);
     }
 
-    private static ClientProcessSnapshot CaptureProcesses(string processName)
+    internal static ClientProcessSnapshot CaptureProcesses(string processName)
     {
         var snapshots = new List<ClientProcessInstance>();
         foreach (var process in Process.GetProcessesByName(processName).OrderBy(process => process.Id))
@@ -184,13 +188,14 @@ internal static partial class Program
         return new ClientProcessSnapshot(true, processName, snapshots.Count > 0, snapshots);
     }
 
-    private static ClientLogSnapshot ParseLog(string path)
+    internal static ClientLogSnapshot ParseLog(string path)
     {
         var fullPath = Path.GetFullPath(path);
         if (!File.Exists(fullPath))
-            return new ClientLogSnapshot(fullPath, false, 0, null, "not_observed", new Dictionary<string, string>());
+            return new ClientLogSnapshot(fullPath, false, 0, null, null, "not_observed", new Dictionary<string, string>());
 
         var file = new FileInfo(fullPath);
+        var sessionStartedAt = ParseSessionStartedAt(fullPath);
         var milestones = new Dictionary<string, string>(StringComparer.Ordinal);
         var state = "not_observed";
         using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
@@ -212,7 +217,30 @@ internal static partial class Program
             }
         }
 
-        return new ClientLogSnapshot(fullPath, true, file.Length, file.LastWriteTimeUtc, state, milestones);
+        return new ClientLogSnapshot(fullPath, true, file.Length, file.LastWriteTimeUtc, sessionStartedAt, state, milestones);
+    }
+
+    private static DateTimeOffset? ParseSessionStartedAt(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var reader = new StreamReader(stream, Encoding.UTF8, true);
+        for (var lineNumber = 0; lineNumber < 20; lineNumber++)
+        {
+            var line = reader.ReadLine();
+            if (line == null)
+                break;
+            var match = SessionStartRegex().Match(line);
+            if (!match.Success)
+                continue;
+            var value = $"{match.Groups["day"].Value} {match.Groups["month"].Value} " +
+                        $"{match.Groups["year"].Value} {match.Groups["hour"].Value} " +
+                        $"{match.Groups["minute"].Value} {match.Groups["second"].Value}";
+            if (DateTime.TryParseExact(value, "d MMMM yyyy H m s", CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeLocal, out var parsed))
+                return new DateTimeOffset(parsed);
+        }
+
+        return null;
     }
 
     private static string DeriveState(ClientProcessSnapshot process, ClientLogSnapshot log, bool ignoreProcess)
@@ -241,11 +269,18 @@ internal static partial class Program
     private static void PrintHelp() => Console.WriteLine(
         "AAEmu.ClientDriver\n" +
         "  status --log <ArcheAge.log> [--process-name archeage] [--ignore-process]\n" +
-        "  serve  --log <ArcheAge.log> [--process-name archeage] [--port 45831] [--once] [--idle-timeout-ms 30000]\n\n" +
-        "The current API is read-only and binds only to 127.0.0.1.");
+        "  serve  --log <ArcheAge.log> [--process-name archeage] [--port 45831] [--once] [--idle-timeout-ms 30000]\n" +
+        "  verify-profile --profile <launch-profile.json>\n" +
+        "  probe-launcher --profile <launch-profile.json>\n" +
+        "  launch --profile <launch-profile.json> --wait-for <process_started|login_connected|world_authorized|world_loaded> [--timeout-ms 120000]\n\n" +
+        "  request-close --profile <launch-profile.json> --process-id <pid> [--timeout-ms 30000]\n\n" +
+        "The status API is read-only and binds only to 127.0.0.1. Launch credentials are read from the console or redirected standard input and are never accepted as command-line options.");
 
     [GeneratedRegex("<(?<time>\\d{2}:\\d{2}:\\d{2})>", RegexOptions.CultureInvariant)]
     private static partial Regex LogTimeRegex();
+
+    [GeneratedRegex("Date\\((?<day>\\d{1,2}) (?<month>[A-Za-z]+) (?<year>\\d{4})\\) Time\\((?<hour>\\d{1,2}) (?<minute>\\d{1,2}) (?<second>\\d{1,2})\\)", RegexOptions.CultureInvariant)]
+    private static partial Regex SessionStartRegex();
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -356,5 +391,6 @@ internal sealed record ClientLogSnapshot(
     bool Exists,
     long Bytes,
     DateTime? LastWriteUtc,
+    DateTimeOffset? SessionStartedAt,
     string State,
     IReadOnlyDictionary<string, string> Milestones);

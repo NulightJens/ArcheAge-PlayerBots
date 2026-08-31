@@ -40,9 +40,20 @@ Validate the fixture parser and loopback API with:
 .\scripts\Test-ClientDriver.ps1
 ```
 
-### Stage 1: launch adapter
+### Stage 1: allowlisted launch and graceful close (implemented)
 
-Wrap the installed `AAEmu.Common.Launcher.dll` rather than clicking through the launcher. The adapter should accept an allowlisted client executable, server endpoint, locale, and credential reference. Passwords remain in the existing secure local launcher configuration or a process-local secret source and must never enter API responses, command lines, evidence, or Git.
+The driver wraps the installed `AAEmu.Common.Launcher.dll` rather than clicking through the launcher. A JSON profile pins the launcher assembly and client executable by exact SHA-256, permits only a loopback endpoint, and contains no username or password. `verify-profile` validates that boundary; `probe-launcher` exercises launcher ticket initialization with synthetic probe values without starting a process; `launch` reads a username and password from an interactive console or two redirected standard-input lines and waits for a lifecycle marker from the new log session.
+
+The stock launcher's `settings.aelcf` format stores `lastLoginPass` as plaintext. The driver deliberately does not read that file. Passwords are rejected in command-line options and profile fields and are not returned in JSON. For unattended tests, provide a disposable test credential through redirected standard input; a future secret-store adapter should use Windows Credential Manager rather than the stock settings file.
+
+`request-close` requires the exact launch profile and PID, re-verifies the process name, executable path, and SHA-256, then posts the normal Windows close message to the verified main window. It never calls `Kill`, `Stop-Process`, or another forced-termination path. If the client does not exit before the timeout, the driver reports `close_requested` and leaves it running.
+
+```powershell
+dotnet run --project tools\AAEmu.ClientDriver -- verify-profile --profile <profile.json>
+dotnet run --project tools\AAEmu.ClientDriver -- probe-launcher --profile <profile.json>
+$credentialLines | dotnet run --project tools\AAEmu.ClientDriver -- launch --profile <profile.json> --wait-for login_connected
+dotnet run --project tools\AAEmu.ClientDriver -- request-close --profile <profile.json> --process-id <pid>
+```
 
 ### Stage 2: bounded real-client input
 

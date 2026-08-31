@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "launcherAssemblyPath": "D:\\AAEmu-Launcher\\AAEmu.Common.Launcher.dll",
+  "launcherAssemblySha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "clientExecutablePath": "D:\\ArcheAge\\bin32\\archeage.exe",
+  "clientExecutableSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "serverAddress": "127.0.0.1",
+  "serverPort": 1337,
+  "locale": "en_us",
+  "loginType": "trino_1_2",
+  "logPath": "C:\\Users\\USER\\Documents\\AAClassic\\ArcheAge.log",
+  "processName": "archeage",
+  "hideSplash": false
+}

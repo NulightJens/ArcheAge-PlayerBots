@@ -1,5 +1,7 @@
 [CmdletBinding()]
-param()
+param(
+    [string] $LauncherProfile = ''
+)
 
 $ErrorActionPreference = 'Stop'
 $moduleRoot = Split-Path -Parent $PSScriptRoot
@@ -15,6 +17,9 @@ $driver = Join-Path $moduleRoot 'tools\AAEmu.ClientDriver\bin\Debug\net10.0\AAEm
 $status = (& dotnet $driver status --log $fixture --ignore-process | ConvertFrom-Json)
 if ($status.schemaVersion -ne 1 -or $status.state -ne 'world_loaded') {
     throw "Unexpected fixture status: schema=$($status.schemaVersion), state=$($status.state)"
+}
+if ($null -eq $status.log.sessionStartedAt) {
+    throw 'The client log session timestamp was not parsed.'
 }
 if ($status.log.milestones.worldAuthorized -ne '17:00:06' -or
     $status.log.milestones.worldLoaded -ne '17:00:28') {
@@ -54,4 +59,38 @@ if ($null -eq $apiStatus -or $apiStatus.state -ne 'world_loaded') {
     throw 'Loopback client status API did not return the expected fixture state.'
 }
 
-Write-Host 'AAEmu.ClientDriver validation passed: build, fixture parser, and one-request loopback API.'
+$forbiddenSecret = 'must-not-appear-in-output'
+$rejection = (& dotnet $driver launch --profile $fixture --password $forbiddenSecret 2>&1 | Out-String)
+if ($LASTEXITCODE -eq 0) {
+    throw 'The client driver accepted a forbidden command-line password option.'
+}
+if ($rejection.Contains($forbiddenSecret, [System.StringComparison]::Ordinal)) {
+    throw 'The rejected command-line password was reflected into output.'
+}
+$global:LASTEXITCODE = 0
+
+if ($LauncherProfile -ne '') {
+    $plan = (& dotnet $driver verify-profile --profile $LauncherProfile | ConvertFrom-Json)
+    if ($LASTEXITCODE -ne 0 -or $plan.credentialsStoredInProfile -or $plan.plaintextLauncherPasswordRead) {
+        throw 'The launcher profile did not validate under the no-stored-credentials contract.'
+    }
+
+    $probe = (& dotnet $driver probe-launcher --profile $LauncherProfile | ConvertFrom-Json)
+    if ($LASTEXITCODE -ne 0 -or -not $probe.initialized -or $probe.processStarted) {
+        throw 'The launcher assembly probe failed or started a process.'
+    }
+    if ($probe.launchArguments -notmatch '-handle <redacted>') {
+        throw 'The launcher probe did not redact inherited handle values.'
+    }
+
+    $missingProcess = (& dotnet $driver request-close --profile $LauncherProfile --process-id 2147483647 2>&1 | Out-String)
+    if ($LASTEXITCODE -eq 0) {
+        throw 'The graceful-close command accepted a nonexistent process ID.'
+    }
+    if ($missingProcess -notmatch 'not running') {
+        throw 'The graceful-close command did not fail closed for a nonexistent process ID.'
+    }
+    $global:LASTEXITCODE = 0
+}
+
+Write-Host 'AAEmu.ClientDriver validation passed: build, fixture parser, loopback API, secret-option rejection, optional launcher probe, and graceful-close fail-closed seam.'
