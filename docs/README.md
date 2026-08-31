@@ -6,6 +6,10 @@ Welcome to the ArcheAge PlayerBots guide. If you are new to the module, start wi
 
 Supported AAEmu versions, clean installation, database setup, updates, and the experimental ArcheAge 3.0 track.
 
+## [Shareable preview](PREVIEW.md)
+
+Create or install an immutable source preview with one exact commit, verified compatibility hashes, JSON provenance, and a SHA-256 sidecar.
+
 ## [Configuration](CONFIGURATION.md)
 
 Startup bots, behavior settings, performance controls, archetypes, and rotations.

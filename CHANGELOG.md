@@ -48,6 +48,8 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ### Documentation and onboarding
 
+- Added a fail-closed source-preview packager that requires a clean Git commit, verifies compatibility-patch and migration hashes, checks archive contents, excludes Git internals, and emits JSON provenance plus a SHA-256 sidecar.
+- Added a shareable-preview guide with exact support claims, archive installation steps, and explicit exclusions for clients, databases, credentials, runtime logs, and local evidence.
 - Reworked the public README and user guides around installation, first bot, party control, configuration, commands, and troubleshooting.
 - Clarified that ArcheAge PlayerBots controls selected existing characters and does not claim random-account populations, automated raid or battleground completion, or a public server-capacity target.
 - Simplified `/bot` help topics and updated compatibility guidance for the supported 1.2 track and experimental, server-start-validated 3.0 track.

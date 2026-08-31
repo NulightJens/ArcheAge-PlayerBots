@@ -84,6 +84,7 @@ Browse the [PlayerBots Guide](docs/README.md) or jump directly to a task:
 | Guide | Description |
 | --- | --- |
 | **[Installation Guide](docs/INSTALLATION.md)** | Install, verify, update, or select a supported server track |
+| **[Shareable preview](docs/PREVIEW.md)** | Package or install one immutable source preview with checksums and exact compatibility provenance |
 | **[Configuration](docs/CONFIGURATION.md)** | Configure startup bots, behavior, and performance settings |
 | **[Commands](docs/COMMANDS.md)** | Everyday party commands and advanced GM tools |
 | **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Fix common install, build, database, and gameplay problems |
@@ -95,7 +96,7 @@ Run `/bot` in game for the quick command guide or `/help <command>` for exact ar
 | ArcheAge version | Status |
 | --- | --- |
 | 1.2 `r208022` | Supported on the documented AAEmu base |
-| 3.0.4.2 `r336598` | Experimental; native login/world entry and one-bot spawn/follow/combat/class/gear paths are verified once, but four-role and scale/recovery acceptance remain open |
+| 3.0.4.2 `r336598` | Experimental; native login/world entry plus one-bot lifecycle, class/gear, combat, exact-NPC quest, item-acquisition, and corpse-delivery paths are verified, but four-role and scale/recovery acceptance remain open |
 
 PlayerBots uses a small, versioned AAEmu compatibility patch because AAEmu does not yet expose every lifecycle and command hook through a module API. The module remains a separate repository and the installer applies the matching integration automatically.
 

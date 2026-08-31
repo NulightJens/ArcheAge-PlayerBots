@@ -7,11 +7,12 @@ This runbook promotes the `3.0.4.2 r336598` track by evidence, not by configurat
 | Gate | State | Acceptance evidence |
 |---|---|---|
 | Asset identity | Passed | Client version, `game_pak`, both SQLite databases, SHA-256 provenance, SQLite integrity |
-| Host adapter | Passed | Active alpha-v4 patch, zero-error builds, clean 1.2 installer suite, 158/158 3.0 unit tests |
+| Host adapter | Passed | Active alpha-v4 patch, zero-error builds, installed-state checks for both tracks, 1,753 plus 4 skipped 1.2 tests, and 159/159 3.0 adapter tests |
 | Server startup | Passed | Login/Game registration, module schema, unique ports, loopback status and `@system` metrics |
 | Client login/serializer | Passed once | Native account and character creation, character select, and world entry completed without serializer or DLL error |
 | One-bot lifecycle | Passed once | Rendered spawn/follow/combat, clean server restart, normal logout/re-add, zero overlap/error |
 | Class and equipment | Passed once | `/setclass` restored three Darkrunner trees/23 skills; `/kit` auto-equipped a grade-5 weapon and logout/re-add retained it |
+| Quest item and delivery | Passed once | Exact-NPC lifecycle, native item skill, cross-region travel, three owned corpse transfers, cleanup, and full-bag reward mail completed without fabricated state |
 | Four-role behavior | Open | Darkrunner, Primeval, caster, and Cleric perform legal movement/casts/recovery using 3.0 templates |
 | Scale and recovery | Open | 0/10/50/100 cohorts, approved 3.0 budget, normal logout, 60-second recovery, clean shutdown |
 
