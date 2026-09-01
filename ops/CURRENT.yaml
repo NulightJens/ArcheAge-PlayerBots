@@ -336,10 +336,11 @@ prepared_workstreams:
     manifest_sha256: a141d75bffc87ef37e6a01f53d71261c2f5b441885522637a4a4adb190460a00
     cleanup: graceful-game-then-login-zero-processes-listeners-live-logs-config-exactly-restored
   - task: T-085
-    state: prepared-awaiting-thread-binding
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
-    base: pending-control-commit
+    state: active-exact-thread-bound
+    client_thread_id: client-new-thread:ac766ead-0d2a-41a9-8fdc-0f747b083462
+    task_thread_id: 01a05da4-8357-7463-94db-dfc407bacee6
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\84a2\PB-W00-control'
+    base: dba356bbadb63343b063a3a64036f762ca3e0df9
     candidate: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
     contract: ops/tasks/T-085/CONTRACT.md
   - task: T-038

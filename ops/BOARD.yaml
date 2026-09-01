@@ -673,7 +673,7 @@ tasks:
   - id: T-085
     title: Integrate and verify the T-041 runtime FAIL receipt
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-041]
     runtime_lease: none
@@ -681,6 +681,10 @@ tasks:
     candidate: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
     candidate_parent: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
     contract: ops/tasks/T-085/CONTRACT.md
+    owner_client_thread_id: client-new-thread:ac766ead-0d2a-41a9-8fdc-0f747b083462
+    owner_thread_id: 01a05da4-8357-7463-94db-dfc407bacee6
+    worktree: 'C:\Users\jensh\.codex\worktrees\84a2\PB-W00-control'
+    dispatch_base: dba356bbadb63343b063a3a64036f762ca3e0df9
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
