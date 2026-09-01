@@ -1,0 +1,55 @@
+schema_version: 1
+id: T-064
+title: Integrate lifecycle and atomic fan-out corrections
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Independently review and integrate the accepted T-062 atomic fan-out and T-063 single-bot lifecycle corrections, install the resulting module into the registered AAEmu 1.2 integration host, and qualify one immutable source/install identity with a clean full build and complete unit suite.
+depends_on: [T-062, T-063]
+branch: codex-managed-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+
+inputs:
+  integration_head: 0fcb943552dcefde95bc2af220caab6bfafa77ef
+  t062_candidate: 4c2d9e8ccdfa1255cef396388ebba2423aa35624
+  t062_parent: 10fb2de0038ecb43d3f2e6cf15f5789e2b5926dd
+  t063_candidate: aadcef712c6ca6c1d797375476611b71cbf86178
+  t063_parent: f22ae76d8a401ad374f74df55a6ef6a675c3ad1f
+  active_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  retained_t060_receipt: ops/evidence/aaemu12-t060-combat-stealth-v5.yaml
+  retained_t061_receipt: ops/evidence/aaemu12-t061-one-bot-autonomy-v1.yaml
+  runtime_workspace: aaemu12_integration
+  installed_module_head: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+  installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+
+write_scope:
+  - scripts/combat/CombatQualification.psm1
+  - scripts/combat/Test-CombatQualificationHarness.ps1
+  - scripts/combat/README.md
+  - ops/tasks/T-062/HANDOFF.md
+  - src/AAEmu.Game/Bots/Host/BotHost.cs
+  - src/AAEmu.Game/Bots/Host/BotHostTask.cs
+  - src/AAEmu.Game/Bots/Host/BotRuntime.cs
+  - src/AAEmu.Game/Bots/Life/BotLifeController.cs
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Bots/Life/BotLifeControllerTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/tasks/T-063/HANDOFF.md
+  - ops/evidence/aaemu12-lifecycle-fanout-integration-v1.yaml
+  - ops/tasks/T-064/HANDOFF.md
+
+external_write_scope:
+  - 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\modules\archeage-playerbots'
+  - registered AAEmu 1.2 build and test outputs only
+  - a new versioned scratch checkout retained after proof if required
+
+runtime:
+  required: false
+  lease: null
+gates: [deterministic-harness-tests, focused-aaemu12-tests, full-aaemu12-suite]
+validation_boundary: Integration/install/build/test only. Do not start Login, GameServer, MySQL, or the ArcheAge client; access databases; claim or edit the runtime lease; edit global ledgers; change retained T-060/T-061 evidence; regenerate compatibility patches; or touch AAEmu 3.0.
+handoff: ops/tasks/T-064/HANDOFF.md

@@ -51,14 +51,13 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-063 wires the minimal production single-bot lifecycle/activity selector and autonomous normal logout requester proven missing by T-061.
-  - Integrate and build that focused correction before assigning the runtime lease to a new immutable T-061 proof version.
-  - Retain completed T-062 atomic combat fan-out at 4c2d9e8ccdfa1255cef396388ebba2423aa35624 for a later integration wave; it does not satisfy or block the one-bot product gate.
+  - T-064 independently integrates T-062 at 4c2d9e8ccdfa1255cef396388ebba2423aa35624 and T-063 at aadcef712c6ca6c1d797375476611b71cbf86178, then installs, builds, and runs the full AAEmu 1.2 suite once.
+  - Assign the runtime lease to a new immutable T-061 proof version only after T-064 is green.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
   - task: T-062
-    state: completed-pending-integration
+    state: done-pending-integration
     client_thread_id: client-new-thread:94a6b91f-5fa0-4de9-aa6a-cafa679bec2e
     task_thread_id: 01a05bf9-cc4e-7072-8f2d-c35505c6de39
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\f8c6\PB-W00-control'
@@ -66,11 +65,22 @@ prepared_workstreams:
     head: 4c2d9e8ccdfa1255cef396388ebba2423aa35624
     handoff: ops/tasks/T-062/HANDOFF.md
   - task: T-063
-    state: active
+    state: done-pending-integration
     client_thread_id: client-new-thread:bbef8555-49ae-4e70-b136-c85ff5f490af
     task_thread_id: 01a05c0d-ae83-7842-b358-82baab117774
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\2130\PB-W00-control'
     base: f22ae76d8a401ad374f74df55a6ef6a675c3ad1f
+    head: aadcef712c6ca6c1d797375476611b71cbf86178
+    handoff: ops/tasks/T-063/HANDOFF.md
+  - task: T-064
+    state: ready
+    client_thread_id: pending-thread-creation
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: 0fcb943552dcefde95bc2af220caab6bfafa77ef
+    source_heads:
+      T-062: 4c2d9e8ccdfa1255cef396388ebba2423aa35624
+      T-063: aadcef712c6ca6c1d797375476611b71cbf86178
     head: pending
     handoff: pending
   - task: T-038

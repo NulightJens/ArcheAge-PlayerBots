@@ -312,7 +312,7 @@ tasks:
   - id: T-062
     title: Atomic shared-target combat fan-out
     track: AAEmu12
-    status: completed
+    status: done
     integration: pending
     depends_on: [T-060, T-044]
     gate: deterministic-harness-tests
@@ -326,7 +326,7 @@ tasks:
   - id: T-063
     title: Wire single-bot lifecycle activity and logout
     track: AAEmu12
-    status: active
+    status: done
     integration: pending
     depends_on: [T-061, T-039]
     gate: focused-aaemu12-tests
@@ -334,6 +334,17 @@ tasks:
     owner_client_thread_id: client-new-thread:bbef8555-49ae-4e70-b136-c85ff5f490af
     owner_thread_id: 01a05c0d-ae83-7842-b358-82baab117774
     worktree: 'C:\Users\jensh\.codex\worktrees\2130\PB-W00-control'
+    head: aadcef712c6ca6c1d797375476611b71cbf86178
+    handoff: ops/tasks/T-063/HANDOFF.md
+
+  - id: T-064
+    title: Integrate lifecycle and atomic fan-out corrections
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-062, T-063]
+    gate: full-aaemu12-suite
+    runtime_lease: none
 
   - id: T-041
     title: One-zone Autonomous Activity Director

@@ -2,7 +2,7 @@ schema_version: 1
 id: T-062
 title: Atomic shared-target combat fan-out
 track: AAEmu12
-status: completed
+status: done
 integration: pending
 outcome: Replace unsafe per-bot shared-target attack fan-out with one atomic all-bot contained-attack stimulus so a mortal fixture cannot disappear before every cohort member is armed.
 depends_on: [T-060, T-044]
