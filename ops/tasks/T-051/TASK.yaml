@@ -1,0 +1,36 @@
+schema_version: 1
+id: T-051
+title: Stable exact-schema startup guard for growing AAEmu logs
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Make live growing-log startup evidence scalar-safe and require exact emitted selected Game and Login schemas before runtime readiness.
+depends_on: [T-050]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+
+inputs:
+  incomplete_receipt: ops/evidence/aaemu12-t050-combat-stealth-v2.yaml
+  incomplete_handoff: ops/tasks/T-050/HANDOFF.md
+  retained_failure: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v2\\startup-failure.json'
+  retained_game_log: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v2\\game-attempt-1-server.log'
+  host_reference: aaemu12_reference
+  host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  active_patch: compatibility/aaemu-1.2-r208022-v3.patch
+
+write_scope:
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - compatibility/README.md
+  - playerbots.module.json
+  - scripts/scale/Start-ScaleGateRuntime.ps1
+  - scripts/scale/ScaleRuntimeStartupGuard.psm1
+  - scripts/scale/Test-ScaleRuntimeStartupGuard.ps1
+  - scripts/scale/README.md
+  - ops/tasks/T-051/HANDOFF.md
+
+runtime:
+  required: false
+  lease: null
+gates: [deterministic-harness-tests, focused-aaemu12-tests]
+validation_boundary: Source and deterministic fixture work only. Do not edit/deploy AAEmu hosts, start runtime processes, access databases, alter global ledgers or runtime lease, or edit client/AAEmu 3.0 files.
+handoff: ops/tasks/T-051/HANDOFF.md

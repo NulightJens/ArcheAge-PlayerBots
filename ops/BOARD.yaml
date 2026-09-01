@@ -148,20 +148,56 @@ tasks:
   - id: T-050
     title: AAEmu 1.2 mortal-combat and stealth recovery attempt
     track: AAEmu12
-    status: active
-    integration: runtime-pending
+    status: blocked
+    integration: runtime-incomplete-retained
     depends_on: [T-049]
     runtime_lease: aaemu12
     gate: serialized-live-aaemu12-proof
     owner_client_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
     owner_thread_id: 01a05a8e-3f30-7c81-996b-3eab7fe2e934
+    attempt_commit: 19bd954098dfa1872bec10cc783b1bd9d0938d4e
+    evidence_receipt: aaemu12-t050-combat-stealth-v2
+    blocker: growing-game-log-value-rejected-by-startup-predicate-parameter-conversion
+
+  - id: T-051
+    title: Stable exact-schema startup guard for growing AAEmu logs
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-050]
+    gate: deterministic-harness-tests
+
+  - id: T-052
+    title: Diagnose retained AAEmu 1.2 Game startup errors
+    track: AAEmu12
+    status: ready
+    integration: analysis-pending
+    depends_on: [T-050]
+    gate: read-only-retained-evidence-analysis
+
+  - id: T-053
+    title: Integrate stable exact-schema startup correction
+    track: AAEmu12
+    status: blocked
+    integration: pending
+    depends_on: [T-051, T-052]
+    gate: full-aaemu12-suite
+
+  - id: T-054
+    title: AAEmu 1.2 combat and stealth physical attempt v3
+    track: AAEmu12
+    status: blocked
+    integration: runtime-pending
+    depends_on: [T-053]
+    runtime_lease: aaemu12
+    gate: serialized-live-aaemu12-proof
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-050]
+    depends_on: [T-054]
     runtime_lease: aaemu12
 
   - id: T-041

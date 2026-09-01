@@ -2,8 +2,8 @@ schema_version: 1
 id: T-050
 title: AAEmu 1.2 mortal-combat and stealth recovery attempt
 track: AAEmu12
-status: active
-integration: runtime-pending
+status: blocked
+integration: runtime-incomplete-retained
 outcome: Complete a fresh immutable physical combat/stealth qualification after the exact selected-schema startup correction.
 depends_on: [T-049]
 branch: codex-managed-detached-worktree

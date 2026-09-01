@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-physical-retry-active
+phase: wave-2-startup-gate-recovery
 verdict: active
 
 source:
@@ -52,8 +52,9 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Claim aaemu12 for fresh task T-050 and run a new immutable physical combat/stealth attempt in external evidence directory public-alpha-v2.
-  - Release the lease only after committed cleanup evidence; activate T-037 only if T-050 passes.
+  - Run T-051 to correct growing-log scalar handling and add exact selected Game-schema startup proof.
+  - Run T-052 in parallel to classify the retained BaseBaiLoader and missing-world startup errors without touching runtime state.
+  - Independently integrate the accepted correction, then dispatch a fresh immutable physical attempt in public-alpha-v3.
   - Keep T-037 and T-041 blocked until their declared dependencies are accepted.
 
 prepared_workstreams:
@@ -175,12 +176,26 @@ wave_2:
     evidence_receipt: aaemu12-startup-schema-integration-v1
   physical_retry:
     task: T-050
-    state: active-preflight
+    state: incomplete-startup-predicate-conversion
     client_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
     task_thread_id: 01a05a8e-3f30-7c81-996b-3eab7fe2e934
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\f4cd\\PB-W00-control'
+    attempt_commit: 19bd954098dfa1872bec10cc783b1bd9d0938d4e
+    evidence_receipt: aaemu12-t050-combat-stealth-v2
+    result: INCOMPLETE-startup-wrapper-before-command-api
+    cleanup: game-login-graceful-zero-processes-five-ports-free-runtime-logs-empty
     external_evidence: 'D:\Codex-Labs\evidence\T-036\public-alpha-v2'
     retained_predecessor: aaemu12-t036-combat-stealth-v1
-  runtime_lease: claimed-by-T-050
+  recovery_source_task:
+    task: T-051
+    state: ready
+  retained_error_analysis_task:
+    task: T-052
+    state: ready
+  next_physical_retry:
+    task: T-054
+    state: blocked-on-T-051-integration-and-T-052-classification
+    external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v3'
+  runtime_lease: released-after-T-050-incomplete-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: authorized-only-after-T-050-synchronizes-final-identity-claim
+  runtime_start: prohibited-until-fresh-versioned-task-and-lease-claim

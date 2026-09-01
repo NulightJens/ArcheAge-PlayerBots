@@ -1,0 +1,27 @@
+schema_version: 1
+id: T-052
+title: Diagnose retained AAEmu 1.2 Game startup errors
+track: AAEmu12
+status: ready
+integration: analysis-pending
+outcome: Classify the retained BaseBaiLoader collection-modification and WorldManager missing-instance errors and define any required pre-v3 action.
+depends_on: [T-050]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+
+inputs:
+  incomplete_receipt: ops/evidence/aaemu12-t050-combat-stealth-v2.yaml
+  retained_game_log: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v2\\game-attempt-1-server.log'
+  retained_game_error_log: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v2\\game-attempt-1-error.log'
+  module_source: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+
+write_scope:
+  - ops/tasks/T-052/HANDOFF.md
+
+runtime:
+  required: false
+  lease: null
+gates: [read-only-retained-evidence-analysis]
+validation_boundary: Read-only evidence and source diagnosis. Do not change source, global ledgers, host/runtime/client/database state, v1/v2 evidence, or AAEmu 3.0.
+handoff: ops/tasks/T-052/HANDOFF.md
