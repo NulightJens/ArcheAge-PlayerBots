@@ -196,10 +196,10 @@ prepared_workstreams:
     handoff: ops/tasks/T-073/HANDOFF.md
     cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
   - task: T-074
-    state: ready
-    client_thread_id: pending-thread-creation
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
+    state: active
+    client_thread_id: client-new-thread:1468e799-5746-4d08-9a2f-b77de5b7e59c
+    task_thread_id: 01a05cc0-3f69-7151-9e8c-7a93ca6398bc
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\5e19\PB-W00-control'
     base: 7261daa3a715213781c2c6a4e163ece69abddda8
     source_commit: 3000b8b92fdb7e88a6196dd966c4420891c81953
     head: pending
