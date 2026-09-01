@@ -266,8 +266,11 @@ prepared_workstreams:
     verdict: PASS-three-iterations-plus42xp-restart-persistence-cleanup
     manifest_sha256: fe00f692aec54da1760ef6e99645f1d21a13bc902f7fc3c7cc81b6d3ae4c5a4e
   - task: T-080
-    state: ready
-    base: pending-control-dispatch-commit
+    state: active
+    client_thread_id: client-new-thread:269a307f-4542-4f77-9161-dea979538a93
+    task_thread_id: 01a05d22-8db5-7d61-b563-b268dee9c290
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\8b10\PB-W00-control'
+    base: 6e53e2a3a92e416b4f6b55aafb6a3b6afd67886a
     source_commit: ad8c0cf2aa9eed46c936c835931ce344341f7d09
     handoff: ops/tasks/T-080/HANDOFF.md
   - task: T-038
