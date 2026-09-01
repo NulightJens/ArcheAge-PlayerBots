@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: autonomy-observer-parser-correction
+phase: autonomy-observer-parser-integration
 verdict: active
 
 source:
@@ -230,7 +230,7 @@ prepared_workstreams:
     head: 48113c98661751cfbe0fc62a123e4941d1b34d8d
     integrity: 34-of-34-payloads-length-and-sha256-green
   - task: T-077
-    state: active
+    state: review
     client_thread_id: client-new-thread:d21780cf-4a33-4588-bf27-046f2875c0bc
     task_thread_id: 01a05ce4-e7c6-73f3-ab81-4b9f57c575e4
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\c717\PB-W00-control'
@@ -238,6 +238,13 @@ prepared_workstreams:
     retained_fixture: 'D:\Codex-Labs\evidence\T-075\one-bot-autonomy-v5\iteration-1\observer\raw\000000-botdebug.response.bin'
     retained_fixture_sha256: f1d865e388eca68afd064d5bbc89fcad18577e97a806c2afb9e3a77e1646bf98
     handoff: ops/tasks/T-077/HANDOFF.md
+    head: 0e48860649ca26a7148350ffdb103118c9e6aba0
+    proof: 64-deterministic-assertions-green
+  - task: T-078
+    state: ready
+    base: pending-control-dispatch-commit
+    source_commit: 0e48860649ca26a7148350ffdb103118c9e6aba0
+    handoff: ops/tasks/T-078/HANDOFF.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

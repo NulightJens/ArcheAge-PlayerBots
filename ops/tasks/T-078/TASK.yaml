@@ -1,0 +1,30 @@
+schema_version: 1
+id: T-078
+title: Integrate the offline-safe autonomy observer
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Independently review, replay, test, and integrate T-077's reusable offline-safe read-only autonomy observer without changing gameplay/runtime code or the retained T-075 verdict.
+depends_on: [T-077]
+branch: pending-codex-managed-worktree
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  integration_head: d72fe742513d9e5f01b4f9fb6bddd2bd9b4b9cb7
+  source_candidate: 0e48860649ca26a7148350ffdb103118c9e6aba0
+  source_parent: 6b77e8e3c92c4c293bfb89454ac23f50ffe42ce1
+  retained_offline_fixture_sha256: f1d865e388eca68afd064d5bbc89fcad18577e97a806c2afb9e3a77e1646bf98
+write_scope:
+  - scripts/autonomy/
+  - ops/tasks/T-077/HANDOFF.md
+  - ops/tasks/T-078/HANDOFF.md
+runtime:
+  required: false
+  lease: null
+gates:
+  - candidate-scope-review
+  - deterministic-observer-parser-tests
+  - saved-branch-fast-forward
+validation_boundary: Tooling review/integration only. Retained T-075 evidence is read-only. Do not control runtime, MySQL, databases, client; edit deployed hosts, global ledgers/lease, retained evidence, module C# source, or AAEmu 3.0.
+handoff: ops/tasks/T-078/HANDOFF.md
