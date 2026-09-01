@@ -654,8 +654,8 @@ tasks:
   - id: T-041
     title: One-zone Autonomous Activity Director
     track: AAEmu12
-    status: review
-    integration: pending
+    status: blocked
+    integration: fail-receipt-integrated
     depends_on: [T-080, T-084]
     runtime_lease: aaemu12
     gate: serialized-one-zone-autonomy-proof
@@ -669,12 +669,14 @@ tasks:
     dispatch_base: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
     candidate_commit: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
     result: FAIL-wave1-lowest-id-bot-received-all-three-kill-credits
+    integrated_commit: c216c751e6a2f2d59adf444d907131ea72171048
+    blocker: three-passive-fixtures-stacked-at-one-anchor-and-one-native-skill-credited-all-three-kills
 
   - id: T-085
     title: Integrate and verify the T-041 runtime FAIL receipt
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-041]
     runtime_lease: none
     gate: t041-immutable-evidence-and-semantics-verification
@@ -685,6 +687,18 @@ tasks:
     owner_thread_id: 01a05da4-8357-7463-94db-dfc407bacee6
     worktree: 'C:\Users\jensh\.codex\worktrees\84a2\PB-W00-control'
     dispatch_base: dba356bbadb63343b063a3a64036f762ca3e0df9
+    integrated_commit: c216c751e6a2f2d59adf444d907131ea72171048
+    result: PASS-6271-payloads-and-67-semantic-assertions-green
+
+  - id: T-086
+    title: Add per-bot anchors to passive runtime fixtures
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-041, T-085]
+    runtime_lease: none
+    gate: focused-aaemu12-passive-fixture-anchor-tests
+    contract: ops/tasks/T-086/CONTRACT.md
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -694,3 +708,4 @@ tasks:
     depends_on: [T-041]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
+    blocker: T-041-retained-fail-awaiting-isolated-fixture-correction-integration-and-fresh-runtime-proof

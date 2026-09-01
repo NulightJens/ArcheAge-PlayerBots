@@ -108,7 +108,7 @@ workspaces:
     path: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
     access: task-evidence-write
     lease: aaemu12
-    expected_state: absent-before-first-run-then-immutable
+    expected_state: immutable-retained-fail
 
   aaemu12_client:
     role: matching-client-fixture

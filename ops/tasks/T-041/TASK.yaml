@@ -2,8 +2,8 @@ schema_version: 1
 id: T-041
 title: One-zone Autonomous Activity Director
 track: AAEmu12
-status: review
-integration: pending
+status: blocked
+integration: fail-receipt-integrated
 outcome: Maintain configured population bounds while persistent bots independently select and complete safe one-zone activities with qualified lifecycle, navigation, combat, recovery, operator visibility, and deterministic cleanup.
 depends_on: [T-080, T-084]
 runtime:
@@ -43,3 +43,5 @@ contract: ops/tasks/T-041/CONTRACT.md
 handoff: ops/tasks/T-041/HANDOFF.md
 candidate_commit: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
 result: FAIL-wave1-lowest-id-bot-received-all-three-kill-credits
+integrated_commit: c216c751e6a2f2d59adf444d907131ea72171048
+blocker: three-passive-fixtures-stacked-at-one-anchor-and-one-native-skill-credited-all-three-kills
