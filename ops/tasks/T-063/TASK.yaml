@@ -3,7 +3,9 @@ id: T-063
 title: Wire single-bot lifecycle activity and logout
 track: AAEmu12
 status: done
-integration: pending
+integration: integrated
+integrated_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
+integrated_commit: 4d8d085e73a2cbcc05f5d37b68abc2e1122a041d
 outcome: Wire the existing deterministic life FSM into the live host so exactly one free Idle bot can autonomously select and activate bounded grinding with a retained decision reason, then request its own normal persisted logout after one completed kill.
 depends_on: [T-061, T-039]
 branch: codex-managed-detached-worktree

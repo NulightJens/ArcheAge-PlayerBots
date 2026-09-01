@@ -313,7 +313,7 @@ tasks:
     title: Atomic shared-target combat fan-out
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated
     depends_on: [T-060, T-044]
     gate: deterministic-harness-tests
     runtime_lease: none
@@ -322,12 +322,14 @@ tasks:
     worktree: 'C:\Users\jensh\.codex\worktrees\f8c6\PB-W00-control'
     head: 4c2d9e8ccdfa1255cef396388ebba2423aa35624
     handoff: ops/tasks/T-062/HANDOFF.md
+    integrated_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
+    integrated_commit: 4d8d085e73a2cbcc05f5d37b68abc2e1122a041d
 
   - id: T-063
     title: Wire single-bot lifecycle activity and logout
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated
     depends_on: [T-061, T-039]
     gate: focused-aaemu12-tests
     runtime_lease: none
@@ -336,18 +338,33 @@ tasks:
     worktree: 'C:\Users\jensh\.codex\worktrees\2130\PB-W00-control'
     head: aadcef712c6ca6c1d797375476611b71cbf86178
     handoff: ops/tasks/T-063/HANDOFF.md
+    integrated_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
+    integrated_commit: 4d8d085e73a2cbcc05f5d37b68abc2e1122a041d
 
   - id: T-064
     title: Integrate lifecycle and atomic fan-out corrections
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-062, T-063]
     gate: full-aaemu12-suite
     runtime_lease: none
     owner_client_thread_id: client-new-thread:8fc41dcb-c5f6-425c-8fc9-20105b52a8b8
     owner_thread_id: 01a05c2a-a57b-7ed2-a60b-3c21a249f3ed
     worktree: 'C:\Users\jensh\.codex\worktrees\b20f\PB-W00-control'
+    tested_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
+    installed_module_tree: 6803d1d7e1d287798390e5aed0b835b9c8f12aef
+    integrated_commit: 4d8d085e73a2cbcc05f5d37b68abc2e1122a041d
+    evidence_receipt: aaemu12-lifecycle-fanout-integration-v1
+
+  - id: T-065
+    title: AAEmu 1.2 single-bot autonomy proof v2
+    track: AAEmu12
+    status: ready
+    integration: runtime-proof-pending
+    depends_on: [T-061, T-064]
+    runtime_lease: aaemu12
+    gate: serialized-one-bot-autonomy-proof-v2
 
   - id: T-041
     title: One-zone Autonomous Activity Director

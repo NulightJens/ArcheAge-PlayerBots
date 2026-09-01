@@ -1,0 +1,35 @@
+schema_version: 1
+id: T-065
+title: AAEmu 1.2 single-bot autonomy proof v2
+track: AAEmu12
+status: ready
+integration: runtime-proof-pending
+outcome: Produce a new immutable runtime receipt proving or falsifying at least three autonomous gameplay iterations by one persistent bot using the integrated lifecycle controller, native combat/progression, self-logout, and restart persistence without per-action operator control.
+depends_on: [T-061, T-064]
+runtime:
+  required: true
+  lease: aaemu12
+  archeage_client_allowed: false
+branch: codex-managed-detached-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+inputs:
+  dispatch_base: 4d8d085e73a2cbcc05f5d37b68abc2e1122a041d
+  tested_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
+  installed_module_tree: 6803d1d7e1d287798390e5aed0b835b9c8f12aef
+  integration_receipt: ops/evidence/aaemu12-lifecycle-fanout-integration-v1.yaml
+  retained_t061_v1_receipt: ops/evidence/aaemu12-t061-one-bot-autonomy-v1.yaml
+  runtime_workspace: aaemu12_integration
+  database_workspace: aaemu12_database_public_alpha_v1
+  evidence_workspace: aaemu12_t065_evidence_v2
+write_scope:
+  - ops/evidence/aaemu12-t065-one-bot-autonomy-v2.yaml
+  - ops/tasks/T-065/HANDOFF.md
+external_write_scope:
+  - 'D:\Codex-Labs\evidence\T-065\one-bot-autonomy-v2'
+gate: serialized-one-bot-autonomy-proof-v2
+minimum_successful_iterations: 3
+failure_policy: Stop at the first smallest verified functional blocker, retain FAIL or INCOMPLETE evidence, clean up gracefully, and do not activate larger populations.
+validation_boundary: Runtime and evidence only. Managed addbot and inert opportunity staging are allowed before autonomous activation; observation commands are allowed. Do not issue botstate, target, travel, attack, loot/progression, recovery, or logout gameplay commands. Do not edit source, deployed host files, global ledgers, databases, clients, retained v1 evidence, or AAEmu 3.0.
+handoff: ops/tasks/T-065/HANDOFF.md

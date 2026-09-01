@@ -3,7 +3,9 @@ id: T-062
 title: Atomic shared-target combat fan-out
 track: AAEmu12
 status: done
-integration: pending
+integration: integrated
+integrated_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
+integrated_commit: 4d8d085e73a2cbcc05f5d37b68abc2e1122a041d
 outcome: Replace unsafe per-bot shared-target attack fan-out with one atomic all-bot contained-attack stimulus so a mortal fixture cannot disappear before every cohort member is armed.
 depends_on: [T-060, T-044]
 branch: codex-managed-detached-worktree
