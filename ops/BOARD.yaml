@@ -388,8 +388,8 @@ tasks:
   - id: T-067
     title: Expose lifecycle progression and resource deltas
     track: AAEmu12
-    status: review
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-063, T-065]
     runtime_lease: none
     gate: focused-aaemu12-tests
@@ -397,18 +397,32 @@ tasks:
     owner_thread_id: 01a05c52-d3b2-7913-95d2-7f0f426bad22
     worktree: 'C:\Users\jensh\.codex\worktrees\d453\PB-W00-control'
     source_head: 4253d0875c5165095621e1e6ff4c672fa21a51d8
+    integrated_commit: a0b826c9864de56e8b0e5c40f45f60a64e743d88
 
   - id: T-068
     title: Integrate progression and resource observability
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-067]
     runtime_lease: none
     gate: full-aaemu12-suite
     owner_client_thread_id: client-new-thread:148eafb1-d1fd-4f79-a728-807f9394898f
     owner_thread_id: 01a05c68-05eb-73f2-ab73-a046fa8a1de3
     worktree: 'C:\Users\jensh\.codex\worktrees\da8a\PB-W00-control'
+    tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
+    installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+    integrated_commit: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+    evidence_receipt: aaemu12-progression-observability-integration-v1
+
+  - id: T-069
+    title: AAEmu 1.2 single-bot autonomy proof v3
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-065, T-068]
+    runtime_lease: aaemu12
+    gate: serialized-one-bot-autonomy-proof-v3
 
   - id: T-041
     title: One-zone Autonomous Activity Director

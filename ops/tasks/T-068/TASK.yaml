@@ -2,8 +2,8 @@ schema_version: 1
 id: T-068
 title: Integrate progression and resource observability
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently replay the accepted T-067 read-only progression/resource observability correction, install the exact result into the registered AAEmu 1.2 integration host, and qualify one immutable source/install identity with a clean build and exactly one complete unit-suite invocation.
 depends_on: [T-067]
 branch: codex-managed-worktree
@@ -38,3 +38,7 @@ runtime:
 gates: [focused-aaemu12-tests, full-aaemu12-suite]
 validation_boundary: Integration/install/build/test only. Do not start Login, GameServer, MySQL, or the ArcheAge client; access databases; claim or edit the runtime lease; edit global ledgers; change retained runtime receipts; regenerate compatibility patches; change lifecycle/combat/loot/recovery behavior beyond the accepted T-067 blobs; or touch AAEmu 3.0.
 handoff: ops/tasks/T-068/HANDOFF.md
+integrated_commit: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
+installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+evidence_receipt: ops/evidence/aaemu12-progression-observability-integration-v1.yaml

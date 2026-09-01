@@ -2,8 +2,8 @@ schema_version: 1
 id: T-067
 title: Expose lifecycle progression and resource deltas
 track: AAEmu12
-status: review
-integration: pending
+status: done
+integration: integrated
 outcome: Add deterministic read-only progression, inventory, HP, and MP snapshots at autonomous activity activation and immediately before lifecycle logout so runtime evidence can prove exact native deltas after self-logout without database access or gameplay control.
 depends_on: [T-063, T-065]
 branch: codex-managed-detached-worktree
@@ -29,3 +29,4 @@ validation_boundary: Source-only read-only observability. Do not start/control A
 handoff: ops/tasks/T-067/HANDOFF.md
 source_head: 4253d0875c5165095621e1e6ff4c672fa21a51d8
 verdict: PASS-source-ready-runtime-pending
+integrated_commit: a0b826c9864de56e8b0e5c40f45f60a64e743d88

@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: progression-resource-observability-integration-qualification
+phase: single-bot-autonomy-runtime-proof-v3
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: 07e230ab959c4147318d3b5228dee492ff18c4fb
-  tested_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
-  integration_evidence: ops/evidence/aaemu12-lifecycle-fanout-integration-v1.yaml
+  integrated_head: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+  tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
+  integration_evidence: ops/evidence/aaemu12-progression-observability-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,20 +30,20 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-after-t065-incomplete
+    state: stopped-clean-and-qualified-for-t069
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
     evidence_receipt: aaemu12-t065-one-bot-autonomy-v2
-    integration_receipt: aaemu12-lifecycle-fanout-integration-v1
-    installed_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
-    installed_module_tree: 6803d1d7e1d287798390e5aed0b835b9c8f12aef
+    integration_receipt: aaemu12-progression-observability-integration-v1
+    installed_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
+    installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
     database_identity: aaemu12_database_public_alpha_v1
     compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
     build: 0-errors-76-warnings
-    focused_tests: 141-passed-0-skipped-0-failed
-    unit_tests: 1803-passed-4-intentional-skips-0-failed
-    runtime_boundary: T-065 proved autonomous grind selection, exact-target mortal combat, one successful cast, authoritative kill credit, and normal self-logout to zero bots/runtimes; exact progression delta and recovery state remained unobservable, so iterations two and three were not staged.
+    focused_tests: 182-passed-0-skipped-0-failed
+    unit_tests: 1806-passed-4-intentional-skips-0-failed
+    runtime_boundary: T-065 proved autonomous grind selection, exact-target mortal combat, one successful cast, authoritative kill credit, and normal self-logout to zero bots/runtimes; T-068 now qualifies native activation-to-logout progression/resource observability for a fresh v3 proof.
 
 control_tower:
   permanent_task:
@@ -54,8 +54,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-067 adds only read-only activation-to-logout progression and resource snapshots to structured lifecycle logs and botdebug.
-  - T-068 must independently replay, install, build, and run the full AAEmu 1.2 suite once before assigning a fresh immutable runtime-proof version; keep T-065 as INCOMPLETE and never reuse its evidence root.
+  - T-069 must prove or falsify three complete single-bot gameplay iterations plus restart persistence using exact native progression/resource snapshots in a new immutable evidence root.
+  - Keep T-065 as INCOMPLETE and never reuse its evidence root.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
@@ -111,7 +111,7 @@ prepared_workstreams:
     head: 07e230ab959c4147318d3b5228dee492ff18c4fb
     handoff: ops/tasks/T-066/HANDOFF.md
   - task: T-067
-    state: source-ready-review
+    state: done-integrated
     client_thread_id: client-new-thread:85417e89-8c24-49e9-84ed-8e2ad2753f6e
     task_thread_id: 01a05c52-d3b2-7913-95d2-7f0f426bad22
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\d453\PB-W00-control'
@@ -120,13 +120,28 @@ prepared_workstreams:
     head: 4253d0875c5165095621e1e6ff4c672fa21a51d8
     handoff: ops/tasks/T-067/HANDOFF.md
     proof: 169-passed-0-failed-build-0-errors-77-retained-warnings
+    integrated_commit: a0b826c9864de56e8b0e5c40f45f60a64e743d88
   - task: T-068
-    state: active
+    state: done-integrated
     client_thread_id: client-new-thread:148eafb1-d1fd-4f79-a728-807f9394898f
     task_thread_id: 01a05c68-05eb-73f2-ab73-a046fa8a1de3
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\da8a\PB-W00-control'
     base: 7b1ff7b879f40bf2bea8ed82d715534e4c75e3c1
     candidate: 4253d0875c5165095621e1e6ff4c672fa21a51d8
+    head: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+    source_commit: 4287ec53e998ecff2e5eb9670908166957a79662
+    installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+    evidence_receipt: ops/evidence/aaemu12-progression-observability-integration-v1.yaml
+    handoff: ops/tasks/T-068/HANDOFF.md
+  - task: T-069
+    state: ready-awaiting-exact-thread-lease-assignment
+    client_thread_id: pending-thread-creation
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+    tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
+    installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+    evidence_root: 'D:\Codex-Labs\evidence\T-069\one-bot-autonomy-v3'
     head: pending
     handoff: pending
   - task: T-038
