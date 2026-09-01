@@ -2,14 +2,14 @@ schema_version: 1
 id: T-055
 title: Give the loopback system actor an AAEmu 1.2 world context
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Make the synthetic loopback @system actor carry the active AAEmu 1.2 MainWorld so world-positioned GM fixture commands can execute headlessly.
 depends_on: [T-054]
-branch: codex-managed-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+branch: codex/t055-system-actor-world
+worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\8fd0\\PB-W00-control'
+owner_client_thread_id: client-new-thread:fb760fa2-cf61-400b-87c8-2f8cc691870c
+owner_thread_id: 01a05aeb-e957-7143-8656-e1f71514c74c
 
 inputs:
   incomplete_receipt: ops/evidence/aaemu12-t054-combat-stealth-v3.yaml

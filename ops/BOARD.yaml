@@ -215,10 +215,12 @@ tasks:
   - id: T-055
     title: Give the loopback system actor an AAEmu 1.2 world context
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-054]
     gate: deterministic-system-actor-tests
+    owner_client_thread_id: client-new-thread:fb760fa2-cf61-400b-87c8-2f8cc691870c
+    owner_thread_id: 01a05aeb-e957-7143-8656-e1f71514c74c
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
