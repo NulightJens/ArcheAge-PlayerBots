@@ -276,6 +276,13 @@ prepared_workstreams:
     handoff: ops/tasks/T-080/HANDOFF.md
     head: a76ca2476e85f134aec94081f50ca4ba3c5112da
     proof: 6490-of-6490-payloads-and-49-of-49-semantic-assertions-green
+  - task: T-081
+    state: active-source
+    client_thread_id: client-new-thread:963fb064-2584-494d-925a-da542c1873cc
+    task_thread_id: 01a05d32-e0c1-76f0-8aba-f91070c448da
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c891\PB-W00-control'
+    base: 069960e3d977767a3738b729c8e9f83767a78e8e
+    handoff: ops/tasks/T-081/HANDOFF.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

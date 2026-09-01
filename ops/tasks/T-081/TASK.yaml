@@ -2,7 +2,7 @@ schema_version: 1
 id: T-081
 title: Implement the one-zone Autonomous Activity Director
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Replace one-shot forced-state auto-spawn with a production-started, gracefully stopped, deterministic one-zone population reconciler whose configured persistent identities independently run the accepted lifecycle and refill toward bounded population targets.
 depends_on: [T-080]
@@ -10,8 +10,11 @@ runtime:
   required: false
   lease: null
 branch: codex-managed-detached-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\c891\PB-W00-control'
+owner_client_thread_id: client-new-thread:963fb064-2584-494d-925a-da542c1873cc
+owner_thread_id: 01a05d32-e0c1-76f0-8aba-f91070c448da
 inputs:
-  dispatch_base: pending-control-tower-commit
+  dispatch_base: 069960e3d977767a3738b729c8e9f83767a78e8e
   accepted_runtime_receipt: ops/evidence/aaemu12-t079-one-bot-autonomy-v6.yaml
   accepted_receipt_review: ops/tasks/T-080/HANDOFF.md
   production_startup_seam: compatibility/aaemu-1.2-r208022-v3.patch
