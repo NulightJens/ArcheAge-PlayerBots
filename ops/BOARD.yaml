@@ -282,19 +282,22 @@ tasks:
   - id: T-060
     title: AAEmu 1.2 live headless combat and stealth attempt v5
     track: AAEmu12
-    status: active
-    integration: runtime-pending
+    status: blocked
+    integration: runtime-incomplete-retained
     depends_on: [T-059]
     runtime_lease: aaemu12
     gate: serialized-live-aaemu12-proof
     archeage_client_allowed: false
     owner_client_thread_id: client-new-thread:a4beac22-f41f-4789-a907-5f40fee9f877
     owner_thread_id: 01a05b47-b0b7-71b3-90df-be5f07c6e81f
+    attempt_commit: f81417898a2531f0dbca83af7ef4a104f6d6a907
+    evidence_receipt: aaemu12-t060-combat-stealth-v5
+    blocker: shared-148-hp-target-died-during-cohort-25-fanout-and-despawned-before-exact-dead-state-observation
 
   - id: T-061
     title: AAEmu 1.2 single-bot autonomous gameplay loop
     track: AAEmu12
-    status: blocked
+    status: ready
     integration: pending
     depends_on: [T-060, T-038, T-039, T-040]
     runtime_lease: aaemu12
