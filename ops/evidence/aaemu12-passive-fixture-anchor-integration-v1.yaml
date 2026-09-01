@@ -1,0 +1,189 @@
+schema_version: 1
+id: aaemu12-passive-fixture-anchor-integration-v1
+recorded_at: '2026-09-01T11:00:18-06:00'
+verdict: green-review-replay-install-build-focused-full-unit
+
+fingerprint:
+  task: T-087
+  preparation_commit: f5df7623d33587a8b0bc4737733e8cec8b00b2cf
+  integration_parent: e80873f92e0ce93dd0604e80062d14cadcac1b45
+  lease_commit: e80873f92e0ce93dd0604e80062d14cadcac1b45
+  lease_owner_thread: 01a05ddf-2e99-72b2-8e54-76681b976592
+  lease_owner_client_thread: client-new-thread:b707adcd-da74-4fef-9e66-b615a1ff6cf6
+  candidate: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
+  candidate_parent: 0da7166627f53118184687736132a88cdb668e1e
+  candidate_tree: bba5acc13efc2ad2c7224c816969a61a27efb01d
+  candidate_parent_tree: 509547e72eadbdb70ae32269d9a73e3a1118857c
+  replay_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  replay_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  compatibility_patch_stable_id: 51cf303462d170dd61551ee2f4d410ac0e293ce8
+  installed_module_commit: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  gate_definition_version: 1
+
+accepted_input:
+  exact_parent: true
+  candidate_writer_clean_detached: true
+  candidate_declared_path_count: 5
+  unexpected_candidate_path_count: 0
+  replayed_blob_count: 5
+  replayed_blob_mismatch_count: 0
+  control_tower_descendants_preserved: true
+  writer_worktree_merged: false
+  candidate_diff_check: passed
+  patch_section_count: 28
+  patch_hunk_payload_changed_from_prior: false
+  patch_index_abbreviation_width: 8
+  manifest_declaration_count: 2
+  manifest_hash_mismatch_count: 0
+  candidate_reference_apply_check: passed-strict-whitespace
+
+independent_review:
+  verdict: passed
+  legacy_one_two_argument_path:
+    bot_manager_evaluations: 0
+    aliases_help_parsing_failure_order_success_bytes: preserved
+    invariant_culture_default_and_bounds: preserved
+    terrain_placement_passivity_displacement_and_no_respawn: preserved
+  optional_anchor_path:
+    exact_unsigned_nonzero_third_argument: enforced
+    active_bot_lookup: exact-key-BotManager-ActiveBots-only
+    absent_mismatched_worldless_zone_zero_nonfinite_stale_rejection: passed
+    world_zone_instance_inconsistency_rejection: passed
+    detached_transform_snapshot: passed
+    same_active_bot_revalidation_before_spawner_creation: passed
+    selected_world_zone_instance_boundary_preserved: passed
+    audit_fields: [anchorBotId, anchorZone, anchorInstance]
+    target_activity_combat_transform_mutation: none
+    gameplay_control_surface_added: false
+  product_defects_found: none
+
+source_replay:
+  method: exact-candidate-cherry-pick-onto-bound-integration-parent
+  replay_commit: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  replay_parent: e80873f92e0ce93dd0604e80062d14cadcac1b45
+  replay_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  unexpected_payload_file_count: 0
+  git_diff_check: passed
+  blob_ids:
+    compatibility_patch: 59057df05dde4fe21cd4c4c79bad07d0020416c8
+    t086_handoff: 9115c0d87b22c53b9cdc38d4760bb666c1ead925
+    module_manifest: 03bb260ced9d318cb78c92666ecf3f1c40562b96
+    command_source: 3775054bdd8edc57413895f11e7d046808e0835f
+    command_tests: 670aecc5803e92c26cccf60e3fa33eada78ad7ba
+
+environment:
+  os: Microsoft Windows 10.0.26200
+  architecture: X64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+
+host_preflight:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean_detached: true
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_host_status_entry_count: 30
+  installed_host_tracked_patch_path_count: 28
+  installed_host_patch_stable_id: 51cf303462d170dd61551ee2f4d410ac0e293ce8
+  prior_installed_module_commit: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+  prior_installed_module_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+  prior_installed_module_clean: true
+  prior_complete_patch_reverse_check: passed
+  aaemu_game_login_client_process_count_before: 0
+  occupied_required_port_count_before: 0
+  mysql_queried_or_controlled: false
+
+installation:
+  installed_module_fast_forward:
+    from: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+    to: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  installed_module_clean: true
+  host_overlay_transition: unchanged-hunk-payload-index-abbreviation-normalization-only
+  installer_check_only_before: passed-installed-supported
+  installer_normal_invocations: 1
+  installer_normal_result: passed-already-installed
+  installer_check_only_after: passed-installed-supported
+  host_status_entry_count_before: 30
+  host_status_entry_count_after: 30
+  host_tracked_patch_path_count_after: 28
+  host_tracked_patch_path_mismatch_count: 0
+  host_untracked_entries_after:
+    - SQL/updates/2026-08-25_aaemu_game_bot_archetype_plans.sql
+    - modules/archeage-playerbots/
+  host_patch_reverse_check_after: passed
+
+results:
+  build:
+    command: dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false --nologo --verbosity minimal
+    elapsed: '00:03:22.14'
+    errors: 0
+    warnings: 79
+  focused:
+    command: "AAEmu.UnitTests.exe --treenode-filter '/*/AAEmu.UnitTests.Game.Scripts.Commands/SpawnPassiveNpcCommandTests/*' --minimum-expected-tests 28 --no-progress --no-ansi --output Detailed"
+    total: 28
+    succeeded: 28
+    skipped: 0
+    failed: 0
+  full_unit:
+    command: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+    invocations: 1
+    total: 1851
+    succeeded: 1847
+    skipped: 4
+    failed: 0
+    intentional_skips:
+      - Legacy_Darkrunner_Pve_MatchesGolden
+      - Legacy_Primeval_Pve_MatchesGolden
+      - Legacy_Primeval_Pvp_MatchesGolden
+      - Legacy_Darkrunner_Pvp_MatchesGolden
+  final_source_diff_check: passed
+  final_reference_clean: true
+  final_installed_module_clean: true
+  final_host_status_entry_count: 30
+
+artifact_hashes:
+  game_assembly_sha256: a4508402e8564a6c6807471c9cd6c9e9bc5950e279ea1a9e7841d35a61d35075
+  test_assembly_sha256: 367522c47a75c3953b53f04e9942b2fcd5a9ea19aa865d8045f118d1fb7b2247
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+  test_report_sha256: 052c37cd3dde93f74c4dcc349a604e8bb2053bd489059d620f114ba5e9096a88
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_failures:
+  product_or_gate_failures: none
+  warnings:
+    - The build retained 79 dependency, compiler, analyzer, and test-analyzer warnings, including existing SQLitePCLRaw.lib.e_sqlite3 and SSH.NET high-severity advisories.
+  operator_probes:
+    - An initial temporary text-materialization hash probe normalized patch bytes and produced a non-authoritative mismatch; its explicit file was moved to quarantine event 20260901T164926797Z-f1f817ef. The direct Git-blob byte stream and final installed file both reproduced the contract hash.
+    - An initial read-only postflight filter treated question marks as wildcards and overcounted untracked entries. The corrected literal-prefix check proved exactly two expected untracked entries and zero patch-path mismatches.
+
+runtime_state:
+  runtime_started_stopped_or_controlled: false
+  database_or_client_accessed: false
+  mysql_queried_started_stopped_or_controlled: false
+  aaemu_game_login_client_process_count_after: 0
+  occupied_required_port_count_after: 0
+  required_ports_observed_free: [1234, 1237, 1239, 1250, 1280]
+
+retained_boundaries:
+  - No physical passive-fixture placement, Director refill, multi-bot autonomous lifecycle, runtime persistence, database, or client behavior is proven.
+  - T-041 remains an immutable retained FAIL and is not reinterpreted by this source/install/unit PASS.
+  - A fresh versioned one-zone proof requires a new exact runtime lease and a new evidence root.
+  - No scale, soak, packaging, release readiness, or AAEmu 3.0 behavior is proven.
+  - T-037 remains blocked until the one-zone Director proof passes.
+
+authorization:
+  fresh_one_zone_proof_may_proceed_after_saved_branch_fast_forward_and_lease_reassignment: true
+  exact_runtime_proof_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  exact_runtime_proof_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  control_tower_action: >-
+    After the saved integration branch contains the scoped commit with this
+    receipt and T-087 handoff, release the T-087 build-only lease and dispatch
+    a fresh versioned one-zone Director proof with a new exact runtime lease
+    and one spatially isolated passive opportunity anchored to each configured
+    bot. Never reuse or overwrite the retained T-041 evidence root.
