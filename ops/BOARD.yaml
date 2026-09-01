@@ -191,6 +191,7 @@ tasks:
     depends_on: [T-051]
     gate: full-aaemu12-suite
     owner_client_thread_id: client-new-thread:1d47aee2-eca1-4548-aae1-50ae4f89ef08
+    owner_thread_id: 01a05ab1-8b08-72f1-b0dd-d846709bb6c4
 
   - id: T-054
     title: AAEmu 1.2 combat and stealth physical attempt v3
