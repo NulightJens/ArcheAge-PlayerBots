@@ -12,7 +12,7 @@ owner_client_thread_id: client-new-thread:08dbaead-1b07-4f00-89d6-e4d9ce4ba3bd
 owner_thread_id: 01a05af9-afa4-78a0-ad93-e8373d5d9aa4
 
 inputs:
-  integration_head: 305ac25
+  integration_head: 305ac25513aa56a5ef664a53444c4f6eb5e11a01
   source_candidate: 68cf32fbe3012364fb0e1dec2c8f6278015e35eb
   source_parent: 3bdeedadbe8818c29079bb495b93fcd8fe7582f8
   source_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
