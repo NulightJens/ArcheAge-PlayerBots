@@ -592,7 +592,7 @@ tasks:
   - id: T-081
     title: Implement the one-zone Autonomous Activity Director
     track: AAEmu12
-    status: active
+    status: review
     integration: pending
     depends_on: [T-080]
     runtime_lease: none
@@ -600,6 +600,18 @@ tasks:
     owner_client_thread_id: client-new-thread:963fb064-2584-494d-925a-da542c1873cc
     owner_thread_id: 01a05d32-e0c1-76f0-8aba-f91070c448da
     worktree: 'C:\Users\jensh\.codex\worktrees\c891\PB-W00-control'
+    source_head: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
+    source_parent: 069960e3d977767a3738b729c8e9f83767a78e8e
+    result: focused-source-green-131-unique-tests-build-0-errors
+
+  - id: T-082
+    title: Integrate and qualify the one-zone Activity Director
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-081]
+    runtime_lease: aaemu12-build-only
+    gate: full-aaemu12-suite
 
   - id: T-041
     title: One-zone Autonomous Activity Director
