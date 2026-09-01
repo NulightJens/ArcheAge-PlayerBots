@@ -1,0 +1,182 @@
+schema_version: 1
+id: aaemu12-progression-observability-integration-v1
+recorded_at: '2026-09-01T04:04:50-06:00'
+verdict: green-review-replay-install-build-focused-full-unit
+
+fingerprint:
+  task: T-068
+  declared_integration_head: 7b1ff7b879f40bf2bea8ed82d715534e4c75e3c1
+  task_dispatch_head: c815259bd3a2b07dbb4725b1b544a4e35683163e
+  resolved_assignment_head: 9bb180add20a55f39649b7af5e07eca9ed1a378b
+  t067_candidate: 4253d0875c5165095621e1e6ff4c672fa21a51d8
+  t067_parent: 301d5ec1001d762b32fbca132eaee06aa8dd44b3
+  t067_stable_patch_id: fd7a46815d8a2c72488e116fdf50b63dd381a9b2
+  replay_source_commit: 4287ec53e998ecff2e5eb9670908166957a79662
+  replay_source_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+  replay_stable_patch_id: fd7a46815d8a2c72488e116fdf50b63dd381a9b2
+  installed_module_commit: 4287ec53e998ecff2e5eb9670908166957a79662
+  installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  active_compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  playerbots_manifest_sha256: ce77c9a3b6f83a66199da55c57847de08ecd0f98cf9d1cdd0579c89ab7c8c076
+  gate_definition_version: 1
+
+accepted_input:
+  declared_integration_head_verified: true
+  declared_head_is_ancestor_of_task_dispatch: true
+  task_dispatch_is_ancestor_of_resolved_assignment: true
+  post_declared_head_changes_are_dispatch_and_owner_metadata: true
+  candidate_exact_parent_verified: true
+  candidate_worktree_clean: true
+  task_worktree_clean_before_replay: true
+  saved_integration_worktree_clean: true
+  candidate_diff_check: passed
+  declared_replay_file_count: 6
+  unexpected_replay_file_count: 0
+  pinned_reference_identity: passed
+  registered_host_identity: passed
+  registered_installed_module_identity: passed
+
+source_replay:
+  method: fast-forward-resolved-assignment-then-cherry-pick-no-commit-and-independent-commit
+  candidate_file_blobs_matched: 6
+  candidate_file_blob_mismatches: 0
+  unexpected_payload_files: 0
+  git_diff_check: passed
+  global_ledger_payload_replayed: false
+  protected_payload_unchanged:
+    - compatibility/aaemu-1.2-r208022-v3.patch
+    - playerbots.module.json
+    - ops/BOARD.yaml
+    - ops/CURRENT.yaml
+    - ops/WORKSPACES.yaml
+    - ops/RUNTIME-LEASE.yaml
+    - ops/evidence/aaemu12-t065-one-bot-autonomy-v2.yaml
+
+independent_review:
+  immutable_accepted_activity_baseline: passed
+  immutable_pre_logout_completion_snapshot: passed
+  exact_signed_native_deltas: passed
+  invariant_inventory_order_summary_and_fingerprint: passed
+  explicit_unavailable_degradation: passed
+  structured_record_before_normal_logout_callback: passed
+  botdebug_pending_and_completed_visibility: passed
+  duplicate_tick_suppression: passed
+  callback_failure_snapshot_retention: passed
+  persistent_identity_reregistration_reset: passed
+  activity_selection_targeting_combat_loot_recovery_unchanged: passed
+  persistence_logout_acceptance_and_callback_path_unchanged: passed
+  read_only_observation_failures_do_not_escape_host_tick: passed
+
+environment:
+  os: Microsoft Windows 10.0.26200
+  architecture: X64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+
+host_preflight:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean: true
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_host_status_entry_count: 30
+  installed_host_status_snapshot: 3ba59378bacebcfafe53e84f59201a0eba09140b
+  prior_installed_module_commit: 401dd353ef37aa858763b41dc2e5c1663446ff57
+  prior_installed_module_tree: 6803d1d7e1d287798390e5aed0b835b9c8f12aef
+  prior_installed_module_clean: true
+  reference_patch_apply_check: passed
+  installed_host_patch_reverse_check: passed
+  aaemu_game_login_client_process_count_before: 0
+  preexisting_mysql_process_count: 2
+  occupied_required_port_count_before: 0
+
+installation:
+  installed_module_fast_forward:
+    from: 401dd353ef37aa858763b41dc2e5c1663446ff57
+    to: 4287ec53e998ecff2e5eb9670908166957a79662
+  installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+  installed_module_clean: true
+  complete_host_patch_reapplied: false
+  compatibility_patch_regenerated: false
+  overwritten_host_file_count: 0
+  installer_check_only_before: passed-installed-supported
+  installer_idempotent_normal_run: passed-already-installed
+  installer_check_only_after: passed-installed-supported
+  host_status_entry_count_before: 30
+  host_status_entry_count_after: 30
+  host_status_snapshot_before: 3ba59378bacebcfafe53e84f59201a0eba09140b
+  host_status_snapshot_after: 3ba59378bacebcfafe53e84f59201a0eba09140b
+  host_status_unchanged: true
+
+results:
+  build:
+    command: dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false --nologo --verbosity minimal
+    errors: 0
+    warnings: 76
+  focused:
+    command: >-
+      AAEmu.UnitTests.exe --treenode-filter
+      /*/*/(BotLifeControllerTests)|(BotLifeStateMachineTests)|(BotBehaviorProfileTests)|(BotHostBehaviorTests)|(BotHostTests)|(BotKillCreditTests)|(BotCombatTaskTests)|(BotCombatStateTests)|(BotManagerTests)|(BotCommandsTests)/*
+      --minimum-expected-tests 169 --no-progress --no-ansi --output Detailed
+    total: 182
+    succeeded: 182
+    skipped: 0
+    failed: 0
+  full_unit:
+    command: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+    invocations: 1
+    total: 1810
+    succeeded: 1806
+    skipped: 4
+    failed: 0
+    intentional_skips:
+      - Legacy_Primeval_Pvp_MatchesGolden
+      - Legacy_Darkrunner_Pvp_MatchesGolden
+      - Legacy_Darkrunner_Pve_MatchesGolden
+      - Legacy_Primeval_Pve_MatchesGolden
+  final_source_diff_check: passed
+  final_reference_clean: true
+  final_installed_module_clean: true
+  final_host_status_entry_count: 30
+  final_host_status_unchanged: true
+
+artifact_hashes:
+  game_assembly_sha256: 2aebd10094ec69f9a2f2839862424712cb2015b3fcb5647ab05174b309d5736c
+  test_assembly_sha256: 56876ab5237584738164c0818e3d76d97ae7d0b387e342c6f7fc5e8938386c1c
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+  test_report: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.UnitTests\bin\Debug\net10.0\TestResults\AAEmu.UnitTests-windows-net10.0-report.html'
+  test_report_sha256: dfe55dc9e2ab58dfac05879b78e56103d534af2a87e2d567c2b244a5b0732b0e
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_failures:
+  product_or_gate_failures: none
+  warnings:
+    - The complete build retained 76 dependency, compiler, analyzer, and test-analyzer warnings and produced zero errors.
+
+runtime_state:
+  runtime_started_stopped_or_controlled: false
+  runtime_lease_claimed_or_edited: false
+  database_or_client_accessed: false
+  preexisting_mysql_processes_controlled_or_accessed: false
+  aaemu_game_login_client_process_count_after: 0
+  preexisting_mysql_process_count_after: 2
+  occupied_required_port_count_after: 0
+  required_ports_observed_free: [1234, 1237, 1239, 1250, 1280]
+
+retained_boundaries:
+  - No Login, GameServer, MySQL, ArcheAge client, or AAEmu runtime process was started, stopped, or controlled.
+  - No database, client fixture, runtime lease, global ledger, retained T-065 evidence, compatibility patch, or AAEmu 3.0 artifact was changed.
+  - T-065 remains INCOMPLETE; this qualification does not reinterpret or replace its immutable evidence root.
+  - Native runtime progression and inventory deltas, recovery state, persisted self-logout, clean restart, Activity Director, scale, soak, and release acceptance remain unproven.
+
+authorization:
+  fresh_immutable_runtime_proof_may_be_dispatched: true
+  control_tower_action: >-
+    Accept this T-068 receipt and the tested/installed module identity
+    4287ec53e998ecff2e5eb9670908166957a79662 with tree
+    1c6820f2f47ec79a3aab40174e1b448f894f67e4. After the Integrator
+    fast-forwards the saved integration branch through the T-068 handoff,
+    PB-000 may dispatch a fresh immutable one-bot runtime proof. Never reuse
+    or alter the retained T-065 evidence root.
