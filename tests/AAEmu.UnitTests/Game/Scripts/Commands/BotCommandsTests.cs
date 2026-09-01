@@ -842,6 +842,114 @@ public class BotCommandsTests
     }
 
     [Test]
+    public async Task BotDebug_TransformTelemetry_IsInvariantRoundTripAndReadOnly()
+    {
+        var previousCulture = CultureInfo.CurrentCulture;
+        var previousUiCulture = CultureInfo.CurrentUICulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+            CultureInfo.CurrentUICulture = new CultureInfo("de-DE");
+            var bot = AddDebugBot(2);
+            var target = AddBot(3);
+            var world = new WorldInstance(
+                new WorldTemplate { Id = 0, Name = "main_world" },
+                0,
+                true,
+                43);
+            const uint zoneId = 601;
+            var position = new Vector3(-123.45679f, 0.00012345678f, -98765.43f);
+            const float yaw = 1.2345678f;
+            BotTestFixture.SetPrivateField(bot.Transform, "_instanceId", world.Id);
+            BotTestFixture.SetPrivateField(bot.Transform, "<WorldId>k__BackingField", 0u);
+            BotTestFixture.SetPrivateField(bot.Transform, "_zoneId", zoneId);
+            bot.Transform.Local.SetPosition(position);
+            bot.Transform.Local.SetRotation(-0.25f, 0.75f, yaw);
+            BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+            bot.CurrentTarget = target;
+            bot.IsInBattle = true;
+
+            var combat = new BotCombatState
+            {
+                CurrentState = BotCombatStateType.Combat,
+                PreviousState = BotCombatStateType.Idle,
+                ForcedState = BotCombatStateType.Grinding,
+                IsActive = true,
+                Target = target
+            };
+            _combatManager.States[bot.Id] = combat;
+            var movement = _botManager.GetBotState(bot.Id);
+            movement.Destination = new Vector3(-7.25f, 8.5f, -9.75f);
+            movement.IsRunning = false;
+            movement.IsMoving = true;
+            movement.IsFalling = true;
+            movement.FallVelocity = -4.25f;
+            movement.FollowTarget = target;
+
+            var originalPosition = bot.Transform.World.Position;
+            var originalRotation = bot.Transform.World.Rotation;
+            var originalDestination = movement.Destination;
+            var expectedTransform = string.Create(CultureInfo.InvariantCulture,
+                $"[botdebug] Transform: world=0, instance=43, zone={zoneId}, " +
+                $"x={position.X:R}, y={position.Y:R}, z={position.Z:R}, yaw_rad={yaw:R}");
+
+            var output = Execute(new BotDebugCommand(), bot.Id.ToString(CultureInfo.InvariantCulture));
+            var messages = output.Messages.ToList();
+            var positionIndex = messages.IndexOf($"[botdebug] Position: {originalPosition}");
+            var transformIndex = messages.IndexOf(expectedTransform);
+            var transformLine = messages.Single(message =>
+                message.StartsWith("[botdebug] Transform: ", StringComparison.Ordinal));
+
+            await Assert.That(positionIndex).IsGreaterThanOrEqualTo(0);
+            await Assert.That(transformIndex).IsEqualTo(positionIndex + 1);
+            await Assert.That(messages).Contains("[botdebug] === Bot 'bot2' (Id: 2, ObjId: 1002) ===");
+            await Assert.That(messages).Contains("[botdebug] HP: 100/100, MP: 100/100");
+            await Assert.That(messages).Contains("[botdebug] IsDead: False, IsInBattle: True");
+            await Assert.That(messages).Contains("[botdebug] --- Movement State ---");
+            await Assert.That(messages).Contains("[botdebug] IsRunning: False");
+            await Assert.That(messages).Contains("[botdebug] IsMoving: True");
+            await Assert.That(messages).Contains("[botdebug] IsFalling: True");
+            await Assert.That(messages).Contains("[botdebug] FollowTarget: bot3");
+            await Assert.That(messages).Contains("[botdebug] --- Combat State ---");
+            await Assert.That(messages).Contains("[botdebug] State: Combat, Previous: Idle, Forced: Grinding");
+            await Assert.That(messages).Contains("[botdebug] Target: bot3, CurrentTarget: bot3");
+            await Assert.That(messages).Contains(message => message.StartsWith("[botdebug] Host metrics: ", StringComparison.Ordinal));
+
+            var parsedYaw = float.Parse(
+                transformLine[(transformLine.LastIndexOf('=') + 1)..],
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture);
+            await Assert.That(BitConverter.SingleToInt32Bits(parsedYaw))
+                .IsEqualTo(BitConverter.SingleToInt32Bits(yaw));
+            await Assert.That(transformLine).DoesNotContain("yaw_rad=1,2345678");
+
+            await Assert.That(bot.Transform.WorldId).IsEqualTo(0u);
+            await Assert.That(bot.Transform.InstanceId).IsEqualTo(43u);
+            await Assert.That(bot.Transform.ZoneId).IsEqualTo(zoneId);
+            await Assert.That(bot.Transform.World.Position).IsEqualTo(originalPosition);
+            await Assert.That(bot.Transform.World.Rotation).IsEqualTo(originalRotation);
+            await Assert.That(bot.CurrentTarget).IsSameReferenceAs(target);
+            await Assert.That(bot.IsInBattle).IsTrue();
+            await Assert.That(combat.CurrentState).IsEqualTo(BotCombatStateType.Combat);
+            await Assert.That(combat.PreviousState).IsEqualTo(BotCombatStateType.Idle);
+            await Assert.That(combat.ForcedState).IsEqualTo(BotCombatStateType.Grinding);
+            await Assert.That(combat.IsActive).IsTrue();
+            await Assert.That(combat.Target).IsSameReferenceAs(target);
+            await Assert.That(movement.Destination).IsEqualTo(originalDestination);
+            await Assert.That(movement.IsRunning).IsFalse();
+            await Assert.That(movement.IsMoving).IsTrue();
+            await Assert.That(movement.IsFalling).IsTrue();
+            await Assert.That(movement.FallVelocity).IsEqualTo(-4.25f);
+            await Assert.That(movement.FollowTarget).IsSameReferenceAs(target);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previousCulture;
+            CultureInfo.CurrentUICulture = previousUiCulture;
+        }
+    }
+
+    [Test]
     public async Task BotDebug_SearchingState_ExposesLossSearchAndDuelDiagnostics()
     {
         var bot = AddDebugBot(2);

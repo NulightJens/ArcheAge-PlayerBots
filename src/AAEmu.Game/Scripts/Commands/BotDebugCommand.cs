@@ -47,6 +47,14 @@ namespace AAEmu.Game.Scripts.Commands
 
             CommandManager.SendNormalText(this, messageOutput, $"=== Bot '{bot.Name}' (Id: {bot.Id}, ObjId: {bot.ObjId}) ===");
             CommandManager.SendNormalText(this, messageOutput, $"Position: {bot.Transform.World.Position}");
+            var transform = bot.Transform;
+            var worldTransform = transform.World;
+            var position = worldTransform.Position;
+            var yaw = worldTransform.Rotation.Z;
+            CommandManager.SendNormalText(this, messageOutput,
+                string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                    $"Transform: world={transform.WorldId}, instance={transform.InstanceId}, zone={transform.ZoneId}, " +
+                    $"x={position.X:R}, y={position.Y:R}, z={position.Z:R}, yaw_rad={yaw:R}"));
             CommandManager.SendNormalText(this, messageOutput, $"HP: {bot.Hp}/{bot.MaxHp}, MP: {bot.Mp}/{bot.MaxMp}");
             CommandManager.SendNormalText(this, messageOutput, $"IsDead: {bot.IsDead}, IsInBattle: {bot.IsInBattle}");
             var isStealthed = bot.Buffs?.HasEffectsMatchingCondition(effect => effect.Template.Stealth) == true;

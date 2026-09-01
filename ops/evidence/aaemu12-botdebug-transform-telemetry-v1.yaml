@@ -1,0 +1,149 @@
+schema_version: 1
+id: aaemu12-botdebug-transform-telemetry-v1
+task: T-102
+track: AAEmu12
+recorded_at: '2026-09-01T16:01:53-06:00'
+verdict: PASS
+
+source:
+  binding_commit: 9a94b21fd4f9855346109cfe7b5b941df13e6b4b
+  dispatch_base: 968720578b8e1e85e925e63ac584e410bcc71635
+  accepted_integration_source: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
+  candidate_parent: 9a94b21fd4f9855346109cfe7b5b941df13e6b4b
+  candidate_commit: exact-hash-reported-to-control-tower-after-commit
+  candidate_tree: exact-hash-reported-to-control-tower-after-commit
+  branch: task/T-102-botdebug-transform-telemetry
+  writer_worktree: 'C:\Users\jensh\.codex\worktrees\dbb1\PB-W00-control'
+
+telemetry:
+  command: BotDebugCommand
+  placement: immediately-after-existing-position-message
+  grammar: 'Transform: world=<uint>, instance=<uint>, zone=<uint>, x=<float:R>, y=<float:R>, z=<float:R>, yaw_rad=<float:R>'
+  exact_fixture_sample: 'Transform: world=0, instance=43, zone=601, x=-123.45679, y=0.00012345678, z=-98765.43, yaw_rad=1.2345678'
+  culture: System.Globalization.CultureInfo.InvariantCulture
+  precision: single-precision-round-trip-R
+  live_values:
+    world: bot.Transform.WorldId
+    instance: bot.Transform.InstanceId
+    zone: bot.Transform.ZoneId
+    position: one-captured-bot.Transform.World.Position
+    yaw_rad: same-captured-bot.Transform.World.Rotation.Z
+  existing_position_message_changed: false
+  transform_target_combat_movement_or_life_mutation_added: false
+
+focused_tests:
+  framework: TUnit-1.54.0.0
+  runtime: net10.0-x64
+  command: >-
+    AAEmu.UnitTests.exe --treenode-filter
+    '/*/AAEmu.UnitTests.Game.Scripts.Commands/BotCommandsTests/*'
+    --minimum-expected-tests 46 --no-progress --no-ansi --output Detailed
+  final:
+    total: 46
+    passed: 46
+    failed: 0
+    skipped: 0
+    duration_ms: 507
+  transform_case:
+    current_culture: de-DE
+    current_ui_culture: de-DE
+    default_world_zero: PASS
+    explicit_instance_43: PASS
+    explicit_zone_601: PASS
+    finite_signed_coordinates: PASS
+    decimal_separator_invariant: PASS
+    yaw_input: 1.2345678
+    yaw_single_bits: '0x3F9E0651'
+    parsed_yaw_single_bits: '0x3F9E0651'
+    yaw_bit_exact_round_trip: PASS
+    immediately_after_position: PASS
+    existing_diagnostics_present: PASS
+    transform_unchanged: PASS
+    target_unchanged: PASS
+    combat_state_unchanged: PASS
+    movement_state_unchanged: PASS
+  superseded_fixture_run:
+    passed: 45
+    failed: 1
+    skipped: 0
+    product_failures: 0
+    cause: >-
+      The new test assigned Transform.InstanceId through the pinned host setter,
+      which requires a WorldManager not registered by BotCommandsTests.
+    correction: established-private-field-test-fixture-seam
+
+isolated_build:
+  proof_workspace: 'D:\Codex-Labs\t102-aaemu12-source-build-v1'
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  preparation:
+    clone: no-hardlinks-no-checkout-then-detached-pinned-head
+    compatibility_patch_applied_files: 28
+    module_delivery: proof-only-junction-to-exact-writer-worktree
+  complete_no_incremental:
+    command: >-
+      dotnet build AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-incremental
+      --no-restore
+    result: PASS
+    warnings: 72
+    errors: 0
+    elapsed: '00:04:08.99'
+  final_test_only_recompile_after_fixture_correction:
+    command: >-
+      dotnet build AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-restore
+    result: PASS
+    warnings: 43
+    errors: 0
+    elapsed: '00:04:54.84'
+    production_source_changed_after_complete_build: false
+  retained_setup_failure:
+    warnings: 3
+    errors: 23
+    product_failures: 0
+    cause: >-
+      The first isolated invocation lacked the required relative
+      modules/archeage-playerbots import path, so the patched host compiled no
+      module namespaces. A proof-only junction supplied the exact writer tree.
+  retained_warning_boundary: >-
+    Pinned package advisory plus existing host/module compiler, analyzer, and
+    TUnit warnings; the final build summaries contain zero errors.
+
+compatibility_patch:
+  path: compatibility/aaemu-1.2-r208022-v3.patch
+  expected_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  observed_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  byte_identical: true
+  registered_reference:
+    workspace_id: aaemu12_reference
+    head: 62e3eb1d87da01194802ac886cd500134facad28
+    clean_detached_before: true
+    strict_apply_check_whitespace_error_all: PASS
+    clean_detached_after: true
+  isolated_proof_workspace_reverse_check: PASS
+
+integrity:
+  writer_and_proof_module_blob_match: PASS
+  proof_host_diff_file_count: 28
+  normalized_blobs:
+    command_source: bb771ced28f10665a4ca453d1fb06738f47cd680
+    command_tests: d59389ba77980db37b387858a2de863308c89e42
+  artifacts:
+    game_assembly_sha256: 894602ab8258a8dba6dcdad969d9fd04349f74c9ca36a47cee9df10fa29560a4
+    test_assembly_sha256: d98a53b2a4b832c4763cbd555b0fbebb97602168819a312c73f60690d3a98e36
+    test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+    final_test_report_sha256: 1f669f5ad453f0998972e57e7192ef0cbffe50d1ea931605ef13936d4feca7a1
+  raw_logs_committed: false
+
+scope:
+  full_suite_invocations: 0
+  deployment_performed: false
+  runtime_started_stopped_inspected_or_controlled: false
+  registered_integration_host_or_module_written: false
+  registered_reference_written: false
+  external_runtime_evidence_written: false
+  database_or_client_accessed: false
+  global_ledgers_or_runtime_lease_written: false
+  aaemu30_scale_soak_or_packaging_touched: false
+
+retained_boundaries:
+  - T-098 remains an immutable retained runtime FAIL and is not reinterpreted by this source PASS.
+  - Installation, the once-per-wave full suite, and physical botdebug/fixture preflight remain pending for independent integration and a fresh versioned runtime successor.
