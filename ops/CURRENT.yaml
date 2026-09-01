@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: portable-client-observer-integration
+phase: fresh-one-zone-runtime-proof-v3
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: d2b3c80eaad6c75cfec8f35658b54e5a12f4e6c0
+  integrated_head: fdb47f9dc2dc2ca82c8fb95e67171b05d6baf02a
   tested_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
-  integration_evidence: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
+  integration_evidence: ops/evidence/aaemu12-client-process-observer-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -54,9 +54,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Independently replay and rerun the T-090 observer under Windows PowerShell and pwsh without a runtime lease.
-  - Integrate the observer only if both 105-assertion gates remain green and its three candidate blobs are exact.
-  - Dispatch a fresh successor runtime proof after T-091; use a new task, binding, runtime lease, and versioned evidence root.
+  - Bind T-092 to an exact runtime thread and commit a fresh AAEmu 1.2 runtime-only lease.
+  - Require the integrated portable observer to publish a validated derived row before Login, then retain continuous zero-client sampling through final cleanup.
+  - Run the corrected two-wave three-bot Director proof, distinct-PID restart and dwell, then independently integrate its sealed evidence before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
@@ -402,7 +402,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t088-incomplete-integration-v1.yaml
     proof: 18-of-18-payloads-and-68-of-68-semantic-assertions-green
   - task: T-090
-    state: done-candidate-pending-integration
+    state: done-integrated-by-T-091
     client_thread_id: client-new-thread:9137a173-88d6-4ca4-9773-70e37d83150f
     task_thread_id: 01a05dfc-60e5-71a2-945f-8b938195c8ee
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\99a2\PB-W00-control'
@@ -412,7 +412,7 @@ prepared_workstreams:
     head: e03ca62e623350cfd88e9f1abe09e6b810b8626a
     proof: powershell-105-and-pwsh-105-assertions-green
   - task: T-091
-    state: active-exact-thread-bound
+    state: done-integrated
     client_thread_id: client-new-thread:f3154b6d-6837-4d5b-8212-61d1b346b8af
     task_thread_id: 01a05e0e-a085-7623-b86f-95cc25ebdc89
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\8db4\PB-W00-control'
@@ -420,6 +420,16 @@ prepared_workstreams:
     candidate: e03ca62e623350cfd88e9f1abe09e6b810b8626a
     candidate_parent: 13522612e1af23c7066bd7836da412d02f018fad
     contract: ops/tasks/T-091/CONTRACT.md
+    head: fdb47f9dc2dc2ca82c8fb95e67171b05d6baf02a
+    replay_commit: bf386e981649ee609fb9a38b6ffb7a2218dc2f67
+    evidence_receipt: ops/evidence/aaemu12-client-process-observer-integration-v1.yaml
+    proof: powershell-105-and-pwsh-105-assertions-green
+  - task: T-092
+    state: prepared-awaiting-thread-binding
+    source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+    evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
+    contract: ops/tasks/T-092/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

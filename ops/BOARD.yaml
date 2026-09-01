@@ -694,7 +694,7 @@ tasks:
     title: Add per-bot anchors to passive runtime fixtures
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated-by-T-087
     depends_on: [T-041, T-085]
     runtime_lease: none
     gate: focused-aaemu12-passive-fixture-anchor-tests
@@ -769,7 +769,7 @@ tasks:
     title: Add a portable continuous client-process observer
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated-by-T-091
     depends_on: [T-088]
     runtime_lease: none
     gate: windows-powershell-and-pwsh-observer-tests
@@ -784,8 +784,8 @@ tasks:
   - id: T-091
     title: Integrate the portable client-process observer
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-090]
     runtime_lease: none
     gate: independent-windows-powershell-and-pwsh-observer-tests
@@ -796,13 +796,30 @@ tasks:
     owner_thread_id: 01a05e0e-a085-7623-b86f-95cc25ebdc89
     worktree: 'C:\Users\jensh\.codex\worktrees\8db4\PB-W00-control'
     dispatch_base: 020c5cc1b4bfabb002a94af004ab78dfa2fb3922
+    integrated_commit: fdb47f9dc2dc2ca82c8fb95e67171b05d6baf02a
+    replay_commit: bf386e981649ee609fb9a38b6ffb7a2218dc2f67
+    result: PASS-powershell-105-and-pwsh-105-assertions
+
+  - id: T-092
+    title: Reprove one-zone autonomy with integrated client observer
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-087, T-091]
+    runtime_lease: aaemu12-pending-thread-binding
+    gate: serialized-one-zone-autonomy-proof-v3
+    zone_id: 221
+    configured_bot_ids: [20001, 20002, 20003]
+    configured_population: {minimum: 2, target: 3, maximum: 3}
+    contract: ops/tasks/T-092/CONTRACT.md
+    evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-088]
+    depends_on: [T-092]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-088-retained-incomplete-awaiting-sampler-correction-and-fresh-successor-proof
+    blocker: T-092-fresh-successor-runtime-proof-not-yet-passed-and-integrated

@@ -1,0 +1,45 @@
+schema_version: 1
+id: T-092
+title: Reprove one-zone autonomy with integrated client observer
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Produce a fresh immutable live AAEmu 1.2 proof that continuously observes zero client processes, bootstraps the exact Director cohort, gives all three bots two independently credited autonomous lifecycles with refills, and preserves target population across a distinct-PID restart.
+depends_on: [T-087, T-091]
+runtime:
+  required: true
+  lease: aaemu12-pending-thread-binding
+  archeage_client_allowed: false
+branch: codex-managed-worktree
+worktree: pending-thread-binding
+owner_client_thread_id: pending-thread-binding
+owner_thread_id: pending-thread-binding
+inputs:
+  dispatch_base: pending-preparation-commit
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: a4508402e8564a6c6807471c9cd6c9e9bc5950e279ea1a9e7841d35a61d35075
+  observer_integration_commit: fdb47f9dc2dc2ca82c8fb95e67171b05d6baf02a
+  observer_script_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+  observer_receipt: ops/evidence/aaemu12-client-process-observer-integration-v1.yaml
+  retained_predecessor_receipt: ops/evidence/aaemu12-t088-one-zone-autonomy-v2.yaml
+  retained_predecessor_root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
+  evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
+write_scope:
+  - ops/evidence/aaemu12-t092-one-zone-autonomy-v3.yaml
+  - ops/tasks/T-092/HANDOFF.md
+external_write_scope:
+  - aaemu12_t092_evidence_v3
+  - deployed BotConfig.json exact contracted edit and byte restoration
+gates:
+  - exact-lease-source-config-observer-and-fresh-root-preflight
+  - observer-ready-row-zero-before-login-and-continuous-zero-client-sampling
+  - observer-prearmed-zero-to-three-director-bootstrap
+  - two-separated-three-bot-autonomy-waves-and-refills
+  - distinct-pid-restart-rebootstrap-and-two-minute-dwell
+  - graceful-cleanup-observer-summary-config-restoration-and-sealed-manifest
+validation_boundary: Runtime evidence only. Do not edit source/tests/tools/scripts/manifests/patches, global ledgers/lease, predecessor evidence, client files, database state, scale, soak, packaging, or AAEmu 3.0. Never start/control/query MySQL or a database or start/control the ArcheAge client. Never issue directed bot gameplay commands.
+contract: ops/tasks/T-092/CONTRACT.md
+handoff: ops/tasks/T-092/HANDOFF.md
