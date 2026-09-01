@@ -218,11 +218,16 @@ wave_2:
     blocker: synthetic-system-actor-parent-world-null
   system_actor_world_recovery_source_task:
     task: T-055
-    state: active
+    state: source-complete-review
     outcome: assign-the-active-world-and-matching-spawn-position-to-fresh-system-actors
     client_thread_id: client-new-thread:fb760fa2-cf61-400b-87c8-2f8cc691870c
     task_thread_id: 01a05aeb-e957-7143-8656-e1f71514c74c
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\8fd0\\PB-W00-control'
+    head: 68cf32fbe3012364fb0e1dec2c8f6278015e35eb
+    patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  system_actor_world_recovery_integration_task:
+    task: T-056
+    state: ready
   startup_log_recovery_integration_task:
     task: T-053
     state: completed
