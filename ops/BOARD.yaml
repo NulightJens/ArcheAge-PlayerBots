@@ -803,7 +803,7 @@ tasks:
   - id: T-092
     title: Reprove one-zone autonomy with integrated client observer
     track: AAEmu12
-    status: active
+    status: blocked
     integration: pending
     depends_on: [T-087, T-091]
     runtime_lease: aaemu12
@@ -817,13 +817,32 @@ tasks:
     owner_thread_id: 01a05e17-fb8b-7610-a0de-e8693dc0af91
     worktree: 'C:\Users\jensh\.codex\worktrees\86b9\PB-W00-control'
     dispatch_base: 38b6ca7518215521dc3bb34389de4c5a4d547368
+    candidate_commit: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
+    result: FAIL-observer-prearm-after-bots-20001-and-20002-admitted
+    blocker: complete-three-bot-two-offline-sample-prearm-not-proven-before-admission
+
+  - id: T-093
+    title: Independently integrate the T-092 retained FAIL evidence
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-092]
+    runtime_lease: null
+    gate: immutable-t092-fail-evidence-verification
+    contract: ops/tasks/T-093/CONTRACT.md
+    candidate_commit: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
+    candidate_parent: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
+    evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-092]
+    depends_on: [T-093, fresh-successor-runtime-proof]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-092-fresh-successor-runtime-proof-not-yet-passed-and-integrated
+    blocker: T-092-is-retained-FAIL-and-fresh-successor-runtime-proof-not-yet-passed-and-integrated

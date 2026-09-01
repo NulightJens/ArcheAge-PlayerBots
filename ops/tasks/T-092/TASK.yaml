@@ -2,7 +2,7 @@ schema_version: 1
 id: T-092
 title: Reprove one-zone autonomy with integrated client observer
 track: AAEmu12
-status: active
+status: blocked
 integration: pending
 outcome: Produce a fresh immutable live AAEmu 1.2 proof that continuously observes zero client processes, bootstraps the exact Director cohort, gives all three bots two independently credited autonomous lifecycles with refills, and preserves target population across a distinct-PID restart.
 depends_on: [T-087, T-091]
@@ -43,3 +43,6 @@ gates:
 validation_boundary: Runtime evidence only. Do not edit source/tests/tools/scripts/manifests/patches, global ledgers/lease, predecessor evidence, client files, database state, scale, soak, packaging, or AAEmu 3.0. Never start/control/query MySQL or a database or start/control the ArcheAge client. Never issue directed bot gameplay commands.
 contract: ops/tasks/T-092/CONTRACT.md
 handoff: ops/tasks/T-092/HANDOFF.md
+candidate_commit: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
+result: FAIL-observer-prearm-after-bots-20001-and-20002-admitted
+manifest_sha256: 39f6c85e69faa78d87824632f0db168bcbc87db4fd26b8d350f7bea70370809c

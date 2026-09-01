@@ -120,9 +120,9 @@ workspaces:
   aaemu12_t092_evidence_v3:
     role: one-zone-autonomous-director-runtime-evidence-v3
     path: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
-    access: task-evidence-write
+    access: evidence-only
     lease: aaemu12
-    expected_state: absent-before-first-run-then-immutable
+    expected_state: immutable-retained-fail
 
   aaemu12_client:
     role: matching-client-fixture

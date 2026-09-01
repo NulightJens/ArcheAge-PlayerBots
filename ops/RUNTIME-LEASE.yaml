@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-runtime-evidence-by-T-092
-    owner_task: T-092
-    owner_thread_id: 01a05e17-fb8b-7610-a0de-e8693dc0af91
+    status: released-after-T-092-fail-cleanup-awaiting-independent-integration
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
-    cleanup_receipt: ops/evidence/aaemu12-t088-one-zone-autonomy-v2.yaml
+    released_at: 2026-09-01
+    cleanup_receipt: candidate-885a6858e97ae073f86eed1aeef1c45bee3bb2ac:ops/evidence/aaemu12-t092-one-zone-autonomy-v3.yaml
     baseline_evidence: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: T-092 may start loopback Login then Game and stop Game then Login gracefully, perform only the contracted deployed BotConfig.json edit and exact byte restoration, run the bound integrated client-process observer plus read-only bot/metrics/roster observers, write only the fresh aaemu12_t092_evidence_v3 root, and issue exactly the six contracted spawnpassive fixture commands. MySQL/database query or control, ArcheAge client start/control, directed bot gameplay, source/install/build changes, force-stop, and every other lease use are prohibited. No other task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 records release.
+    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact task/thread/worktree claim. T-092 cleanup was accepted from candidate 885a6858e97ae073f86eed1aeef1c45bee3bb2ac: graceful Game-then-Login stop, zero bots/runtimes/processes/client/listeners/live logs, exact config restoration, and unchanged observed MySQL PIDs.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
