@@ -1,0 +1,185 @@
+schema_version: 1
+id: aaemu12-activity-director-delay-range-integration-v1
+recorded_at: '2026-09-01T13:51:32-06:00'
+verdict: PASS-integration-install-build-focused-full-unit
+
+fingerprint:
+  task: T-097
+  preparation_commit: 8515e189fd775e8a83853e6cca62d7f517cce48c
+  binding_commit: fade69068009a90a9f2cd7936618fbede28e8f43
+  integration_parent: fade69068009a90a9f2cd7936618fbede28e8f43
+  lease_commit: fade69068009a90a9f2cd7936618fbede28e8f43
+  lease_owner_thread: 01a05e7a-7318-7611-aa5e-d6fc1a52ab84
+  lease_owner_client_thread: client-new-thread:0e011ddf-ffdc-4c8c-a595-aee28b756ec7
+  candidate: 859e0daf64df482fcb17d83e16344387453a19b7
+  candidate_parent: 1ebfd0ec47138ebf15268befde9ed1671aa05ef8
+  candidate_tree: 593e0cf3d53fced072a665ed5de0aa6549946bf4
+  candidate_parent_tree: 8b3dedb01fb6f33db576172efe0da8cc25d8a8c0
+  replay_source: 761ffa1e0bd76d06532688f34b45e192a493b239
+  replay_parent: fade69068009a90a9f2cd7936618fbede28e8f43
+  replay_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  installed_module_commit: 761ffa1e0bd76d06532688f34b45e192a493b239
+  installed_module_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  gate_definition_version: 1
+
+accepted_input:
+  exact_sole_parent: true
+  candidate_declared_path_count: 4
+  unexpected_candidate_path_count: 0
+  replayed_blob_count: 4
+  replayed_blob_mismatch_count: 0
+  candidate_parent_source_matches_binding_source: true
+  candidate_parent_tests_match_binding_tests: true
+  control_tower_descendants_preserved: true
+  writer_branch_merged: false
+  t094_retained_fail_preserved: true
+  candidate_paths:
+    - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+    - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+    - ops/evidence/aaemu12-activity-director-delay-range-v1.yaml
+    - ops/tasks/T-096/HANDOFF.md
+
+independent_review:
+  verdict: passed
+  shared_initial_delay_ceiling_ms: 300000
+  shared_by_validation_and_runtime_configuration: true
+  preserved_initial_delay_ms: 180000
+  legacy_initial_delay_ms: 60000
+  validation_cases:
+    negative_ms: {input: -1, expected: 0, result: PASS}
+    legacy_ms: {input: 60000, expected: 60000, result: PASS}
+    widened_ms: {input: 180000, expected: 180000, result: PASS}
+    exact_ceiling_ms: {input: 300000, expected: 300000, result: PASS}
+    above_ceiling_ms: {input: 300001, expected: 300000, result: PASS}
+    runtime_timespan: {input_ms: 180000, expected: '00:03:00', result: PASS}
+  product_defects_found: none
+
+environment:
+  os: Microsoft Windows 10.0.26200
+  architecture: X64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+
+host_preflight:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean_detached: true
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  host_status_entry_count: 30
+  host_tracked_patch_path_count: 28
+  host_untracked_entries:
+    - SQL/updates/2026-08-25_aaemu_game_bot_archetype_plans.sql
+    - modules/archeage-playerbots/
+  prior_installed_module_commit: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  prior_installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  prior_installed_module_clean: true
+  strict_reference_apply_check: passed
+  complete_integration_host_reverse_check: passed
+
+installation:
+  method: clean-installed-module-detached-switch-to-exact-replay-object
+  installed_module_transition:
+    from: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    to: 761ffa1e0bd76d06532688f34b45e192a493b239
+  installed_module_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+  installed_module_clean: true
+  exact_four_blob_identity: true
+  host_overlay_transition: unchanged
+  installer_check_only_after: passed-installed-supported
+  installer_normal_invocations: 0
+  final_host_status_entry_count: 30
+  final_host_tracked_patch_path_count: 28
+  final_host_patch_reverse_check: passed
+
+results:
+  focused:
+    framework: TUnit-1.54.0.0
+    runtime: net10.0-x64
+    bot_config:
+      command: >-
+        AAEmu.UnitTests.exe --treenode-filter
+        /*/AAEmu.UnitTests.Game.Core.Managers.BotManagers/BotConfigTests/*
+        --minimum-expected-tests 32 --no-progress --no-ansi --output Detailed
+      total: 32
+      succeeded: 32
+      skipped: 0
+      failed: 0
+    activity_director:
+      command: >-
+        AAEmu.UnitTests.exe --treenode-filter
+        /*/AAEmu.UnitTests.Bots.Ops/BotActivityDirectorTaskTests/*
+        --minimum-expected-tests 8 --no-progress --no-ansi --output Detailed
+      total: 8
+      succeeded: 8
+      skipped: 0
+      failed: 0
+    total:
+      succeeded: 40
+      skipped: 0
+      failed: 0
+  build:
+    command: dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false --nologo --verbosity minimal
+    elapsed: '00:02:35.78'
+    errors: 0
+    warnings: 79
+  full_unit:
+    command: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+    invocations: 1
+    total: 1855
+    succeeded: 1851
+    skipped: 4
+    failed: 0
+    intentional_skips:
+      - Legacy_Darkrunner_Pve_MatchesGolden
+      - Legacy_Primeval_Pve_MatchesGolden
+      - Legacy_Primeval_Pvp_MatchesGolden
+      - Legacy_Darkrunner_Pvp_MatchesGolden
+  final_source_diff_check: passed
+  final_reference_clean: true
+  final_installed_module_clean: true
+
+artifact_hashes:
+  game_assembly_sha256: c1b3bd922c900c31c76a5748359b8363ea7c56ba34d27daed9c90fd1ddbd51ef
+  test_assembly_sha256: 1ce75c20799fc6f47cbe12e56d2d7ffd3ccb085e5cc93d5b5f9f1b79605fb9bc
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+  test_report_sha256: d710e959acb00a77b876787f9d9275532633da85e2b419a8dad6ca95f91b58fb
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_failures:
+  product_or_gate_failures: none
+  warnings:
+    - The clean build retained 79 pinned dependency, compiler, analyzer, and test-analyzer warnings, including existing SQLitePCLRaw.lib.e_sqlite3 and SSH.NET high-severity advisories.
+  operator_probes:
+    - The first read-only host preflight used PowerShell's reserved Host variable; the affected host checks were rerun successfully before any host write.
+    - A non-proof incremental unit-test-project compilation produced 72 retained warnings before the exact focused selections; the subsequent contracted clean solution build is authoritative.
+
+runtime_state:
+  runtime_started_stopped_or_controlled: false
+  runtime_observer_started_or_controlled: false
+  database_or_client_accessed: false
+  mysql_queried_started_stopped_or_controlled: false
+  deployed_runtime_configuration_edited: false
+  aaemu_game_login_client_process_count_after: 0
+  occupied_required_port_count_after: 0
+  required_ports_observed_free: [1234, 1237, 1239, 1250, 1280]
+
+retained_boundaries:
+  - T-094 remains an immutable retained FAIL; this source/install/unit PASS does not reinterpret its runtime evidence.
+  - No physical 180-second admission delay, Director refill, three-bot autonomous lifecycle, restart persistence, database, or client behavior is proven.
+  - No scale, soak, packaging, release readiness, or AAEmu 3.0 behavior is proven.
+  - T-037 remains blocked until a fresh post-correction runtime proof passes and is independently integrated.
+
+authorization:
+  fresh_runtime_successor_may_proceed_after_saved_branch_fast_forward_and_lease_reassignment: true
+  exact_runtime_proof_source: 761ffa1e0bd76d06532688f34b45e192a493b239
+  exact_runtime_proof_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+  control_tower_action: >-
+    After the saved integration branch contains the scoped T-097 integration
+    commit, release or reassign the build-only lease and dispatch a fresh
+    versioned runtime successor against this exact source and tree. It must use
+    a new evidence root and prove the configured 180-second first admission;
+    never reuse or overwrite retained T-094 evidence.
