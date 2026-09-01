@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-startup-gate-recovery
+phase: wave-2-physical-retry-ready
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: 30d2b90955350918998f6e005d2fc8994e36f56b
-  tested_module_source: 9938495eb7f1904ac4575bc0db42fc28a7f35851
-  integration_evidence: ops/evidence/aaemu12-wave2-integration-v1.yaml
+  integrated_head: da570e3cc3936917c097ddd2302525f56125c916
+  tested_module_source: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+  integration_evidence: ops/evidence/aaemu12-startup-schema-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,12 +30,13 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: source-green-database-registered-runtime-ready
+    state: startup-proof-integrated-runtime-retry-ready
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-wave2-integration-v1
+    evidence_receipt: aaemu12-startup-schema-integration-v1
     database_identity: aaemu12_database_public_alpha_v1
+    compatibility_patch_sha256: 5b44353fef730367b6dfe29baaa0c5141374163f6616549b6724cead91d82ac3
     build: 0-errors-75-warnings
     focused_tests: 120-passed-0-skipped-0-failed
     unit_tests: 1789-passed-4-intentional-skips-0-failed
@@ -51,8 +52,8 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Run T-048 to add and deterministically validate credential-free exact selected-schema startup evidence on AAEmu 1.2.
-  - Independently integrate the correction, then dispatch a new immutable T-036 physical attempt under a fresh aaemu12 lease claim.
+  - Claim aaemu12 for fresh task T-050 and run a new immutable physical combat/stealth attempt in external evidence directory public-alpha-v2.
+  - Release the lease only after committed cleanup evidence; activate T-037 only if T-050 passes.
   - Keep T-037 and T-041 blocked until their declared dependencies are accepted.
 
 prepared_workstreams:
@@ -156,18 +157,27 @@ wave_2:
     cleanup: login-graceful-game-never-started-zero-processes-five-ports-free
   recovery_source_task:
     task: T-048
-    state: handoff-ready
+    state: integrated
     client_thread_id: client-new-thread:881e830f-eaed-46f2-abb5-ab300f7089d0
     task_thread_id: pending-task-list-resolution
     outcome: exact-selected-schema-startup-proof
     worktree: 'C:\Users\jensh\.codex\worktrees\6038\PB-W00-control'
     head: dc9340fc61d1090e61eda99e55f0cd993b2af898
+    integrated_commit: da570e3cc3936917c097ddd2302525f56125c916
   recovery_integration_task:
     task: T-049
-    state: setup-in-progress
+    state: completed
     client_thread_id: client-new-thread:d720cd48-efde-46ec-81d1-d501386a8059
     task_thread_id: pending-task-list-resolution
     source_head: dc9340fc61d1090e61eda99e55f0cd993b2af898
-  runtime_lease: released-after-T-036-incomplete-cleanup
+    tested_module_source: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+    integrated_commit: da570e3cc3936917c097ddd2302525f56125c916
+    evidence_receipt: aaemu12-startup-schema-integration-v1
+  physical_retry:
+    task: T-050
+    state: ready
+    external_evidence: 'D:\Codex-Labs\evidence\T-036\public-alpha-v2'
+    retained_predecessor: aaemu12-t036-combat-stealth-v1
+  runtime_lease: unclaimed
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-T-048-integration-and-new-lease-claim
+  runtime_start: prohibited-until-T-050-assignment-and-lease-claim

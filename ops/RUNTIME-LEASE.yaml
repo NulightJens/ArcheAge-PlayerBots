@@ -15,8 +15,8 @@ runtimes:
     claimed_at: 2026-08-31
     released_at: 2026-08-31
     cleanup_receipt: ops/evidence/aaemu12-t036-combat-stealth-v1.yaml
-    baseline_evidence: ops/evidence/aaemu12-wave2-integration-v1.yaml
-    availability_limit: T-036 recovery remains blocked until the exact selected-schema startup guard is corrected and integrated.
+    baseline_evidence: ops/evidence/aaemu12-startup-schema-integration-v1.yaml
+    availability_limit: PB-000 must claim and assign the fresh T-050 physical attempt before Login or Game starts.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

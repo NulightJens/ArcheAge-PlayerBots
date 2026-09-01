@@ -126,28 +126,40 @@ tasks:
   - id: T-048
     title: Exact AAEmu 1.2 selected-schema startup proof
     track: AAEmu12
-    status: review
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-036]
     gate: deterministic-harness-tests
     owner_client_thread_id: client-new-thread:881e830f-eaed-46f2-abb5-ab300f7089d0
     source_head: dc9340fc61d1090e61eda99e55f0cd993b2af898
+    integrated_commit: da570e3cc3936917c097ddd2302525f56125c916
 
   - id: T-049
     title: AAEmu 1.2 startup-proof integration
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-048]
     gate: full-aaemu12-suite
     owner_client_thread_id: client-new-thread:d720cd48-efde-46ec-81d1-d501386a8059
+    integrated_commit: da570e3cc3936917c097ddd2302525f56125c916
+    evidence_receipt: aaemu12-startup-schema-integration-v1
+
+  - id: T-050
+    title: AAEmu 1.2 mortal-combat and stealth recovery attempt
+    track: AAEmu12
+    status: ready
+    integration: runtime-pending
+    depends_on: [T-049]
+    runtime_lease: aaemu12
+    gate: serialized-live-aaemu12-proof
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-036]
+    depends_on: [T-050]
     runtime_lease: aaemu12
 
   - id: T-041
