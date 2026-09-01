@@ -2,17 +2,17 @@ schema_version: 1
 id: T-098
 title: Reprove one-zone autonomy after Director delay correction
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Produce a fresh immutable live AAEmu 1.2 proof that honors the 180-second Director delay, pre-arms all three observers, gives all three bots two independently credited autonomous lifecycles with refills, and preserves target population across a distinct-PID restart.
 depends_on: [T-097]
 runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
 branch: codex-managed-worktree
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\4e59\PB-W00-control'
+owner_client_thread_id: client-new-thread:1bb59774-6513-4413-ab92-af3e3d8253cb
+owner_thread_id: 01a05e8c-e6b0-7902-81b1-8dd7a6456dd3
 inputs:
-  dispatch_base: pending-control-commit
+  dispatch_base: bc6c8bd528e88d1bf2fe17b460336818cb58d85e
   host_base: 62e3eb1d87da01194802ac886cd500134facad28
   installed_module_source: 761ffa1e0bd76d06532688f34b45e192a493b239
   installed_module_tree: c36b1255cccb3a782e44e87a56bc9e867a946048

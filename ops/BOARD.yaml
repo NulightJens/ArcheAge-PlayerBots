@@ -926,7 +926,7 @@ tasks:
   - id: T-098
     title: Reprove one-zone autonomy after Director delay correction
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-097]
     runtime_lease: aaemu12
@@ -937,9 +937,10 @@ tasks:
     initial_delay_ms: 180000
     contract: ops/tasks/T-098/CONTRACT.md
     evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:1bb59774-6513-4413-ab92-af3e3d8253cb
+    owner_thread_id: 01a05e8c-e6b0-7902-81b1-8dd7a6456dd3
+    worktree: 'C:\Users\jensh\.codex\worktrees\4e59\PB-W00-control'
+    dispatch_base: bc6c8bd528e88d1bf2fe17b460336818cb58d85e
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

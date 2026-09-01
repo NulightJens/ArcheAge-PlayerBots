@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: prepare-fresh-one-zone-runtime-proof-v5
+phase: execute-fresh-one-zone-runtime-proof-v5
 verdict: active
 
 source:
@@ -30,7 +30,7 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-build-qualified-awaiting-t098-runtime
+    state: stopped-clean-build-qualified-claimed-by-t098-before-runtime
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
@@ -55,7 +55,7 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-098 to an exact runtime thread/worktree and fresh aaemu12 lease from integrated head 71d13ca70b7c6f530a48ece85ced7041adaa7e1b.
+  - Execute T-098 under its exact committed thread/worktree and aaemu12 lease from integrated head 71d13ca70b7c6f530a48ece85ced7041adaa7e1b.
   - Require all three pre-arms and no first admission before 180000 ms, then both separated three-bot lifecycle/refill waves.
   - Prove distinct-PID restart/rebootstrap/two-minute dwell and independently integrate the sealed result before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
@@ -509,10 +509,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
     proof: 40-focused-build-0-errors-79-warnings-full-1851-pass-4-intentional-skips-once
   - task: T-098
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-runtime-evidence-worker
+    client_thread_id: client-new-thread:1bb59774-6513-4413-ab92-af3e3d8253cb
+    task_thread_id: 01a05e8c-e6b0-7902-81b1-8dd7a6456dd3
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\4e59\PB-W00-control'
+    dispatch_base: bc6c8bd528e88d1bf2fe17b460336818cb58d85e
     source: 761ffa1e0bd76d06532688f34b45e192a493b239
     installed_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
     evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
