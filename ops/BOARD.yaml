@@ -340,11 +340,14 @@ tasks:
   - id: T-064
     title: Integrate lifecycle and atomic fan-out corrections
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-062, T-063]
     gate: full-aaemu12-suite
     runtime_lease: none
+    owner_client_thread_id: client-new-thread:8fc41dcb-c5f6-425c-8fc9-20105b52a8b8
+    owner_thread_id: 01a05c2a-a57b-7ed2-a60b-3c21a249f3ed
+    worktree: 'C:\Users\jensh\.codex\worktrees\b20f\PB-W00-control'
 
   - id: T-041
     title: One-zone Autonomous Activity Director

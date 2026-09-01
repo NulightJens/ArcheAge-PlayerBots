@@ -2,14 +2,14 @@ schema_version: 1
 id: T-064
 title: Integrate lifecycle and atomic fan-out corrections
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Independently review and integrate the accepted T-062 atomic fan-out and T-063 single-bot lifecycle corrections, install the resulting module into the registered AAEmu 1.2 integration host, and qualify one immutable source/install identity with a clean full build and complete unit suite.
 depends_on: [T-062, T-063]
 branch: codex-managed-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+worktree: 'C:\Users\jensh\.codex\worktrees\b20f\PB-W00-control'
+owner_client_thread_id: client-new-thread:8fc41dcb-c5f6-425c-8fc9-20105b52a8b8
+owner_thread_id: 01a05c2a-a57b-7ed2-a60b-3c21a249f3ed
 
 inputs:
   integration_head: 0fcb943552dcefde95bc2af220caab6bfafa77ef

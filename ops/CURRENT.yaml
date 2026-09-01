@@ -73,10 +73,10 @@ prepared_workstreams:
     head: aadcef712c6ca6c1d797375476611b71cbf86178
     handoff: ops/tasks/T-063/HANDOFF.md
   - task: T-064
-    state: ready
-    client_thread_id: pending-thread-creation
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
+    state: active
+    client_thread_id: client-new-thread:8fc41dcb-c5f6-425c-8fc9-20105b52a8b8
+    task_thread_id: 01a05c2a-a57b-7ed2-a60b-3c21a249f3ed
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\b20f\PB-W00-control'
     base: 0fcb943552dcefde95bc2af220caab6bfafa77ef
     source_heads:
       T-062: 4c2d9e8ccdfa1255cef396388ebba2423aa35624
