@@ -241,8 +241,11 @@ prepared_workstreams:
     head: 0e48860649ca26a7148350ffdb103118c9e6aba0
     proof: 64-deterministic-assertions-green
   - task: T-078
-    state: ready
-    base: pending-control-dispatch-commit
+    state: active
+    client_thread_id: client-new-thread:1099e6b6-9c17-4666-9d52-bae68ae8607a
+    task_thread_id: 01a05cf5-d7ba-7d83-aa9e-e48ed090940e
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\3881\PB-W00-control'
+    base: 189e96c304d1e7b41517c764887ec5010b1a93b2
     source_commit: 0e48860649ca26a7148350ffdb103118c9e6aba0
     handoff: ops/tasks/T-078/HANDOFF.md
   - task: T-038

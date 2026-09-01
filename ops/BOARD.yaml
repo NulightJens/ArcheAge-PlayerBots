@@ -547,11 +547,14 @@ tasks:
   - id: T-078
     title: Integrate the offline-safe autonomy observer
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-077]
     runtime_lease: none
     gate: deterministic-observer-parser-integration
+    owner_client_thread_id: client-new-thread:1099e6b6-9c17-4666-9d52-bae68ae8607a
+    owner_thread_id: 01a05cf5-d7ba-7d83-aa9e-e48ed090940e
+    worktree: 'C:\Users\jensh\.codex\worktrees\3881\PB-W00-control'
 
   - id: T-041
     title: One-zone Autonomous Activity Director
