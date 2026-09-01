@@ -54,8 +54,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-065 exact thread 01a05c3c-9169-7eb3-b0a6-3ecaf41ecf16 owns the serialized AAEmu 1.2 runtime proof and must stop at the first smallest functional blocker.
-  - Retain T-061 v1 as FAIL; T-065 must produce a separate immutable v2 evidence root and stop at the first smallest functional blocker.
+  - T-066 integrates the exact T-065 INCOMPLETE receipt at 630c6c9d24505dc074e0da31ed1d633f84014c0d without changing its verdict.
+  - Release the AAEmu 1.2 lease only after that receipt is branch-integrated, then dispatch the smallest read-only progression/resource observability source correction.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
@@ -98,6 +98,16 @@ prepared_workstreams:
     tested_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
     installed_module_tree: 6803d1d7e1d287798390e5aed0b835b9c8f12aef
     evidence_root: 'D:\Codex-Labs\evidence\T-065\one-bot-autonomy-v2'
+    attempt_commit: 630c6c9d24505dc074e0da31ed1d633f84014c0d
+    verdict: INCOMPLETE-absent-authoritative-progression-delta
+    handoff: ops/tasks/T-065/HANDOFF.md
+  - task: T-066
+    state: ready
+    client_thread_id: pending-thread-creation
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: 04912db77beaac540a45d455fe852ebd6f4284de
+    source_commit: 630c6c9d24505dc074e0da31ed1d633f84014c0d
     handoff: pending
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f

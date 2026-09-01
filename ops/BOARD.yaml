@@ -369,6 +369,15 @@ tasks:
     owner_thread_id: 01a05c3c-9169-7eb3-b0a6-3ecaf41ecf16
     worktree: 'C:\Users\jensh\.codex\worktrees\beca\PB-W00-control'
 
+  - id: T-066
+    title: Integrate T-065 runtime receipt
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-065]
+    runtime_lease: none
+    gate: receipt-integrity-review
+
   - id: T-041
     title: One-zone Autonomous Activity Director
     track: AAEmu12

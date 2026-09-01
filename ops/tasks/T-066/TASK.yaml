@@ -1,0 +1,27 @@
+schema_version: 1
+id: T-066
+title: Integrate T-065 runtime receipt
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Independently verify and branch-integrate the exact two-file T-065 INCOMPLETE runtime receipt without changing its verdict, evidence, or cleanup boundary.
+depends_on: [T-065]
+branch: codex-managed-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+inputs:
+  integration_head: 04912db77beaac540a45d455fe852ebd6f4284de
+  source_candidate: 630c6c9d24505dc074e0da31ed1d633f84014c0d
+  source_parent: 04912db77beaac540a45d455fe852ebd6f4284de
+  evidence_manifest_sha256: 0114c06ccef9a45ef0a09955d57e06e5761c97505eed517665bcb0b6e86caa91
+write_scope:
+  - ops/evidence/aaemu12-t065-one-bot-autonomy-v2.yaml
+  - ops/tasks/T-065/HANDOFF.md
+  - ops/tasks/T-066/HANDOFF.md
+runtime:
+  required: false
+  lease: null
+gates: [receipt-integrity-review]
+validation_boundary: Receipt review and integration only. Do not start or control any runtime, MySQL, or client; do not access databases; edit global ledgers/leases; change source/deployed hosts; reinterpret T-065; modify external evidence; or touch AAEmu 3.0.
+handoff: ops/tasks/T-066/HANDOFF.md
