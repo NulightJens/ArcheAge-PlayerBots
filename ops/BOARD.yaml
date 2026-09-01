@@ -837,12 +837,30 @@ tasks:
     owner_thread_id: pending
     worktree: pending
 
+  - id: T-094
+    title: Reprove one-zone autonomy with widened observer pre-arm window
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-087, T-091, T-093]
+    runtime_lease: aaemu12
+    gate: serialized-one-zone-autonomy-proof-v4
+    zone_id: 221
+    configured_bot_ids: [20001, 20002, 20003]
+    configured_population: {minimum: 2, target: 3, maximum: 3}
+    initial_delay_ms: 180000
+    contract: ops/tasks/T-094/CONTRACT.md
+    evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
+
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-093, fresh-successor-runtime-proof]
+    depends_on: [T-094]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-092-is-retained-FAIL-and-fresh-successor-runtime-proof-not-yet-passed-and-integrated
+    blocker: T-094-fresh-successor-runtime-proof-not-yet-passed-and-integrated

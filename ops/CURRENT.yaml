@@ -55,7 +55,7 @@ control_tower:
 
 next_transition:
   - Independently verify and integrate only the retained T-092 FAIL receipt from candidate 885a6858e97ae073f86eed1aeef1c45bee3bb2ac.
-  - Prepare a fresh successor with a 180000 ms initial delay; require all three autonomy observers to publish two offline samples before Director admission.
+  - After T-093 integration, bind T-094 with a 180000 ms initial delay and require all three autonomy observers to publish two offline samples before Director admission.
   - Run the corrected two-wave three-bot Director proof, distinct-PID restart and dwell, then independently integrate its sealed evidence before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
@@ -447,6 +447,16 @@ prepared_workstreams:
     source_candidate_parent: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
     evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
     contract: ops/tasks/T-093/CONTRACT.md
+  - task: T-094
+    state: prepared-waiting-for-T-093-integration
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+    evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
+    initial_delay_ms: 180000
+    contract: ops/tasks/T-094/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
