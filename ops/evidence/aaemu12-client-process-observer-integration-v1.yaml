@@ -1,0 +1,119 @@
+schema_version: 1
+id: aaemu12-client-process-observer-integration-v1
+recorded_at: '2026-09-01T11:45:24-06:00'
+verdict: PASS-independent-review-byte-identical-replay-dual-shell
+
+integration_identity:
+  task: T-091
+  task_thread_id: 01a05e0e-a085-7623-b86f-95cc25ebdc89
+  owner_client_thread_id: client-new-thread:f3154b6d-6837-4d5b-8212-61d1b346b8af
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\8db4\PB-W00-control'
+  dispatch_base: 020c5cc1b4bfabb002a94af004ab78dfa2fb3922
+  binding_commit: 2452e1d3dd8d5476ce1de9a999c1e7f54734c0c5
+  saved_branch: integration/aaemu12-world
+  saved_branch_head_before: 2452e1d3dd8d5476ce1de9a999c1e7f54734c0c5
+  runtime_lease: none
+
+candidate:
+  commit: e03ca62e623350cfd88e9f1abe09e6b810b8626a
+  parent: 13522612e1af23c7066bd7836da412d02f018fad
+  tree: 801f144671b77466de9f1dc14e31f7efd1db6a4d
+  writer_worktree: 'C:\Users\jensh\.codex\worktrees\99a2\PB-W00-control'
+  writer_clean_detached_at_candidate: true
+  exact_path_count: 3
+  unexpected_path_count: 0
+  paths:
+    - path: scripts/autonomy/Observe-ClientProcessAbsence.ps1
+      blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+    - path: scripts/autonomy/tests/Test-ClientProcessObserver.ps1
+      blob: 8bad3e454bcdc12f68bc564f88db0ebc15dfe898
+    - path: ops/tasks/T-090/HANDOFF.md
+      blob: 4676fff035668d43f0324515aeff9032d6992dc1
+
+replay:
+  commit: bf386e981649ee609fb9a38b6ffb7a2218dc2f67
+  parent: 2452e1d3dd8d5476ce1de9a999c1e7f54734c0c5
+  tree: be58ceaa4ea71fdea1c8145da85a9df4989b452a
+  candidate_stable_patch_id: 557ca150a6baf7935de723a59c679a03e439e20c
+  replay_stable_patch_id: 557ca150a6baf7935de723a59c679a03e439e20c
+  stable_patch_id_match: true
+  replayed_blob_count: 3
+  replayed_blob_mismatch_count: 0
+  byte_identical: true
+  unexpected_path_count: 0
+  git_diff_check: passed
+
+independent_review:
+  verdict: passed
+  windows_powershell_5_1_compatible: true
+  framework_sha256_over_exact_bytes: true
+  get_filehash_command_dependency: false
+  create_new_and_atomic_artifacts: true
+  raw_and_hash_chain_rows_durably_flushed: true
+  ready_published_only_after_raw_and_row_zero: true
+  raw_sequences_monotonic: true
+  exact_process_identities_and_counts: true
+  cooperative_sentinel_only_success: true
+  summary_counts_gap_and_terminal_chain: true
+  fail_closed_error_and_refusal_paths: true
+  observed_process_mutation: false
+  product_or_contract_defects_found: none
+
+test_results:
+  complete_harness_invocations:
+    windows_powershell: 1
+    pwsh: 1
+  windows_powershell:
+    version: 5.1.26100.9168
+    command: powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File scripts/autonomy/tests/Test-ClientProcessObserver.ps1 -ArtifactsDirectory <fresh-retained-root>
+    exit_code: 0
+    assertions: 105
+    zero_match_samples: 4
+    current_shell_samples: 2
+    artifact_root: 'C:\Users\jensh\.codex\worktrees\8db4\PB-W00-control\scripts\autonomy\.test-runs\t091-powershell-20260901T1744108766661Z-19b4d118b8774ab788ca3ac92327ac87'
+  pwsh:
+    version: 7.6.4
+    command: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File scripts/autonomy/tests/Test-ClientProcessObserver.ps1 -ArtifactsDirectory <fresh-retained-root>
+    exit_code: 0
+    assertions: 105
+    zero_match_samples: 4
+    current_shell_samples: 2
+    artifact_root: 'C:\Users\jensh\.codex\worktrees\8db4\PB-W00-control\scripts\autonomy\.test-runs\t091-pwsh-20260901T1744241438683Z-9307eb6aad684c288a58ce8729690162'
+  artifact_roots_distinct_fresh_and_retained: true
+  artifact_deletions_or_overwrites: 0
+  raw_test_output_committed: false
+
+environment:
+  os: Microsoft Windows NT 10.0.26200.0
+  architecture: X64
+
+boundaries:
+  registered_host_module_or_config_accessed: false
+  runtime_started_stopped_or_controlled: false
+  login_game_mysql_database_or_client_accessed: false
+  external_runtime_evidence_accessed_or_mutated: false
+  global_ledgers_or_runtime_lease_mutated: false
+  product_source_or_patch_mutated: false
+  full_suite_scale_soak_packaging_or_aaemu30_used: false
+  live_runtime_behavior_proven: false
+
+retained_failures:
+  product_or_gate_failures: none
+  prior_test_attempts_deleted: false
+
+integration:
+  integrator_authored_paths:
+    - ops/evidence/aaemu12-client-process-observer-integration-v1.yaml
+    - ops/tasks/T-091/HANDOFF.md
+  total_committed_path_count: 5
+  saved_branch_update: fast-forward-only-through-the-commit-containing-this-receipt
+  merge_commit_created: false
+  history_rewritten: false
+
+authorization:
+  fresh_runtime_successor_may_be_prepared_after_saved_branch_fast_forward: true
+  control_tower_action: >-
+    PB-000 may prepare a fresh separately bound runtime successor only after
+    the saved branch contains the replay and this receipt. T-088 remains
+    INCOMPLETE and T-037 remains blocked until a new runtime proof passes and
+    is independently integrated. No live runtime behavior is claimed here.
