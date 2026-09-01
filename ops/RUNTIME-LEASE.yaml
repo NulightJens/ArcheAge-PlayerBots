@@ -5,7 +5,7 @@ runtimes:
   aaemu12:
     status: claimed-by-T-050
     owner_task: T-050
-    owner_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
+    owner_thread_id: 01a05a8e-3f30-7c81-996b-3eab7fe2e934
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'

@@ -175,11 +175,12 @@ wave_2:
     evidence_receipt: aaemu12-startup-schema-integration-v1
   physical_retry:
     task: T-050
-    state: setup-in-progress
+    state: active-preflight
     client_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
-    task_thread_id: pending-task-list-resolution
+    task_thread_id: 01a05a8e-3f30-7c81-996b-3eab7fe2e934
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\f4cd\\PB-W00-control'
     external_evidence: 'D:\Codex-Labs\evidence\T-036\public-alpha-v2'
     retained_predecessor: aaemu12-t036-combat-stealth-v1
   runtime_lease: claimed-by-T-050
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: authorized-only-after-T-050-synchronizes-this-claim
+  runtime_start: authorized-only-after-T-050-synchronizes-final-identity-claim

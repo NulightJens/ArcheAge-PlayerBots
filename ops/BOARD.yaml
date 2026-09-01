@@ -154,6 +154,7 @@ tasks:
     runtime_lease: aaemu12
     gate: serialized-live-aaemu12-proof
     owner_client_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
+    owner_thread_id: 01a05a8e-3f30-7c81-996b-3eab7fe2e934
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
