@@ -1,0 +1,36 @@
+schema_version: 1
+id: T-055
+title: Give the loopback system actor an AAEmu 1.2 world context
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Make the synthetic loopback @system actor carry the active AAEmu 1.2 MainWorld so world-positioned GM fixture commands can execute headlessly.
+depends_on: [T-054]
+branch: codex-managed-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+
+inputs:
+  incomplete_receipt: ops/evidence/aaemu12-t054-combat-stealth-v3.yaml
+  incomplete_handoff: ops/tasks/T-054/HANDOFF.md
+  host_reference: aaemu12_reference
+  host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  active_patch: compatibility/aaemu-1.2-r208022-v3.patch
+
+write_scope:
+  - src/AAEmu.Game/Bots/Ops/SystemActor.cs
+  - tests/AAEmu.UnitTests/Services/WebApi/CommandControllerTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - compatibility/README.md
+  - playerbots.module.json
+  - CHANGELOG.md
+  - ops/tasks/T-055/HANDOFF.md
+
+runtime:
+  required: false
+  lease: null
+gates: [deterministic-system-actor-tests, focused-aaemu12-tests, patch-apply-check]
+validation_boundary: Source and deterministic fixture work only. Do not edit or deploy AAEmu hosts, start runtime or client processes, access databases, alter global ledgers or the runtime lease, or edit AAEmu 3.0 compatibility artifacts.
+handoff: ops/tasks/T-055/HANDOFF.md

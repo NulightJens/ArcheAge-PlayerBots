@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-by-T-054
-    owner_task: T-054
-    owner_thread_id: 01a05abe-7ea9-70c1-94c4-236f31392392
+    status: available-clean-after-T-054
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,10 +13,10 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-08-31
-    released_at: null
-    cleanup_receipt: pending-T-054-zero-bot-graceful-stop-and-restart-proof
+    released_at: 2026-08-31
+    cleanup_receipt: ops/evidence/aaemu12-t054-combat-stealth-v3.yaml
     baseline_evidence: ops/evidence/aaemu12-startup-log-integration-v2.yaml
-    availability_limit: Exclusive to T-054 until PB-000 records committed cleanup evidence and releases the lease.
+    availability_limit: No task may start Login, GameServer, or the client until PB-000 commits a new exact task/thread claim.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
