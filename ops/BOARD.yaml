@@ -505,8 +505,8 @@ tasks:
   - id: T-075
     title: AAEmu 1.2 single-bot autonomy proof v5
     track: AAEmu12
-    status: review
-    integration: runtime-incomplete-receipt-pending
+    status: blocked
+    integration: runtime-incomplete-retained
     depends_on: [T-073, T-074]
     runtime_lease: aaemu12
     gate: serialized-one-bot-autonomy-proof-v5
@@ -521,14 +521,24 @@ tasks:
   - id: T-076
     title: Integrate T-075 runtime receipt
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-075]
     runtime_lease: none
     gate: receipt-integrity-review
     owner_client_thread_id: client-new-thread:0ffedae2-c299-4adc-b868-3768ade91679
     owner_thread_id: 01a05cde-3eaf-7801-a6b4-9836f880dd72
     worktree: 'C:\Users\jensh\.codex\worktrees\5dee\PB-W00-control'
+    integrated_commit: 48113c98661751cfbe0fc62a123e4941d1b34d8d
+
+  - id: T-077
+    title: Build and qualify the offline-safe autonomy observer
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-075, T-076]
+    runtime_lease: none
+    gate: deterministic-observer-parser-tests
 
   - id: T-041
     title: One-zone Autonomous Activity Director

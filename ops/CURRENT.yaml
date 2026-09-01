@@ -1,11 +1,11 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-v5-incomplete-receipt-integration
+phase: autonomy-observer-parser-correction
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: d629f405618b0b0b83ca3c7ff1b2c2e2bbb54b9d
+  integrated_head: 48113c98661751cfbe0fc62a123e4941d1b34d8d
   tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
   integration_evidence: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
@@ -54,8 +54,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Dispatch T-075 as a fresh proof only; pre-arm read-only brain/mover counters before fixture staging and use a new immutable evidence root.
-  - Require three serial iterations and restart persistence; stop at the first smallest behavioral or evidence blocker.
+  - Correct and qualify the reusable offline-safe observer/parser in T-077, then integrate it independently.
+  - Dispatch a fresh runtime proof only after that tooling gate; use a new immutable evidence root and pre-arm observation before addbot and fixture staging.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
@@ -206,7 +206,7 @@ prepared_workstreams:
     handoff: ops/tasks/T-074/HANDOFF.md
     integrity: 382-of-382-payloads-length-and-sha256-green
   - task: T-075
-    state: incomplete-receipt-review-pre-addbot-observer-parser
+    state: blocked-retained-incomplete-pre-addbot-observer-parser
     client_thread_id: client-new-thread:18eac77e-1067-4eb7-955f-d1108cce9b2c
     task_thread_id: 01a05cc7-e6bd-70c0-a554-4245ac292feb
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\11c9\PB-W00-control'
@@ -220,13 +220,21 @@ prepared_workstreams:
     verdict: INCOMPLETE-observer-parser-absent-optional-obj-capture
     cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
   - task: T-076
-    state: active
+    state: done-integrated
     client_thread_id: client-new-thread:0ffedae2-c299-4adc-b868-3768ade91679
     task_thread_id: 01a05cde-3eaf-7801-a6b4-9836f880dd72
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\5dee\PB-W00-control'
     base: 91d4c5d2376771a8c3a170b1176d6d47396fc324
     source_commit: f24f0f246adfdcf6ce2c692fc43eccd5b0c1d834
     handoff: ops/tasks/T-076/HANDOFF.md
+    head: 48113c98661751cfbe0fc62a123e4941d1b34d8d
+    integrity: 34-of-34-payloads-length-and-sha256-green
+  - task: T-077
+    state: ready
+    base: pending-control-dispatch-commit
+    retained_fixture: 'D:\Codex-Labs\evidence\T-075\one-bot-autonomy-v5\iteration-1\observer\raw\000000-botdebug.response.bin'
+    retained_fixture_sha256: f1d865e388eca68afd064d5bbc89fcad18577e97a806c2afb9e3a77e1646bf98
+    handoff: ops/tasks/T-077/HANDOFF.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

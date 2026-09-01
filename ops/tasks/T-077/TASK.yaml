@@ -1,0 +1,29 @@
+schema_version: 1
+id: T-077
+title: Build and qualify the offline-safe autonomy observer
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Add reusable PowerShell observation tooling that preserves raw botdebug responses, parses offline and online shapes without strict-mode optional-capture failures, emits derived samples separately, and proves its command surface is read-only before another runtime attempt.
+depends_on: [T-075, T-076]
+runtime:
+  required: false
+  lease: null
+branch: pending-codex-managed-detached-worktree
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-dispatch-commit
+  blocker_receipt: ops/evidence/aaemu12-t075-one-bot-autonomy-v5.yaml
+  retained_offline_fixture: 'D:\Codex-Labs\evidence\T-075\one-bot-autonomy-v5\iteration-1\observer\raw\000000-botdebug.response.bin'
+  retained_offline_fixture_sha256: f1d865e388eca68afd064d5bbc89fcad18577e97a806c2afb9e3a77e1646bf98
+write_scope:
+  - scripts/autonomy/
+  - ops/tasks/T-077/HANDOFF.md
+gates:
+  - deterministic-offline-online-parser-tests
+  - retained-t075-offline-fixture-qualification
+  - observer-command-surface-read-only
+validation_boundary: Source/tooling and tests only. The retained T-075 fixture is read-only. Do not control runtime, MySQL, databases, clients; edit deployed hosts, global ledgers/lease, retained evidence, or AAEmu 3.0.
+handoff: ops/tasks/T-077/HANDOFF.md
