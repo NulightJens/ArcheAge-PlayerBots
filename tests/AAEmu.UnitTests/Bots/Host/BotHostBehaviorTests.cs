@@ -632,6 +632,58 @@ public class BotHostBehaviorTests
     }
 
     [Test]
+    public async Task NaturalRecoveryWait_SuspendsMoverAndBrainUntilWorldResourcesAreFull()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 2, 0, TimeSpan.Zero));
+        var callbackCount = 0;
+        var host = MakeLifecycleHost(time, _ =>
+        {
+            callbackCount++;
+            return true;
+        });
+        var runtime = MakeLifecycleRuntime(6304, time);
+        var mover = (BotSim.SimMover)runtime.Mover;
+
+        host.Register(runtime);
+        try
+        {
+            host.HostTask.Execute();
+            var moverStepsBeforeRecovery = mover.StepCount;
+            var brainStepsBeforeRecovery = host.Metrics.BrainStepsTotal;
+            runtime.CombatState.KillCount = 1;
+            runtime.CombatState.KillGoal = null;
+            runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+            runtime.Bot.Mp = 60;
+            time.Advance(TimeSpan.FromSeconds(1));
+
+            host.HostTask.Execute();
+            host.HostTask.Execute();
+
+            var pending = runtime.LifeController.Inspect();
+            await Assert.That(callbackCount).IsEqualTo(0);
+            await Assert.That(pending.Recovery.State).IsEqualTo(BotLifeRecoveryState.Pending);
+            await Assert.That(pending.ProgressionCompletion).IsNull();
+            await Assert.That(runtime.LifeController.ShouldSuspendRuntime).IsTrue();
+            await Assert.That(mover.StepCount).IsEqualTo(moverStepsBeforeRecovery);
+            await Assert.That(host.Metrics.BrainStepsTotal).IsEqualTo(brainStepsBeforeRecovery);
+
+            runtime.Bot.Mp = 100;
+            time.Advance(TimeSpan.FromSeconds(1));
+            host.HostTask.Execute();
+
+            var completed = runtime.LifeController.Inspect();
+            await Assert.That(callbackCount).IsEqualTo(1);
+            await Assert.That(completed.Recovery.State).IsEqualTo(BotLifeRecoveryState.Completed);
+            await Assert.That(completed.ProgressionCompletion?.Mp).IsEqualTo(100L);
+            await Assert.That(completed.Life.State).IsEqualTo(BotLifeState.Offline);
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
     public async Task LogoutCallbackFailure_IsRecordedAndNeverRetried()
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 5, 0, TimeSpan.Zero));
@@ -701,6 +753,9 @@ public class BotHostBehaviorTests
             await Assert.That(fresh.Life.State).IsEqualTo(BotLifeState.Idle);
             await Assert.That(fresh.Activity).IsNull();
             await Assert.That(fresh.DecisionAt).IsNull();
+            await Assert.That(fresh.Recovery.State).IsEqualTo(BotLifeRecoveryState.NotRequired);
+            await Assert.That(fresh.Recovery.StartedAt).IsNull();
+            await Assert.That(fresh.Recovery.ObservedAt).IsNull();
             await Assert.That(fresh.LogoutRequestedAt).IsNull();
             await Assert.That(fresh.LogoutSucceeded).IsNull();
             await Assert.That(fresh.ProgressionBaseline).IsNull();
@@ -930,9 +985,15 @@ public class BotHostBehaviorTests
         FakeTimeProvider time,
         BotLifeController controller = null)
     {
-        var bot = BotTestFixture.MakeBot(id, Vector3.Zero);
-        bot.Hp = 100;
-        bot.MaxHp = 100;
+        var bot = new LifecycleCharacterMock
+        {
+            Id = id,
+            ObjId = 1000 + id,
+            Name = $"bot{id}",
+            Hp = 100,
+            Mp = 100
+        };
+        bot.Transform.Local.SetPosition(Vector3.Zero);
         var world = BotTestFixture.MakeWorld();
         BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
         var movement = new BotMovementState();
@@ -959,6 +1020,12 @@ public class BotHostBehaviorTests
             blackboard,
             new BotConfig { UseEngine = false },
             controller);
+    }
+
+    private sealed class LifecycleCharacterMock : CharacterMock
+    {
+        public override int MaxHp { get; set; } = 100;
+        public override int MaxMp => 100;
     }
 
     private sealed class BlockingBrain(AAEmu.Game.Models.Game.Char.Character bot, BotCombatState state, BotMovementBroadcaster broadcaster)

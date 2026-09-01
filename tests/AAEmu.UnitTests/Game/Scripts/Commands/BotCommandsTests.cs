@@ -892,6 +892,9 @@ public class BotCommandsTests
             await Assert.That(output.Messages).Contains(message =>
                 message.Contains("Life decision: activity=grind, reason=nearby_mortal") &&
                 message.Contains("at=2026-"));
+            await Assert.That(output.Messages).Contains(
+                "[botdebug] Life recovery: state=not_required, started_at=none, completed_at=none, " +
+                "observed_at=none, resources=pending, hp=unavailable/unavailable, mp=unavailable/unavailable");
             await Assert.That(output.Messages).Contains(message =>
                 message.Contains("Life baseline: captured_at=2026-") &&
                 message.Contains("hp=100/100") &&
@@ -911,17 +914,44 @@ public class BotCommandsTests
                 true,
                 BotHost.Instance.TimeProvider.GetUtcNow().AddSeconds(1));
 
+            var pendingOutput = Execute(new BotDebugCommand(), "4");
+
+            await Assert.That(pendingOutput.Messages).Contains(message =>
+                message.Contains("Life recovery: state=pending") &&
+                message.Contains("started_at=2026-") &&
+                message.Contains("completed_at=none") &&
+                message.Contains("observed_at=2026-") &&
+                message.Contains("resources=available") &&
+                message.Contains("hp=80/100") &&
+                message.Contains("mp=70/100"));
+            await Assert.That(pendingOutput.Messages).Contains("[botdebug] Life completion: pending");
+            await Assert.That(pendingOutput.Messages).Contains("[botdebug] Life delta: pending");
+
+            bot.Hp = 100;
+            bot.Mp = 100;
+            runtime.LifeController.Step(
+                runtime,
+                true,
+                BotHost.Instance.TimeProvider.GetUtcNow().AddSeconds(2));
+
             var completedOutput = Execute(new BotDebugCommand(), "4");
 
             await Assert.That(completedOutput.Messages).Contains(message =>
+                message.Contains("Life recovery: state=completed") &&
+                message.Contains("started_at=2026-") &&
+                message.Contains("completed_at=2026-") &&
+                message.Contains("resources=available") &&
+                message.Contains("hp=100/100") &&
+                message.Contains("mp=100/100"));
+            await Assert.That(completedOutput.Messages).Contains(message =>
                 message.Contains("Life completion: captured_at=2026-") &&
-                message.Contains("hp=80/100") &&
-                message.Contains("mp=70/100") &&
+                message.Contains("hp=100/100") &&
+                message.Contains("mp=100/100") &&
                 message.Contains("inventory=unavailable"));
             await Assert.That(completedOutput.Messages).Contains(message =>
                 message.Contains("Life delta: level=+0, experience=+0") &&
-                message.Contains("hp=-20, max_hp=+0") &&
-                message.Contains("mp=-30, max_mp=+0") &&
+                message.Contains("hp=+0, max_hp=+0") &&
+                message.Contains("mp=+0, max_mp=+0") &&
                 message.Contains("bag_slots=unavailable, bag_units=unavailable") &&
                 message.Contains("inventory_changed=unavailable"));
         }

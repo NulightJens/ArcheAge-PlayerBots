@@ -35,6 +35,24 @@ public readonly record struct BotLifeProgressionDelta(
     long? BagItemUnits,
     bool? InventoryChanged);
 
+public enum BotLifeRecoveryState
+{
+    NotRequired,
+    Pending,
+    Completed
+}
+
+public readonly record struct BotLifeRecoveryView(
+    BotLifeRecoveryState State,
+    DateTimeOffset? StartedAt,
+    DateTimeOffset? CompletedAt,
+    DateTimeOffset? ObservedAt,
+    bool? ResourcesAvailable,
+    long? Hp,
+    long? MaxHp,
+    long? Mp,
+    long? MaxMp);
+
 public readonly record struct BotLifeControllerView(
     BotLifeSnapshot Life,
     string ProfileId,
@@ -42,6 +60,7 @@ public readonly record struct BotLifeControllerView(
     string DecisionReason,
     DateTimeOffset? DecisionAt,
     BotLifeTransition? LastTransition,
+    BotLifeRecoveryView Recovery,
     DateTimeOffset? LogoutRequestedAt,
     DateTimeOffset? LogoutCallbackAt,
     DateTimeOffset? LogoutCompletedAt,
@@ -80,6 +99,9 @@ public sealed class BotLifeController
     private DateTimeOffset? _logoutCompletedAt;
     private bool? _logoutSucceeded;
     private bool _logoutQueued;
+    private DateTimeOffset? _recoveryStartedAt;
+    private DateTimeOffset? _recoveryCompletedAt;
+    private ResourceObservation? _resourceObservation;
     private BotLifeProgressionSnapshot? _progressionBaseline;
     private BotLifeProgressionSnapshot? _progressionCompletion;
     private BotLifeProgressionDelta? _progressionDelta;
@@ -103,6 +125,9 @@ public sealed class BotLifeController
             _logoutCompletedAt = null;
             _logoutSucceeded = null;
             _logoutQueued = false;
+            _recoveryStartedAt = null;
+            _recoveryCompletedAt = null;
+            _resourceObservation = null;
             _progressionBaseline = null;
             _progressionCompletion = null;
             _progressionDelta = null;
@@ -144,7 +169,8 @@ public sealed class BotLifeController
         get
         {
             lock (_syncRoot)
-                return _logoutQueued;
+                return _logoutQueued ||
+                    (_recoveryStartedAt.HasValue && !_recoveryCompletedAt.HasValue);
         }
     }
 
@@ -188,6 +214,7 @@ public sealed class BotLifeController
                 _decisionReason,
                 _decisionAt,
                 _lastTransition,
+                RecoveryView(),
                 _logoutRequestedAt,
                 _logoutCallbackAt,
                 _logoutCompletedAt,
@@ -260,42 +287,55 @@ public sealed class BotLifeController
     {
         var bot = runtime.Bot;
         var combat = runtime.CombatState;
-        if (_life.State != BotLifeState.Active || combat.KillCount < 1 || bot.IsDead || bot.Hp <= 0 ||
-            bot.Transform?.World == null || bot.ParentWorld == null || combat.IsForced || combat.IsActive ||
-            combat.CurrentState != BotCombatStateType.Idle || combat.InDuel || combat.IsResting ||
-            combat.IsSearching)
+        if (_life.State != BotLifeState.Active || combat.KillCount < 1)
         {
             return false;
         }
+
+        var previousAvailability = _resourceObservation?.Available;
+        var resources = ObserveResources(bot, now);
+        _resourceObservation = resources;
+        if (!IsCompletionContext(runtime, resources))
+            return false;
 
         // The legacy combat task returns to Idle after consuming its kill goal but
         // can retain a reference to the defeated object. Clearing only that dead
         // reference establishes the required targetless boundary; this controller
         // never chooses or assigns a target.
-        if (combat.Target?.IsDead == true)
+        if (combat.Target != null && ReadBoolean(() => combat.Target.IsDead) == true)
         {
             var defeated = combat.Target;
             combat.Target = null;
             if (ReferenceEquals(bot.CurrentTarget, defeated))
                 bot.CurrentTarget = null;
         }
-        if (bot.CurrentTarget is Unit currentTarget && currentTarget.IsDead)
+        if (bot.CurrentTarget is Unit currentTarget && ReadBoolean(() => currentTarget.IsDead) == true)
             bot.CurrentTarget = null;
 
         if (combat.Target != null || bot.CurrentTarget != null)
             return false;
 
-        var completion = CaptureProgression(runtime.Bot, now);
+        if (!resources.IsDebtFree)
+        {
+            BeginOrContinueRecovery(runtime.Bot.Id, now, resources, previousAvailability);
+            return false;
+        }
+
+        var completion = CaptureProgression(runtime.Bot, now, resources);
         var transition = BotLifeStateMachine.Transition(
             _life,
             new BotLifeEvent(BotLifeEventKind.LogoutRequested, now),
             _profile);
         _lastTransition = transition;
         _life = transition.After;
-        LogTransition(runtime.Bot.Id, transition, _activity, _decisionReason);
         if (!transition.Accepted || !transition.Changed)
+        {
+            LogTransition(runtime.Bot.Id, transition, _activity, _decisionReason);
             return false;
+        }
 
+        CompleteRecovery(runtime.Bot.Id, now, resources);
+        LogTransition(runtime.Bot.Id, transition, _activity, _decisionReason);
         _progressionCompletion ??= completion;
         if (_progressionBaseline.HasValue && !_progressionDelta.HasValue)
         {
@@ -309,17 +349,94 @@ public sealed class BotLifeController
         return true;
     }
 
-    private static BotLifeProgressionSnapshot CaptureProgression(Character bot, DateTimeOffset now)
+    private static bool IsCompletionContext(BotRuntime runtime, ResourceObservation resources)
+    {
+        var bot = runtime.Bot;
+        var combat = runtime.CombatState;
+        var movement = runtime.MovementState;
+        return ReadBoolean(() => bot.IsDead) == false && resources.Hp is > 0 &&
+            bot.Transform?.World != null && bot.ParentWorld != null &&
+            !combat.IsForced && !combat.IsActive && combat.CurrentState == BotCombatStateType.Idle &&
+            !combat.InDuel && !combat.DuelRequestPending && !combat.IsResting &&
+            !combat.RespawnScheduled && !combat.ShouldRespawn && !combat.IsSearching &&
+            combat.StopAtTargetHpPercent == null && combat.NonlethalFloorReached == null &&
+            combat.LostTarget == null && !combat.LastKnownTargetPosition.HasValue &&
+            !combat.RoamDestination.HasValue &&
+            !movement.Destination.HasValue && !movement.ApprovedNavigationDestination.HasValue &&
+            movement.FollowTarget == null && !movement.IsMoving && !movement.IsFalling &&
+            !movement.JumpRequested && !movement.IsJumping;
+    }
+
+    private void BeginOrContinueRecovery(
+        uint botId,
+        DateTimeOffset now,
+        ResourceObservation resources,
+        bool? previousAvailability)
+    {
+        _resourceObservation = resources;
+        if (!_recoveryStartedAt.HasValue)
+        {
+            _recoveryStartedAt = now;
+            LogRecovery(botId, "pending", now, resources);
+            return;
+        }
+
+        if (previousAvailability != resources.Available)
+            LogRecovery(botId, "pending", now, resources);
+    }
+
+    private void CompleteRecovery(uint botId, DateTimeOffset now, ResourceObservation resources)
+    {
+        _resourceObservation = resources;
+        if (!_recoveryStartedAt.HasValue || _recoveryCompletedAt.HasValue)
+            return;
+
+        _recoveryCompletedAt = now;
+        LogRecovery(botId, "completed", now, resources);
+    }
+
+    private BotLifeRecoveryView RecoveryView()
+    {
+        var resources = _resourceObservation;
+        var state = _recoveryCompletedAt.HasValue
+            ? BotLifeRecoveryState.Completed
+            : _recoveryStartedAt.HasValue
+                ? BotLifeRecoveryState.Pending
+                : BotLifeRecoveryState.NotRequired;
+        return new BotLifeRecoveryView(
+            state,
+            _recoveryStartedAt,
+            _recoveryCompletedAt,
+            resources?.ObservedAt,
+            resources?.Available,
+            resources?.Hp,
+            resources?.MaxHp,
+            resources?.Mp,
+            resources?.MaxMp);
+    }
+
+    private static ResourceObservation ObserveResources(Character bot, DateTimeOffset now) =>
+        new(
+            now,
+            ReadValue(() => bot.Hp),
+            ReadValue(() => bot.MaxHp),
+            ReadValue(() => bot.Mp),
+            ReadValue(() => bot.MaxMp));
+
+    private static BotLifeProgressionSnapshot CaptureProgression(
+        Character bot,
+        DateTimeOffset now,
+        ResourceObservation? resources = null)
     {
         var inventory = CaptureInventory(bot);
         return new BotLifeProgressionSnapshot(
             now,
             ReadValue(() => bot.Level),
             ReadValue(() => bot.Experience),
-            ReadValue(() => bot.Hp),
-            ReadValue(() => bot.MaxHp),
-            ReadValue(() => bot.Mp),
-            ReadValue(() => bot.MaxMp),
+            resources?.Hp ?? ReadValue(() => bot.Hp),
+            resources?.MaxHp ?? ReadValue(() => bot.MaxHp),
+            resources?.Mp ?? ReadValue(() => bot.Mp),
+            resources?.MaxMp ?? ReadValue(() => bot.MaxMp),
             inventory.OccupiedSlots,
             inventory.ItemUnits,
             inventory.Available,
@@ -434,6 +551,18 @@ public sealed class BotLifeController
         }
     }
 
+    private static bool? ReadBoolean(Func<bool> read)
+    {
+        try
+        {
+            return read();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     private static long? Difference(long? before, long? after) =>
         before.HasValue && after.HasValue ? after.Value - before.Value : null;
 
@@ -459,6 +588,28 @@ public sealed class BotLifeController
             $"activity={activity ?? "none"} reason={decisionReason ?? "none"}");
     }
 
+    private void LogRecovery(
+        uint botId,
+        string state,
+        DateTimeOffset now,
+        ResourceObservation resources)
+    {
+        try
+        {
+            Logger.Info(
+                $"BOT id={botId} ev=life_recovery state={state} activity={_activity ?? "none"} " +
+                $"reason={_decisionReason ?? "none"} started_at={Timestamp(_recoveryStartedAt)} " +
+                $"completed_at={Timestamp(_recoveryCompletedAt)} observed_at={Timestamp(now)} " +
+                $"resources={(resources.Available ? "available" : "unavailable")} " +
+                $"hp={Value(resources.Hp)} max_hp={Value(resources.MaxHp)} " +
+                $"mp={Value(resources.Mp)} max_mp={Value(resources.MaxMp)}");
+        }
+        catch
+        {
+            // Recovery observability is fail-closed and must never escape the host tick.
+        }
+    }
+
     private static string Timestamp(DateTimeOffset? value) =>
         value?.ToUniversalTime().ToString("O") ?? "none";
 
@@ -471,5 +622,21 @@ public sealed class BotLifeController
     {
         internal static InventoryObservation Unavailable { get; } =
             new(false, null, null, "unavailable", "unavailable");
+    }
+
+    private readonly record struct ResourceObservation(
+        DateTimeOffset ObservedAt,
+        long? Hp,
+        long? MaxHp,
+        long? Mp,
+        long? MaxMp)
+    {
+        internal bool Available =>
+            Hp.HasValue && MaxHp is > 0 && Mp.HasValue && MaxMp is > 0 &&
+            Hp.Value >= 0 && Hp.Value <= MaxHp.Value &&
+            Mp.Value >= 0 && Mp.Value <= MaxMp.Value;
+
+        internal bool IsDebtFree =>
+            Available && Hp == MaxHp && Mp == MaxMp;
     }
 }

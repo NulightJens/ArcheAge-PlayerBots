@@ -108,6 +108,13 @@ namespace AAEmu.Game.Scripts.Commands
                 CommandManager.SendNormalText(this, messageOutput,
                     $"Life decision: activity={life.Activity ?? "none"}, reason={life.DecisionReason ?? "none"}, " +
                     $"at={Timestamp(life.DecisionAt)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life recovery: state={RecoveryState(life.Recovery.State)}, " +
+                    $"started_at={Timestamp(life.Recovery.StartedAt)}, completed_at={Timestamp(life.Recovery.CompletedAt)}, " +
+                    $"observed_at={Timestamp(life.Recovery.ObservedAt)}, " +
+                    $"resources={Availability(life.Recovery.ResourcesAvailable)}, " +
+                    $"hp={Number(life.Recovery.Hp)}/{Number(life.Recovery.MaxHp)}, " +
+                    $"mp={Number(life.Recovery.Mp)}/{Number(life.Recovery.MaxMp)}");
                 var callback = !life.LogoutCallbackAt.HasValue
                     ? "not_requested"
                     : !life.LogoutSucceeded.HasValue
@@ -165,5 +172,16 @@ namespace AAEmu.Game.Scripts.Commands
 
         private static string Boolean(bool? value) =>
             value.HasValue ? value.Value.ToString().ToLowerInvariant() : "unavailable";
+
+        private static string Availability(bool? value) =>
+            value.HasValue ? value.Value ? "available" : "unavailable" : "pending";
+
+        private static string RecoveryState(BotLifeRecoveryState state) => state switch
+        {
+            BotLifeRecoveryState.NotRequired => "not_required",
+            BotLifeRecoveryState.Pending => "pending",
+            BotLifeRecoveryState.Completed => "completed",
+            _ => "unavailable"
+        };
     }
 }

@@ -70,21 +70,29 @@ public sealed class BotLifeControllerTests
         ];
         fixture.Runtime.CombatState.KillCount = 1;
         fixture.Runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
-        var completedAt = activatedAt.AddSeconds(3);
+        var waitingAt = activatedAt.AddSeconds(3);
 
+        var waiting = fixture.Runtime.LifeController.Step(fixture.Runtime, true, waitingAt);
+        var recovery = fixture.Runtime.LifeController.Inspect();
+        bot.Hp = 110;
+        bot.Mp = 90;
+        var completedAt = activatedAt.AddSeconds(4);
         var requested = fixture.Runtime.LifeController.Step(fixture.Runtime, true, completedAt);
 
         var completed = fixture.Runtime.LifeController.Inspect();
         var completion = completed.ProgressionCompletion;
         var delta = completed.ProgressionDelta;
+        await Assert.That(waiting).IsFalse();
+        await Assert.That(recovery.Recovery.State).IsEqualTo(BotLifeRecoveryState.Pending);
+        await Assert.That(recovery.ProgressionCompletion).IsNull();
         await Assert.That(requested).IsTrue();
         await Assert.That(completion.HasValue).IsTrue();
         await Assert.That(completion.Value.CapturedAt).IsEqualTo(completedAt);
         await Assert.That(completion.Value.Level).IsEqualTo(11L);
         await Assert.That(completion.Value.Experience).IsEqualTo(1325L);
-        await Assert.That(completion.Value.Hp).IsEqualTo(95L);
+        await Assert.That(completion.Value.Hp).IsEqualTo(110L);
         await Assert.That(completion.Value.MaxHp).IsEqualTo(110L);
-        await Assert.That(completion.Value.Mp).IsEqualTo(60L);
+        await Assert.That(completion.Value.Mp).IsEqualTo(90L);
         await Assert.That(completion.Value.MaxMp).IsEqualTo(90L);
         await Assert.That(completion.Value.OccupiedBagSlots).IsEqualTo(3L);
         await Assert.That(completion.Value.BagItemUnits).IsEqualTo(9L);
@@ -94,9 +102,9 @@ public sealed class BotLifeControllerTests
         await Assert.That(delta.HasValue).IsTrue();
         await Assert.That(delta.Value.Level).IsEqualTo(1L);
         await Assert.That(delta.Value.Experience).IsEqualTo(125L);
-        await Assert.That(delta.Value.Hp).IsEqualTo(15L);
+        await Assert.That(delta.Value.Hp).IsEqualTo(30L);
         await Assert.That(delta.Value.MaxHp).IsEqualTo(10L);
-        await Assert.That(delta.Value.Mp).IsEqualTo(25L);
+        await Assert.That(delta.Value.Mp).IsEqualTo(55L);
         await Assert.That(delta.Value.MaxMp).IsEqualTo(10L);
         await Assert.That(delta.Value.OccupiedBagSlots).IsEqualTo(1L);
         await Assert.That(delta.Value.BagItemUnits).IsEqualTo(4L);
@@ -158,28 +166,42 @@ public sealed class BotLifeControllerTests
             fixture.Runtime.CombatState.KillCount = 1;
             fixture.Runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
 
-            var requested = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(2));
+            var waiting = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(2));
             var duplicate = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(3));
-            var callbackStarted = fixture.Runtime.LifeController.TryBeginLogoutCallback(now.AddSeconds(4));
+            fixture.Runtime.Bot.Hp = 100;
+            var requested = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(4));
+            var callbackStarted = fixture.Runtime.LifeController.TryBeginLogoutCallback(now.AddSeconds(5));
             fixture.Runtime.LifeController.RecordLogoutResult(
                 fixture.Runtime.Bot.Id,
                 false,
-                now.AddSeconds(5));
-            fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(6));
+                now.AddSeconds(6));
+            fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(7));
 
+            var recoveryRecords = target.Logs.Where(message => message.Contains("ev=life_recovery")).ToArray();
             var records = target.Logs.Where(message => message.Contains("ev=life_progression")).ToArray();
+            var logs = target.Logs.ToArray();
+            await Assert.That(waiting).IsFalse();
             await Assert.That(requested).IsTrue();
             await Assert.That(duplicate).IsFalse();
             await Assert.That(callbackStarted).IsTrue();
+            await Assert.That(recoveryRecords.Length).IsEqualTo(2);
+            await Assert.That(recoveryRecords[0]).Contains("ev=life_recovery state=pending");
+            await Assert.That(recoveryRecords[0]).Contains("resources=available hp=90 max_hp=100 mp=100 max_mp=100");
+            await Assert.That(recoveryRecords[1]).Contains("ev=life_recovery state=completed");
+            await Assert.That(recoveryRecords[1]).Contains("resources=available hp=100 max_hp=100 mp=100 max_mp=100");
             await Assert.That(records.Length).IsEqualTo(1);
             await Assert.That(records[0]).Contains("id=63 ev=life_progression activity=grind reason=nearby_mortal");
             await Assert.That(records[0]).Contains("baseline_at=2026-09-01T12:00:00.0000000+00:00");
-            await Assert.That(records[0]).Contains("completion_at=2026-09-01T12:00:02.0000000+00:00");
-            await Assert.That(records[0]).Contains("hp_before=100 hp_after=90 hp_delta=-10");
+            await Assert.That(records[0]).Contains("completion_at=2026-09-01T12:00:04.0000000+00:00");
+            await Assert.That(records[0]).Contains("hp_before=100 hp_after=100 hp_delta=+0");
             await Assert.That(records[0]).Contains("bag_units_before=2 bag_units_after=3 bag_units_delta=+1");
             await Assert.That(records[0]).Contains("inventory_summary_before=3:400:2 inventory_summary_after=3:400:3");
             await Assert.That(records[0]).Contains("inventory_fingerprint_before=");
             await Assert.That(records[0]).Contains("inventory_fingerprint_after=");
+            await Assert.That(Array.IndexOf(logs, recoveryRecords[0]))
+                .IsLessThan(Array.IndexOf(logs, recoveryRecords[1]));
+            await Assert.That(Array.IndexOf(logs, recoveryRecords[1]))
+                .IsLessThan(Array.IndexOf(logs, records[0]));
         }
         finally
         {
@@ -288,6 +310,10 @@ public sealed class BotLifeControllerTests
         await Assert.That(pending.Life.State).IsEqualTo(BotLifeState.Despawning);
         await Assert.That(pending.LastTransition?.Event.Kind).IsEqualTo(BotLifeEventKind.LogoutRequested);
         await Assert.That(pending.LogoutRequestedAt).IsEqualTo(now.AddSeconds(3));
+        await Assert.That(pending.Recovery.State).IsEqualTo(BotLifeRecoveryState.NotRequired);
+        await Assert.That(pending.Recovery.ResourcesAvailable).IsTrue();
+        await Assert.That(pending.Recovery.Hp).IsEqualTo(pending.Recovery.MaxHp);
+        await Assert.That(pending.Recovery.Mp).IsEqualTo(pending.Recovery.MaxMp);
         await Assert.That(firstObservation.ProgressionCompletion?.Hp).IsEqualTo(100L);
         await Assert.That(pending.ProgressionCompletion).IsEqualTo(firstObservation.ProgressionCompletion);
         await Assert.That(pending.ProgressionDelta).IsEqualTo(firstObservation.ProgressionDelta);
@@ -302,12 +328,170 @@ public sealed class BotLifeControllerTests
         await Assert.That(completed.LastTransition?.Event.Kind).IsEqualTo(BotLifeEventKind.DespawnCompleted);
     }
 
+    [Test]
+    public async Task MpDebt_EntersObservableRecoveryAndCompletesOnlyAfterNaturalFullObservation()
+    {
+        var fixture = MakeFixture();
+        var now = fixture.Time.GetUtcNow();
+        fixture.Runtime.LifeController.Step(fixture.Runtime, true, now);
+        fixture.Runtime.CombatState.KillCount = 1;
+        fixture.Runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+        fixture.Runtime.Bot.Mp = 75;
+
+        var pending = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(1));
+        var duplicate = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(2));
+        var pendingView = fixture.Runtime.LifeController.Inspect();
+
+        await Assert.That(pending).IsFalse();
+        await Assert.That(duplicate).IsFalse();
+        await Assert.That(pendingView.Recovery.State).IsEqualTo(BotLifeRecoveryState.Pending);
+        await Assert.That(pendingView.Recovery.StartedAt).IsEqualTo(now.AddSeconds(1));
+        await Assert.That(pendingView.Recovery.CompletedAt).IsNull();
+        await Assert.That(pendingView.Recovery.ResourcesAvailable).IsTrue();
+        await Assert.That(pendingView.Recovery.Mp).IsEqualTo(75L);
+        await Assert.That(pendingView.Recovery.MaxMp).IsEqualTo(100L);
+        await Assert.That(pendingView.ProgressionCompletion).IsNull();
+        await Assert.That(pendingView.LogoutRequestedAt).IsNull();
+        await Assert.That(fixture.Runtime.LifeController.ShouldSuspendRuntime).IsTrue();
+
+        fixture.Runtime.Bot.Mp = 100;
+        var completed = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(3));
+        var completedView = fixture.Runtime.LifeController.Inspect();
+
+        await Assert.That(completed).IsTrue();
+        await Assert.That(completedView.Recovery.State).IsEqualTo(BotLifeRecoveryState.Completed);
+        await Assert.That(completedView.Recovery.StartedAt).IsEqualTo(now.AddSeconds(1));
+        await Assert.That(completedView.Recovery.CompletedAt).IsEqualTo(now.AddSeconds(3));
+        await Assert.That(completedView.ProgressionCompletion?.Mp).IsEqualTo(100L);
+        await Assert.That(completedView.LogoutRequestedAt).IsEqualTo(now.AddSeconds(3));
+    }
+
+    [Test]
+    public async Task HpDebt_WaitsWithoutCapturingCompletionUntilNaturalFullObservation()
+    {
+        var fixture = MakeFixture();
+        var now = fixture.Time.GetUtcNow();
+        fixture.Runtime.LifeController.Step(fixture.Runtime, true, now);
+        fixture.Runtime.CombatState.KillCount = 1;
+        fixture.Runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+        fixture.Runtime.Bot.Hp = 55;
+
+        var pending = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(1));
+        var pendingView = fixture.Runtime.LifeController.Inspect();
+        fixture.Runtime.Bot.Hp = 100;
+        var completed = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(2));
+        var completedView = fixture.Runtime.LifeController.Inspect();
+
+        await Assert.That(pending).IsFalse();
+        await Assert.That(pendingView.Recovery.State).IsEqualTo(BotLifeRecoveryState.Pending);
+        await Assert.That(pendingView.Recovery.Hp).IsEqualTo(55L);
+        await Assert.That(pendingView.ProgressionCompletion).IsNull();
+        await Assert.That(completed).IsTrue();
+        await Assert.That(completedView.Recovery.State).IsEqualTo(BotLifeRecoveryState.Completed);
+        await Assert.That(completedView.ProgressionCompletion?.Hp).IsEqualTo(100L);
+    }
+
+    [Test]
+    public async Task InvalidOrUnavailableResources_FailClosedWithoutEscapingTheHostTick()
+    {
+        var fixture = MakeFixture();
+        var now = fixture.Time.GetUtcNow();
+        fixture.Runtime.LifeController.Step(fixture.Runtime, true, now);
+        fixture.Runtime.CombatState.KillCount = 1;
+        fixture.Runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+        var bot = (ProgressionCharacterMock)fixture.Runtime.Bot;
+        bot.ThrowOnMaxMpRead = true;
+
+        var unavailable = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(1));
+        var unavailableView = fixture.Runtime.LifeController.Inspect();
+        bot.ThrowOnMaxMpRead = false;
+        bot.FixedMaxMp = 0;
+        var invalid = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(2));
+        var invalidView = fixture.Runtime.LifeController.Inspect();
+
+        await Assert.That(unavailable).IsFalse();
+        await Assert.That(unavailableView.Recovery.State).IsEqualTo(BotLifeRecoveryState.Pending);
+        await Assert.That(unavailableView.Recovery.ResourcesAvailable).IsFalse();
+        await Assert.That(unavailableView.Recovery.MaxMp).IsNull();
+        await Assert.That(unavailableView.ProgressionCompletion).IsNull();
+        await Assert.That(invalid).IsFalse();
+        await Assert.That(invalidView.Recovery.ResourcesAvailable).IsFalse();
+        await Assert.That(invalidView.Recovery.MaxMp).IsEqualTo(0L);
+        await Assert.That(invalidView.ProgressionCompletion).IsNull();
+
+        bot.FixedMaxMp = 100;
+        var completed = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(3));
+        await Assert.That(completed).IsTrue();
+    }
+
+    [Test]
+    public async Task RecoveryPending_TargetCombatRestRespawnAndMovementReappearanceRemainFailClosed()
+    {
+        var fixture = MakeFixture();
+        var now = fixture.Time.GetUtcNow();
+        fixture.Runtime.LifeController.Step(fixture.Runtime, true, now);
+        fixture.Runtime.CombatState.KillCount = 1;
+        fixture.Runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+        fixture.Runtime.Bot.Mp = 50;
+        fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(1));
+        fixture.Runtime.Bot.Mp = 100;
+
+        var target = new Npc { ObjId = 9010, Hp = 100, MaxHp = 100 };
+        fixture.Runtime.CombatState.Target = target;
+        fixture.Runtime.Bot.CurrentTarget = target;
+        var targeted = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(2));
+        fixture.Runtime.CombatState.Target = null;
+        fixture.Runtime.Bot.CurrentTarget = null;
+
+        fixture.Runtime.CombatState.CurrentState = BotCombatStateType.Combat;
+        fixture.Runtime.CombatState.IsActive = true;
+        var combat = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(3));
+        fixture.Runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+
+        fixture.Runtime.CombatState.IsResting = true;
+        var resting = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(4));
+        fixture.Runtime.CombatState.IsResting = false;
+        fixture.Runtime.CombatState.InDuel = true;
+        var dueling = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(5));
+        fixture.Runtime.CombatState.InDuel = false;
+        fixture.Runtime.CombatState.IsSearching = true;
+        var searching = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(6));
+        fixture.Runtime.CombatState.IsSearching = false;
+        fixture.Runtime.CombatState.RespawnScheduled = true;
+        var respawnScheduled = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(7));
+        fixture.Runtime.CombatState.RespawnScheduled = false;
+        fixture.Runtime.CombatState.ShouldRespawn = true;
+        var shouldRespawn = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(8));
+        fixture.Runtime.CombatState.ShouldRespawn = false;
+
+        fixture.Runtime.MovementState.Destination = Vector3.One;
+        var moving = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(9));
+        fixture.Runtime.MovementState.Destination = null;
+        fixture.Runtime.MovementState.IsMoving = true;
+        var unresolvedMovement = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(10));
+        fixture.Runtime.MovementState.IsMoving = false;
+
+        var completed = fixture.Runtime.LifeController.Step(fixture.Runtime, true, now.AddSeconds(11));
+        var view = fixture.Runtime.LifeController.Inspect();
+
+        foreach (var blocked in new[]
+                 {
+                     targeted, combat, resting, dueling, searching, respawnScheduled, shouldRespawn, moving,
+                     unresolvedMovement
+                 })
+            await Assert.That(blocked).IsFalse();
+        await Assert.That(completed).IsTrue();
+        await Assert.That(view.Recovery.State).IsEqualTo(BotLifeRecoveryState.Completed);
+        await Assert.That(view.ProgressionCompletion?.CapturedAt).IsEqualTo(now.AddSeconds(11));
+    }
+
     private static Fixture MakeFixture(bool hasOpportunity = true, BotLifeController controller = null)
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 0, 0, TimeSpan.Zero));
         var bot = new ProgressionCharacterMock { Id = 63, ObjId = 1063, Name = "bot63" };
         bot.Transform.Local.SetPosition(Vector3.Zero);
         bot.Hp = 100;
+        bot.Mp = 100;
         var world = BotTestFixture.MakeWorld();
         BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
         var movement = new BotMovementState();
@@ -377,9 +561,12 @@ public sealed class BotLifeControllerTests
     {
         internal int FixedMaxHp { get; set; } = 100;
         internal int FixedMaxMp { get; set; } = 100;
+        internal bool ThrowOnMaxMpRead { get; set; }
 
         public override int MaxHp => FixedMaxHp;
-        public override int MaxMp => FixedMaxMp;
+        public override int MaxMp => ThrowOnMaxMpRead
+            ? throw new InvalidOperationException("simulated unavailable max MP")
+            : FixedMaxMp;
     }
 
     private sealed record Fixture(FakeTimeProvider Time, BotRuntime Runtime);
