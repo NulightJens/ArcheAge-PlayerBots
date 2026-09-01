@@ -460,11 +460,14 @@ tasks:
   - id: T-072
     title: Integrate natural recovery lifecycle correction
     track: AAEmu12
-    status: ready
-    integration: pending
+    status: active
+    integration: integration-active
     depends_on: [T-071]
     runtime_lease: aaemu12-build-only
     gate: full-aaemu12-suite
+    owner_client_thread_id: client-new-thread:e4a39679-a28d-4b9b-8795-cb6c77815ef1
+    owner_thread_id: 01a05c9d-4322-7f22-97dc-bb46803ecd6b
+    worktree: 'C:\Users\jensh\.codex\worktrees\dd46\PB-W00-control'
 
   - id: T-041
     title: One-zone Autonomous Activity Director

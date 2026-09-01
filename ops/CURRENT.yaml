@@ -168,10 +168,10 @@ prepared_workstreams:
     proof: 100-passed-0-failed-build-0-errors-40-retained-warnings
     retained_scope_event: one-pre-clarification-registered-host-output-only-build-no-source-config-module-change
   - task: T-072
-    state: ready-awaiting-exact-thread-build-lease-assignment
-    client_thread_id: pending-thread-creation
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
+    state: active-build-only-lease-authorized
+    client_thread_id: client-new-thread:e4a39679-a28d-4b9b-8795-cb6c77815ef1
+    task_thread_id: 01a05c9d-4322-7f22-97dc-bb46803ecd6b
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\dd46\PB-W00-control'
     base: d71a52b10e78be9ca6a91a3b1d5822a5ef199740
     candidate: 16e8c2fe707f7bd96e4b6977dd6b7c441124c63f
     head: pending
@@ -420,6 +420,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: released-after-T-069-fail-cleanup
+  runtime_lease: claimed-build-only-by-T-072-natural-recovery-integration
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: not-authorized-until-next-exact-thread-lease-claim
+  runtime_start: prohibited-T-072-authority-is-install-build-test-only
