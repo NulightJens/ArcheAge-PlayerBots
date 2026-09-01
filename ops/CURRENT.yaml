@@ -439,10 +439,11 @@ prepared_workstreams:
     manifest_sha256: 39f6c85e69faa78d87824632f0db168bcbc87db4fd26b8d350f7bea70370809c
     cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login-config-restored
   - task: T-093
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-read-only-evidence-integration
+    client_thread_id: client-new-thread:a66b535b-c992-4eff-ac52-15181641b305
+    task_thread_id: 01a05e2d-c7ee-79a3-8329-023d34130f88
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\007f\PB-W00-control'
+    dispatch_base: cd84b322e91233d58c7294f24c80da4dcab42063
     source_candidate: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
     source_candidate_parent: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
     evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'

@@ -2,7 +2,7 @@ schema_version: 1
 id: T-093
 title: Independently integrate the T-092 retained FAIL evidence
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Independently verify the immutable T-092 manifest, continuous client observer, observer-prearm failure, untouched gameplay boundaries, and graceful cleanup, then integrate only the truthful two-file FAIL receipt onto the saved branch.
 depends_on: [T-092]
@@ -10,12 +10,12 @@ runtime:
   required: false
   lease: null
 branch: codex-managed-worktree
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\007f\PB-W00-control'
+owner_client_thread_id: client-new-thread:a66b535b-c992-4eff-ac52-15181641b305
+owner_thread_id: 01a05e2d-c7ee-79a3-8329-023d34130f88
 inputs:
-  dispatch_base: pending-control-commit
-  integration_head_before_dispatch: pending-control-commit
+  dispatch_base: cd84b322e91233d58c7294f24c80da4dcab42063
+  integration_head_before_dispatch: cd84b322e91233d58c7294f24c80da4dcab42063
   candidate_commit: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
   candidate_parent: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
   external_evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'

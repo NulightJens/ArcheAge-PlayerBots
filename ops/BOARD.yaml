@@ -824,7 +824,7 @@ tasks:
   - id: T-093
     title: Independently integrate the T-092 retained FAIL evidence
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-092]
     runtime_lease: null
@@ -833,9 +833,10 @@ tasks:
     candidate_commit: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
     candidate_parent: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
     evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:a66b535b-c992-4eff-ac52-15181641b305
+    owner_thread_id: 01a05e2d-c7ee-79a3-8329-023d34130f88
+    worktree: 'C:\Users\jensh\.codex\worktrees\007f\PB-W00-control'
+    dispatch_base: cd84b322e91233d58c7294f24c80da4dcab42063
 
   - id: T-094
     title: Reprove one-zone autonomy with widened observer pre-arm window
