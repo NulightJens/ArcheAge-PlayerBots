@@ -2,17 +2,17 @@ schema_version: 1
 id: T-106
 title: Add bounded relative-yaw passive fixture placement
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Extend the anchored passive-fixture command with an optional finite invariant relative-yaw offset so deterministic preflight can place uniquely owned fixtures around clustered live bots, while keeping every existing argument form, zero-offset result, anchor guard, and no-mutation boundary intact.
 depends_on: [T-105]
 runtime: {required: false, lease: null}
 branch: task/T-106-passive-yaw-offset
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\4173\PB-W00-control'
+owner_client_thread_id: client-new-thread:cf15f37f-a09b-419d-a8b8-dad7ec57734c
+owner_thread_id: 01a05f65-58af-70f2-a138-1bcccdffaf03
 inputs:
-  dispatch_base: pending-control-prep-commit
+  dispatch_base: 41f2d35a9e20bd66fff80a4ae8394321785e172b
   source_base: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
   retained_fail_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
   compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606

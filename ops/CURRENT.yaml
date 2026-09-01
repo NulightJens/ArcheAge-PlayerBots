@@ -629,11 +629,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
     proof: PASS-receipt-integrity-17528-of-17528-payloads-5357-autonomy-1345-client-1331-geometry-subject-retained-FAIL
   - task: T-106
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
-    dispatch_base: pending-control-prep-commit
+    state: active-exact-thread-bound-source-writer
+    client_thread_id: client-new-thread:cf15f37f-a09b-419d-a8b8-dad7ec57734c
+    task_thread_id: 01a05f65-58af-70f2-a138-1bcccdffaf03
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\4173\PB-W00-control'
+    dispatch_base: 41f2d35a9e20bd66fff80a4ae8394321785e172b
     source_base: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
     contract: ops/tasks/T-106/CONTRACT.md
     retained_fail_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml

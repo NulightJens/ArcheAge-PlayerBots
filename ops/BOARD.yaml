@@ -1096,16 +1096,16 @@ tasks:
   - id: T-106
     title: Add bounded relative-yaw passive fixture placement
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-105]
     runtime_lease: null
     gate: focused-invariant-angular-placement-source-correction
     contract: ops/tasks/T-106/CONTRACT.md
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
-    dispatch_base: pending-control-prep-commit
+    owner_client_thread_id: client-new-thread:cf15f37f-a09b-419d-a8b8-dad7ec57734c
+    owner_thread_id: 01a05f65-58af-70f2-a138-1bcccdffaf03
+    worktree: 'C:\Users\jensh\.codex\worktrees\4173\PB-W00-control'
+    dispatch_base: 41f2d35a9e20bd66fff80a4ae8394321785e172b
     source_base: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
     deterministic_dry_run: 681472-tuples-2430-eligible-from-exact-t104-transform-bits
 
