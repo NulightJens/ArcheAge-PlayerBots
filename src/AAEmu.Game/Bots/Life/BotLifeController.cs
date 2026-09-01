@@ -1,10 +1,39 @@
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Host;
 using AAEmu.Game.Models.Game.Bots;
+using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Units;
 using NLog;
 
 namespace AAEmu.Game.Bots.Life;
+
+public readonly record struct BotLifeProgressionSnapshot(
+    DateTimeOffset CapturedAt,
+    long? Level,
+    long? Experience,
+    long? Hp,
+    long? MaxHp,
+    long? Mp,
+    long? MaxMp,
+    long? OccupiedBagSlots,
+    long? BagItemUnits,
+    bool InventoryAvailable,
+    string InventorySummary,
+    string InventoryFingerprint);
+
+public readonly record struct BotLifeProgressionDelta(
+    long? Level,
+    long? Experience,
+    long? Hp,
+    long? MaxHp,
+    long? Mp,
+    long? MaxMp,
+    long? OccupiedBagSlots,
+    long? BagItemUnits,
+    bool? InventoryChanged);
 
 public readonly record struct BotLifeControllerView(
     BotLifeSnapshot Life,
@@ -16,7 +45,10 @@ public readonly record struct BotLifeControllerView(
     DateTimeOffset? LogoutRequestedAt,
     DateTimeOffset? LogoutCallbackAt,
     DateTimeOffset? LogoutCompletedAt,
-    bool? LogoutSucceeded);
+    bool? LogoutSucceeded,
+    BotLifeProgressionSnapshot? ProgressionBaseline,
+    BotLifeProgressionSnapshot? ProgressionCompletion,
+    BotLifeProgressionDelta? ProgressionDelta);
 
 /// <summary>
 /// Owns the bounded production lifecycle for one runtime. Population eligibility
@@ -48,6 +80,9 @@ public sealed class BotLifeController
     private DateTimeOffset? _logoutCompletedAt;
     private bool? _logoutSucceeded;
     private bool _logoutQueued;
+    private BotLifeProgressionSnapshot? _progressionBaseline;
+    private BotLifeProgressionSnapshot? _progressionCompletion;
+    private BotLifeProgressionDelta? _progressionDelta;
 
     public BotLifeController(BotBehaviorProfile profile = null)
     {
@@ -68,6 +103,9 @@ public sealed class BotLifeController
             _logoutCompletedAt = null;
             _logoutSucceeded = null;
             _logoutQueued = false;
+            _progressionBaseline = null;
+            _progressionCompletion = null;
+            _progressionDelta = null;
         }
 
         Logger.Info($"BOT id={botId} ev=life_registered state=Idle entered_at={Timestamp(now)} profile={_profile.Id}");
@@ -153,7 +191,10 @@ public sealed class BotLifeController
                 _logoutRequestedAt,
                 _logoutCallbackAt,
                 _logoutCompletedAt,
-                _logoutSucceeded);
+                _logoutSucceeded,
+                _progressionBaseline,
+                _progressionCompletion,
+                _progressionDelta);
         }
     }
 
@@ -204,6 +245,7 @@ public sealed class BotLifeController
         if (!transition.Accepted || !transition.Changed)
             return false;
 
+        _progressionBaseline ??= CaptureProgression(runtime.Bot, now);
         combat.KillCount = 0;
         combat.KillGoal = 1;
         combat.TargetTypeFilter = null;
@@ -243,6 +285,7 @@ public sealed class BotLifeController
         if (combat.Target != null || bot.CurrentTarget != null)
             return false;
 
+        var completion = CaptureProgression(runtime.Bot, now);
         var transition = BotLifeStateMachine.Transition(
             _life,
             new BotLifeEvent(BotLifeEventKind.LogoutRequested, now),
@@ -253,10 +296,155 @@ public sealed class BotLifeController
         if (!transition.Accepted || !transition.Changed)
             return false;
 
+        _progressionCompletion ??= completion;
+        if (_progressionBaseline.HasValue && !_progressionDelta.HasValue)
+        {
+            _progressionDelta = CalculateDelta(
+                _progressionBaseline.Value,
+                _progressionCompletion.Value);
+        }
         _logoutRequestedAt = now;
         _logoutQueued = true;
+        LogProgression(runtime.Bot.Id);
         return true;
     }
+
+    private static BotLifeProgressionSnapshot CaptureProgression(Character bot, DateTimeOffset now)
+    {
+        var inventory = CaptureInventory(bot);
+        return new BotLifeProgressionSnapshot(
+            now,
+            ReadValue(() => bot.Level),
+            ReadValue(() => bot.Experience),
+            ReadValue(() => bot.Hp),
+            ReadValue(() => bot.MaxHp),
+            ReadValue(() => bot.Mp),
+            ReadValue(() => bot.MaxMp),
+            inventory.OccupiedSlots,
+            inventory.ItemUnits,
+            inventory.Available,
+            inventory.Summary,
+            inventory.Fingerprint);
+    }
+
+    private static InventoryObservation CaptureInventory(Character bot)
+    {
+        try
+        {
+            var items = bot.Inventory?.Bag?.Items;
+            if (items == null)
+                return InventoryObservation.Unavailable;
+
+            var snapshot = items.ToArray();
+            var occupiedSlots = new HashSet<int>();
+            foreach (var item in snapshot)
+            {
+                if (item == null || item.Slot < 0 || item.TemplateId == 0 || item.Count <= 0 ||
+                    !occupiedSlots.Add(item.Slot))
+                {
+                    return InventoryObservation.Unavailable;
+                }
+            }
+
+            Array.Sort(snapshot, static (left, right) =>
+            {
+                var slot = left.Slot.CompareTo(right.Slot);
+                if (slot != 0)
+                    return slot;
+                var template = left.TemplateId.CompareTo(right.TemplateId);
+                return template != 0 ? template : left.Count.CompareTo(right.Count);
+            });
+
+            var summary = snapshot.Length == 0
+                ? "empty"
+                : string.Join(",", snapshot.Select(item => string.Concat(
+                    item.Slot.ToString(CultureInfo.InvariantCulture), ":",
+                    item.TemplateId.ToString(CultureInfo.InvariantCulture), ":",
+                    item.Count.ToString(CultureInfo.InvariantCulture))));
+            var units = snapshot.Sum(item => (long)item.Count);
+            var fingerprint = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(summary)))
+                .ToLowerInvariant();
+            return new InventoryObservation(true, snapshot.LongLength, units, summary, fingerprint);
+        }
+        catch
+        {
+            return InventoryObservation.Unavailable;
+        }
+    }
+
+    private static BotLifeProgressionDelta CalculateDelta(
+        BotLifeProgressionSnapshot baseline,
+        BotLifeProgressionSnapshot completion) =>
+        new(
+            Difference(baseline.Level, completion.Level),
+            Difference(baseline.Experience, completion.Experience),
+            Difference(baseline.Hp, completion.Hp),
+            Difference(baseline.MaxHp, completion.MaxHp),
+            Difference(baseline.Mp, completion.Mp),
+            Difference(baseline.MaxMp, completion.MaxMp),
+            Difference(baseline.OccupiedBagSlots, completion.OccupiedBagSlots),
+            Difference(baseline.BagItemUnits, completion.BagItemUnits),
+            baseline.InventoryAvailable && completion.InventoryAvailable
+                ? !string.Equals(
+                    baseline.InventoryFingerprint,
+                    completion.InventoryFingerprint,
+                    StringComparison.Ordinal)
+                : null);
+
+    private void LogProgression(uint botId)
+    {
+        if (!_progressionBaseline.HasValue || !_progressionCompletion.HasValue || !_progressionDelta.HasValue)
+            return;
+
+        var baseline = _progressionBaseline.Value;
+        var completion = _progressionCompletion.Value;
+        var delta = _progressionDelta.Value;
+        try
+        {
+            Logger.Info(
+                $"BOT id={botId} ev=life_progression activity={_activity ?? "none"} reason={_decisionReason ?? "none"} " +
+                $"baseline_at={Timestamp(baseline.CapturedAt)} completion_at={Timestamp(completion.CapturedAt)} " +
+                $"level_before={Value(baseline.Level)} level_after={Value(completion.Level)} level_delta={Signed(delta.Level)} " +
+                $"experience_before={Value(baseline.Experience)} experience_after={Value(completion.Experience)} experience_delta={Signed(delta.Experience)} " +
+                $"hp_before={Value(baseline.Hp)} hp_after={Value(completion.Hp)} hp_delta={Signed(delta.Hp)} " +
+                $"max_hp_before={Value(baseline.MaxHp)} max_hp_after={Value(completion.MaxHp)} max_hp_delta={Signed(delta.MaxHp)} " +
+                $"mp_before={Value(baseline.Mp)} mp_after={Value(completion.Mp)} mp_delta={Signed(delta.Mp)} " +
+                $"max_mp_before={Value(baseline.MaxMp)} max_mp_after={Value(completion.MaxMp)} max_mp_delta={Signed(delta.MaxMp)} " +
+                $"bag_slots_before={Value(baseline.OccupiedBagSlots)} bag_slots_after={Value(completion.OccupiedBagSlots)} bag_slots_delta={Signed(delta.OccupiedBagSlots)} " +
+                $"bag_units_before={Value(baseline.BagItemUnits)} bag_units_after={Value(completion.BagItemUnits)} bag_units_delta={Signed(delta.BagItemUnits)} " +
+                $"inventory_before={(baseline.InventoryAvailable ? "available" : "unavailable")} inventory_after={(completion.InventoryAvailable ? "available" : "unavailable")} " +
+                $"inventory_changed={Boolean(delta.InventoryChanged)} inventory_summary_before={baseline.InventorySummary} inventory_summary_after={completion.InventorySummary} " +
+                $"inventory_fingerprint_before={baseline.InventoryFingerprint} inventory_fingerprint_after={completion.InventoryFingerprint}");
+        }
+        catch
+        {
+            // Observability must never reject or delay the accepted logout.
+        }
+    }
+
+    private static long? ReadValue(Func<long> read)
+    {
+        try
+        {
+            return read();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static long? Difference(long? before, long? after) =>
+        before.HasValue && after.HasValue ? after.Value - before.Value : null;
+
+    private static string Value(long? value) =>
+        value?.ToString(CultureInfo.InvariantCulture) ?? "unavailable";
+
+    private static string Signed(long? value) =>
+        value?.ToString("+0;-0;+0", CultureInfo.InvariantCulture) ?? "unavailable";
+
+    private static string Boolean(bool? value) =>
+        value.HasValue ? value.Value.ToString().ToLowerInvariant() : "unavailable";
 
     private static void LogTransition(
         uint botId,
@@ -273,4 +461,15 @@ public sealed class BotLifeController
 
     private static string Timestamp(DateTimeOffset? value) =>
         value?.ToUniversalTime().ToString("O") ?? "none";
+
+    private readonly record struct InventoryObservation(
+        bool Available,
+        long? OccupiedSlots,
+        long? ItemUnits,
+        string Summary,
+        string Fingerprint)
+    {
+        internal static InventoryObservation Unavailable { get; } =
+            new(false, null, null, "unavailable", "unavailable");
+    }
 }

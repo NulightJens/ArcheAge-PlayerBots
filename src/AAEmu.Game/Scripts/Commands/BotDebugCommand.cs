@@ -1,5 +1,6 @@
 ﻿using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Bots.Life;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
@@ -115,6 +116,12 @@ namespace AAEmu.Game.Scripts.Commands
                 CommandManager.SendNormalText(this, messageOutput,
                     $"Life logout: callback={callback}, requested_at={Timestamp(life.LogoutRequestedAt)}, " +
                     $"callback_at={Timestamp(life.LogoutCallbackAt)}, completed_at={Timestamp(life.LogoutCompletedAt)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life baseline: {Snapshot(life.ProgressionBaseline)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life completion: {Snapshot(life.ProgressionCompletion)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life delta: {Delta(life.ProgressionDelta)}");
             }
             var hostMetrics = BotHost.Instance.Metrics;
             CommandManager.SendNormalText(this, messageOutput, $"Host metrics: bots={hostMetrics.LastTickBots}, active={hostMetrics.ActiveBots}, tick_ms_ema={hostMetrics.TickMsEma:F2}, max={hostMetrics.MaxTickMs:F2}, skipped={hostMetrics.SkippedTicks}, brain_steps={hostMetrics.BrainStepsTotal}, mover_steps={hostMetrics.MoverStepsTotal}");
@@ -122,5 +129,41 @@ namespace AAEmu.Game.Scripts.Commands
 
         private static string Timestamp(DateTimeOffset? value) =>
             value?.ToUniversalTime().ToString("O") ?? "none";
+
+        private static string Snapshot(BotLifeProgressionSnapshot? snapshot)
+        {
+            if (!snapshot.HasValue)
+                return "pending";
+
+            var value = snapshot.Value;
+            return
+                $"captured_at={Timestamp(value.CapturedAt)}, level={Number(value.Level)}, experience={Number(value.Experience)}, " +
+                $"hp={Number(value.Hp)}/{Number(value.MaxHp)}, mp={Number(value.Mp)}/{Number(value.MaxMp)}, " +
+                $"bag_slots={Number(value.OccupiedBagSlots)}, bag_units={Number(value.BagItemUnits)}, " +
+                $"inventory={(value.InventoryAvailable ? "available" : "unavailable")}, " +
+                $"summary={value.InventorySummary}, fingerprint={value.InventoryFingerprint}";
+        }
+
+        private static string Delta(BotLifeProgressionDelta? delta)
+        {
+            if (!delta.HasValue)
+                return "pending";
+
+            var value = delta.Value;
+            return
+                $"level={Signed(value.Level)}, experience={Signed(value.Experience)}, " +
+                $"hp={Signed(value.Hp)}, max_hp={Signed(value.MaxHp)}, mp={Signed(value.Mp)}, max_mp={Signed(value.MaxMp)}, " +
+                $"bag_slots={Signed(value.OccupiedBagSlots)}, bag_units={Signed(value.BagItemUnits)}, " +
+                $"inventory_changed={Boolean(value.InventoryChanged)}";
+        }
+
+        private static string Number(long? value) =>
+            value?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "unavailable";
+
+        private static string Signed(long? value) =>
+            value?.ToString("+0;-0;+0", System.Globalization.CultureInfo.InvariantCulture) ?? "unavailable";
+
+        private static string Boolean(bool? value) =>
+            value.HasValue ? value.Value.ToString().ToLowerInvariant() : "unavailable";
     }
 }

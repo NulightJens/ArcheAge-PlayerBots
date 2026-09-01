@@ -579,10 +579,15 @@ public class BotHostBehaviorTests
         var callbackState = BotLifeState.Offline;
         var callbackHeldRuntimeLock = true;
         var callbackRunning = -1;
+        var callbackHadCompletion = false;
+        var callbackHadDelta = false;
         var host = MakeLifecycleHost(time, _ =>
         {
             callbackCount++;
-            callbackState = runtime.LifeController.Inspect().Life.State;
+            var callbackView = runtime.LifeController.Inspect();
+            callbackState = callbackView.Life.State;
+            callbackHadCompletion = callbackView.ProgressionCompletion.HasValue;
+            callbackHadDelta = callbackView.ProgressionDelta.HasValue;
             callbackHeldRuntimeLock = Monitor.IsEntered(runtime.SyncRoot);
             callbackRunning = Volatile.Read(ref runtime.Running);
             return true;
@@ -613,6 +618,8 @@ public class BotHostBehaviorTests
             await Assert.That(runtime.CombatState.KillCount).IsEqualTo(1);
             await Assert.That(callbackCount).IsEqualTo(1);
             await Assert.That(callbackState).IsEqualTo(BotLifeState.Despawning);
+            await Assert.That(callbackHadCompletion).IsTrue();
+            await Assert.That(callbackHadDelta).IsTrue();
             await Assert.That(callbackHeldRuntimeLock).IsFalse();
             await Assert.That(callbackRunning).IsEqualTo(0);
             await Assert.That(life.Life.State).IsEqualTo(BotLifeState.Offline);
@@ -650,10 +657,18 @@ public class BotHostBehaviorTests
             host.HostTask.Execute();
 
             var life = runtime.LifeController.Inspect();
+            var completion = life.ProgressionCompletion;
+            runtime.Bot.Hp = 64;
+            host.HostTask.Execute();
+            var afterDuplicateTick = runtime.LifeController.Inspect();
             await Assert.That(callbackCount).IsEqualTo(1);
             await Assert.That(life.Life.State).IsEqualTo(BotLifeState.Despawning);
             await Assert.That(life.LogoutSucceeded).IsFalse();
             await Assert.That(life.LastTransition?.Event.Kind).IsEqualTo(BotLifeEventKind.LogoutRequested);
+            await Assert.That(completion.HasValue).IsTrue();
+            await Assert.That(completion.Value.Hp).IsEqualTo(100L);
+            await Assert.That(afterDuplicateTick.ProgressionCompletion).IsEqualTo(completion);
+            await Assert.That(afterDuplicateTick.ProgressionDelta).IsEqualTo(life.ProgressionDelta);
             await Assert.That(mover.StepCount).IsEqualTo(1);
         }
         finally
@@ -688,12 +703,18 @@ public class BotHostBehaviorTests
             await Assert.That(fresh.DecisionAt).IsNull();
             await Assert.That(fresh.LogoutRequestedAt).IsNull();
             await Assert.That(fresh.LogoutSucceeded).IsNull();
+            await Assert.That(fresh.ProgressionBaseline).IsNull();
+            await Assert.That(fresh.ProgressionCompletion).IsNull();
+            await Assert.That(fresh.ProgressionDelta).IsNull();
 
             host.HostTask.Execute();
 
             var restarted = controller.Inspect();
             await Assert.That(restarted.Life.State).IsEqualTo(BotLifeState.Active);
             await Assert.That(restarted.Activity).IsEqualTo("grind");
+            await Assert.That(restarted.ProgressionBaseline.HasValue).IsTrue();
+            await Assert.That(restarted.ProgressionCompletion).IsNull();
+            await Assert.That(restarted.ProgressionDelta).IsNull();
             await Assert.That(second.CombatState.KillGoal).IsEqualTo(1);
         }
         finally

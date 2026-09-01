@@ -892,6 +892,38 @@ public class BotCommandsTests
             await Assert.That(output.Messages).Contains(message =>
                 message.Contains("Life decision: activity=grind, reason=nearby_mortal") &&
                 message.Contains("at=2026-"));
+            await Assert.That(output.Messages).Contains(message =>
+                message.Contains("Life baseline: captured_at=2026-") &&
+                message.Contains("hp=100/100") &&
+                message.Contains("mp=100/100") &&
+                message.Contains("inventory=unavailable") &&
+                message.Contains("summary=unavailable") &&
+                message.Contains("fingerprint=unavailable"));
+            await Assert.That(output.Messages).Contains("[botdebug] Life completion: pending");
+            await Assert.That(output.Messages).Contains("[botdebug] Life delta: pending");
+
+            bot.Hp = 80;
+            bot.Mp = 70;
+            combat.KillCount = 1;
+            combat.TransitionTo(BotCombatStateType.Idle);
+            runtime.LifeController.Step(
+                runtime,
+                true,
+                BotHost.Instance.TimeProvider.GetUtcNow().AddSeconds(1));
+
+            var completedOutput = Execute(new BotDebugCommand(), "4");
+
+            await Assert.That(completedOutput.Messages).Contains(message =>
+                message.Contains("Life completion: captured_at=2026-") &&
+                message.Contains("hp=80/100") &&
+                message.Contains("mp=70/100") &&
+                message.Contains("inventory=unavailable"));
+            await Assert.That(completedOutput.Messages).Contains(message =>
+                message.Contains("Life delta: level=+0, experience=+0") &&
+                message.Contains("hp=-20, max_hp=+0") &&
+                message.Contains("mp=-30, max_mp=+0") &&
+                message.Contains("bag_slots=unavailable, bag_units=unavailable") &&
+                message.Contains("inventory_changed=unavailable"));
         }
         finally
         {
