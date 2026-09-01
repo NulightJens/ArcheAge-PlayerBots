@@ -1,0 +1,192 @@
+schema_version: 1
+id: aaemu12-t088-incomplete-integration-v1
+recorded_at: '2026-09-01T11:30:26-06:00'
+verdict: PASS-receipt-integrity
+subject_verdict: INCOMPLETE-client-sampler-exit-before-derived-ledger-runtime-never-started
+
+integration_identity:
+  task: T-089
+  task_thread_id: 01a05dfc-6107-74d0-ae13-9c46df5cd6d5
+  owner_client_thread_id: client-new-thread:8e87e7b2-ae31-4c10-a3c9-83b22656b91a
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\c4fe\PB-W00-control'
+  dispatch_base: 5308fe24ae64de7b9c080a4094dde6290e379e35
+  binding_commit: 13522612e1af23c7066bd7836da412d02f018fad
+  saved_branch: integration/aaemu12-world
+  saved_branch_head_before: 13522612e1af23c7066bd7836da412d02f018fad
+
+candidate:
+  commit: 7919a43fc370ea5f59edd77112385366f4928a94
+  parent: 8abf3f3fd714680bf354a4fd2c1a6259b8171b8d
+  replay_commit: f5f7897335b77fadb4b585aca179c1e3a94cba79
+  replay_parent: 13522612e1af23c7066bd7836da412d02f018fad
+  candidate_stable_patch_id: 863436367f91ef33a35e4e54fcce47ce44eaf33f
+  replay_stable_patch_id: 863436367f91ef33a35e4e54fcce47ce44eaf33f
+  stable_patch_id_match: true
+  exact_path_count: 2
+  exact_paths:
+    - path: ops/evidence/aaemu12-t088-one-zone-autonomy-v2.yaml
+      candidate_blob: 3842fc7b141b5e0b4262a40d3a746770571d96c9
+      replay_blob: 3842fc7b141b5e0b4262a40d3a746770571d96c9
+      byte_identical: true
+    - path: ops/tasks/T-088/HANDOFF.md
+      candidate_blob: 05ccaa295e22a818912572555564dc866eaa3861
+      replay_blob: 05ccaa295e22a818912572555564dc866eaa3861
+      byte_identical: true
+  rejected_scope_changes: 0
+
+immutable_evidence:
+  root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
+  manifest_path: manifest.tsv
+  manifest_sha256: d2447105376fd7bfcbc24d77183f38afa16dc10806b32b656c9c7fb3079763ae
+  declared_payload_file_count: 18
+  actual_payload_file_count: 18
+  verified_payload_file_count: 18
+  declared_payload_total_bytes: 40612
+  verified_payload_total_bytes: 40612
+  duplicate_paths: 0
+  unsafe_paths: 0
+  missing_paths: 0
+  length_mismatches: 0
+  sha256_mismatches: 0
+  unlisted_payloads: 0
+  reparse_points: 0
+  result: 18-of-18-length-and-sha256-green-zero-missing-mismatched-duplicate-unsafe-or-unlisted
+
+semantic_verification:
+  assertion_result: 68-of-68-green
+  groups:
+    authority_source_and_overlay: 23-of-23-green
+    configuration: 5-of-5-green
+    client_sampler: 14-of-14-green
+    runtime_non_start: 8-of-8-green
+    cleanup: 13-of-13-green
+    anomalies_and_boundaries: 5-of-5-green
+  fingerprint:
+    t088_binding_commit: 8abf3f3fd714680bf354a4fd2c1a6259b8171b8d
+    t088_dispatch_base: 4e89fff7b1ca89cf44fda28099c6ee657629bc95
+    t088_thread_id: 01a05df1-47a7-7b70-b851-dbea1c6a69f7
+    t088_owner_client_thread_id: client-new-thread:6e47bdff-97cd-45cf-9d1d-5f439ce9943b
+    t088_worktree: 'C:\Users\jensh\.codex\worktrees\578d\PB-W00-control'
+    evidence_root_absent_before_creation: true
+    evidence_root_created_once: true
+    aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+    module_source_commit: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+    compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+    game_assembly_sha256: a4508402e8564a6c6807471c9cd6c9e9bc5950e279ea1a9e7841d35a61d35075
+    database_identity: aaemu12_database_public_alpha_v1
+  authority_copy_materialization:
+    retained_line_endings: CRLF
+    git_authority_line_endings: LF
+    normalized_content_mismatches: 0
+    copies:
+      - retained_path: preflight/TASK.binding.yaml
+        retained_blob: 85e68c93c2b442ce01b6971bb594edf958e1317b
+        authority_blob: f886e6aee8d06175e9e07a5e3fa8dbde32828b03
+        normalized_content_exact: true
+      - retained_path: preflight/RUNTIME-LEASE.binding.yaml
+        retained_blob: f3cace9530dc9525cd8abdec1f4b07e4e5a09373
+        authority_blob: 27895aa7149f674eb9370229047dba57b46abb90
+        normalized_content_exact: true
+      - retained_path: preflight/integration-receipt.yaml
+        retained_blob: 4f0eea4873eacb5c3323f1b8bb4af624d280b746
+        authority_blob: e771609ab1f2fd6641513d9e8854c721db55cd72
+        normalized_content_exact: true
+      - retained_path: preflight/predecessor-receipt.yaml
+        retained_blob: e973c8e371877fb5bc7680708d3867e51e35e769
+        authority_blob: 6c323d9df785890b615cdf7781c033909f295839
+        normalized_content_exact: true
+  host_overlay:
+    preflight_entry_count: 30
+    final_entry_count: 30
+    tracked_patch_entries: 28
+    expected_untracked_entries: 2
+    unexpected_entry_count: 0
+    unchanged: true
+  configuration:
+    original_length: 1772
+    final_length: 1772
+    original_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+    final_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+    edited: false
+    exact_byte_equality: true
+  client_sampler:
+    launcher_process_id: 120604
+    launch_environment: Windows-PowerShell
+    intended_interval_ms: 500
+    raw_sample_count: 1
+    raw_sample_process_count: 0
+    raw_sample_sha256: a606977632555affcd32c49088e143f1c7d4f47dda8fa2556494ef404e091b83
+    derived_csv_row_count: 0
+    exit_code: 2
+    error: Get-FileHash-unavailable-before-derived-row
+    successful_result_present: false
+    retry_attempted: false
+    continuous_zero_client_boundary_proven: false
+  runtime:
+    login_start_count: 0
+    game_start_count: 0
+    autonomy_observer_start_count: 0
+    metrics_snapshot_count: 0
+    roster_query_count: 0
+    fixture_command_count: 0
+    loopback_operator_command_count: 0
+    directed_gameplay_command_count: 0
+    wave_1_attempted: false
+    wave_2_attempted: false
+    restart_attempted: false
+    runtime_1_payload_file_count: 0
+    runtime_2_payload_file_count: 0
+
+cleanup:
+  shutdown_required: false
+  forced_termination: false
+  final_game_login_process_count: 0
+  final_archeage_client_process_count: 0
+  final_observer_process_count: 0
+  final_sampler_process_count: 0
+  final_required_listener_count: 0
+  final_runtime_log_count: 0
+  mysql_process_ids_before_and_after: [6308, 8076]
+  direct_database_access: false
+  reference_clean_exact: true
+  installed_module_clean_exact: true
+  host_overlay_unchanged: true
+  config_exact_original_bytes: true
+
+retained_anomalies:
+  - category: read-only-preflight-shell-variable
+    finding: A reserved Host-variable assignment was rejected before integration-checkout access; no external state changed.
+  - category: continuous-client-sampler-launch
+    finding: The sampler retained one raw zero-process snapshot, then exited 2 because Get-FileHash was unavailable before a derived/hash row; it was not retried.
+  - category: final-process-query-self-match
+    finding: The raw generic query self-matched the evidence-capture pwsh process; the retained PID-specific correction proves sampler PID 120604 absent and zero started autonomy observers.
+
+integration:
+  candidate_replayed_byte_identically: true
+  integrator_authored_paths:
+    - ops/evidence/aaemu12-t088-incomplete-integration-v1.yaml
+    - ops/tasks/T-089/HANDOFF.md
+  saved_branch_update: fast-forward-only-through-the-commit-containing-this-receipt
+  history_rewritten: false
+  runtime_or_host_used: false
+  external_evidence_mutated: false
+  global_ledgers_or_runtime_lease_mutated: false
+  source_tooling_or_config_mutated: false
+  database_or_client_accessed: false
+  full_suite_consumed: false
+
+retained_boundaries:
+  - T-088 remains INCOMPLETE because continuous zero-client sampling was not established; one raw zero-client snapshot has no derived/hash ledger row.
+  - Director bootstrap, zero-to-three admission, zone/default-instance qualification, and target dwell were not attempted or proven.
+  - Fixture coordinates and separation, autonomous lifecycles, progression, recovery, normal logout, and refills were not attempted or proven.
+  - Both waves, second refill, distinct-PID restart, rebootstrap, and two-minute dwell were not attempted or proven.
+  - T-037 remains blocked.
+  - Scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+
+control_action: >-
+  PB-000 may accept this sealed INCOMPLETE receipt and release or reassign the
+  aaemu12 lease in a separate Control Tower commit. T-088 must not be upgraded
+  to PASS, T-037 remains blocked, and any successor runtime proof requires a
+  corrected continuous sampler, a new exact task/thread/worktree/lease binding,
+  and a fresh versioned evidence root. Never reuse or overwrite the T-088 root.
