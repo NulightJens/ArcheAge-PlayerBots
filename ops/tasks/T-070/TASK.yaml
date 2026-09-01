@@ -2,14 +2,14 @@ schema_version: 1
 id: T-070
 title: Integrate T-069 runtime receipt
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Independently verify and branch-integrate the exact two-file T-069 FAIL runtime receipt without changing its verdict, evidence, or cleanup boundary.
 depends_on: [T-069]
 branch: codex-managed-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+worktree: 'C:\Users\jensh\.codex\worktrees\4538\PB-W00-control'
+owner_client_thread_id: client-new-thread:9d7435c9-4545-4bb2-8752-190ec4219a49
+owner_thread_id: 01a05c84-116f-7d30-bd6f-8f733677bc29
 inputs:
   integration_head: 88182ede5f32399d0ffd8684391fb8a5260c7b0e
   source_candidate: 1f26c4309868b379ab0fb64cad59ae48a6a75648
