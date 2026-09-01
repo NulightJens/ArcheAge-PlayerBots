@@ -1,0 +1,192 @@
+schema_version: 1
+id: aaemu12-qualified-anchor-integration-v1
+recorded_at: '2026-08-31T22:35:12-06:00'
+verdict: green-review-replay-install-build-focused-full-unit
+
+fingerprint:
+  task: T-059
+  pre_preparation_integration_head: 06e57bfa427d79d7e96dd311dbb2a7716e64b5cf
+  resolved_assignment_head: 1c338854ff3b2bad16823011805f80652349d6b1
+  source_candidate: 5bd425327367b72871aef2eae7e51655a53f7bbc
+  source_parent: fef939a460f262269f2586efd2e794fdcbe6f704
+  candidate_stable_patch_id: 2222ac5235e542a13b1a848a8cc88b1bf35ab504
+  replay_source_commit: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+  replay_source_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+  replay_stable_patch_id: 2222ac5235e542a13b1a848a8cc88b1bf35ab504
+  installed_module_commit: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+  installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  active_compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  playerbots_manifest_sha256: ce77c9a3b6f83a66199da55c57847de08ecd0f98cf9d1cdd0579c89ab7c8c076
+  gate_definition_version: 1
+
+accepted_input:
+  worktree_clean: true
+  assignment_base_exact: true
+  pre_preparation_head_is_assignment_base_parent: true
+  exact_candidate_parent: true
+  declared_file_count: 6
+  unexpected_file_count: 0
+  candidate_diff_check: passed
+  pinned_reference_identity: passed
+  registered_host_identity: passed
+  registered_installed_module_identity: passed
+
+source_replay:
+  method: cherry-pick-no-commit-then-independent-commit
+  assignment_parent_exact: true
+  candidate_and_replay_stable_patch_id_match: true
+  candidate_and_replay_file_blobs_match: 6
+  unexpected_payload_files: 0
+  git_diff_check: passed
+  global_ledger_payload_replayed: false
+  protected_payload_unchanged:
+    - compatibility
+    - playerbots.module.json
+    - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+    - ops/BOARD.yaml
+    - ops/CURRENT.yaml
+    - ops/WORKSPACES.yaml
+    - ops/RUNTIME-LEASE.yaml
+    - ops/evidence/aaemu12-t057-combat-stealth-v4.yaml
+
+qualified_anchor_review:
+  active_bot_snapshot_before_ordering: passed
+  stable_lowest_character_id_selection: passed
+  detached_world_transform_snapshot: passed
+  parent_world_stable_after_capture: passed
+  live_transform_instance_matches_snapshot: passed
+  snapshot_instance_matches_parent_world: passed
+  non_zero_zone_required: passed
+  finite_position_and_rotation_required: passed
+  worldless_fallback_without_qualified_bot: passed
+  fresh_controller_actor_per_request: passed
+  zero_world_player_registration: passed
+  spawnpassive_world_guard_unchanged: passed
+  aaemu30_conditional_path_unchanged: passed
+
+environment:
+  os: Microsoft Windows 10.0.26200
+  architecture: X64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+
+host_preflight:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean: true
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_host_status_entry_count: 30
+  installed_host_status_snapshot: 3ba59378bacebcfafe53e84f59201a0eba09140b
+  prior_installed_module_commit: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+  prior_installed_module_tree: 1f3befa4dc3c01222b057c28279e82d25fcc176e
+  prior_installed_module_clean: true
+  reference_patch_apply_check: passed
+  installed_host_patch_reverse_check: passed
+  aaemu_game_login_client_process_count_before: 0
+  pre_existing_mysql_process_count: 2
+  pre_existing_mysql_process_ids: [6308, 8076]
+  occupied_required_port_count_before: 0
+
+installation:
+  installed_module_fast_forward:
+    from: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+    to: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+  installed_module_clean: true
+  complete_host_patch_reapplied: false
+  compatibility_patch_regenerated: false
+  overwritten_host_file_count: 0
+  installer_check_only_before: passed-installed-supported
+  installer_idempotent_child_process_run: passed-already-installed
+  installer_check_only_after: passed-installed-supported
+  host_status_entry_count_before: 30
+  host_status_entry_count_after: 30
+  host_status_snapshot_before: 3ba59378bacebcfafe53e84f59201a0eba09140b
+  host_status_snapshot_after: 3ba59378bacebcfafe53e84f59201a0eba09140b
+  host_status_unchanged: true
+
+results:
+  manifest_hash_reproduction:
+    parsed: true
+    declared_hash_fields: 5
+    mismatches: 0
+  reference_patch_apply_check: passed
+  installed_host_patch_reverse_check: passed
+  build:
+    command: dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false --nologo --verbosity minimal
+    errors: 0
+    warnings: 76
+  focused:
+    command_shape: AAEmu.UnitTests.exe --treenode-filter <class> --minimum-expected-tests <count> --no-progress --no-ansi --output Detailed
+    total: 70
+    succeeded: 70
+    skipped: 0
+    failed: 0
+    CommandControllerTests: 5
+    SpawnPassiveNpcCommandTests: 11
+    CharacterManagerTests: 33
+    BotManagerTests: 21
+  full_unit:
+    command: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+    invocations: 1
+    total: 1800
+    succeeded: 1796
+    skipped: 4
+    failed: 0
+    intentional_skips:
+      - Legacy_Primeval_Pve_MatchesGolden
+      - Legacy_Primeval_Pvp_MatchesGolden
+      - Legacy_Darkrunner_Pve_MatchesGolden
+      - Legacy_Darkrunner_Pvp_MatchesGolden
+  final_source_diff_check: passed
+  final_reference_clean: true
+  final_installed_module_clean: true
+  final_host_status_entry_count: 30
+  final_host_status_unchanged: true
+
+artifact_hashes:
+  game_assembly_sha256: 8326bc9502752491cdcbd53417237659e7277a5c94fc0ad85bcdf9501241c521
+  test_assembly_sha256: bfdf6e3dd2ce16cca25dc0771bf36816207cf970b7cca5c9b9033d28f4b86a49
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+  test_report: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.UnitTests\bin\Debug\net10.0\TestResults\AAEmu.UnitTests-windows-net10.0-report.html'
+  test_report_sha256: 0b1783d2cfc39b9952e8c52014d14b53ee1a3ac0cf39e0c01ccea5c2c8f62d9f
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_failures:
+  product_or_gate_failures: none
+  warnings:
+    - The build retained 75 existing dependency, compiler, analyzer, and test-analyzer warnings and added one analyzer warning for the new MakeAnchoredBot test helper; there were zero build errors.
+  operator_probes:
+    - The first combined manifest-check wrapper had a PowerShell parse error and stopped before installer execution or mutation; the corrected wrapper passed all five fields.
+    - An in-process installer probe printed success but exposed PowerShell's stale native LASTEXITCODE from the expected failed forward-check of an already-installed patch; the child-process installer invocation returned zero and the host snapshot remained unchanged.
+    - A variable-backed host-status hash probe serialized pipeline objects differently; the corrected direct native pipeline reproduced the exact preflight snapshot.
+
+runtime_state:
+  runtime_started_stopped_or_controlled: false
+  runtime_lease_claimed_or_edited: false
+  database_or_client_accessed: false
+  aaemu_game_login_client_process_count_after: 0
+  pre_existing_mysql_process_count_after: 2
+  pre_existing_mysql_process_ids_after: [6308, 8076]
+  pre_existing_mysql_processes_touched: false
+  occupied_required_port_count_after: 0
+  required_ports_observed_free: [1234, 1237, 1239, 1250, 1280]
+
+retained_boundaries:
+  - No Login, GameServer, MySQL, or ArcheAge client process was started, stopped, or controlled.
+  - No database, client fixture, runtime lease, global ledger, retained evidence, or AAEmu 3.0 artifact was changed.
+  - The two pre-existing MySQL processes were observed read-only and retained untouched.
+  - No physical passive-NPC creation, combat, stealth, cleanup, restart, scale, soak, or Population Director acceptance is claimed.
+  - T-057 remains INCOMPLETE; its public-alpha-v4 evidence was retained unchanged.
+
+authorization:
+  control_tower_action: >-
+    Fast-forward integration/aaemu12-world through the T-059 handoff commit,
+    record cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9 and tree
+    1e15fa38ef2f91c62f9a5a72709703d3acd1505a as the tested and installed
+    module identity, accept this receipt, mark T-058 integrated and T-059 done,
+    then dispatch a fresh serialized AAEmu 1.2 live-headless physical attempt
+    with a new runtime-lease claim and new immutable evidence version. Never
+    reuse or alter T-057's public-alpha-v4 evidence.
