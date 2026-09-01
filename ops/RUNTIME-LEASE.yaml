@@ -3,21 +3,21 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-084-build-only-pass
-    owner_task: null
-    owner_thread_id: null
+    status: claimed-runtime-T-041
+    owner_task: T-041
+    owner_thread_id: 01a05d8b-5c96-71c2-9e14-40959480d28f
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
     client_path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
-    claimed_at: null
-    released_at: 2026-09-01
-    cleanup_receipt: ops/evidence/aaemu12-activity-director-integration-v1.yaml
+    claimed_at: 2026-09-01
+    released_at: null
+    cleanup_receipt: null
     baseline_evidence: ops/evidence/aaemu12-activity-director-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: No task may start, stop, or control AAEmu 1.2 until PB-000 commits a fresh exact task/thread binding and authority limit.
+    authority_limit: T-041 thread 01a05d8b-5c96-71c2-9e14-40959480d28f in worktree C:\Users\jensh\.codex\worktrees\3daa\PB-W00-control may run only the contracted live-headless one-zone proof: preserve runtime logs, edit and exactly restore the deployed BotConfig.json Director fields, start loopback Login then Game, run read-only observers/roster/debug/metrics queries, stage at most six inert spawnpassive 10004 12 fixtures, and stop Game then Login gracefully. MySQL/database and ArcheAge client start/control/query/mutation, addbot/removebot or directed gameplay commands, source/tooling/global-ledger/predecessor evidence edits, force-stop, destructive cleanup, scale, soak, packaging, and AAEmu 3.0 are prohibited. Authority ends after a committed T-041 handoff and PB-000 release.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

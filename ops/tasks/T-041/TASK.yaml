@@ -2,7 +2,7 @@ schema_version: 1
 id: T-041
 title: One-zone Autonomous Activity Director
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Maintain configured population bounds while persistent bots independently select and complete safe one-zone activities with qualified lifecycle, navigation, combat, recovery, operator visibility, and deterministic cleanup.
 depends_on: [T-080, T-084]
@@ -11,11 +11,11 @@ runtime:
   lease: aaemu12
 gate: serialized-one-zone-autonomy-proof
 branch: codex-managed-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+worktree: 'C:\Users\jensh\.codex\worktrees\3daa\PB-W00-control'
+owner_client_thread_id: client-new-thread:0ae842b1-85c3-4b16-b0e0-987df65f75c0
+owner_thread_id: 01a05d8b-5c96-71c2-9e14-40959480d28f
 inputs:
-  dispatch_base: pending-control-commit
+  dispatch_base: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
   integration_head: f42206c60df4955213eb6d26f3f093a76d4fe56f
   tested_module_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
   installed_module_tree: 731314bf03169ffcc08a383a9652afd9281c75fa

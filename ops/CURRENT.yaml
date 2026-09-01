@@ -321,10 +321,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-activity-director-integration-v1.yaml
     proof: 154-unique-focused-1830-full-unit-4-intentional-skips-build-0-errors
   - task: T-041
-    state: prepared-awaiting-thread-and-lease-binding
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
-    base: pending-control-commit
+    state: active-exact-runtime-lease-bound
+    client_thread_id: client-new-thread:0ae842b1-85c3-4b16-b0e0-987df65f75c0
+    task_thread_id: 01a05d8b-5c96-71c2-9e14-40959480d28f
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\3daa\PB-W00-control'
+    base: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
     configured_zone: 221
     configured_ids: [20001, 20002, 20003]
     configured_population: {minimum: 2, target: 3, maximum: 3}
@@ -574,6 +575,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: released-after-T-084-build-only-pass-awaiting-T-041-exact-binding
+  runtime_lease: claimed-by-T-041-thread-01a05d8b-5c96-71c2-9e14-40959480d28f
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-exact-new-runtime-task-is-bound-and-committed-to-lease
+  runtime_start: authorized-only-for-exact-T-041-thread-after-binding-commit-and-contract-preflight

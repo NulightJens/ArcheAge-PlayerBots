@@ -654,7 +654,7 @@ tasks:
   - id: T-041
     title: One-zone Autonomous Activity Director
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-080, T-084]
     runtime_lease: aaemu12
@@ -663,6 +663,10 @@ tasks:
     configured_bot_ids: [20001, 20002, 20003]
     configured_population: {minimum: 2, target: 3, maximum: 3}
     contract: ops/tasks/T-041/CONTRACT.md
+    owner_client_thread_id: client-new-thread:0ae842b1-85c3-4b16-b0e0-987df65f75c0
+    owner_thread_id: 01a05d8b-5c96-71c2-9e14-40959480d28f
+    worktree: 'C:\Users\jensh\.codex\worktrees\3daa\PB-W00-control'
+    dispatch_base: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
