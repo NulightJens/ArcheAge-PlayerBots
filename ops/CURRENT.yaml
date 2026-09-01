@@ -613,10 +613,11 @@ prepared_workstreams:
     manifest_sha256: cbe9026f8e27ac0503521370a84be286b01ca38935cc8e3da4552e40bc31f7a0
     proof: FAIL-180042.318ms-delay-1331-tuples-87-separated-0-owned-best-margin-minus-1.2237695385452456m-zero-commands-clean-sealed
   - task: T-105
-    state: prepared-awaiting-exact-evidence-integrator-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-evidence-integrator
+    client_thread_id: client-new-thread:a3aefb4b-97da-4f82-a729-7d9ec4a71c65
+    task_thread_id: 01a05f4e-0502-7a93-bf64-96b14156c2a3
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\d154\PB-W00-control'
+    dispatch_base: cac9064dac253be963d51642332c39dab6519d7a
     candidate: 3b0627f857c8e573cf67450b585e284f3f8ac0e9
     candidate_parent: dde605d10912e8f282ce263680b70d1f02133249
     candidate_tree: 41319cfb1568da0219d5a5d2445a8902c9e9eea7

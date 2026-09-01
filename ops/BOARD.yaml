@@ -1076,15 +1076,16 @@ tasks:
   - id: T-105
     title: Independently integrate retained T-104 runtime failure
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-104]
     runtime_lease: null
     gate: sealed-fail-evidence-replay-and-integration
     contract: ops/tasks/T-105/CONTRACT.md
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:a3aefb4b-97da-4f82-a729-7d9ec4a71c65
+    owner_thread_id: 01a05f4e-0502-7a93-bf64-96b14156c2a3
+    worktree: 'C:\Users\jensh\.codex\worktrees\d154\PB-W00-control'
+    dispatch_base: cac9064dac253be963d51642332c39dab6519d7a
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
