@@ -2,8 +2,8 @@ schema_version: 1
 id: T-093
 title: Independently integrate the T-092 retained FAIL evidence
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently verify the immutable T-092 manifest, continuous client observer, observer-prearm failure, untouched gameplay boundaries, and graceful cleanup, then integrate only the truthful two-file FAIL receipt onto the saved branch.
 depends_on: [T-092]
 runtime:
@@ -34,3 +34,6 @@ gates:
 validation_boundary: Read-only external evidence verification and Git integration only. Do not touch registered host/module/config, Login, GameServer, MySQL/database, client, global ledgers/lease, source/tooling, retained evidence, tests/full suite, scale, soak, packaging, or AAEmu 3.0.
 contract: ops/tasks/T-093/CONTRACT.md
 handoff: ops/tasks/T-093/HANDOFF.md
+integrated_commit: cb52f2c224bb4cfbbc1807fdfff0f8aff3517070
+replay_commit: e978a41b62f00493b22c96f436073eb4f8c42ba7
+result: PASS-1523-payloads-866-client-rows-92-semantic-assertions-subject-remains-FAIL

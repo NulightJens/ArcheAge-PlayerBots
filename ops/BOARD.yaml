@@ -804,7 +804,7 @@ tasks:
     title: Reprove one-zone autonomy with integrated client observer
     track: AAEmu12
     status: blocked
-    integration: pending
+    integration: retained-fail-integrated-by-T-093
     depends_on: [T-087, T-091]
     runtime_lease: aaemu12
     gate: serialized-one-zone-autonomy-proof-v3
@@ -824,8 +824,8 @@ tasks:
   - id: T-093
     title: Independently integrate the T-092 retained FAIL evidence
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-092]
     runtime_lease: null
     gate: immutable-t092-fail-evidence-verification
@@ -837,6 +837,10 @@ tasks:
     owner_thread_id: 01a05e2d-c7ee-79a3-8329-023d34130f88
     worktree: 'C:\Users\jensh\.codex\worktrees\007f\PB-W00-control'
     dispatch_base: cd84b322e91233d58c7294f24c80da4dcab42063
+    replay_commit: e978a41b62f00493b22c96f436073eb4f8c42ba7
+    integrated_commit: cb52f2c224bb4cfbbc1807fdfff0f8aff3517070
+    evidence_receipt: ops/evidence/aaemu12-t092-fail-integration-v1.yaml
+    result: PASS-receipt-integrity-subject-remains-FAIL-1523-payloads-866-client-rows-92-semantics
 
   - id: T-094
     title: Reprove one-zone autonomy with widened observer pre-arm window

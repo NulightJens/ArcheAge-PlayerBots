@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: independent-t092-fail-evidence-integration
+phase: prepare-fresh-one-zone-runtime-proof-v4
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: fdb47f9dc2dc2ca82c8fb95e67171b05d6baf02a
+  integrated_head: cb52f2c224bb4cfbbc1807fdfff0f8aff3517070
   tested_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
-  integration_evidence: ops/evidence/aaemu12-client-process-observer-integration-v1.yaml
+  integration_evidence: ops/evidence/aaemu12-t092-fail-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,12 +30,12 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-build-qualified-awaiting-t088-runtime
+    state: stopped-clean-build-qualified-awaiting-t094-runtime
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-t041-one-zone-autonomy-v1
-    integration_receipt: aaemu12-passive-fixture-anchor-integration-v1
+    evidence_receipt: aaemu12-t092-one-zone-autonomy-v3
+    integration_receipt: aaemu12-t092-fail-integration-v1
     installed_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
     installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
     database_identity: aaemu12_database_public_alpha_v1
@@ -43,7 +43,7 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 28-passed-0-skipped-0-failed
     unit_tests: 1847-passed-4-intentional-skips-0-failed
-    runtime_boundary: T-087 independently qualified and installed the per-bot passive fixture anchor. Physical anchor separation, two three-bot activity waves, refills, restart, scale, and soak remain unclaimed; retained T-041 stays FAIL.
+    runtime_boundary: T-093 independently integrated the cleanly shut down T-092 retained FAIL. Continuous client observation passed, but only bot 20003 was pre-armed before admission. T-094 must reprove all three pre-arms under a 180000 ms initial delay before any fixture or lifecycle evidence can count.
 
 control_tower:
   permanent_task:
@@ -54,8 +54,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Independently verify and integrate only the retained T-092 FAIL receipt from candidate 885a6858e97ae073f86eed1aeef1c45bee3bb2ac.
-  - After T-093 integration, bind T-094 with a 180000 ms initial delay and require all three autonomy observers to publish two offline samples before Director admission.
+  - Bind T-094 to an exact runtime thread/worktree and commit the fresh aaemu12 lease from integrated head cb52f2c224bb4cfbbc1807fdfff0f8aff3517070.
+  - Use the 180000 ms initial delay and require all three autonomy observers to publish two offline samples before Director admission.
   - Run the corrected two-wave three-bot Director proof, distinct-PID restart and dwell, then independently integrate its sealed evidence before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
@@ -439,7 +439,7 @@ prepared_workstreams:
     manifest_sha256: 39f6c85e69faa78d87824632f0db168bcbc87db4fd26b8d350f7bea70370809c
     cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login-config-restored
   - task: T-093
-    state: active-exact-thread-bound-read-only-evidence-integration
+    state: done-integrated
     client_thread_id: client-new-thread:a66b535b-c992-4eff-ac52-15181641b305
     task_thread_id: 01a05e2d-c7ee-79a3-8329-023d34130f88
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\007f\PB-W00-control'
@@ -448,8 +448,12 @@ prepared_workstreams:
     source_candidate_parent: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
     evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
     contract: ops/tasks/T-093/CONTRACT.md
+    replay_commit: e978a41b62f00493b22c96f436073eb4f8c42ba7
+    head: cb52f2c224bb4cfbbc1807fdfff0f8aff3517070
+    evidence_receipt: ops/evidence/aaemu12-t092-fail-integration-v1.yaml
+    proof: 1523-of-1523-payloads-866-of-866-client-chain-92-of-92-semantics-green
   - task: T-094
-    state: prepared-waiting-for-T-093-integration
+    state: prepared-awaiting-exact-thread-binding
     client_thread_id: pending
     task_thread_id: pending
     codex_worktree: pending
