@@ -44,9 +44,9 @@ runtime:
 
 control_tower:
   permanent_task:
-    thread_id: 01a059ec-2ca2-7320-bd0b-aef296413ef7
-    title: PB-000 PlayerBots Control Tower
-    state: active-pinned
+    thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    title: PB-000 PlayerBots Control Tower — Autonomous Alpha
+    state: active-pinned-successor
   saved_project_id: 9cdd642a-c900-4027-8f7b-d369835cef26
   operating_mode: local-integration-worktree
 
