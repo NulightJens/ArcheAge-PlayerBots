@@ -201,11 +201,13 @@ tasks:
   - id: T-054
     title: AAEmu 1.2 combat and stealth physical attempt v3
     track: AAEmu12
-    status: ready
+    status: active
     integration: runtime-pending
     depends_on: [T-053]
     runtime_lease: aaemu12
     gate: serialized-live-aaemu12-proof
+    owner_client_thread_id: client-new-thread:0f5a761f-4dee-4216-938a-9d0df433dbc7
+    owner_thread_id: 01a05abe-7ea9-70c1-94c4-236f31392392
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification

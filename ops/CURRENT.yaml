@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-physical-retry-ready
+phase: wave-2-physical-retry-active
 verdict: active
 
 source:
@@ -207,7 +207,10 @@ wave_2:
     v3_observation: retain-and-classify-recurrence-against-readiness-shutdown-and-cleanup-markers
   next_physical_retry:
     task: T-054
-    state: ready
+    state: active-preflight
+    client_thread_id: client-new-thread:0f5a761f-4dee-4216-938a-9d0df433dbc7
+    task_thread_id: 01a05abe-7ea9-70c1-94c4-236f31392392
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\0721\\PB-W00-control'
     external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v3'
   startup_log_recovery_integration_task:
     task: T-053
@@ -219,6 +222,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: released-after-T-050-incomplete-cleanup
+  runtime_lease: claimed-by-T-054
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-fresh-versioned-task-and-lease-claim
+  runtime_start: authorized-only-after-T-054-synchronizes-this-final-identity-claim
