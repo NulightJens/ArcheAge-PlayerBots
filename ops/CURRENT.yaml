@@ -286,7 +286,11 @@ prepared_workstreams:
     head: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
     proof: 131-unique-focused-tests-build-0-errors-patch-apply-and-sha-green
   - task: T-082
-    state: prepared-integration
+    state: active-integration-build-only-lease
+    client_thread_id: client-new-thread:c37a90bf-63e3-4155-ae31-148e873f2937
+    task_thread_id: 01a05d51-0b47-7b90-b202-9457829b6b24
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\e3d2\PB-W00-control'
+    base: aeaa51c7bf4a5ed1d54aecc07d234c9b399de04d
     candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
     candidate_parent: 069960e3d977767a3738b729c8e9f83767a78e8e
     handoff: ops/tasks/T-082/HANDOFF.md

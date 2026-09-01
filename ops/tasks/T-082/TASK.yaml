@@ -2,7 +2,7 @@ schema_version: 1
 id: T-082
 title: Integrate and qualify the one-zone Activity Director
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Independently review, replay, install, build, full-suite qualify, and saved-branch integrate the exact T-081 Activity Director candidate without starting a runtime or changing its product boundary.
 depends_on: [T-081]
@@ -11,6 +11,9 @@ runtime:
   lease: aaemu12-build-only
   archeage_client_allowed: false
 branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\e3d2\PB-W00-control'
+owner_client_thread_id: client-new-thread:c37a90bf-63e3-4155-ae31-148e873f2937
+owner_thread_id: 01a05d51-0b47-7b90-b202-9457829b6b24
 inputs:
   integration_head_before_dispatch: 697a38b3934692220a3f52c0f92470e316fd659b
   source_candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
