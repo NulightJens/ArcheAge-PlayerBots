@@ -1,0 +1,122 @@
+schema_version: 1
+id: aaemu12-t088-one-zone-autonomy-v2
+recorded_at: '2026-09-01T11:15:06-06:00'
+verdict: INCOMPLETE
+
+fingerprint:
+  task: T-088
+  binding_commit: 8abf3f3fd714680bf354a4fd2c1a6259b8171b8d
+  dispatch_base: 4e89fff7b1ca89cf44fda28099c6ee657629bc95
+  task_thread_id: 01a05df1-47a7-7b70-b851-dbea1c6a69f7
+  owner_client_thread_id: client-new-thread:6e47bdff-97cd-45cf-9d1d-5f439ce9943b
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\578d\PB-W00-control'
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  module_source_commit: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: a4508402e8564a6c6807471c9cd6c9e9bc5950e279ea1a9e7841d35a61d35075
+  database_identity: aaemu12_database_public_alpha_v1
+
+preflight:
+  exact_committed_task_thread_worktree_and_lease_binding: true
+  control_at_binding_commit_and_clean: true
+  reference_head_exact_and_clean: true
+  installed_module_head_tree_exact_and_clean: true
+  integration_host_status_entry_count: 30
+  installed_host_overlay_expected: true
+  fresh_evidence_root_was_absent: true
+  evidence_root_created_once: true
+  game_database: aaemu_playerbots_game_public_alpha_v1
+  login_database: aaemu_playerbots_login_public_alpha_v1
+  all_runtime_hosts_loopback: true
+  required_ports: [1234, 1237, 1239, 1250, 1280]
+  occupied_required_port_count: 0
+  aaemu_game_login_process_count: 0
+  archeage_client_process_count: 0
+  runtime_log_entry_count: 0
+  mysql_observed_process_ids: [6308, 8076]
+  direct_database_access: false
+
+configuration:
+  deployed_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\Configurations\BotConfig.json'
+  original_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  edited: false
+  edit_reason: The client-sampler gate failed before any runtime or configuration change.
+  restoration_required: false
+  final_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  final_exact_original_bytes: true
+
+client_sampler:
+  launcher_process_id: 120604
+  launch_environment: Windows PowerShell via powershell.exe
+  intended_interval_ms: 500
+  retained_raw_sample_count: 1
+  retained_derived_sample_count: 0
+  first_raw_sample_at_utc: '2026-09-01T17:13:08.0187290Z'
+  first_raw_process_count: 0
+  first_raw_sample_sha256: a606977632555affcd32c49088e143f1c7d4f47dda8fa2556494ef404e091b83
+  exit_code: 2
+  error: Get-FileHash was unavailable in the launched Windows PowerShell environment before the first derived/hash ledger row was appended.
+  continuous_zero_process_boundary_proven: false
+  retry_attempted: false
+  first_material_invalid_gate: continuously-retained-zero-client-process-sampling
+
+runtime:
+  login_started: false
+  game_started: false
+  autonomy_observers_started: 0
+  metrics_snapshot_count: 0
+  roster_query_count: 0
+  loopback_operator_command_count: 0
+  spawnpassive_command_count: 0
+  directed_gameplay_command_count: 0
+  wave_1_attempted: false
+  wave_2_attempted: false
+  restart_attempted: false
+  stop_reason: Contract required stopping at the first material invalid gate without retry.
+
+cleanup:
+  shutdown_required: false
+  graceful_game_then_login_shutdown: not-applicable-runtime-never-started
+  forced_termination: false
+  final_game_login_process_count: 0
+  final_observer_process_count: 0
+  final_sampler_process_count: 0
+  final_archeage_client_process_count: 0
+  final_occupied_required_port_count: 0
+  final_runtime_log_entry_count: 0
+  mysql_process_ids_unchanged: [6308, 8076]
+  database_queries_or_mutations: 0
+  reference_and_installed_module_clean: true
+  host_overlay_unchanged: true
+  bot_config_exact_original_bytes: true
+
+retained_anomalies:
+  - category: read-only-preflight-shell-variable
+    finding: A first read-only path probe used PowerShell's reserved Host variable and was rejected before integration-checkout access; no external state changed.
+  - category: continuous-client-sampler-launch
+    finding: The dedicated sampler wrote one raw zero-process snapshot, then exited because Get-FileHash was unavailable; no relaunch or evidence overwrite was attempted.
+  - category: final-process-query-self-match
+    finding: A generic CommandLine query self-matched its evidence-capture pwsh process; the raw result is retained and a PID-based correction proves sampler PID 120604 absent and zero started autonomy observers.
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
+  attempt_summary_present: true
+  manifest_payload_file_count: 18
+  manifest_payload_total_bytes: 40612
+  manifest_sha256: d2447105376fd7bfcbc24d77183f38afa16dc10806b32b656c9c7fb3079763ae
+  manifest_validation: 18-of-18-length-and-sha256-matched-zero-missing-mismatched-duplicate-unsafe-or-unlisted
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_boundaries:
+  - Continuous zero-client process sampling was not established; only one raw zero-process snapshot exists and it lacks an in-run derived/hash ledger row.
+  - Director startup, zero-to-three admission order, zone/default-instance qualification, and target dwell were not attempted or proven.
+  - No fixture command, coordinate audit, pairwise separation, autonomous lifecycle, progression, normal logout, or refill was attempted or proven.
+  - Wave 1, wave 2, second refill, distinct-PID restart, rebootstrap, and two-minute restart dwell were not attempted or proven.
+  - Scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+
+control_actions:
+  integrator: Integrate this task commit only as the retained T-088 INCOMPLETE receipt after independently verifying its immutable evidence and cleanup claims.
+  pb_000_release: PB-000 alone may release or reassign the aaemu12 lease after accepting the zero-runtime, unchanged-MySQL-PID, exact-config, and sealed-evidence boundaries.
+  downstream: Keep T-037 blocked. Any successor proof requires a new task, exact binding and lease, and a fresh versioned evidence root; never reuse or overwrite this root.
