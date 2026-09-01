@@ -156,10 +156,16 @@ wave_2:
     cleanup: login-graceful-game-never-started-zero-processes-five-ports-free
   recovery_source_task:
     task: T-048
-    state: setup-in-progress
+    state: handoff-ready
     client_thread_id: client-new-thread:881e830f-eaed-46f2-abb5-ab300f7089d0
     task_thread_id: pending-task-list-resolution
     outcome: exact-selected-schema-startup-proof
+    worktree: 'C:\Users\jensh\.codex\worktrees\6038\PB-W00-control'
+    head: dc9340fc61d1090e61eda99e55f0cd993b2af898
+  recovery_integration_task:
+    task: T-049
+    state: ready
+    source_head: dc9340fc61d1090e61eda99e55f0cd993b2af898
   runtime_lease: released-after-T-036-incomplete-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
   runtime_start: prohibited-until-T-048-integration-and-new-lease-claim

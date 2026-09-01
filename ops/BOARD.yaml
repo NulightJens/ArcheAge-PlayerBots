@@ -126,11 +126,20 @@ tasks:
   - id: T-048
     title: Exact AAEmu 1.2 selected-schema startup proof
     track: AAEmu12
-    status: active
+    status: review
     integration: pending
     depends_on: [T-036]
     gate: deterministic-harness-tests
     owner_client_thread_id: client-new-thread:881e830f-eaed-46f2-abb5-ab300f7089d0
+    source_head: dc9340fc61d1090e61eda99e55f0cd993b2af898
+
+  - id: T-049
+    title: AAEmu 1.2 startup-proof integration
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-048]
+    gate: full-aaemu12-suite
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
