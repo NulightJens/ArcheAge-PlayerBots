@@ -1,0 +1,135 @@
+schema_version: 1
+id: aaemu12-t050-combat-stealth-v2
+recorded_at: 2026-08-31
+verdict: INCOMPLETE
+
+fingerprint:
+  task_lease_commit: d87e7d722cef8578509a24b048f2e10192ddb9c1
+  task_thread_id: 01a05a8e-3f30-7c81-996b-3eab7fe2e934
+  integration_ancestor: da570e3cc3936917c097ddd2302525f56125c916
+  module_source_commit: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+  module_tree: 92d100838dd4b963edc25245729ea29759deb05a
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: 5b44353fef730367b6dfe29baaa0c5141374163f6616549b6724cead91d82ac3
+  database_identity: aaemu12_database_public_alpha_v1
+  database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+  game_executable_sha256: c10fcd802124406f349253cfafd9413e1768605b90f36110d40c248a85fbc79e
+  login_executable_sha256: 96ef53555b53e532608eb0352ab993e30968eaae55d6d3e2ae9c83ba7c8c389e
+  game_config_sha256: d87acc71056021abe64aaeca29d37fa6cb60015109cbd81df92c9fef4b98ca1c
+  login_config_sha256: 2b18234b5306f7cd3a44138e94520ec27b3462aa8553f2fcdadad176d3fd58e1
+  retained_bot_ids_sha256: 4990553caca2e0843b3a063e3ebd804f34eac75da58b97901982141e756b6203
+  gate_definition_version: 1
+
+preflight:
+  captured_at_utc: '2026-09-01T01:28:51.1013155Z'
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean: true
+  installed_module_head: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+  installed_module_clean: true
+  required_ports: [1234, 1237, 1239, 1250, 1280]
+  aaemu_game_login_process_count: 0
+  occupied_required_port_count: 0
+  runtime_log_file_count: 0
+  v2_evidence_path_absent_before_creation: true
+  retained_bot_ids_exact_range: [20001, 20100]
+  retained_bot_id_count: 100
+  retained_bot_id_distinct_count: 100
+  game_database_in_config: aaemu_playerbots_game_public_alpha_v1
+  login_database_in_config: aaemu_playerbots_login_public_alpha_v1
+  all_task_listeners_loopback: true
+  retained_data_hashes_match_v1: true
+  preflight_external_sha256: 1d525530df746bae2bbfef8787977797ab9ca95cf808a8a662e5fa0b8d05b350
+
+startup_attempt:
+  run_id: t050-startup-wrapper-blocked-20260901T012903Z
+  command: Start-ScaleGateRuntime.ps1 -SafetyAcknowledged
+  startup_receipt_written: false
+  login_process_id: 116256
+  game_process_id: 103600
+  login_exact_selected_schema_observed: true
+  login_internal_network_started: true
+  login_loopback_listener_observed: '127.0.0.1:1237'
+  game_server_started_marker_observed: true
+  game_network_started_marker_observed: true
+  game_stream_started_marker_observed: true
+  game_web_api_started_marker_observed: '127.0.0.1:1280'
+  game_exact_selected_schema_observed: false
+  initial_zero_bot_metrics_observed: false
+  blocker: >-
+    The authorized wrapper failed closed while binding the growing Game log
+    value to Test-ScaleRuntimeStartupEvidence's string Content parameter. It
+    wrote no startup receipt and retained no exact selected Game-schema proof,
+    so T-050 did not access the command API or begin fixture work.
+  graceful_shutdown:
+    game: wrapper-graceful-ctrl-c-exited
+    login: wrapper-graceful-ctrl-c-exited
+    forced_termination: false
+  shutdown_cleanup_marker: BOT ev=shutdown_cleanup remaining_bots=0 remaining_runtimes=0
+  retained_game_errors:
+    - 'BaseBaiLoader: Collection was modified; enumeration operation may not execute. (observed twice)'
+    - 'WorldManager: GetWorld: No such World Instance 0. (observed twice)'
+
+qualification:
+  command_api_accessed: false
+  retained_ids_used: false
+  mortal_template_verified: false
+  stealth_buff_verified: false
+  mortal_targets_spawned: 0
+  stealth_targets_spawned: 0
+  cohorts_executed: []
+  zero_bot_start_observed: not-reached-command-api
+  exact_population_cleanup: not-applicable-no-bots-spawned
+  restart_executed: false
+  analyzer:
+    script: scripts/combat/Test-CombatQualificationEvidence.ps1
+    verdict: INCOMPLETE
+    native_exit_code: 2
+    incomplete_reason_count: 15
+    failure_count: 0
+    result_sha256: 08b89c15fd70083c45698ebe7127bfb9cfd4f6c1055780bb050066347bbea55c
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-036\public-alpha-v2'
+  preflight_sha256: 1d525530df746bae2bbfef8787977797ab9ca95cf808a8a662e5fa0b8d05b350
+  startup_failure_sha256: ccd26ec4f88efe23e42e7697341ac38d3081b6468567ca6c436294f7c2222fb3
+  game_server_log_sha256: 97fcffdf5dea3f9f3bbac948773eca3e83d38dfba91cb0feba5667548a718dec
+  game_error_log_sha256: 748be933f77b36eb1ab7db2be76df2572fdf088c3043f7d5881f1f0c3f6eb6da
+  login_server_log_sha256: 7f31e3f5c2c3480bc6868dac9fe3fe050f6300cad139b524f76a77a23b197950
+  blocked_plan_sha256: 395ea9aab48cae14c890fc3c87e2a23e064b101cde74a204928cb5170dc2ef39
+  blocked_evidence_sha256: 193d67ff764342a586098d1dc625a45f5a3d665a470a9550c045e847b2ed37f6
+  blocked_result_sha256: 08b89c15fd70083c45698ebe7127bfb9cfd4f6c1055780bb050066347bbea55c
+  raw_logs_committed: false
+  configs_committed: false
+  credentials_recorded: false
+
+retained_predecessor:
+  receipt: aaemu12-t036-combat-stealth-v1
+  receipt_sha256: 9d4a3def6ce85ffd112a7cf694a4c159adefcff7b1f36d0511504ad478945246
+  external_blocked_plan_sha256: 75cfad7351346503281282349a326ae1ed34f0744d84f6194098a38a29f2ce35
+  external_blocked_evidence_sha256: c06f0524da19be739e03e5a79bee19b7aef42515349a3ae0fa33b7428dac6f16
+  external_blocked_result_sha256: d95e21249816e7bcdc80161589e653386abc822487d382669c797a90b8a2bd3d
+  external_login_log_sha256: 2e758a6d5aba39f1114ae81e87349a6eaed6da601dc775e46c3efe3f2d3d7bbd
+  immutable: true
+
+final_runtime_state:
+  aaemu_game_process_count: 0
+  aaemu_login_process_count: 0
+  occupied_required_port_count: 0
+  required_ports_free: [1234, 1237, 1239, 1250, 1280]
+  server_logs_remaining_in_runtime_paths: 0
+  isolated_databases_retained: true
+  direct_database_queries_or_mutations: 0
+  database_access_boundary: normal-aaemu-startup-only
+  runtime_configs_retained_unchanged: true
+  retained_data_unchanged: true
+
+retained_failures:
+  - The corrected startup wrapper did not complete or write its immutable startup receipt because its strict Game-log predicate rejected the log value at PowerShell parameter conversion.
+  - Exact selected Game-schema proof and initial zero-population metrics are absent, so no combat, stealth, cleanup, or distinct-PID restart qualification can be claimed.
+  - The Game error log retained two BaseBaiLoader collection-modification errors and two missing-world-instance fatal entries during the failed attempt boundary.
+
+retained_boundaries:
+  - No bot ID, passive NPC, target object, buff, qualification command stimulus, client, AAEmu 3.0 runtime, or direct database command was used.
+  - No source file, global ledger, retained config, retained Data file, client fixture, isolated schema, or predecessor v1 artifact was edited or overwritten.
+  - The failed immutable v2 attempt was not retried or reinterpreted.
+
