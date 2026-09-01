@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-072-build-integration
-    owner_task: null
-    owner_thread_id: null
+    status: claimed-by-T-073-one-bot-autonomy-v4
+    owner_task: T-073
+    owner_thread_id: 01a05ca9-8270-7ed1-aa9a-652dce47db8c
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: 2026-09-01
+    released_at: null
     cleanup_receipt: ops/tasks/T-072/HANDOFF.md
     baseline_evidence: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: No task may start or control Login, GameServer, MySQL, or the ArcheAge client until PB-000 commits a new exact owner assignment.
+    authority_limit: Only exact T-073 thread 01a05ca9-8270-7ed1-aa9a-652dce47db8c may start or control Login and GameServer; no task may start, stop, query, or control MySQL or the ArcheAge client.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

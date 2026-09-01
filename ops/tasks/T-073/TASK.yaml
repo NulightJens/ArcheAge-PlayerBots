@@ -2,8 +2,8 @@ schema_version: 1
 id: T-073
 title: AAEmu 1.2 single-bot autonomy proof v4
 track: AAEmu12
-status: ready
-integration: pending
+status: active
+integration: runtime-proof-active
 outcome: Produce a new immutable runtime receipt proving or falsifying three complete autonomous gameplay iterations by one persistent bot with natural post-activity recovery, exact progression/resource snapshots, normal self-logout, and restart persistence without per-action operator control.
 depends_on: [T-069, T-072]
 runtime:
@@ -11,9 +11,9 @@ runtime:
   lease: aaemu12
   archeage_client_allowed: false
 branch: codex-managed-detached-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+worktree: 'C:\Users\jensh\.codex\worktrees\a03c\PB-W00-control'
+owner_client_thread_id: client-new-thread:7c499b5e-a3e5-4d9d-8f74-b4a4560850e1
+owner_thread_id: 01a05ca9-8270-7ed1-aa9a-652dce47db8c
 inputs:
   dispatch_base: 7aabaa0aafd6e591d50251965bde0a5ab9c5c14f
   tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2

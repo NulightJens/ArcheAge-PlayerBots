@@ -181,10 +181,10 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
     handoff: ops/tasks/T-072/HANDOFF.md
   - task: T-073
-    state: ready-awaiting-exact-thread-lease-assignment
-    client_thread_id: pending-thread-creation
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
+    state: active-runtime-authorized
+    client_thread_id: client-new-thread:7c499b5e-a3e5-4d9d-8f74-b4a4560850e1
+    task_thread_id: 01a05ca9-8270-7ed1-aa9a-652dce47db8c
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\a03c\PB-W00-control'
     base: 7aabaa0aafd6e591d50251965bde0a5ab9c5c14f
     tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
     installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
@@ -435,6 +435,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: released-after-T-072-build-integration
+  runtime_lease: claimed-by-T-073-one-bot-autonomy-v4
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: not-authorized-until-next-exact-thread-lease-claim
+  runtime_start: authorized-only-for-exact-T-073-thread-after-committed-lease-verification
