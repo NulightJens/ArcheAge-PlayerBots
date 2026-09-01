@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-physical-combat-ready
+phase: wave-2-physical-combat-active
 verdict: active
 
 source:
@@ -143,6 +143,12 @@ wave_2:
     tested_module_source: 9938495eb7f1904ac4575bc0db42fc28a7f35851
     integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
     evidence_receipt: aaemu12-wave2-integration-v1
-  runtime_lease: unclaimed
+  physical_gate:
+    task: T-036
+    state: setup-in-progress
+    client_thread_id: client-new-thread:a9f5a4a5-8adf-4765-a624-7673a9cb7559
+    task_thread_id: pending-task-list-resolution
+    contract_commit: f1c0563c71e85ae2cd32bf1209f001ae63151cf4
+  runtime_lease: claimed-by-T-036
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-T-036-assignment-and-lease-claim
+  runtime_start: authorized-only-after-T-036-synchronizes-this-claim

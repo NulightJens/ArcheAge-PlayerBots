@@ -112,11 +112,12 @@ tasks:
   - id: T-036
     title: AAEmu 1.2 mortal-combat and stealth closure
     track: AAEmu12
-    status: ready
+    status: active
     integration: runtime-pending
     depends_on: [T-043, T-044, T-046]
     runtime_lease: aaemu12
     gate: serialized-live-aaemu12-proof
+    owner_client_thread_id: client-new-thread:a9f5a4a5-8adf-4765-a624-7673a9cb7559
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
