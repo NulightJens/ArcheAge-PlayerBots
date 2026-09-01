@@ -784,7 +784,7 @@ tasks:
   - id: T-091
     title: Integrate the portable client-process observer
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-090]
     runtime_lease: none
@@ -792,6 +792,10 @@ tasks:
     contract: ops/tasks/T-091/CONTRACT.md
     candidate: e03ca62e623350cfd88e9f1abe09e6b810b8626a
     candidate_parent: 13522612e1af23c7066bd7836da412d02f018fad
+    owner_client_thread_id: client-new-thread:f3154b6d-6837-4d5b-8212-61d1b346b8af
+    owner_thread_id: 01a05e0e-a085-7623-b86f-95cc25ebdc89
+    worktree: 'C:\Users\jensh\.codex\worktrees\8db4\PB-W00-control'
+    dispatch_base: 020c5cc1b4bfabb002a94af004ab78dfa2fb3922
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

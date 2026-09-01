@@ -2,7 +2,7 @@ schema_version: 1
 id: T-091
 title: Integrate the portable client-process observer
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Independently review, replay, dual-shell test, and saved-branch integrate the exact T-090 portable continuous client-process observer without using any runtime lease.
 depends_on: [T-090]
@@ -10,12 +10,12 @@ runtime:
   required: false
   lease: null
 branch: codex-managed-worktree
-worktree: pending-thread-binding
-owner_client_thread_id: pending-thread-binding
-owner_thread_id: pending-thread-binding
+worktree: 'C:\Users\jensh\.codex\worktrees\8db4\PB-W00-control'
+owner_client_thread_id: client-new-thread:f3154b6d-6837-4d5b-8212-61d1b346b8af
+owner_thread_id: 01a05e0e-a085-7623-b86f-95cc25ebdc89
 inputs:
-  dispatch_base: pending-preparation-commit
-  integration_head_before_dispatch: pending-preparation-commit
+  dispatch_base: 020c5cc1b4bfabb002a94af004ab78dfa2fb3922
+  integration_head_before_dispatch: 020c5cc1b4bfabb002a94af004ab78dfa2fb3922
   candidate_commit: e03ca62e623350cfd88e9f1abe09e6b810b8626a
   candidate_parent: 13522612e1af23c7066bd7836da412d02f018fad
 write_scope:
