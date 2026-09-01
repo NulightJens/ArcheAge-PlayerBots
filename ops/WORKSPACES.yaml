@@ -131,6 +131,13 @@ workspaces:
     lease: aaemu12
     expected_state: immutable-retained-fail
 
+  aaemu12_t098_evidence_v5:
+    role: one-zone-autonomous-director-runtime-evidence-v5
+    path: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: absent-before-first-run-then-immutable
+
   aaemu12_client:
     role: matching-client-fixture
     path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'

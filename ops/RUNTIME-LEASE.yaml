@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-build-install-by-T-097
-    owner_task: T-097
-    owner_thread_id: 01a05e7a-7318-7611-aa5e-d6fc1a52ab84
+    status: released-after-T-097-green-install-awaiting-runtime-successor
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
-    cleanup_receipt: ops/evidence/aaemu12-t094-fail-integration-v1.yaml
-    baseline_evidence: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
+    released_at: 2026-09-01
+    cleanup_receipt: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
+    baseline_evidence: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: T-097 in worktree C:\Users\jensh\.codex\worktrees\ef38\PB-W00-control may replay candidate 859e0daf64df482fcb17d83e16344387453a19b7, install its exact replay source into the registered AAEmu 1.2 integration module, verify the unchanged compatibility patch, run focused tests, a clean build, and exactly one full AAEmu 1.2 suite, and write only its contracted Git receipt/handoff. Login/Game/runtime observer start or control, deployed BotConfig.json edits, MySQL/database query or control, ArcheAge client start/control, reference checkout writes, force-stop, and every other lease use are prohibited. No other task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 records release.
+    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact task/thread/worktree claim. T-097 installed and qualified replay source/tree 761ffa1e0bd76d06532688f34b45e192a493b239 / c36b1255cccb3a782e44e87a56bc9e867a946048 with focused 40, clean build, and exactly one green full suite; no runtime was started.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

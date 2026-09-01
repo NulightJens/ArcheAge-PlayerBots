@@ -3,7 +3,7 @@ id: T-096
 title: Support the widened Activity Director initial delay
 track: AAEmu12
 status: done
-integration: pending
+integration: integrated-by-T-097
 outcome: Raise the supported ActivityDirectorInitialDelayMs ceiling so a deployed value of 180000 is preserved by validation and used by the Director, with focused regression tests and a regenerated AAEmu 1.2 compatibility patch.
 depends_on: [T-094]
 runtime: {required: false, lease: null}
@@ -33,3 +33,4 @@ contract: ops/tasks/T-096/CONTRACT.md
 handoff: ops/tasks/T-096/HANDOFF.md
 candidate_commit: 859e0daf64df482fcb17d83e16344387453a19b7
 result: PASS-40-focused-build-0-errors-40-retained-warnings-patch-clean-apply
+integrated_commit: 71d13ca70b7c6f530a48ece85ced7041adaa7e1b

@@ -889,7 +889,7 @@ tasks:
     title: Support the widened Activity Director initial delay
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated-by-T-097
     depends_on: [T-094]
     runtime_lease: null
     gate: focused-director-delay-range-source-correction
@@ -905,8 +905,8 @@ tasks:
   - id: T-097
     title: Integrate and install widened Director delay support
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-095, T-096]
     runtime_lease: aaemu12-build-only
     gate: source-install-build-full-suite-integration
@@ -917,13 +917,36 @@ tasks:
     owner_thread_id: 01a05e7a-7318-7611-aa5e-d6fc1a52ab84
     worktree: 'C:\Users\jensh\.codex\worktrees\ef38\PB-W00-control'
     dispatch_base: 8515e189fd775e8a83853e6cca62d7f517cce48c
+    replay_commit: 761ffa1e0bd76d06532688f34b45e192a493b239
+    installed_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+    integrated_commit: 71d13ca70b7c6f530a48ece85ced7041adaa7e1b
+    evidence_receipt: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
+    result: PASS-40-focused-build-0-errors-full-1851-pass-4-intentional-skips-once
+
+  - id: T-098
+    title: Reprove one-zone autonomy after Director delay correction
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-097]
+    runtime_lease: aaemu12
+    gate: serialized-one-zone-autonomy-proof-v5
+    zone_id: 221
+    configured_bot_ids: [20001, 20002, 20003]
+    configured_population: {minimum: 2, target: 3, maximum: 3}
+    initial_delay_ms: 180000
+    contract: ops/tasks/T-098/CONTRACT.md
+    evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [fresh-post-T-096-runtime-proof]
+    depends_on: [T-098]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-094-is-retained-FAIL-and-post-T-096-runtime-proof-not-yet-passed-and-integrated
+    blocker: T-098-fresh-runtime-proof-not-yet-passed-and-integrated

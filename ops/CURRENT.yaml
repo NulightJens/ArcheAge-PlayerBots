@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: integrate-install-director-delay-range-correction
+phase: prepare-fresh-one-zone-runtime-proof-v5
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: 0030c1b534cdce3e312a8653a8dd21544e420143
-  tested_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
-  integration_evidence: ops/evidence/aaemu12-t094-fail-integration-v1.yaml
+  integrated_head: 71d13ca70b7c6f530a48ece85ced7041adaa7e1b
+  tested_module_source: 761ffa1e0bd76d06532688f34b45e192a493b239
+  integration_evidence: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,20 +30,21 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-build-qualified-awaiting-t094-runtime
+    state: stopped-clean-build-qualified-awaiting-t098-runtime
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
     evidence_receipt: aaemu12-t092-one-zone-autonomy-v3
-    integration_receipt: aaemu12-t092-fail-integration-v1
-    installed_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
-    installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+    integration_receipt: aaemu12-activity-director-delay-range-integration-v1
+    installed_module_source: 761ffa1e0bd76d06532688f34b45e192a493b239
+    installed_module_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
     database_identity: aaemu12_database_public_alpha_v1
     compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+    game_assembly_sha256: c1b3bd922c900c31c76a5748359b8363ea7c56ba34d27daed9c90fd1ddbd51ef
     build: 0-errors-79-warnings
-    focused_tests: 28-passed-0-skipped-0-failed
-    unit_tests: 1847-passed-4-intentional-skips-0-failed
-    runtime_boundary: T-093 independently integrated the cleanly shut down T-092 retained FAIL. Continuous client observation passed, but only bot 20003 was pre-armed before admission. T-094 must reprove all three pre-arms under a 180000 ms initial delay before any fixture or lifecycle evidence can count.
+    focused_tests: 40-passed-0-skipped-0-failed
+    unit_tests: 1851-passed-4-intentional-skips-0-failed-exactly-one-invocation
+    runtime_boundary: T-097 installed and qualified the shared 300000 ms delay ceiling; 180000 now survives validation and runtime conversion. T-094 remains retained FAIL against predecessor source. T-098 must physically prove no admission before 180000 ms, both three-bot lifecycle waves/refills, and distinct-PID restart/dwell.
 
 control_tower:
   permanent_task:
@@ -54,9 +55,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-097 to an exact Integrator thread and build-only aaemu12 lease.
-  - Replay/install T-096, rerun focused 40, clean build, and exactly one complete AAEmu 1.2 suite.
-  - After T-097 acceptance, dispatch a fresh runtime successor before activating T-037.
+  - Bind T-098 to an exact runtime thread/worktree and fresh aaemu12 lease from integrated head 71d13ca70b7c6f530a48ece85ced7041adaa7e1b.
+  - Require all three pre-arms and no first admission before 180000 ms, then both separated three-bot lifecycle/refill waves.
+  - Prove distinct-PID restart/rebootstrap/two-minute dwell and independently integrate the sealed result before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
@@ -492,8 +493,9 @@ prepared_workstreams:
     contract: ops/tasks/T-096/CONTRACT.md
     candidate_commit: 859e0daf64df482fcb17d83e16344387453a19b7
     proof: 40-focused-build-0-errors-40-retained-warnings-patch-sha-unchanged-clean-apply
+    integration: integrated-by-T-097
   - task: T-097
-    state: active-exact-thread-bound-build-install-integrator
+    state: done-integrated-installed
     client_thread_id: client-new-thread:0e011ddf-ffdc-4c8c-a595-aee28b756ec7
     task_thread_id: 01a05e7a-7318-7611-aa5e-d6fc1a52ab84
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\ef38\PB-W00-control'
@@ -501,6 +503,21 @@ prepared_workstreams:
     source_candidate: 859e0daf64df482fcb17d83e16344387453a19b7
     source_candidate_parent: 1ebfd0ec47138ebf15268befde9ed1671aa05ef8
     contract: ops/tasks/T-097/CONTRACT.md
+    replay_commit: 761ffa1e0bd76d06532688f34b45e192a493b239
+    head: 71d13ca70b7c6f530a48ece85ced7041adaa7e1b
+    installed_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+    evidence_receipt: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
+    proof: 40-focused-build-0-errors-79-warnings-full-1851-pass-4-intentional-skips-once
+  - task: T-098
+    state: prepared-awaiting-exact-thread-binding
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    source: 761ffa1e0bd76d06532688f34b45e192a493b239
+    installed_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+    evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
+    initial_delay_ms: 180000
+    contract: ops/tasks/T-098/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
