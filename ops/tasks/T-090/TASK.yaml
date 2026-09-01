@@ -2,7 +2,7 @@ schema_version: 1
 id: T-090
 title: Add a portable continuous client-process observer
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Replace the failed ad-hoc T-088 sampler with a reusable fail-closed observer that continuously records client-process absence, raw snapshot hashes and a derived ledger under both Windows PowerShell and pwsh, using only framework APIs and cooperative shutdown.
 depends_on: [T-088]
@@ -10,11 +10,11 @@ runtime:
   required: false
   lease: null
 branch: codex-managed-worktree
-worktree: pending-thread-binding
-owner_client_thread_id: pending-thread-binding
-owner_thread_id: pending-thread-binding
+worktree: 'C:\Users\jensh\.codex\worktrees\99a2\PB-W00-control'
+owner_client_thread_id: client-new-thread:9137a173-88d6-4ca4-9773-70e37d83150f
+owner_thread_id: 01a05dfc-60e5-71a2-945f-8b938195c8ee
 inputs:
-  dispatch_base: pending-preparation-commit
+  dispatch_base: 5308fe24ae64de7b9c080a4094dde6290e379e35
   retained_sampler: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2\client-sampler\client-process-sampler.ps1'
   retained_error: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2\client-sampler\sampler-error.json'
 write_scope:

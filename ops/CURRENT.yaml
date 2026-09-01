@@ -389,12 +389,20 @@ prepared_workstreams:
     manifest_sha256: d2447105376fd7bfcbc24d77183f38afa16dc10806b32b656c9c7fb3079763ae
     cleanup: runtime-never-started-config-untouched-zero-processes-listeners-live-logs
   - task: T-089
-    state: prepared-awaiting-thread-binding
+    state: active-exact-thread-bound
+    client_thread_id: client-new-thread:8e87e7b2-ae31-4c10-a3c9-83b22656b91a
+    task_thread_id: 01a05dfc-6107-74d0-ae13-9c46df5cd6d5
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c4fe\PB-W00-control'
+    base: 5308fe24ae64de7b9c080a4094dde6290e379e35
     candidate: 7919a43fc370ea5f59edd77112385366f4928a94
     candidate_parent: 8abf3f3fd714680bf354a4fd2c1a6259b8171b8d
     contract: ops/tasks/T-089/CONTRACT.md
   - task: T-090
-    state: prepared-awaiting-thread-binding
+    state: active-exact-thread-bound
+    client_thread_id: client-new-thread:9137a173-88d6-4ca4-9773-70e37d83150f
+    task_thread_id: 01a05dfc-60e5-71a2-945f-8b938195c8ee
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\99a2\PB-W00-control'
+    base: 5308fe24ae64de7b9c080a4094dde6290e379e35
     retained_sampler: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2\client-sampler\client-process-sampler.ps1'
     contract: ops/tasks/T-090/CONTRACT.md
   - task: T-038

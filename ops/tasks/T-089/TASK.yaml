@@ -2,7 +2,7 @@ schema_version: 1
 id: T-089
 title: Integrate the T-088 pre-runtime INCOMPLETE receipt
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Independently verify the immutable T-088 manifest, sampler failure, untouched config and zero-runtime cleanup, then integrate only the truthful two-file INCOMPLETE receipt onto the saved branch.
 depends_on: [T-088]
@@ -10,12 +10,12 @@ runtime:
   required: false
   lease: null
 branch: codex-managed-worktree
-worktree: pending-thread-binding
-owner_client_thread_id: pending-thread-binding
-owner_thread_id: pending-thread-binding
+worktree: 'C:\Users\jensh\.codex\worktrees\c4fe\PB-W00-control'
+owner_client_thread_id: client-new-thread:8e87e7b2-ae31-4c10-a3c9-83b22656b91a
+owner_thread_id: 01a05dfc-6107-74d0-ae13-9c46df5cd6d5
 inputs:
-  dispatch_base: pending-preparation-commit
-  integration_head_before_dispatch: pending-preparation-commit
+  dispatch_base: 5308fe24ae64de7b9c080a4094dde6290e379e35
+  integration_head_before_dispatch: 5308fe24ae64de7b9c080a4094dde6290e379e35
   candidate_commit: 7919a43fc370ea5f59edd77112385366f4928a94
   candidate_parent: 8abf3f3fd714680bf354a4fd2c1a6259b8171b8d
   external_evidence_root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
