@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: progression-resource-observability-source-correction
+phase: progression-resource-observability-integration-qualification
 verdict: active
 
 source:
@@ -55,7 +55,7 @@ control_tower:
 
 next_transition:
   - T-067 adds only read-only activation-to-logout progression and resource snapshots to structured lifecycle logs and botdebug.
-  - Integrate/build T-067 before assigning a fresh immutable runtime-proof version; keep T-065 as INCOMPLETE and never reuse its evidence root.
+  - T-068 must independently replay, install, build, and run the full AAEmu 1.2 suite once before assigning a fresh immutable runtime-proof version; keep T-065 as INCOMPLETE and never reuse its evidence root.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
@@ -111,12 +111,22 @@ prepared_workstreams:
     head: 07e230ab959c4147318d3b5228dee492ff18c4fb
     handoff: ops/tasks/T-066/HANDOFF.md
   - task: T-067
-    state: active
+    state: source-ready-review
     client_thread_id: client-new-thread:85417e89-8c24-49e9-84ed-8e2ad2753f6e
     task_thread_id: 01a05c52-d3b2-7913-95d2-7f0f426bad22
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\d453\PB-W00-control'
     base: 07e230ab959c4147318d3b5228dee492ff18c4fb
     blocker_receipt: ops/evidence/aaemu12-t065-one-bot-autonomy-v2.yaml
+    head: 4253d0875c5165095621e1e6ff4c672fa21a51d8
+    handoff: ops/tasks/T-067/HANDOFF.md
+    proof: 169-passed-0-failed-build-0-errors-77-retained-warnings
+  - task: T-068
+    state: ready
+    client_thread_id: pending-thread-creation
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: 7b1ff7b879f40bf2bea8ed82d715534e4c75e3c1
+    candidate: 4253d0875c5165095621e1e6ff4c672fa21a51d8
     head: pending
     handoff: pending
   - task: T-038

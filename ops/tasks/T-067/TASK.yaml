@@ -2,7 +2,7 @@ schema_version: 1
 id: T-067
 title: Expose lifecycle progression and resource deltas
 track: AAEmu12
-status: active
+status: review
 integration: pending
 outcome: Add deterministic read-only progression, inventory, HP, and MP snapshots at autonomous activity activation and immediately before lifecycle logout so runtime evidence can prove exact native deltas after self-logout without database access or gameplay control.
 depends_on: [T-063, T-065]
@@ -27,3 +27,5 @@ write_scope:
 gates: [focused-aaemu12-tests]
 validation_boundary: Source-only read-only observability. Do not start/control AAEmu, MySQL, or clients; edit deployed hosts, databases, global ledgers/leases, lifecycle decisions, combat/loot/recovery behavior, retained evidence, AAEmu 3.0, or unrelated PlayerBots systems.
 handoff: ops/tasks/T-067/HANDOFF.md
+source_head: 4253d0875c5165095621e1e6ff4c672fa21a51d8
+verdict: PASS-source-ready-runtime-pending
