@@ -2,8 +2,8 @@ schema_version: 1
 id: T-079
 title: AAEmu 1.2 single-bot autonomy proof v6
 track: AAEmu12
-status: review
-integration: runtime-pass-receipt-pending
+status: done
+integration: integrated-runtime-pass
 outcome: Produce a new immutable runtime receipt proving or falsifying three complete autonomous gameplay iterations by one persistent bot with the integrated observer pre-armed, directly sampled recovery-window brain/mover suspension, natural debt-free recovery, exact progression, normal self-logout, and restart persistence.
 depends_on: [T-073, T-078]
 runtime:
@@ -40,3 +40,4 @@ handoff: ops/tasks/T-079/HANDOFF.md
 attempt_commit: ad8c0cf2aa9eed46c936c835931ce344341f7d09
 evidence_receipt: ops/evidence/aaemu12-t079-one-bot-autonomy-v6.yaml
 result: PASS-three-serial-autonomous-iterations-plus42xp-restart-persistence-cleanup
+integrated_commit: a76ca2476e85f134aec94081f50ca4ba3c5112da

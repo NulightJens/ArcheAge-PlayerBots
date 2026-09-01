@@ -2,8 +2,8 @@ schema_version: 1
 id: T-080
 title: Integrate T-079 PASS runtime receipt
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently verify and branch-integrate the exact two-file T-079 PASS runtime receipt, including every immutable external payload, without changing its verdict or evidence boundary.
 depends_on: [T-079]
 branch: codex-managed-worktree
@@ -25,3 +25,5 @@ runtime:
 gates: [receipt-integrity-review]
 validation_boundary: Receipt review/integration only. Do not control runtime, MySQL, client, or databases; edit global ledgers/lease; change source/tooling/host; reinterpret T-079; modify external evidence; or touch AAEmu 3.0.
 handoff: ops/tasks/T-080/HANDOFF.md
+integrated_commit: a76ca2476e85f134aec94081f50ca4ba3c5112da
+result: PASS-6490-payloads-and-49-semantic-assertions-green

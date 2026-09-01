@@ -1,11 +1,11 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-v6-pass-receipt-integration
+phase: one-zone-activity-director-source
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: a406a3598213745ac3bead7dc5ba7ce009cf50e3
+  integrated_head: a76ca2476e85f134aec94081f50ca4ba3c5112da
   tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
   integration_evidence: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
@@ -30,11 +30,11 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-after-t073-incomplete-and-qualified-for-fresh-proof
+    state: stopped-clean-after-t079-pass
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-t073-one-bot-autonomy-v4
+    evidence_receipt: aaemu12-t079-one-bot-autonomy-v6
     integration_receipt: aaemu12-natural-recovery-integration-v1
     installed_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
     installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
@@ -43,7 +43,7 @@ runtime:
     build: 0-errors-76-warnings
     focused_tests: 100-passed-0-skipped-0-failed
     unit_tests: 1811-passed-4-intentional-skips-0-failed
-    runtime_boundary: T-073 proved autonomous selection, combat, exact +14 XP, ordered natural recovery to full MP, debt-free completion, self-logout, and clean shutdown; its receipt remains INCOMPLETE only because direct pending-window brain/mover counters were not pre-armed.
+    runtime_boundary: T-079 and T-080 accepted three observer-prearmed autonomous one-kill iterations, exact +42 XP total, fixed recovery-window brain/mover counters, debt-free completion, self-logout, restart persistence, and clean graceful shutdown. This satisfies the single-bot milestone and does not claim multi-bot Director or scale behavior.
 
 control_tower:
   permanent_task:
@@ -54,10 +54,11 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Dispatch T-079 as a fresh runtime proof using the integrated observer unchanged and a new immutable evidence root.
-  - Require both offline arm/liveness markers before addbot, current online samples before fixture staging, three serial iterations, and restart persistence.
+  - Dispatch T-081 to implement the production one-zone Activity Director at the existing GameService startup/shutdown seam and qualify it with focused deterministic AAEmu 1.2 tests.
+  - Dispatch T-082 only after T-081 hands off a clean candidate; require independent review, host install/build, focused tests, and the next single full-suite wave gate.
+  - Keep T-041 runtime proof blocked until T-082 accepts the exact Director source and installed fingerprints; then prove bounded autonomous refill in one nonzero zone.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
-  - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
+  - Keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
   - task: T-062
@@ -251,7 +252,7 @@ prepared_workstreams:
     head: a406a3598213745ac3bead7dc5ba7ce009cf50e3
     proof: 64-deterministic-assertions-green-zero-fixture-copies
   - task: T-079
-    state: pass-receipt-review
+    state: done-runtime-pass-integrated
     client_thread_id: client-new-thread:aaa2aa85-cbf0-4f6b-9dcc-5ac9bdd5eacb
     task_thread_id: 01a05cfc-1ebf-79a2-94d8-4d287c3990ab
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\3058\PB-W00-control'
@@ -266,13 +267,15 @@ prepared_workstreams:
     verdict: PASS-three-iterations-plus42xp-restart-persistence-cleanup
     manifest_sha256: fe00f692aec54da1760ef6e99645f1d21a13bc902f7fc3c7cc81b6d3ae4c5a4e
   - task: T-080
-    state: active
+    state: done-integrated
     client_thread_id: client-new-thread:269a307f-4542-4f77-9161-dea979538a93
     task_thread_id: 01a05d22-8db5-7d61-b563-b268dee9c290
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\8b10\PB-W00-control'
     base: 6e53e2a3a92e416b4f6b55aafb6a3b6afd67886a
     source_commit: ad8c0cf2aa9eed46c936c835931ce344341f7d09
     handoff: ops/tasks/T-080/HANDOFF.md
+    head: a76ca2476e85f134aec94081f50ca4ba3c5112da
+    proof: 6490-of-6490-payloads-and-49-of-49-semantic-assertions-green
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

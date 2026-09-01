@@ -1,0 +1,37 @@
+schema_version: 1
+id: T-081
+title: Implement the one-zone Autonomous Activity Director
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Replace one-shot forced-state auto-spawn with a production-started, gracefully stopped, deterministic one-zone population reconciler whose configured persistent identities independently run the accepted lifecycle and refill toward bounded population targets.
+depends_on: [T-080]
+runtime:
+  required: false
+  lease: null
+branch: codex-managed-detached-worktree
+inputs:
+  dispatch_base: pending-control-tower-commit
+  accepted_runtime_receipt: ops/evidence/aaemu12-t079-one-bot-autonomy-v6.yaml
+  accepted_receipt_review: ops/tasks/T-080/HANDOFF.md
+  production_startup_seam: compatibility/aaemu-1.2-r208022-v3.patch
+write_scope:
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - playerbots.module.json
+  - src/AAEmu.Game/Bots/Ops/
+  - src/AAEmu.Game/Bots/Host/BotHostTask.cs
+  - src/AAEmu.Game/Bots/Life/BotLifeController.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+  - src/AAEmu.Game/Configurations/BotConfig.json
+  - src/AAEmu.Game/Scripts/Commands/BotMetricsCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Ops/
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/tasks/T-081/HANDOFF.md
+gates:
+  - deterministic-activity-director-tests
+  - focused-aaemu12-tests
+  - compatibility-patch-hash-consistency
+validation_boundary: Source and focused tests only. Do not start or control runtime, MySQL, databases, or clients; edit deployed hosts, global ledgers/lease, retained evidence, release artifacts, AAEmu 3.0, scale, soak, or unrelated PlayerBots systems.
+handoff: ops/tasks/T-081/HANDOFF.md
