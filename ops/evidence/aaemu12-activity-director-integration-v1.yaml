@@ -1,0 +1,203 @@
+schema_version: 1
+id: aaemu12-activity-director-integration-v1
+recorded_at: '2026-09-01T09:05:03-06:00'
+verdict: green-review-replay-install-build-focused-full-unit
+
+fingerprint:
+  task: T-084
+  integration_parent: 5969b84f4aef6b1ade18b82a77d431dae8cbce13
+  lease_commit: 5969b84f4aef6b1ade18b82a77d431dae8cbce13
+  lease_owner_thread: 01a05d70-6f07-7b61-abad-eafc8d12a307
+  replacement_source: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
+  replacement_parent: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
+  replacement_tree: f45f406efbaf68f683e08c36cd5b05e0d28a1031
+  replacement_parent_tree: 6cb6ad7eaaf027317526e1bef673cd6dbbd0a271
+  rejected_source: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
+  replay_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+  replay_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+  replacement_stable_patch_id: 605881a2f64212cfa68bc21e8a851b1074dfba0c
+  replay_stable_patch_id: 605881a2f64212cfa68bc21e8a851b1074dfba0c
+  compatibility_patch_sha256: 395a83ab5bf6a4f4f1c0d56289590d6a36ad36b3ab5f87e1701d6aa17ffbefcd
+  installed_host_patch_stable_id: 51cf303462d170dd61551ee2f4d410ac0e293ce8
+  installed_module_commit: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+  installed_module_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  gate_definition_version: 1
+
+accepted_input:
+  exact_parent: true
+  replacement_writer_clean: true
+  replacement_declared_path_count: 14
+  unexpected_replacement_path_count: 0
+  preserved_t081_blob_count: 11
+  preserved_t081_blob_mismatch_count: 0
+  patch_section_count: 28
+  patch_sections_changed_from_rejected_source:
+    - AAEmu.Game/GameService.cs
+    - AAEmu.UnitTests/Services/GameServiceTests.cs
+  rejected_source_is_saved_branch_ancestor: false
+  replacement_source_is_replay_ancestor: false
+  rejected_source_is_replay_ancestor: false
+  manifest_declaration_count: 2
+  manifest_hash_mismatch_count: 0
+  candidate_diff_check: passed
+  candidate_reference_apply_check: passed-strict-whitespace
+
+independent_review:
+  t081_product_surface: passed
+  bounds_refill_retry_and_no_shrink: passed
+  zone_default_world_and_default_instance_qualification: passed
+  wrong_boundary_normal_cleanup_only: passed
+  unforced_lifecycle_and_direct_target_prohibitions: passed
+  manual_unconfigured_and_wrong_boundary_isolation: passed
+  immutable_visibility_and_disabled_invalid_defaults: passed
+  graceful_shutdown: passed
+  t082_defects_closed: true
+  lifecycle_linearization: >-
+    One GameService-owned lifecycle lock and state machine covers admission,
+    construction/publication, TryStart, scheduler result/publication,
+    cancellation, Director stop, state clearing, and once-only BotManager stop.
+  lock_order: service-lifecycle-then-scheduler-then-director-execution-state
+  director_tick_acquires_service_lock: false
+  deterministic_service_concurrency_tests: 15-passed-0-skipped-0-failed
+  covered_interleavings:
+    - stop-during-construction-before-publication
+    - stop-during-scheduling-before-success-publication
+    - scheduler-rejection-concurrent-with-stop
+    - repeated-concurrent-starts
+    - repeated-concurrent-stops
+    - sequential-cancel-stop-before-bot-manager-stop
+
+source_replay:
+  method: exact-candidate-blob-restore-then-independent-commit
+  assignment_parent_exact: true
+  replayed_blob_count: 14
+  blob_mismatch_count: 0
+  unexpected_payload_file_count: 0
+  stable_patch_id_match: true
+  git_diff_check: passed
+  control_tower_descendants_preserved: true
+  writer_branch_merged: false
+
+environment:
+  os: Microsoft Windows 10.0.26200
+  architecture: X64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+
+host_preflight:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean: true
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_host_status_entry_count: 30
+  prior_installed_host_patch_stable_id: 7891d6bb88fd8b76f66067c15f064b611323d642
+  prior_installed_module_commit: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+  prior_installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+  prior_installed_module_clean: true
+  prior_compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  prior_complete_patch_reverse_check: passed
+  aaemu_game_login_client_process_count_before: 0
+  occupied_required_port_count_before: 0
+  observed_mysql_processes_before: [6308, 8076]
+
+installation:
+  installed_module_fast_forward:
+    from: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+    to: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+  installed_module_clean: true
+  host_overlay_transition: exact-old-patch-reversed-then-exact-new-patch-applied
+  old_overlay_returned_to_pinned_tracked_base: true
+  new_complete_patch_applied: true
+  installer_check_only_before: passed-installed-supported
+  installer_normal_invocations: 1
+  installer_normal_result: passed-already-installed
+  installer_check_only_after: passed-installed-supported
+  host_status_entry_count_before: 30
+  host_status_entry_count_after: 30
+  host_patch_reverse_check_after: passed
+
+results:
+  build:
+    command: dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false --nologo --verbosity minimal
+    errors: 0
+    warnings: 79
+  focused:
+    command_shape: AAEmu.UnitTests.exe --treenode-filter <namespace/class> --minimum-expected-tests <count> --no-progress --no-ansi
+    unique_total: 154
+    succeeded: 154
+    skipped: 0
+    failed: 0
+    passing_executions_including_corrected_host_selection: 187
+    BotActivityDirectorTaskTests: 8
+    GameServiceTests: 15
+    BotHostBehaviorTests: 33
+    BotCommandsTests: 45
+    BotConfigTests: 28
+    BotLifeControllerTests: 10
+    BotKillCreditTests: 6
+    BotLifeStateMachineTests: 6
+    BotBehaviorProfileTests: 2
+    BotAutoSpawnTaskTests: 1
+  full_unit:
+    command: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+    invocations: 1
+    total: 1834
+    succeeded: 1830
+    skipped: 4
+    failed: 0
+    intentional_skips:
+      - Legacy_Darkrunner_Pve_MatchesGolden
+      - Legacy_Primeval_Pve_MatchesGolden
+      - Legacy_Primeval_Pvp_MatchesGolden
+      - Legacy_Darkrunner_Pvp_MatchesGolden
+  final_source_diff_check: passed
+  final_reference_clean: true
+  final_installed_module_clean: true
+  final_host_status_entry_count: 30
+
+artifact_hashes:
+  game_assembly_sha256: 98f9ce66a8648d13aa79494e3bae2831df3df2365cab8cb2f55372c5f0ce7516
+  test_assembly_sha256: 57aee039633880a0590967d28616ac09993b96ec79c9f7c13a3e553b35a1caf8
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+  test_report_sha256: 762f8d828205f9a235171f0d156c89ea28590553a9cf090325657269bef867d0
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_failures:
+  product_or_gate_failures: none
+  warnings:
+    - The build retained 79 dependency, compiler, analyzer, and test-analyzer warnings, including the existing SQLitePCLRaw.lib.e_sqlite3 and SSH.NET high-severity advisories.
+  operator_probes:
+    - A read-only preflight first used PowerShell's reserved Host variable; affected Git sub-checks were rerun successfully before mutation.
+    - The first strict apply-check wrapper escaped input redirection as a literal path; the direct patch-file check then passed without mutation.
+    - The successful normal installer left native LASTEXITCODE at one from its expected internal forward probe in the already-installed state; its success output, unchanged fingerprints, and post check-only prove the one invocation completed, and it was not rerun.
+    - The first BotHostBehaviorTests selection required 34 tests although the class contains 33; all 33 passed but the runner returned its minimum-policy code, then the corrected 33-test selection passed. No test failed.
+
+runtime_state:
+  runtime_started_stopped_or_controlled: false
+  database_or_client_accessed: false
+  mysql_data_queried: false
+  aaemu_game_process_count_after: 0
+  aaemu_login_process_count_after: 0
+  archeage_client_process_count_after: 0
+  mysql_processes_after_untouched: [6308, 8076]
+  occupied_required_port_count_after: 0
+  required_ports_observed_free: [1234, 1237, 1239, 1250, 1280]
+
+retained_boundaries:
+  - No physical Director refill, one-zone multi-bot behavior, runtime lifecycle, database, or client behavior is proven.
+  - No scale, soak, packaging, release readiness, or AAEmu 3.0 behavior is proven.
+  - T-041 requires a fresh exact runtime lease and remains the physical one-zone proof gate.
+  - T-037 remains blocked until T-041 passes.
+
+authorization:
+  t041_may_proceed_after_saved_branch_fast_forward_and_lease_reassignment: true
+  exact_runtime_proof_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+  exact_runtime_proof_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+  control_tower_action: >-
+    After the saved integration branch contains the commit with this receipt
+    and handoff, release the T-084 build-only lease and dispatch T-041 with a
+    fresh exact runtime lease against source 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+    and tree 731314bf03169ffcc08a383a9652afd9281c75fa.
