@@ -2,12 +2,13 @@ schema_version: 1
 id: T-052
 title: Diagnose retained AAEmu 1.2 Game startup errors
 track: AAEmu12
-status: ready
+status: active
 integration: analysis-pending
 outcome: Classify the retained BaseBaiLoader collection-modification and WorldManager missing-instance errors and define any required pre-v3 action.
 depends_on: [T-050]
 branch: assigned-by-codex
 worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:a7e7080c-7676-4ede-bda9-9c38ba919892
 
 inputs:
   incomplete_receipt: ops/evidence/aaemu12-t050-combat-stealth-v2.yaml

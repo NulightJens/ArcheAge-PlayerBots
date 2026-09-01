@@ -188,10 +188,14 @@ wave_2:
     retained_predecessor: aaemu12-t036-combat-stealth-v1
   recovery_source_task:
     task: T-051
-    state: ready
+    state: setup-in-progress
+    client_thread_id: client-new-thread:d7e98349-adf1-4f47-8f52-b8c21b6cc68a
+    task_thread_id: pending-task-list-resolution
   retained_error_analysis_task:
     task: T-052
-    state: ready
+    state: setup-in-progress
+    client_thread_id: client-new-thread:a7e7080c-7676-4ede-bda9-9c38ba919892
+    task_thread_id: pending-task-list-resolution
   next_physical_retry:
     task: T-054
     state: blocked-on-T-051-integration-and-T-052-classification

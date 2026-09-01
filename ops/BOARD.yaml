@@ -162,18 +162,20 @@ tasks:
   - id: T-051
     title: Stable exact-schema startup guard for growing AAEmu logs
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-050]
     gate: deterministic-harness-tests
+    owner_client_thread_id: client-new-thread:d7e98349-adf1-4f47-8f52-b8c21b6cc68a
 
   - id: T-052
     title: Diagnose retained AAEmu 1.2 Game startup errors
     track: AAEmu12
-    status: ready
+    status: active
     integration: analysis-pending
     depends_on: [T-050]
     gate: read-only-retained-evidence-analysis
+    owner_client_thread_id: client-new-thread:a7e7080c-7676-4ede-bda9-9c38ba919892
 
   - id: T-053
     title: Integrate stable exact-schema startup correction
