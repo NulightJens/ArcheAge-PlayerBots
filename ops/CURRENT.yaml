@@ -250,7 +250,10 @@ wave_2:
     blocker: system-actor-mainworld-template-origin-zone-zero
   qualified_system_actor_anchor_source_task:
     task: T-058
-    state: ready
+    state: active
+    client_thread_id: client-new-thread:162b3705-4db6-4460-969f-2b43edd88f06
+    task_thread_id: 01a05b29-8864-78a0-8fe5-ac293959432d
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\4dee\\PB-W00-control'
   startup_log_recovery_integration_task:
     task: T-053
     state: completed

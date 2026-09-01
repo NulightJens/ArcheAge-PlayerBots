@@ -255,10 +255,12 @@ tasks:
   - id: T-058
     title: Give the system actor a qualified active-bot world anchor
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-057]
     gate: deterministic-system-actor-anchor-tests
+    owner_client_thread_id: client-new-thread:162b3705-4db6-4460-969f-2b43edd88f06
+    owner_thread_id: 01a05b29-8864-78a0-8fe5-ac293959432d
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification

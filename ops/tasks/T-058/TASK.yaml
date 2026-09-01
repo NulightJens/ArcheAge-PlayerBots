@@ -2,14 +2,14 @@ schema_version: 1
 id: T-058
 title: Give the system actor a qualified active-bot world anchor
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Make each fresh loopback @system actor use a deterministic active bot's valid non-zero-zone world transform when world-positioned commands need an operational anchor, while preserving worldless headless commands before bots exist.
 depends_on: [T-057]
-branch: codex-managed-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+branch: codex-managed-detached-worktree
+worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\4dee\\PB-W00-control'
+owner_client_thread_id: client-new-thread:162b3705-4db6-4460-969f-2b43edd88f06
+owner_thread_id: 01a05b29-8864-78a0-8fe5-ac293959432d
 
 inputs:
   incomplete_receipt: ops/evidence/aaemu12-t057-combat-stealth-v4.yaml
