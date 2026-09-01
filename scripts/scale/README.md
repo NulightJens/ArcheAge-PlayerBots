@@ -48,6 +48,33 @@ AAEmu user secrets load after `Config.Local.json`. Startup succeeds only when
 both logs identify the exact isolated schemas. Stop both processes with
 `Stop-ScaleGateRuntime.ps1`; it sends Ctrl+C and never force-terminates.
 
+## Exact selected-schema startup proof
+
+The active AAEmu 1.2 patch makes `LoginService` emit
+`Selected Login database schema: <database>` from the resolved
+`Connections.MySQLProvider.Database` value after configuration precedence is
+complete and before the Login database updater runs. Only the database name is
+logged; host, port, user, password, and connection strings are excluded.
+
+Before it can start Game, `Start-ScaleGateRuntime.ps1` requires that message to
+end with the exact supplied Login schema name, with the name escaped as literal
+text, and also requires `InternalNetwork started` plus the configured
+`http://127.0.0.1:<port>` listener. A generic connection message, the updater's
+hard-coded `aaemu_login` prefix, a donor or wrong schema, a substring collision,
+or a missing selected-schema line is not proof and fails closed. Run the
+deterministic no-runtime regression harness with:
+
+```powershell
+pwsh -NoProfile -File .\scripts\scale\Test-ScaleRuntimeStartupGuard.ps1
+```
+
+The committed T-036 attempt remains `INCOMPLETE`: the old Login binary emitted
+only a generic connection line and a hard-coded updater prefix, so the guard
+timed out and Game never started. Do not reinterpret or retry that attempt. An
+Integrator must apply the new Login hunk and rebuild the registered AAEmu 1.2
+integration host; only then may a newly dispatched physical attempt claim a
+fresh runtime lease and reuse the retained external inputs.
+
 `Analyze-ScaleGate.ps1` produces a non-overwriting analysis beside an immutable
 final result. It recomputes normalized CPU from retained cumulative process CPU
 ticks and timestamps, reports all required rates and distributions, and keeps

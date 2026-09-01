@@ -12,6 +12,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+Import-Module (Join-Path $PSScriptRoot 'ScaleRuntimeStartupGuard.psm1') -Force
+
 function Resolve-ExistingPath([string]$Path, [string]$Label) {
     if (-not (Test-Path -LiteralPath $Path)) { throw "$Label does not exist: $Path" }
     return (Resolve-Path -LiteralPath $Path).Path
@@ -30,8 +32,7 @@ function Wait-ForLog(
         if ($Process.HasExited) { throw "$Label exited during startup with code $($Process.ExitCode)." }
         if (Test-Path -LiteralPath $LogPath) {
             $content = Get-Content -LiteralPath $LogPath -Raw
-            $missing = @($RequiredPatterns | Where-Object { $content -notmatch $_ })
-            if ($missing.Count -eq 0) { return }
+            if (Test-ScaleRuntimeStartupEvidence -Content $content -RequiredPatterns $RequiredPatterns) { return }
         }
         Start-Sleep -Milliseconds 500
     } while ([DateTime]::UtcNow -lt $deadline)
@@ -128,11 +129,10 @@ $loginProcess = $null
 $gameProcess = $null
 try {
     $loginProcess = Start-Process -FilePath $loginExe -WorkingDirectory (Split-Path -Parent $loginExe) -WindowStyle Hidden -Environment $loginEnvironment -PassThru
-    Wait-ForLog $loginProcess $loginLog @(
-        [regex]::Escape("database $LoginDatabaseName"),
-        'InternalNetwork started',
-        [regex]::Escape("Now listening on: http://127.0.0.1:$($loginConfig.Network.Port)")
-    ) $StartupTimeoutSeconds 'Login'
+    $loginStartupPatterns = New-ScaleLoginStartupPatterns `
+        -LoginDatabaseName $LoginDatabaseName `
+        -LoginHttpPort ([int]$loginConfig.Network.Port)
+    Wait-ForLog $loginProcess $loginLog $loginStartupPatterns $StartupTimeoutSeconds 'Login'
 
     # Several legacy managers resolve Data paths from the process working directory.
     # Keep evidence under RuntimeRoot, but run each executable from its own task-local bin directory.

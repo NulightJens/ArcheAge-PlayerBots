@@ -862,6 +862,19 @@ index 4c48175411a950548c99b3ab90cb6222d5cff0db..9327094e43da08b7c37b3d1379cc7bf8
          if (character == null)
              return BadRequestJson(new ErrorModel($"Character \"{commandCharacter}\" not found"));
  
+diff --git a/AAEmu.Login/LoginService.cs b/AAEmu.Login/LoginService.cs
+index c106ab755bbdc3194f473cf3f994cf23a7abf8d3..5b65cc7f85cf891ed63019f29dfaf79ce58bbe06 100644
+--- a/AAEmu.Login/LoginService.cs
++++ b/AAEmu.Login/LoginService.cs
+@@ -18,6 +18,8 @@ public sealed class LoginService(
+     public async Task StartAsync(CancellationToken cancellationToken)
+     {
+         logger.LogInformation("Starting daemon: AAEmu.Login");
++        logger.LogInformation("Selected Login database schema: {Database}",
++            dbConnectionsConfig.Value.MySQLProvider.Database);
+ 
+         // Check for updates
+         await using (var connection = connectionFactory.CreateConnection())
 diff --git a/AAEmu.UnitTests/AAEmu.UnitTests.csproj b/AAEmu.UnitTests/AAEmu.UnitTests.csproj
 index cfd84120aeb3f7cbb55171aaf2180e345803a4d8..fcbfb6914f335f09b7ea3847ae4010edf4b0e3a0 100644
 --- a/AAEmu.UnitTests/AAEmu.UnitTests.csproj

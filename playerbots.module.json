@@ -19,7 +19,7 @@
       "testedBaseCommit": "62e3eb1d87da01194802ac886cd500134facad28",
       "status": "supported",
       "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v3.patch",
-      "compatibilityPatchSha256": "afbb6aa2c5d379eb76ad339642c190f4185b4981815aa27c68d0680d28edd046"
+      "compatibilityPatchSha256": "5b44353fef730367b6dfe29baaa0c5141374163f6616549b6724cead91d82ac3"
     },
     {
       "id": "AAEmu30",
@@ -33,7 +33,7 @@
   ],
   "install": {
     "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v3.patch",
-    "compatibilityPatchSha256": "afbb6aa2c5d379eb76ad339642c190f4185b4981815aa27c68d0680d28edd046",
+    "compatibilityPatchSha256": "5b44353fef730367b6dfe29baaa0c5141374163f6616549b6724cead91d82ac3",
     "optionalHostSecurityPatch": "compatibility/aaemu-1.2-security-baseline.patch",
     "optionalHostSecurityPatchSha256": "64d0fb4ba543a86670a4e8d9fa5859548fe23217b842f4b1660852e4131371ae",
     "gameTargets": "build/AAEmu.PlayerBots.Game.targets",

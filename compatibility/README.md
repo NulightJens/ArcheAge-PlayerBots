@@ -6,9 +6,9 @@ The patches are intentionally visible and reviewable. They are applied to an AAE
 
 ## ArcheAge 1.2 host hooks
 
-`aaemu-1.2-r208022-v3.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and adds the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs. Version 3 also registers the GM-only `/botquest` quest-development command alongside the version 2 class, gear, and kit integration.
+`aaemu-1.2-r208022-v3.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and adds the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs. Version 3 also registers the GM-only `/botquest` quest-development command alongside the version 2 class, gear, and kit integration. Login logs `Selected Login database schema: <database>` from the resolved `MySQLProvider.Database` value before its updater runs; the message contains no connection or credential fields.
 
-SHA-256: `afbb6aa2c5d379eb76ad339642c190f4185b4981815aa27c68d0680d28edd046`
+SHA-256: `5b44353fef730367b6dfe29baaa0c5141374163f6616549b6724cead91d82ac3`
 
 The released `aaemu-1.2-r208022.patch` and the version 2 patch remain unchanged; neither is the active Unreleased installer contract.
 
