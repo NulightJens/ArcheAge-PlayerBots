@@ -3,6 +3,7 @@ using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Body;
 using AAEmu.Game.Bots.Kernel;
 using AAEmu.Game.Bots.Content.Rotations;
+using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Tasks.Bots;
@@ -85,6 +86,8 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
         for (var i = 0; i < runtimes.Length; i++)
         {
             var runtime = runtimes[i];
+            var lifecycleEligible = isSoleRuntime ||
+                                    BotActivityDirectorTask.IsCurrentLifecycleEligible(runtime.Bot);
             runtime.Schedule.Now = now;
 
             if (Interlocked.CompareExchange(ref runtime.Running, 1, 0) != 0)
@@ -106,7 +109,7 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
 
                     var logoutRequested = runtime.LifeController.Step(
                         runtime,
-                        isSoleRuntime,
+                        lifecycleEligible,
                         nowOffset);
                     if (logoutRequested)
                     {
@@ -127,7 +130,7 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                 lock (runtime.SyncRoot)
                 {
                     if (!runtime.Retired &&
-                        runtime.LifeController.Step(runtime, isSoleRuntime, nowOffset))
+                        runtime.LifeController.Step(runtime, lifecycleEligible, nowOffset))
                     {
                         _logoutRequests.Add(runtime);
                     }

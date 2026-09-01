@@ -5,6 +5,7 @@ using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
@@ -82,6 +83,39 @@ public class BotCommandsTests
         await Assert.That(SetBotClass.TreeName(AbilityType.Fight)).IsEqualTo("Battlerage");
         await Assert.That(SetBotClass.TreeName(AbilityType.Will)).IsEqualTo("Auramancy");
         await Assert.That(SetBotClass.TreeName(AbilityType.Vocation)).IsEqualTo("Shadowplay");
+    }
+
+    [Test]
+    public async Task BotMetrics_SnapshotIncludesImmutableActivityDirectorEnvelope()
+    {
+        _ = new BotActivityDirectorTask(
+            new BotConfig
+            {
+                ActivityDirectorEnabled = true,
+                ActivityDirectorZoneId = 137,
+                ActivityDirectorCharacterIds = [7, 8],
+                ActivityDirectorMinimumPopulation = 1,
+                ActivityDirectorTargetPopulation = 1,
+                ActivityDirectorMaximumPopulation = 2
+            },
+            _botManager,
+            TimeProvider.System);
+
+        var output = Execute(new BotMetricsCommand(), "snapshot");
+
+        await Assert.That(output.Messages).Contains(message => message.Contains("T021_METRICS "));
+        await Assert.That(output.Messages).Contains(message =>
+            message.Contains("T081_DIRECTOR ") &&
+            message.Contains("\"enabled\":true") &&
+            message.Contains("\"valid\":true") &&
+            message.Contains("\"zoneId\":137") &&
+            message.Contains("\"minimumPopulation\":1") &&
+            message.Contains("\"targetPopulation\":1") &&
+            message.Contains("\"maximumPopulation\":2") &&
+            message.Contains("\"eligibleIdentities\":2") &&
+            message.Contains("\"attemptCount\":0") &&
+            message.Contains("\"startedAt\":null") &&
+            message.Contains("\"lastTickAt\":null"));
     }
 
     [Test]

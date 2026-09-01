@@ -5,10 +5,13 @@ using AAEmu.Game.Bots.Life;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Bots.Kernel;
+using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.NPChar;
+using AAEmu.Game.Models.Game.World;
+using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Models.Tasks.Bots;
 using AAEmu.UnitTests.Bots.Sim;
 using AAEmu.UnitTests.Utils.Mocks;
@@ -779,6 +782,74 @@ public class BotHostBehaviorTests
     }
 
     [Test]
+    public async Task MultipleRuntimes_OnlyQualifiedDirectorIdentitiesRunIndependentLifecycle()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 20, 0, TimeSpan.Zero));
+        var logoutIds = new List<uint>();
+        var host = MakeLifecycleHost(time, id =>
+        {
+            logoutIds.Add(id);
+            return true;
+        });
+        var qualifiedOne = MakeLifecycleRuntime(6401, time, directorZone: 137);
+        var qualifiedTwo = MakeLifecycleRuntime(6402, time, directorZone: 137);
+        var configuredWrongZone = MakeLifecycleRuntime(6403, time, directorZone: 999);
+        var manual = MakeLifecycleRuntime(6404, time, directorZone: 137);
+        var director = new BotActivityDirectorTask(
+            new BotConfig
+            {
+                ActivityDirectorEnabled = true,
+                ActivityDirectorZoneId = 137,
+                ActivityDirectorCharacterIds = [6401, 6402, 6403],
+                ActivityDirectorMinimumPopulation = 1,
+                ActivityDirectorTargetPopulation = 2,
+                ActivityDirectorMaximumPopulation = 3
+            },
+            Mock.Of<IBotManager>().Object,
+            time);
+        var runtimes = new[] { qualifiedOne, qualifiedTwo, configuredWrongZone, manual };
+
+        try
+        {
+            await Assert.That(director.TryStart()).IsTrue();
+            foreach (var runtime in runtimes)
+                host.Register(runtime);
+
+            host.HostTask.Execute();
+
+            await Assert.That(qualifiedOne.LifeController.Inspect().Activity).IsEqualTo("grind");
+            await Assert.That(qualifiedTwo.LifeController.Inspect().Activity).IsEqualTo("grind");
+            await Assert.That(configuredWrongZone.LifeController.Inspect().Activity).IsNull();
+            await Assert.That(manual.LifeController.Inspect().Activity).IsNull();
+            await Assert.That(qualifiedOne.CombatState.ForcedState).IsNull();
+            await Assert.That(qualifiedTwo.CombatState.ForcedState).IsNull();
+            await Assert.That(qualifiedOne.CombatState.Target).IsNull();
+            await Assert.That(qualifiedTwo.CombatState.Target).IsNull();
+
+            foreach (var runtime in new[] { qualifiedOne, qualifiedTwo })
+            {
+                runtime.CombatState.KillCount = 1;
+                runtime.CombatState.KillGoal = null;
+                runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+            }
+            time.Advance(TimeSpan.FromSeconds(1));
+            host.HostTask.Execute();
+
+            await Assert.That(string.Join(",", logoutIds.OrderBy(id => id))).IsEqualTo("6401,6402");
+            await Assert.That(qualifiedOne.LifeController.Inspect().LogoutSucceeded).IsTrue();
+            await Assert.That(qualifiedTwo.LifeController.Inspect().LogoutSucceeded).IsTrue();
+            await Assert.That(configuredWrongZone.LifeController.Inspect().LogoutRequestedAt).IsNull();
+            await Assert.That(manual.LifeController.Inspect().LogoutRequestedAt).IsNull();
+        }
+        finally
+        {
+            director.Stop();
+            foreach (var runtime in runtimes)
+                host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
     public async Task TickMetrics_TickMsEmaMovesForSlowBrain()
     {
         var sim = new BotSim();
@@ -983,7 +1054,8 @@ public class BotHostBehaviorTests
     private static BotRuntime MakeLifecycleRuntime(
         uint id,
         FakeTimeProvider time,
-        BotLifeController controller = null)
+        BotLifeController controller = null,
+        uint? directorZone = null)
     {
         var bot = new LifecycleCharacterMock
         {
@@ -994,8 +1066,19 @@ public class BotHostBehaviorTests
             Mp = 100
         };
         bot.Transform.Local.SetPosition(Vector3.Zero);
-        var world = BotTestFixture.MakeWorld();
+        var instanceId = directorZone.HasValue ? WorldManager.DefaultInstanceId : 1u;
+        var templateId = directorZone.HasValue ? WorldManager.DefaultWorldTemplateId : 1u;
+        var world = new WorldInstance(
+            new WorldTemplate { Id = templateId, Name = $"world{instanceId}" },
+            0,
+            true,
+            instanceId);
         BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+        if (directorZone.HasValue)
+        {
+            BotTestFixture.SetPrivateField(bot.Transform, "_instanceId", instanceId);
+            BotTestFixture.SetPrivateField(bot.Transform, "_zoneId", directorZone.Value);
+        }
         var movement = new BotMovementState();
         var combat = new BotCombatState();
         var blackboard = new BotBlackboard();

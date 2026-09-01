@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Bots;
@@ -70,5 +71,7 @@ public sealed class BotMetricsCommand : ICommand
             BotHost.Instance.RuntimeCount);
         var json = JsonSerializer.Serialize(snapshot, JsonOptions);
         CommandManager.SendNormalText(this, messageOutput, $"T021_METRICS {json}");
+        var directorJson = JsonSerializer.Serialize(BotActivityDirectorTask.CurrentSnapshot, JsonOptions);
+        CommandManager.SendNormalText(this, messageOutput, $"T081_DIRECTOR {directorJson}");
     }
 }

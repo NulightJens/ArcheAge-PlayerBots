@@ -44,9 +44,15 @@ public class BotConfigTests
         await Assert.That(config.ScanTtlMs).IsEqualTo(2000d);
         await Assert.That(config.RealPlayerScanTtlMs).IsEqualTo(5000d);
         await Assert.That(config.MetricsLogIntervalMs).IsEqualTo(60000d);
-        await Assert.That(config.AutoSpawnCharacterIds).IsEmpty();
-        await Assert.That(config.AutoSpawnState).IsEqualTo("grind");
-        await Assert.That(config.AutoSpawnDelayMs).IsEqualTo(2000);
+        await Assert.That(config.ActivityDirectorEnabled).IsFalse();
+        await Assert.That(config.ActivityDirectorZoneId).IsEqualTo(0u);
+        await Assert.That(config.ActivityDirectorCharacterIds).IsEmpty();
+        await Assert.That(config.ActivityDirectorMinimumPopulation).IsEqualTo(0);
+        await Assert.That(config.ActivityDirectorTargetPopulation).IsEqualTo(0);
+        await Assert.That(config.ActivityDirectorMaximumPopulation).IsEqualTo(0);
+        await Assert.That(config.ActivityDirectorInitialDelayMs).IsEqualTo(2000);
+        await Assert.That(config.ActivityDirectorReconciliationIntervalMs).IsEqualTo(5000);
+        await Assert.That(config.ActivityDirectorRetryBackoffMs).IsEqualTo(30000);
     }
 
     [Test]
@@ -125,9 +131,15 @@ public class BotConfigTests
               "ScanTtlMs": 2006.6,
               "RealPlayerScanTtlMs": 5006.6,
               "MetricsLogIntervalMs": 60006.6,
-              "AutoSpawnCharacterIds": [2, 3, 4],
-              "AutoSpawnState": "questing",
-              "AutoSpawnDelayMs": 1234
+              "ActivityDirectorEnabled": true,
+              "ActivityDirectorZoneId": 137,
+              "ActivityDirectorCharacterIds": [2, 3, 4],
+              "ActivityDirectorMinimumPopulation": 1,
+              "ActivityDirectorTargetPopulation": 2,
+              "ActivityDirectorMaximumPopulation": 3,
+              "ActivityDirectorInitialDelayMs": 1234,
+              "ActivityDirectorReconciliationIntervalMs": 2345,
+              "ActivityDirectorRetryBackoffMs": 3456
             }
             """);
 
@@ -156,9 +168,15 @@ public class BotConfigTests
         await Assert.That(config.ScanTtlMs).IsEqualTo(2006.6);
         await Assert.That(config.RealPlayerScanTtlMs).IsEqualTo(5006.6);
         await Assert.That(config.MetricsLogIntervalMs).IsEqualTo(60006.6);
-        await Assert.That(config.AutoSpawnCharacterIds).IsEquivalentTo([2u, 3u, 4u]);
-        await Assert.That(config.AutoSpawnState).IsEqualTo("questing");
-        await Assert.That(config.AutoSpawnDelayMs).IsEqualTo(1234);
+        await Assert.That(config.ActivityDirectorEnabled).IsTrue();
+        await Assert.That(config.ActivityDirectorZoneId).IsEqualTo(137u);
+        await Assert.That(config.ActivityDirectorCharacterIds).IsEquivalentTo([2u, 3u, 4u]);
+        await Assert.That(config.ActivityDirectorMinimumPopulation).IsEqualTo(1);
+        await Assert.That(config.ActivityDirectorTargetPopulation).IsEqualTo(2);
+        await Assert.That(config.ActivityDirectorMaximumPopulation).IsEqualTo(3);
+        await Assert.That(config.ActivityDirectorInitialDelayMs).IsEqualTo(1234);
+        await Assert.That(config.ActivityDirectorReconciliationIntervalMs).IsEqualTo(2345);
+        await Assert.That(config.ActivityDirectorRetryBackoffMs).IsEqualTo(3456);
     }
 
     [Test]
@@ -264,9 +282,15 @@ public class BotConfigTests
         await Assert.That(config.ScanTtlMs).IsEqualTo(2000d);
         await Assert.That(config.RealPlayerScanTtlMs).IsEqualTo(5000d);
         await Assert.That(config.MetricsLogIntervalMs).IsEqualTo(60000d);
-        await Assert.That(config.AutoSpawnCharacterIds).IsEmpty();
-        await Assert.That(config.AutoSpawnState).IsEqualTo("grind");
-        await Assert.That(config.AutoSpawnDelayMs).IsEqualTo(2000);
+        await Assert.That(config.ActivityDirectorEnabled).IsFalse();
+        await Assert.That(config.ActivityDirectorZoneId).IsEqualTo(0u);
+        await Assert.That(config.ActivityDirectorCharacterIds).IsEmpty();
+        await Assert.That(config.ActivityDirectorMinimumPopulation).IsEqualTo(0);
+        await Assert.That(config.ActivityDirectorTargetPopulation).IsEqualTo(0);
+        await Assert.That(config.ActivityDirectorMaximumPopulation).IsEqualTo(0);
+        await Assert.That(config.ActivityDirectorInitialDelayMs).IsEqualTo(2000);
+        await Assert.That(config.ActivityDirectorReconciliationIntervalMs).IsEqualTo(5000);
+        await Assert.That(config.ActivityDirectorRetryBackoffMs).IsEqualTo(30000);
     }
 
     [Test]
@@ -318,9 +342,15 @@ public class BotConfigTests
         // (BotConfig.Load -> SaveDefault); nothing ships in the repo, so that generator is the golden source.
         var json = JObject.Parse(new BotConfig().BuildDefaultJson());
 
-        await Assert.That((JArray)json["AutoSpawnCharacterIds"]).IsEmpty();
-        await Assert.That((string)json["AutoSpawnState"]).IsEqualTo("grind");
-        await Assert.That((int)json["AutoSpawnDelayMs"]).IsEqualTo(2000);
+        await Assert.That((bool)json["ActivityDirectorEnabled"]).IsFalse();
+        await Assert.That((uint)json["ActivityDirectorZoneId"]).IsEqualTo(0u);
+        await Assert.That((JArray)json["ActivityDirectorCharacterIds"]).IsEmpty();
+        await Assert.That((int)json["ActivityDirectorMinimumPopulation"]).IsEqualTo(0);
+        await Assert.That((int)json["ActivityDirectorTargetPopulation"]).IsEqualTo(0);
+        await Assert.That((int)json["ActivityDirectorMaximumPopulation"]).IsEqualTo(0);
+        await Assert.That((int)json["ActivityDirectorInitialDelayMs"]).IsEqualTo(2000);
+        await Assert.That((int)json["ActivityDirectorReconciliationIntervalMs"]).IsEqualTo(5000);
+        await Assert.That((int)json["ActivityDirectorRetryBackoffMs"]).IsEqualTo(30000);
         await Assert.That((double)json["ActivityPercent"]).IsEqualTo(100d);
         await Assert.That((double)json["ServerTickBudgetMs"]).IsEqualTo(0d);
     }
@@ -439,31 +469,98 @@ public class BotConfigTests
     }
 
     [Test]
-    public async Task Validate_AutoSpawnFields_ClampsDelayAndInvalidStateToIdle()
+    public async Task Validate_ActivityDirectorTimings_AreBoundedAndNullRosterBecomesEmpty()
     {
         var config = new BotConfig
         {
-            AutoSpawnCharacterIds = null,
-            AutoSpawnState = "not-a-state",
-            AutoSpawnDelayMs = 70000
+            ActivityDirectorCharacterIds = null,
+            ActivityDirectorInitialDelayMs = 70000,
+            ActivityDirectorReconciliationIntervalMs = 0,
+            ActivityDirectorRetryBackoffMs = 700000
         };
 
         config.Validate();
 
-        await Assert.That(config.AutoSpawnCharacterIds).IsEmpty();
-        await Assert.That(config.AutoSpawnState).IsEqualTo("idle");
-        await Assert.That(config.AutoSpawnDelayMs).IsEqualTo(60000);
+        await Assert.That(config.ActivityDirectorCharacterIds).IsEmpty();
+        await Assert.That(config.ActivityDirectorInitialDelayMs).IsEqualTo(60000);
+        await Assert.That(config.ActivityDirectorReconciliationIntervalMs).IsEqualTo(100);
+        await Assert.That(config.ActivityDirectorRetryBackoffMs).IsEqualTo(600000);
     }
 
     [Test]
     [Arguments(-1)]
     [Arguments(60001)]
-    public async Task Validate_AutoSpawnDelay_ClampsToSupportedRange(int delay)
+    public async Task Validate_ActivityDirectorInitialDelay_ClampsToSupportedRange(int delay)
     {
-        var config = new BotConfig { AutoSpawnDelayMs = delay };
+        var config = new BotConfig { ActivityDirectorInitialDelayMs = delay };
 
         config.Validate();
 
-        await Assert.That(config.AutoSpawnDelayMs).IsEqualTo(delay < 0 ? 0 : 60000);
+        await Assert.That(config.ActivityDirectorInitialDelayMs).IsEqualTo(delay < 0 ? 0 : 60000);
     }
+
+    [Test]
+    public async Task ActivityDirectorConfiguration_DisabledDefaultsAreValidAndFailClosed()
+    {
+        var result = new BotConfig().GetActivityDirectorConfiguration();
+
+        await Assert.That(result.Enabled).IsFalse();
+        await Assert.That(result.Valid).IsTrue();
+        await Assert.That(result.Reason).IsEqualTo("disabled");
+        await Assert.That(result.CharacterIds).IsEmpty();
+    }
+
+    [Test]
+    public async Task ActivityDirectorConfiguration_EveryRequiredInvalidShapeHasStableReason()
+    {
+        var invalid = new (BotConfig Config, string Reason)[]
+        {
+            (DirectorConfig(zoneId: 0), "zone_zero"),
+            (DirectorConfig(characterIds: []), "identities_empty"),
+            (DirectorConfig(characterIds: [7, 0]), "identity_zero"),
+            (DirectorConfig(characterIds: [7, 7]), "identity_duplicate"),
+            (DirectorConfig(minimum: -1), "population_negative"),
+            (DirectorConfig(minimum: 2, target: 1), "population_order_invalid"),
+            (DirectorConfig(target: 3, maximum: 2), "population_order_invalid"),
+            (DirectorConfig(characterIds: [7, 8], maximum: 3), "maximum_exceeds_identities")
+        };
+
+        foreach (var (config, reason) in invalid)
+        {
+            var result = config.GetActivityDirectorConfiguration();
+            await Assert.That(result.Enabled).IsTrue();
+            await Assert.That(result.Valid).IsFalse();
+            await Assert.That(result.Reason).IsEqualTo(reason);
+        }
+    }
+
+    [Test]
+    public async Task ActivityDirectorConfiguration_ValidRosterPreservesOrderAndBounds()
+    {
+        var result = DirectorConfig(characterIds: [9, 7, 8], minimum: 1, target: 2, maximum: 3)
+            .GetActivityDirectorConfiguration();
+
+        await Assert.That(result.Valid).IsTrue();
+        await Assert.That(result.Reason).IsEqualTo("valid");
+        await Assert.That(string.Join(",", result.CharacterIds)).IsEqualTo("9,7,8");
+        await Assert.That(result.InitialDelay).IsEqualTo(TimeSpan.FromSeconds(2));
+        await Assert.That(result.ReconciliationInterval).IsEqualTo(TimeSpan.FromSeconds(5));
+        await Assert.That(result.RetryBackoff).IsEqualTo(TimeSpan.FromSeconds(30));
+    }
+
+    private static BotConfig DirectorConfig(
+        uint zoneId = 137,
+        List<uint> characterIds = null,
+        int minimum = 1,
+        int target = 1,
+        int maximum = 2) =>
+        new()
+        {
+            ActivityDirectorEnabled = true,
+            ActivityDirectorZoneId = zoneId,
+            ActivityDirectorCharacterIds = characterIds ?? [7, 8],
+            ActivityDirectorMinimumPopulation = minimum,
+            ActivityDirectorTargetPopulation = target,
+            ActivityDirectorMaximumPopulation = maximum
+        };
 }

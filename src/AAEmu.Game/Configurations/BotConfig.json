@@ -46,7 +46,13 @@
   "IterationsPerTick": 10,
   "ExpireActionTimeMs": 5000,
   "GlobalSkillDelayMs": 600,
-  "AutoSpawnCharacterIds": [],
-  "AutoSpawnState": "grind",
-  "AutoSpawnDelayMs": 2000
+  "ActivityDirectorEnabled": false,
+  "ActivityDirectorZoneId": 0,
+  "ActivityDirectorCharacterIds": [],
+  "ActivityDirectorMinimumPopulation": 0,
+  "ActivityDirectorTargetPopulation": 0,
+  "ActivityDirectorMaximumPopulation": 0,
+  "ActivityDirectorInitialDelayMs": 2000,
+  "ActivityDirectorReconciliationIntervalMs": 5000,
+  "ActivityDirectorRetryBackoffMs": 30000
 }

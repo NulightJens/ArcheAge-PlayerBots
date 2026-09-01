@@ -136,13 +136,13 @@ public sealed class BotLifeController
         Logger.Info($"BOT id={botId} ev=life_registered state=Idle entered_at={Timestamp(now)} profile={_profile.Id}");
     }
 
-    internal bool Step(BotRuntime runtime, bool isSoleRuntime, DateTimeOffset now)
+    internal bool Step(BotRuntime runtime, bool lifecycleEligible, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(runtime);
 
         lock (_syncRoot)
         {
-            if (!isSoleRuntime || runtime.Retired || _logoutQueued)
+            if (!lifecycleEligible || runtime.Retired || _logoutQueued)
                 return false;
 
             if (_activity == null)
