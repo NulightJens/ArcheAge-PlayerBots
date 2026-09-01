@@ -194,10 +194,13 @@ wave_2:
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\ee21\\PB-W00-control'
   retained_error_analysis_task:
     task: T-052
-    state: active
+    state: completed-non-blocking
     client_thread_id: client-new-thread:a7e7080c-7676-4ede-bda9-9c38ba919892
     task_thread_id: 01a05a9f-d70c-7dd0-9bdb-7e9dd45b4c1f
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\0e7a\\PB-W00-control'
+    head: b1833eaaf09a19d27954ccc27d7452635a310a7a
+    result: native-aaemu12-post-readiness-shutdown-races
+    v3_observation: retain-and-classify-recurrence-against-readiness-shutdown-and-cleanup-markers
   next_physical_retry:
     task: T-054
     state: blocked-on-T-051-integration-and-T-052-classification

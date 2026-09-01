@@ -2,8 +2,8 @@ schema_version: 1
 id: T-052
 title: Diagnose retained AAEmu 1.2 Game startup errors
 track: AAEmu12
-status: active
-integration: analysis-pending
+status: done
+integration: analysis-accepted
 outcome: Classify the retained BaseBaiLoader collection-modification and WorldManager missing-instance errors and define any required pre-v3 action.
 depends_on: [T-050]
 branch: codex-managed-detached-worktree
