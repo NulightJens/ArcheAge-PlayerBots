@@ -534,8 +534,8 @@ tasks:
   - id: T-077
     title: Build and qualify the offline-safe autonomy observer
     track: AAEmu12
-    status: review
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-075, T-076]
     runtime_lease: none
     gate: deterministic-observer-parser-tests
@@ -543,18 +543,30 @@ tasks:
     owner_thread_id: 01a05ce4-e7c6-73f3-ab81-4b9f57c575e4
     worktree: 'C:\Users\jensh\.codex\worktrees\c717\PB-W00-control'
     source_head: 0e48860649ca26a7148350ffdb103118c9e6aba0
+    integrated_commit: a406a3598213745ac3bead7dc5ba7ce009cf50e3
 
   - id: T-078
     title: Integrate the offline-safe autonomy observer
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-077]
     runtime_lease: none
     gate: deterministic-observer-parser-integration
     owner_client_thread_id: client-new-thread:1099e6b6-9c17-4666-9d52-bae68ae8607a
     owner_thread_id: 01a05cf5-d7ba-7d83-aa9e-e48ed090940e
     worktree: 'C:\Users\jensh\.codex\worktrees\3881\PB-W00-control'
+    integrated_commit: a406a3598213745ac3bead7dc5ba7ce009cf50e3
+
+  - id: T-079
+    title: AAEmu 1.2 single-bot autonomy proof v6
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-073, T-078]
+    runtime_lease: aaemu12
+    gate: serialized-one-bot-autonomy-proof-v6
+    archeage_client_allowed: false
 
   - id: T-041
     title: One-zone Autonomous Activity Director

@@ -96,6 +96,13 @@ workspaces:
     lease: aaemu12
     expected_state: immutable-retained-incomplete
 
+  aaemu12_t079_evidence_v6:
+    role: single-bot-autonomy-runtime-evidence-v6
+    path: 'D:\Codex-Labs\evidence\T-079\one-bot-autonomy-v6'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: absent-before-first-run-then-immutable
+
   aaemu12_client:
     role: matching-client-fixture
     path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'

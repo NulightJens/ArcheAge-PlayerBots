@@ -2,8 +2,8 @@ schema_version: 1
 id: T-078
 title: Integrate the offline-safe autonomy observer
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently review, replay, test, and integrate T-077's reusable offline-safe read-only autonomy observer without changing gameplay/runtime code or the retained T-075 verdict.
 depends_on: [T-077]
 branch: codex-managed-worktree
@@ -28,3 +28,4 @@ gates:
   - saved-branch-fast-forward
 validation_boundary: Tooling review/integration only. Retained T-075 evidence is read-only. Do not control runtime, MySQL, databases, client; edit deployed hosts, global ledgers/lease, retained evidence, module C# source, or AAEmu 3.0.
 handoff: ops/tasks/T-078/HANDOFF.md
+integrated_commit: a406a3598213745ac3bead7dc5ba7ce009cf50e3

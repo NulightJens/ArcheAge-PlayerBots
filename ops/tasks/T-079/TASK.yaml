@@ -1,0 +1,39 @@
+schema_version: 1
+id: T-079
+title: AAEmu 1.2 single-bot autonomy proof v6
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Produce a new immutable runtime receipt proving or falsifying three complete autonomous gameplay iterations by one persistent bot with the integrated observer pre-armed, directly sampled recovery-window brain/mover suspension, natural debt-free recovery, exact progression, normal self-logout, and restart persistence.
+depends_on: [T-073, T-078]
+runtime:
+  required: true
+  lease: aaemu12
+  archeage_client_allowed: false
+branch: pending-codex-managed-detached-worktree
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-dispatch-commit
+  tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+  installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+  observer_integration: a406a3598213745ac3bead7dc5ba7ce009cf50e3
+  observer_entry_point: scripts/autonomy/Observe-AutonomyBot.ps1
+  integration_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
+  observer_integration_handoff: ops/tasks/T-078/HANDOFF.md
+  retained_t073_v4_receipt: ops/evidence/aaemu12-t073-one-bot-autonomy-v4.yaml
+  retained_t075_v5_receipt: ops/evidence/aaemu12-t075-one-bot-autonomy-v5.yaml
+  runtime_workspace: aaemu12_integration
+  database_workspace: aaemu12_database_public_alpha_v1
+  evidence_workspace: aaemu12_t079_evidence_v6
+write_scope:
+  - ops/evidence/aaemu12-t079-one-bot-autonomy-v6.yaml
+  - ops/tasks/T-079/HANDOFF.md
+external_write_scope:
+  - 'D:\Codex-Labs\evidence\T-079\one-bot-autonomy-v6'
+gate: serialized-one-bot-autonomy-proof-v6
+minimum_successful_iterations: 3
+failure_policy: Stop at the first smallest verified functional or evidence blocker, retain FAIL or INCOMPLETE evidence, clean up gracefully, and do not activate larger populations.
+validation_boundary: Runtime and evidence only. Use the integrated observer unchanged. Managed addbot and inert opportunity staging are allowed only at declared boundaries. Do not issue botstate, target, travel, attack, loot/progression, recovery, or logout gameplay commands. Do not edit source/tooling, deployed host files, global ledgers, databases, clients, retained evidence, or AAEmu 3.0.
+handoff: ops/tasks/T-079/HANDOFF.md

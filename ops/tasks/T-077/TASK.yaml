@@ -2,8 +2,8 @@ schema_version: 1
 id: T-077
 title: Build and qualify the offline-safe autonomy observer
 track: AAEmu12
-status: review
-integration: pending
+status: done
+integration: integrated
 outcome: Add reusable PowerShell observation tooling that preserves raw botdebug responses, parses offline and online shapes without strict-mode optional-capture failures, emits derived samples separately, and proves its command surface is read-only before another runtime attempt.
 depends_on: [T-075, T-076]
 runtime:
@@ -28,3 +28,4 @@ gates:
 validation_boundary: Source/tooling and tests only. The retained T-075 fixture is read-only. Do not control runtime, MySQL, databases, clients; edit deployed hosts, global ledgers/lease, retained evidence, or AAEmu 3.0.
 handoff: ops/tasks/T-077/HANDOFF.md
 source_head: 0e48860649ca26a7148350ffdb103118c9e6aba0
+integrated_commit: a406a3598213745ac3bead7dc5ba7ce009cf50e3
