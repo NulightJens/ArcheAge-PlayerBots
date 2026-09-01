@@ -30,7 +30,7 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-build-qualified-awaiting-t104-runtime-binding
+    state: stopped-clean-build-qualified-claimed-by-t104-preflight-not-started
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
@@ -598,10 +598,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
     proof: 46-focused-build-0-errors-79-warnings-full-1864-pass-4-intentional-skips-once
   - task: T-104
-    state: prepared-awaiting-exact-runtime-worker-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-runtime-worker
+    client_thread_id: client-new-thread:6981cb4b-860b-480e-9960-155c11bcacb9
+    task_thread_id: 01a05f1e-79b2-7cd1-beef-446c870c4f9a
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\7259\PB-W00-control'
+    dispatch_base: dc9a1f721e1cb1e972a3a1d8c58a51f3c5add056
     source: bf0ae36fc65eea4f341b936c9f7a961e9d474580
     installed_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
     evidence_root: 'D:\Codex-Labs\evidence\T-104\one-zone-autonomy-v6'
