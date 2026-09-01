@@ -102,10 +102,10 @@ prepared_workstreams:
     verdict: INCOMPLETE-absent-authoritative-progression-delta
     handoff: ops/tasks/T-065/HANDOFF.md
   - task: T-066
-    state: ready
-    client_thread_id: pending-thread-creation
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
+    state: active
+    client_thread_id: client-new-thread:5f2ae548-ae67-4f17-ac9b-635105b4e911
+    task_thread_id: 01a05c4b-c985-7890-9909-c80061c13c0e
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\7745\PB-W00-control'
     base: 04912db77beaac540a45d455fe852ebd6f4284de
     source_commit: 630c6c9d24505dc074e0da31ed1d633f84014c0d
     handoff: pending
