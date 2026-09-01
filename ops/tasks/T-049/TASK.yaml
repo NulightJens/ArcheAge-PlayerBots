@@ -8,6 +8,7 @@ outcome: Independently integrate T-048, apply its one new Login host hunk, and q
 depends_on: [T-048]
 branch: assigned-by-codex
 worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:d720cd48-efde-46ec-81d1-d501386a8059
 
 inputs:
   integration_branch: integration/aaemu12-world

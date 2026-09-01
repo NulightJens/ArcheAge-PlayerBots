@@ -136,10 +136,11 @@ tasks:
   - id: T-049
     title: AAEmu 1.2 startup-proof integration
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-048]
     gate: full-aaemu12-suite
+    owner_client_thread_id: client-new-thread:d720cd48-efde-46ec-81d1-d501386a8059
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification

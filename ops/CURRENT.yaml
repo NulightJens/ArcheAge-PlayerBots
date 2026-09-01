@@ -164,7 +164,9 @@ wave_2:
     head: dc9340fc61d1090e61eda99e55f0cd993b2af898
   recovery_integration_task:
     task: T-049
-    state: ready
+    state: setup-in-progress
+    client_thread_id: client-new-thread:d720cd48-efde-46ec-81d1-d501386a8059
+    task_thread_id: pending-task-list-resolution
     source_head: dc9340fc61d1090e61eda99e55f0cd993b2af898
   runtime_lease: released-after-T-036-incomplete-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
