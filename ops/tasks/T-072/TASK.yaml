@@ -2,8 +2,8 @@ schema_version: 1
 id: T-072
 title: Integrate natural recovery lifecycle correction
 track: AAEmu12
-status: active
-integration: integration-active
+status: done
+integration: integrated
 outcome: Independently replay the accepted T-071 natural recovery lifecycle correction, install the exact result into the registered AAEmu 1.2 integration host under a build-only lease, and qualify one immutable source/install identity with a clean build and exactly one complete unit-suite invocation.
 depends_on: [T-071]
 branch: codex-managed-worktree
@@ -39,3 +39,7 @@ runtime:
 gates: [focused-aaemu12-tests, full-aaemu12-suite]
 validation_boundary: Integration/install/build/test only under the exact committed build-only lease. Do not start Login, GameServer, MySQL, or the ArcheAge client; access databases; edit global ledgers/lease; change retained runtime receipts; regenerate patches; change target/combat/loot/progression behavior beyond accepted T-071 blobs; or touch AAEmu 3.0.
 handoff: ops/tasks/T-072/HANDOFF.md
+integrated_commit: 7aabaa0aafd6e591d50251965bde0a5ab9c5c14f
+tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+evidence_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml

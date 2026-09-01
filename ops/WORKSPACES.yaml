@@ -44,10 +44,10 @@ workspaces:
     expected_state: receipted-module-install-changes
     lease: aaemu12
     installed_module_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\modules\archeage-playerbots'
-    installed_module_head: 4287ec53e998ecff2e5eb9670908166957a79662
-    installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+    installed_module_head: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+    installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
     compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
-    evidence_receipt: ops/evidence/aaemu12-progression-observability-integration-v1.yaml
+    evidence_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
 
   aaemu12_database_public_alpha_v1:
     role: isolated-public-alpha-runtime-database
@@ -81,6 +81,13 @@ workspaces:
     access: task-evidence-write
     lease: aaemu12
     expected_state: immutable-retained-fail
+
+  aaemu12_t073_evidence_v4:
+    role: single-bot-autonomy-runtime-evidence-v4
+    path: 'D:\Codex-Labs\evidence\T-073\one-bot-autonomy-v4'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: absent-before-first-run-then-immutable
 
   aaemu12_client:
     role: matching-client-fixture

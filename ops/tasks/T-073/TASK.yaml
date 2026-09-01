@@ -1,0 +1,35 @@
+schema_version: 1
+id: T-073
+title: AAEmu 1.2 single-bot autonomy proof v4
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Produce a new immutable runtime receipt proving or falsifying three complete autonomous gameplay iterations by one persistent bot with natural post-activity recovery, exact progression/resource snapshots, normal self-logout, and restart persistence without per-action operator control.
+depends_on: [T-069, T-072]
+runtime:
+  required: true
+  lease: aaemu12
+  archeage_client_allowed: false
+branch: codex-managed-detached-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+inputs:
+  dispatch_base: 7aabaa0aafd6e591d50251965bde0a5ab9c5c14f
+  tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+  installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+  integration_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
+  retained_t069_v3_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+  runtime_workspace: aaemu12_integration
+  database_workspace: aaemu12_database_public_alpha_v1
+  evidence_workspace: aaemu12_t073_evidence_v4
+write_scope:
+  - ops/evidence/aaemu12-t073-one-bot-autonomy-v4.yaml
+  - ops/tasks/T-073/HANDOFF.md
+external_write_scope:
+  - 'D:\Codex-Labs\evidence\T-073\one-bot-autonomy-v4'
+gate: serialized-one-bot-autonomy-proof-v4
+minimum_successful_iterations: 3
+failure_policy: Stop at the first smallest verified functional blocker, retain FAIL or INCOMPLETE evidence, clean up gracefully, and do not activate larger populations.
+validation_boundary: Runtime and evidence only. Managed addbot and inert opportunity staging are allowed at declared boundaries; read-only observation is allowed. Do not issue botstate, target, travel, attack, loot/progression, recovery, or logout gameplay commands. Do not edit source, deployed host files, global ledgers, databases, clients, retained evidence, or AAEmu 3.0.
+handoff: ops/tasks/T-073/HANDOFF.md

@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-build-only-by-T-072-natural-recovery-integration
-    owner_task: T-072
-    owner_thread_id: 01a05c9d-4322-7f22-97dc-bb46803ecd6b
+    status: released-after-T-072-build-integration
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
-    cleanup_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
-    baseline_evidence: ops/evidence/aaemu12-progression-observability-integration-v1.yaml
+    released_at: 2026-09-01
+    cleanup_receipt: ops/tasks/T-072/HANDOFF.md
+    baseline_evidence: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: Exact T-072 thread 01a05c9d-4322-7f22-97dc-bb46803ecd6b may install the module and write AAEmu 1.2 build/test outputs only; it may not start or control Login, GameServer, MySQL, the ArcheAge client, or access any database.
+    authority_limit: No task may start or control Login, GameServer, MySQL, or the ArcheAge client until PB-000 commits a new exact owner assignment.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
