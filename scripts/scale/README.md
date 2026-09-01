@@ -50,30 +50,42 @@ both logs identify the exact isolated schemas. Stop both processes with
 
 ## Exact selected-schema startup proof
 
-The active AAEmu 1.2 patch makes `LoginService` emit
-`Selected Login database schema: <database>` from the resolved
-`Connections.MySQLProvider.Database` value after configuration precedence is
-complete and before the Login database updater runs. Only the database name is
-logged; host, port, user, password, and connection strings are excluded.
+The active AAEmu 1.2 patch makes `LoginService` and `GameService` emit
+`Selected Login database schema: <database>` and
+`Selected Game database schema: <database>` from their resolved
+`Connections.MySQLProvider.Database` values after configuration precedence is
+complete and before either database updater runs. Each message contains only
+the database name; host, port, user, password, and connection strings are
+excluded.
 
-Before it can start Game, `Start-ScaleGateRuntime.ps1` requires that message to
-end with the exact supplied Login schema name, with the name escaped as literal
-text, and also requires `InternalNetwork started` plus the configured
-`http://127.0.0.1:<port>` listener. A generic connection message, the updater's
-hard-coded `aaemu_login` prefix, a donor or wrong schema, a substring collision,
-or a missing selected-schema line is not proof and fails closed. Run the
-deterministic no-runtime regression harness with:
+Before it can start Game, `Start-ScaleGateRuntime.ps1` requires the Login
+message to end with the exact supplied Login schema name, with the name escaped
+as literal text, plus `InternalNetwork started` and the configured loopback HTTP
+listener. Runtime readiness then requires the equally exact Game schema line,
+`GameNetwork` and `StreamNetwork` starts, the `GameService` server-start line,
+and the configured loopback Web API marker. A generic connection message, an
+updater prefix, a donor or wrong schema, a substring collision, a wrong logger,
+or a missing marker is not proof and fails closed.
+
+The live log reader treats each successful `Get-Content -Raw` result as a
+snapshot collection and calls the predicate only when it contains exactly one
+string. A transient read failure, no value, or accidental multi-value result is
+retried until the startup deadline and can never satisfy readiness. The outer
+wrapper retains its existing graceful Ctrl+C recovery on timeout or failure.
+Run the deterministic no-runtime regression harness with:
 
 ```powershell
 pwsh -NoProfile -File .\scripts\scale\Test-ScaleRuntimeStartupGuard.ps1
 ```
 
-The committed T-036 attempt remains `INCOMPLETE`: the old Login binary emitted
-only a generic connection line and a hard-coded updater prefix, so the guard
-timed out and Game never started. Do not reinterpret or retry that attempt. An
-Integrator must apply the new Login hunk and rebuild the registered AAEmu 1.2
-integration host; only then may a newly dispatched physical attempt claim a
-fresh runtime lease and reuse the retained external inputs.
+The committed T-050 attempt remains `INCOMPLETE`: Login and Game started and
+emitted their prior markers, but the growing Game-log value failed conversion
+at the predicate's string parameter. It contains no exact selected Game-schema
+proof and must not be reinterpreted or retried. An Integrator must apply the new
+Game hunk, install this scalar-safe guard, rebuild the registered AAEmu 1.2
+integration host, and run focused tests. Only after independent acceptance may
+a newly dispatched physical attempt claim a fresh runtime lease and use a new
+immutable evidence directory.
 
 `Analyze-ScaleGate.ps1` produces a non-overwriting analysis beside an immutable
 final result. It recomputes normalized CPU from retained cumulative process CPU

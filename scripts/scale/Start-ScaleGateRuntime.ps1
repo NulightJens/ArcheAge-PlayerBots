@@ -31,8 +31,19 @@ function Wait-ForLog(
         $Process.Refresh()
         if ($Process.HasExited) { throw "$Label exited during startup with code $($Process.ExitCode)." }
         if (Test-Path -LiteralPath $LogPath) {
-            $content = Get-Content -LiteralPath $LogPath -Raw
-            if (Test-ScaleRuntimeStartupEvidence -Content $content -RequiredPatterns $RequiredPatterns) { return }
+            $snapshots = @()
+            try {
+                $snapshots = @(Get-Content -LiteralPath $LogPath -Raw -ErrorAction Stop)
+            }
+            catch {
+                # A live writer or rollover may make a snapshot temporarily unreadable.
+                # Retry until the deadline; persistent failure remains fail-closed.
+                $snapshots = @()
+            }
+            if ($snapshots.Count -eq 1 -and $snapshots[0] -is [string]) {
+                [string]$content = $snapshots[0]
+                if (Test-ScaleRuntimeStartupEvidence -Content $content -RequiredPatterns $RequiredPatterns) { return }
+            }
         }
         Start-Sleep -Milliseconds 500
     } while ([DateTime]::UtcNow -lt $deadline)
@@ -137,10 +148,10 @@ try {
     # Several legacy managers resolve Data paths from the process working directory.
     # Keep evidence under RuntimeRoot, but run each executable from its own task-local bin directory.
     $gameProcess = Start-Process -FilePath $gameExe -WorkingDirectory (Split-Path -Parent $gameExe) -WindowStyle Hidden -Environment $gameEnvironment -PassThru
-    Wait-ForLog $gameProcess $gameLog @(
-        [regex]::Escape("database $GameDatabaseName"),
-        'Server started!'
-    ) $StartupTimeoutSeconds 'Game'
+    $gameStartupPatterns = New-ScaleGameStartupPatterns `
+        -GameDatabaseName $GameDatabaseName `
+        -GameWebApiPort ([int]$gameConfig.WebApiNetwork.Port)
+    Wait-ForLog $gameProcess $gameLog $gameStartupPatterns $StartupTimeoutSeconds 'Game'
 
     $evidence = [ordered]@{
         schemaVersion = 't021.runtime-start.v1'

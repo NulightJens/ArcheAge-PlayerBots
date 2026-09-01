@@ -484,7 +484,7 @@ index 17372138515d9ec1cdbaa117a1911843dc63eb9c..c39485ddf9d18c5e494f33d8d9dfcd76
      {
          var res = new List<uint>();
 diff --git a/AAEmu.Game/GameService.cs b/AAEmu.Game/GameService.cs
-index c25a30ca64d8f762b33e4b260aaccd11c3e25c93..c4d308fee06e2945be01ba93857743e3cffc1cc9 100644
+index c25a30ca64d8f762b33e4b260aaccd11c3e25c93..403332171f6b92a88a10082885b54dd302fd6026 100644
 --- a/AAEmu.Game/GameService.cs
 +++ b/AAEmu.Game/GameService.cs
 @@ -3,7 +3,10 @@ using System.Diagnostics;
@@ -518,7 +518,20 @@ index c25a30ca64d8f762b33e4b260aaccd11c3e25c93..c4d308fee06e2945be01ba93857743e3
          s_timeProvider = timeProvider;
          StartTime = timeProvider.GetUtcNow().UtcDateTime;
      }
-@@ -78,6 +89,7 @@ public sealed class GameService : IHostedService, IDisposable
+@@ -43,6 +54,12 @@ public sealed class GameService : IHostedService, IDisposable
++    internal static void LogSelectedGameDatabaseSchema(string database)
++    {
++        Logger.Info($"Selected Game database schema: {database}");
++    }
++
+     public async Task StartAsync(CancellationToken cancellationToken)
+     {
+         Logger.Info("Starting daemon: AAEmu.Game");
++        LogSelectedGameDatabaseSchema(AppConfiguration.Instance.Connections.MySQLProvider.Database);
+ 
+         // Check for updates
+         using (var connection = MySQL.CreateConnection())
+@@ -78,6 +95,7 @@ public sealed class GameService : IHostedService, IDisposable
          FormulaManager.Instance.Load();
          ItemManager.Instance.Load();
          ItemManager.Instance.LoadUserItems();
@@ -526,7 +539,7 @@ index c25a30ca64d8f762b33e4b260aaccd11c3e25c93..c4d308fee06e2945be01ba93857743e3
  
          // --- Stage 2: Orchestrated parallel Load() ---
          // Managers implementing ILoadable are sorted by constructor dep graph and run in parallel batches.
-@@ -118,13 +130,33 @@ public sealed class GameService : IHostedService, IDisposable
+@@ -118,13 +136,33 @@ public sealed class GameService : IHostedService, IDisposable
          LoginNetwork.Instance.Start();
  
          stopWatch.Stop();
@@ -1104,7 +1117,7 @@ index f04033b5f96e804611ee5a823feaa564023c4644..b149dda32a38e903bf02ac8882185300
  
      #region PlayerRoll Tests
 diff --git a/AAEmu.UnitTests/Services/GameServiceTests.cs b/AAEmu.UnitTests/Services/GameServiceTests.cs
-index c7919db94e5f56f093a73acb4c556c2a373c53a9..5a45d7b5d30a885ec7af7582e94455ada2076df7 100644
+index c7919db94e5f56f093a73acb4c556c2a373c53a9..843d861208dfad4f5be58e1d38b96ed0311ca869 100644
 --- a/AAEmu.UnitTests/Services/GameServiceTests.cs
 +++ b/AAEmu.UnitTests/Services/GameServiceTests.cs
 @@ -1,8 +1,16 @@
@@ -1124,7 +1137,7 @@ index c7919db94e5f56f093a73acb4c556c2a373c53a9..5a45d7b5d30a885ec7af7582e94455ad
  namespace AAEmu.UnitTests.Services;
  
  /// <summary>
-@@ -65,4 +73,119 @@ public class GameServiceTests
+@@ -65,4 +73,142 @@ public class GameServiceTests
          service.Dispose();
          await Task.CompletedTask; // Suppress warning
      }
@@ -1207,6 +1220,29 @@ index c7919db94e5f56f093a73acb4c556c2a373c53a9..5a45d7b5d30a885ec7af7582e94455ad
 +            await Assert.That(taskManager.ScheduledAfterServerStarted).IsTrue();
 +            await Assert.That(taskManager.ScheduledTasks).HasSingleItem();
 +            await Assert.That(logTarget.Logs.Any(message => message.Contains("Server started! Took 00:00:01.2500000", StringComparison.Ordinal))).IsTrue();
++        }
++        finally
++        {
++            LogManager.Configuration = previousConfiguration;
++        }
++    }
++
++    [Test]
++    public async Task LogSelectedGameDatabaseSchema_LogsOnlyExactSchemaName()
++    {
++        const string schema = "aaemu.playerbots+game[retry](v1)?^$|exact";
++        using var logTarget = new MemoryTarget { Layout = "${message}" };
++        var loggingConfiguration = new LoggingConfiguration();
++        loggingConfiguration.AddRuleForOneLevel(LogLevel.Info, logTarget, "AAEmu.Game.GameService");
++        var previousConfiguration = LogManager.Configuration;
++        LogManager.Configuration = loggingConfiguration;
++
++        try
++        {
++            GameService.LogSelectedGameDatabaseSchema(schema);
++
++            await Assert.That(logTarget.Logs).HasSingleItem();
++            await Assert.That(logTarget.Logs.Single()).IsEqualTo($"Selected Game database schema: {schema}");
 +        }
 +        finally
 +        {

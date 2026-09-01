@@ -13,7 +13,7 @@ function Assert-StartupEvidence {
         [Parameter(Mandatory)][bool]$Expected,
         [Parameter(Mandatory)][string]$Label,
         [Parameter(Mandatory)][string]$ExpectedDatabase,
-        [Parameter(Mandatory)][string]$Content,
+        [Parameter(Mandatory)][AllowNull()][object]$Content,
         [int]$LoginHttpPort = 1237
     )
 
@@ -25,6 +25,46 @@ function Assert-StartupEvidence {
     if ($actual -ne $Expected) {
         throw "$Label expected $Expected but received $actual."
     }
+}
+
+function Assert-GameStartupEvidence {
+    param(
+        [Parameter(Mandatory)][bool]$Expected,
+        [Parameter(Mandatory)][string]$Label,
+        [Parameter(Mandatory)][string]$ExpectedDatabase,
+        [Parameter(Mandatory)][AllowNull()][object]$Content,
+        [int]$GameWebApiPort = 1280
+    )
+
+    $patterns = New-ScaleGameStartupPatterns `
+        -GameDatabaseName $ExpectedDatabase `
+        -GameWebApiPort $GameWebApiPort
+    $actual = Test-ScaleRuntimeStartupEvidence -Content $Content -RequiredPatterns $patterns
+    $script:AssertionCount++
+    if ($actual -ne $Expected) {
+        throw "$Label expected $Expected but received $actual."
+    }
+}
+
+function Assert-LegacyArrayBindingFailure([object[]]$Content) {
+    function Invoke-LegacyStringPredicate {
+        [CmdletBinding()]
+        param([Parameter(Mandatory)][string]$Content)
+
+        return $true
+    }
+
+    try {
+        [void](Invoke-LegacyStringPredicate -Content $Content)
+    }
+    catch {
+        if ($_.Exception.Message -notmatch 'transform.*System\.String|convert.*System\.String') {
+            throw "Legacy array fixture produced an unexpected failure: $($_.Exception.Message)"
+        }
+        $script:AssertionCount++
+        return
+    }
+    throw 'Legacy array fixture did not reproduce the T-050 string parameter-conversion failure.'
 }
 
 function Join-StartupLog([string[]]$Lines) {
@@ -127,4 +167,105 @@ $wrongLoopbackPort = Join-StartupLog @(
 )
 Assert-StartupEvidence $false 'wrong loopback HTTP port' $database $wrongLoopbackPort
 
-Write-Output "T-048 deterministic startup-guard fixtures: PASS ($script:AssertionCount assertions, no runtime)"
+$gameDatabase = 'aaemu_playerbots_game_public_alpha_v1'
+$gameSelectedPrefix = '19:29:09 [INFO] GameService - Selected Game database schema: '
+$gameNetworkLine = '19:30:45 [INFO] GameNetwork - Network started'
+$streamNetworkLine = '19:30:45 [INFO] StreamNetwork - StreamNetwork started'
+$serverStartedLine = '19:30:45 [INFO] GameService - Server started! Took 00:01:32.2618974'
+$webApiLine = '19:30:45 [INFO] WebApiService - WebApi server started on 127.0.0.1:1280'
+
+$gameExact = Join-StartupLog @(
+    $gameSelectedPrefix + $gameDatabase
+    $gameNetworkLine
+    $streamNetworkLine
+    $serverStartedLine
+    $webApiLine
+)
+Assert-GameStartupEvidence $true 'exact Game schema and loopback startup' $gameDatabase $gameExact
+
+$gameGenericConnection = Join-StartupLog @(
+    '19:29:09 [INFO] MySqlInitializer - MySQL connection established successfully'
+    $gameNetworkLine
+    $streamNetworkLine
+    $serverStartedLine
+    $webApiLine
+)
+Assert-GameStartupEvidence $false 'Game generic connection line' $gameDatabase $gameGenericConnection
+
+$gameUpdaterPrefix = Join-StartupLog @(
+    "19:29:09 [INFO] MySqlDatabaseUpdater - database aaemu_game selected $gameDatabase"
+    $gameNetworkLine
+    $streamNetworkLine
+    $serverStartedLine
+    $webApiLine
+)
+Assert-GameStartupEvidence $false 'Game updater prefix' $gameDatabase $gameUpdaterPrefix
+
+$gameDonorSchema = $gameExact.Replace($gameSelectedPrefix + $gameDatabase, $gameSelectedPrefix + 'aaemu_game')
+Assert-GameStartupEvidence $false 'Game donor schema' $gameDatabase $gameDonorSchema
+
+$gameSubstringCollision = $gameExact.Replace(
+    $gameSelectedPrefix + $gameDatabase,
+    $gameSelectedPrefix + $gameDatabase + '_shadow')
+Assert-GameStartupEvidence $false 'Game schema substring collision' $gameDatabase $gameSubstringCollision
+
+$gameMissingSelectedLine = Join-StartupLog @(
+    '19:29:09 [INFO] GameService - Starting daemon: AAEmu.Game'
+    $gameNetworkLine
+    $streamNetworkLine
+    $serverStartedLine
+    $webApiLine
+)
+Assert-GameStartupEvidence $false 'missing Game selected-schema line' $gameDatabase $gameMissingSelectedLine
+
+$gameWrongSchema = $gameExact.Replace(
+    $gameSelectedPrefix + $gameDatabase,
+    $gameSelectedPrefix + 'aaemu_playerbots_game_public_alpha_v2')
+Assert-GameStartupEvidence $false 'wrong Game schema' $gameDatabase $gameWrongSchema
+
+$gameWrongLogger = $gameExact.Replace(
+    $gameSelectedPrefix + $gameDatabase,
+    '19:29:09 [INFO] MySqlDatabaseUpdater - Selected Game database schema: ' + $gameDatabase)
+Assert-GameStartupEvidence $false 'Game schema from wrong logger' $gameDatabase $gameWrongLogger
+
+$gameEmbeddedLogger = $gameExact.Replace(
+    $gameSelectedPrefix + $gameDatabase,
+    '19:29:09 [INFO] OtherLogger - GameService - Selected Game database schema: ' + $gameDatabase)
+Assert-GameStartupEvidence $false 'embedded GameService text from wrong logger' $gameDatabase $gameEmbeddedLogger
+
+$gameMetacharDatabase = 'aaemu.playerbots+game[retry](v1)?^$|\exact'
+$gameMetacharExact = $gameExact.Replace(
+    $gameSelectedPrefix + $gameDatabase,
+    $gameSelectedPrefix + $gameMetacharDatabase)
+Assert-GameStartupEvidence $true 'Game regex metacharacters are literal' $gameMetacharDatabase $gameMetacharExact
+
+$gameMetacharCollision = $gameMetacharExact.Replace(
+    $gameSelectedPrefix + $gameMetacharDatabase,
+    $gameSelectedPrefix + $gameMetacharDatabase + '.copy')
+Assert-GameStartupEvidence $false 'Game regex metacharacter substring collision' $gameMetacharDatabase $gameMetacharCollision
+
+Assert-GameStartupEvidence $false 'missing GameNetwork startup' $gameDatabase ($gameExact.Replace($gameNetworkLine, ''))
+Assert-GameStartupEvidence $false 'missing StreamNetwork startup' $gameDatabase ($gameExact.Replace($streamNetworkLine, ''))
+Assert-GameStartupEvidence $false 'missing Game server-start marker' $gameDatabase ($gameExact.Replace($serverStartedLine, ''))
+Assert-GameStartupEvidence $false 'non-loopback Game Web API' $gameDatabase ($gameExact.Replace('127.0.0.1:1280', '0.0.0.0:1280'))
+Assert-GameStartupEvidence $false 'wrong Game Web API port' $gameDatabase ($gameExact.Replace('127.0.0.1:1280', '127.0.0.1:1281'))
+
+# T-050 retained a 20,255,151-byte Game log and a string parameter-conversion
+# failure. These observed startup lines plus a same-scale deterministic prefix
+# reproduce its accidental multi-value boundary without depending on mutable logs.
+$largeBuilder = [Text.StringBuilder]::new(21 * 1024 * 1024)
+[void]$largeBuilder.Append([string]::new('x', 20 * 1024 * 1024))
+[void]$largeBuilder.Append("`r`n")
+[void]$largeBuilder.Append($gameExact)
+[string]$largeGrowingLog = $largeBuilder.ToString()
+Assert-GameStartupEvidence $true 'large growing Game log scalar' $gameDatabase $largeGrowingLog
+
+$splitAt = [int]($largeGrowingLog.Length / 2)
+[object[]]$accidentalArray = @(
+    $largeGrowingLog.Substring(0, $splitAt)
+    $largeGrowingLog.Substring($splitAt)
+)
+Assert-LegacyArrayBindingFailure $accidentalArray
+Assert-GameStartupEvidence $false 'accidental Game log array fails closed' $gameDatabase $accidentalArray
+
+Write-Output "T-051 deterministic startup-guard fixtures: PASS ($script:AssertionCount assertions, no runtime)"
