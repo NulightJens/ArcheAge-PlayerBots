@@ -2,14 +2,14 @@ schema_version: 1
 id: T-071
 title: Wait for natural debt-free lifecycle completion
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: After the bounded one-kill activity is complete, keep the bot targetless and noncombat while natural world recovery clears HP/MP debt, then capture the completion snapshot and invoke the existing normal logout path exactly once.
 depends_on: [T-069, T-070]
 branch: codex-managed-detached-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+worktree: 'C:\Users\jensh\.codex\worktrees\b798\PB-W00-control'
+owner_client_thread_id: client-new-thread:8bc5f5e0-9730-430b-bb46-730a70a56d08
+owner_thread_id: 01a05c8a-96fb-70c3-aec9-6884445f0e35
 runtime:
   required: false
   lease: null
