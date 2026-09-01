@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: independently-integrate-t104-retained-runtime-fail
+phase: implement-angular-fixture-placement-source-correction
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: f63f3cd56586f968b92462e87948abc1a0d47596
+  integrated_head: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
   tested_module_source: bf0ae36fc65eea4f341b936c9f7a961e9d474580
-  integration_evidence: ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
+  integration_evidence: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,12 +30,12 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-after-t104-fail-awaiting-evidence-integration
+    state: stopped-clean-after-independently-integrated-t104-retained-fail
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-t098-one-zone-autonomy-v5-candidate-e7361e10c8c1d722c3f18481af07e6173030fb30
-    integration_receipt: aaemu12-botdebug-transform-telemetry-integration-v1
+    evidence_receipt: aaemu12-t104-one-zone-autonomy-v6
+    integration_receipt: aaemu12-t104-fail-integration-v1
     installed_module_source: bf0ae36fc65eea4f341b936c9f7a961e9d474580
     installed_module_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
     database_identity: aaemu12_database_public_alpha_v1
@@ -44,7 +44,7 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 46-passed-0-skipped-0-failed
     unit_tests: 1864-passed-4-intentional-skips-0-failed-exactly-one-invocation
-    runtime_boundary: T-104 retained FAIL proved exact live transforms and complete 1,331-tuple forward-distance search cannot satisfy unique ownership for the collinear three-bot geometry: 87 tuples met 20 m separation, zero met 3 m ownership, best margin -1.2237695385452456 m. Zero fixture commands/world mutations occurred and cleanup is sealed. T-105 must independently integrate the failure before an angular-placement source correction.
+    runtime_boundary: T-104 retained FAIL proved exact live transforms and complete 1,331-tuple forward-distance search cannot satisfy unique ownership for the collinear three-bot geometry: 87 tuples met 20 m separation, zero met 3 m ownership, best margin -1.2237695385452456 m. T-105 independently rehashed all 17,528 payloads, replayed every semantic gate, retained the FAIL, and integrated it cleanly. Zero fixture commands/world mutations occurred; T-106 is the bounded angular-placement source correction.
 
 control_tower:
   permanent_task:
@@ -55,9 +55,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-105 to an exact isolated evidence Integrator and independently rehash/replay the sealed T-104 FAIL without touching the runtime host.
-  - Add a bounded source-only fixture yaw-offset seam so deterministic preflight can place three uniquely owned fixtures around live clustered bots while preserving the current forward-only default.
-  - Independently install/qualify that correction, then run a fresh versioned runtime successor and prove both lifecycle/refill waves plus distinct-PID restart/rebootstrap and two-minute dwell before activating T-037.
+  - Bind T-106 to an exact isolated source writer and add a finite invariant relative-yaw fixture seam while preserving one/two/three-argument and zero-offset behavior exactly.
+  - Independently replay, install, focus-test, build, and run exactly one full suite for T-106 in T-107.
+  - Run fresh T-108 evidence in a new v7 root with the deterministic 11-distance by 8-angle search, then prove both lifecycle/refill waves plus distinct-PID restart/rebootstrap and two-minute dwell before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
@@ -598,7 +598,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
     proof: 46-focused-build-0-errors-79-warnings-full-1864-pass-4-intentional-skips-once
   - task: T-104
-    state: done-retained-fail-awaiting-independent-integration
+    state: done-retained-fail-integrated-by-t105
     client_thread_id: client-new-thread:6981cb4b-860b-480e-9960-155c11bcacb9
     task_thread_id: 01a05f1e-79b2-7cd1-beef-446c870c4f9a
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\7259\PB-W00-control'
@@ -613,7 +613,7 @@ prepared_workstreams:
     manifest_sha256: cbe9026f8e27ac0503521370a84be286b01ca38935cc8e3da4552e40bc31f7a0
     proof: FAIL-180042.318ms-delay-1331-tuples-87-separated-0-owned-best-margin-minus-1.2237695385452456m-zero-commands-clean-sealed
   - task: T-105
-    state: active-exact-thread-bound-evidence-integrator
+    state: done-integrated-retained-fail
     client_thread_id: client-new-thread:a3aefb4b-97da-4f82-a729-7d9ec4a71c65
     task_thread_id: 01a05f4e-0502-7a93-bf64-96b14156c2a3
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\d154\PB-W00-control'
@@ -622,6 +622,22 @@ prepared_workstreams:
     candidate_parent: dde605d10912e8f282ce263680b70d1f02133249
     candidate_tree: 41319cfb1568da0219d5a5d2445a8902c9e9eea7
     contract: ops/tasks/T-105/CONTRACT.md
+    replay_commit: 37e43842dd737d492c7bb54984083b520be4f359
+    replay_tree: 1aecc7181e99e00783ec685e6b042e1416080288
+    integrated_head: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
+    integrated_tree: 6853901fce746caa13384a784bd72cae7144dec4
+    evidence_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
+    proof: PASS-receipt-integrity-17528-of-17528-payloads-5357-autonomy-1345-client-1331-geometry-subject-retained-FAIL
+  - task: T-106
+    state: prepared-awaiting-exact-thread-binding
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    dispatch_base: pending-control-prep-commit
+    source_base: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
+    contract: ops/tasks/T-106/CONTRACT.md
+    retained_fail_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
+    deterministic_dry_run: 681472-tuples-2430-eligible-from-exact-t104-transform-bits
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

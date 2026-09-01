@@ -1057,7 +1057,7 @@ tasks:
     title: Prove safe two-wave one-zone autonomy with live transform preflight
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated-by-T-105
     depends_on: [T-103]
     runtime_lease: aaemu12
     gate: physical-transform-preflight-two-wave-restart-dwell
@@ -1076,8 +1076,8 @@ tasks:
   - id: T-105
     title: Independently integrate retained T-104 runtime failure
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-104]
     runtime_lease: null
     gate: sealed-fail-evidence-replay-and-integration
@@ -1086,6 +1086,28 @@ tasks:
     owner_thread_id: 01a05f4e-0502-7a93-bf64-96b14156c2a3
     worktree: 'C:\Users\jensh\.codex\worktrees\d154\PB-W00-control'
     dispatch_base: cac9064dac253be963d51642332c39dab6519d7a
+    replay_commit: 37e43842dd737d492c7bb54984083b520be4f359
+    replay_tree: 1aecc7181e99e00783ec685e6b042e1416080288
+    integrated_commit: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
+    integrated_tree: 6853901fce746caa13384a784bd72cae7144dec4
+    evidence_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
+    result: PASS-receipt-integrity-subject-retained-FAIL
+
+  - id: T-106
+    title: Add bounded relative-yaw passive fixture placement
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-105]
+    runtime_lease: null
+    gate: focused-invariant-angular-placement-source-correction
+    contract: ops/tasks/T-106/CONTRACT.md
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
+    dispatch_base: pending-control-prep-commit
+    source_base: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
+    deterministic_dry_run: 681472-tuples-2430-eligible-from-exact-t104-transform-bits
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -1095,4 +1117,4 @@ tasks:
     depends_on: [fresh-post-angular-placement-runtime-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-104-retained-fail-proves-forward-distance-only-placement-cannot-meet-unique-ownership-for-live-collinear-geometry-angular-placement-source-correction-and-fresh-runtime-pass-remain-required
+    blocker: T-104-retained-fail-independently-integrated-by-T-105-proves-forward-distance-only-placement-cannot-meet-unique-ownership-for-live-collinear-geometry-T-106-angular-placement-and-fresh-runtime-pass-remain-required

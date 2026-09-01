@@ -2,8 +2,8 @@ schema_version: 1
 id: T-105
 title: Independently integrate retained T-104 runtime failure
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently verify the immutable T-104 v6 evidence root and exact two-path candidate, replay its retained FAIL receipt/handoff onto the saved lineage, record an integration receipt, and fast-forward the saved branch without reinterpreting failure as acceptance.
 depends_on: [T-104]
 runtime: {required: false, lease: null}
@@ -36,3 +36,9 @@ gates:
 validation_boundary: Immutable evidence verification and retained FAIL integration only. Do not write external evidence, runtime host/module/config/reference, global ledgers/lease/workspace registry, database, client, source/tests, AAEmu 3.0, scale, soak, or packaging. Do not run build, focused tests, full suite, Login, Game, or observers.
 contract: ops/tasks/T-105/CONTRACT.md
 handoff: ops/tasks/T-105/HANDOFF.md
+replay_commit: 37e43842dd737d492c7bb54984083b520be4f359
+replay_tree: 1aecc7181e99e00783ec685e6b042e1416080288
+integrated_commit: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
+integrated_tree: 6853901fce746caa13384a784bd72cae7144dec4
+evidence_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
+result: PASS-receipt-integrity-subject-retained-FAIL
