@@ -468,19 +468,21 @@ prepared_workstreams:
     manifest_sha256: 46ce346de698964231a522b2e3646af7a7fc0b0fbd5a080959c9e78da7d57293
     cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login-config-restored
   - task: T-095
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-read-only-evidence-integration
+    client_thread_id: client-new-thread:56b43285-c933-4ebf-9bc9-7064fab3ff27
+    task_thread_id: 01a05e67-3355-7330-aea6-453cf311e49b
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\0c40\PB-W00-control'
+    dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
     source_candidate: 453d0bd60cf1e72117b10579d40e549b0a24729f
     source_candidate_parent: cc4f9fc6889abc17a149e6dad9d4ff92491a8dc0
     evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
     contract: ops/tasks/T-095/CONTRACT.md
   - task: T-096
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-source-writer
+    client_thread_id: client-new-thread:021eef91-9b03-4ef2-a4bb-3621eceffb94
+    task_thread_id: 01a05e67-6053-7232-9328-22b789946651
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\661e\PB-W00-control'
+    dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
     source_base: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
     blocker_candidate: 453d0bd60cf1e72117b10579d40e549b0a24729f
     contract: ops/tasks/T-096/CONTRACT.md

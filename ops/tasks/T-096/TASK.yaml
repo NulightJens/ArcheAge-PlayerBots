@@ -2,17 +2,17 @@ schema_version: 1
 id: T-096
 title: Support the widened Activity Director initial delay
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Raise the supported ActivityDirectorInitialDelayMs ceiling so a deployed value of 180000 is preserved by validation and used by the Director, with focused regression tests and a regenerated AAEmu 1.2 compatibility patch.
 depends_on: [T-094]
 runtime: {required: false, lease: null}
 branch: codex-managed-worktree
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\661e\PB-W00-control'
+owner_client_thread_id: client-new-thread:021eef91-9b03-4ef2-a4bb-3621eceffb94
+owner_thread_id: 01a05e67-6053-7232-9328-22b789946651
 inputs:
-  dispatch_base: pending-control-commit
+  dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
   accepted_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
   installed_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
   blocker_candidate: 453d0bd60cf1e72117b10579d40e549b0a24729f

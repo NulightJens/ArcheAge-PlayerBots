@@ -867,7 +867,7 @@ tasks:
   - id: T-095
     title: Independently integrate the T-094 retained FAIL evidence
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-094]
     runtime_lease: null
@@ -876,23 +876,25 @@ tasks:
     candidate_commit: 453d0bd60cf1e72117b10579d40e549b0a24729f
     candidate_parent: cc4f9fc6889abc17a149e6dad9d4ff92491a8dc0
     evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:56b43285-c933-4ebf-9bc9-7064fab3ff27
+    owner_thread_id: 01a05e67-3355-7330-aea6-453cf311e49b
+    worktree: 'C:\Users\jensh\.codex\worktrees\0c40\PB-W00-control'
+    dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
 
   - id: T-096
     title: Support the widened Activity Director initial delay
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-094]
     runtime_lease: null
     gate: focused-director-delay-range-source-correction
     contract: ops/tasks/T-096/CONTRACT.md
     source_base: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:021eef91-9b03-4ef2-a4bb-3621eceffb94
+    owner_thread_id: 01a05e67-6053-7232-9328-22b789946651
+    worktree: 'C:\Users\jensh\.codex\worktrees\661e\PB-W00-control'
+    dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
