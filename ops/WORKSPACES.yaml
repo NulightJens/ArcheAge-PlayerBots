@@ -44,8 +44,20 @@ workspaces:
     expected_state: receipted-module-install-changes
     lease: aaemu12
     installed_module_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\modules\archeage-playerbots'
-    installed_module_head: 60f574d70c35dce418dc8a9ca53a99bd775bf099
-    evidence_receipt: ops/evidence/aaemu12-wave1-integration-v1.yaml
+    installed_module_head: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+    evidence_receipt: ops/evidence/aaemu12-wave2-integration-v1.yaml
+
+  aaemu12_database_public_alpha_v1:
+    role: isolated-public-alpha-runtime-database
+    access: lease-controlled
+    lease: aaemu12
+    game_database: aaemu_playerbots_game_public_alpha_v1
+    login_database: aaemu_playerbots_login_public_alpha_v1
+    retained_output_path: 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1'
+    donor_workspace: aaemu12_legacy_t022
+    evidence_receipt: ops/evidence/aaemu12-database-public-alpha-v1.yaml
+    database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+    credentials: not-recorded
 
   aaemu12_client:
     role: matching-client-fixture

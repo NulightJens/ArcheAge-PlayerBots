@@ -11,26 +11,26 @@ runtimes:
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
     client_path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
-    database_identity: null
+    database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-08-31
     released_at: 2026-08-31
     cleanup_receipt: no-runtime-started-install-build-unit-only
-    baseline_evidence: ops/evidence/aaemu12-wave1-integration-v1.yaml
-    availability_limit: An isolated versioned Game database must be assigned before starting Login or Game.
+    baseline_evidence: ops/evidence/aaemu12-wave2-integration-v1.yaml
+    availability_limit: PB-000 must claim and assign the lease before starting Login or Game.
 
   aaemu30:
-    status: game-stopped-dependencies-retained
+    status: stopped-no-runtime-listeners-observed
     owner_task: null
     owner_thread_id: null
     host_path: 'D:\Codex-Labs\aaemu-3.0.4.2-r336598-runtime-v1\host'
     pinned_host_commit: 8c1c943bb2309eefffb9da2aa99a408d0acbb095
     listeners:
       game: []
-      login: [1334, 1337]
-      mysql: [3307]
+      login: []
+      mysql: []
     claimed_at: null
     released_at: 2026-08-31
-    cleanup_receipt: graceful-command-scripts-shutdown-now
+    cleanup_receipt: prior-game-graceful-login-and-mysql-no-longer-observed-at-wave2-boundary
 
 release_requirements:
   - Graceful server shutdown or graceful Ctrl+C path.

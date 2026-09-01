@@ -57,29 +57,33 @@ tasks:
   - id: T-007
     title: Evidence and log receipt translator
     track: shared-tooling
-    status: review
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [PB-W00]
     owner_client_thread_id: client-new-thread:ef7ac466-7e88-406d-afaa-ac9f65ffd000
     source_head: 43956fb9e6f1c3cc88cff0f8385f7dd7ef1ebb4e
+    integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
 
   - id: T-043
     title: Isolated AAEmu 1.2 public-alpha database runway
     track: AAEmu12
-    status: review
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [PB-W00]
     owner_client_thread_id: client-new-thread:79f73bc9-6fb3-497f-8e13-1090909474c6
     source_head: e0e0825c35b5f0863e43b677a416c4f819419716
+    integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
+    database_identity: aaemu12_database_public_alpha_v1
 
   - id: T-044
     title: Deterministic combat and stealth qualification harness
     track: AAEmu12
-    status: review
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [PB-W00]
     owner_client_thread_id: client-new-thread:eec3a1e8-c920-4a9c-b140-0b64c5f36a4c
     source_head: 9ba012805124e667185257449d7ec15ce147406f
+    integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
 
   - id: T-045
     title: Wave 2 source and database-runway integration
@@ -96,20 +100,23 @@ tasks:
   - id: T-046
     title: Wave 2 recovery integration qualification
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-045]
     gate: full-aaemu12-suite
     retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
     owner_client_thread_id: client-new-thread:6ff6c6dc-8216-4872-950e-cecb0d27547b
+    integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
+    evidence_receipt: aaemu12-wave2-integration-v1
 
   - id: T-036
     title: AAEmu 1.2 mortal-combat and stealth closure
     track: AAEmu12
-    status: proposed
-    integration: pending
-    depends_on: [T-043, T-044]
+    status: ready
+    integration: runtime-pending
+    depends_on: [T-043, T-044, T-046]
     runtime_lease: aaemu12
+    gate: serialized-live-aaemu12-proof
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification

@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-integration-recovery
+phase: wave-2-physical-combat-ready
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: 413e3d39c9bde154ae62d51d97421d92cb350ba4
-  tested_module_source: 60f574d70c35dce418dc8a9ca53a99bd775bf099
-  integration_evidence: ops/evidence/aaemu12-wave1-integration-v1.yaml
+  integrated_head: 30d2b90955350918998f6e005d2fc8994e36f56b
+  tested_module_source: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+  integration_evidence: ops/evidence/aaemu12-wave2-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -23,21 +23,22 @@ runtime:
     method: loopback-command-scripts-shutdown-now
     stopped_at: 2026-08-31
   aaemu30_login:
-    state: retained-running
-    observed_pid: 107540
+    state: no-process-observed-at-wave2-runtime-boundary
+    last_observed_pid: 107540
   aaemu30_mysql:
-    state: retained-running
-    observed_pid: 88204
-    port: 3307
+    state: no-listener-observed-at-wave2-runtime-boundary
+    last_observed_pid: 88204
+    last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: install-build-unit-green-runtime-pending
+    state: source-green-database-registered-runtime-ready
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-wave1-integration-v1
-    build: 0-errors-76-warnings
-    focused_tests: 51-passed-0-skipped-0-failed
-    unit_tests: 1786-passed-4-intentional-skips-0-failed
+    evidence_receipt: aaemu12-wave2-integration-v1
+    database_identity: aaemu12_database_public_alpha_v1
+    build: 0-errors-75-warnings
+    focused_tests: 120-passed-0-skipped-0-failed
+    unit_tests: 1789-passed-4-intentional-skips-0-failed
     runtime_boundary: No server process or database was started; physical runtime acceptance remains pending.
 
 control_tower:
@@ -50,8 +51,8 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Run T-046 as the independent recovery qualification for retained T-045 candidate 225595ebe45d5b0c08bfa0a1059cb8ba97669f86.
-  - Register the isolated database, claim the aaemu12 lease, and activate T-036 only after the integrated candidate is green.
+  - Claim the aaemu12 lease and run T-036 against database identity aaemu12_database_public_alpha_v1.
+  - Release the lease only after zero-bot cleanup, graceful Login/Game shutdown, process/listener checks, and committed T-036 evidence.
   - Keep T-037 and T-041 blocked until their declared dependencies are accepted.
 
 prepared_workstreams:
@@ -97,7 +98,7 @@ integration_wave:
     T-040: a99663059db71afaa227bdce8f680b5196e36226
 
 wave_2:
-  state: recovery-integration-ready
+  state: source-green-physical-gate-ready
   base: e0350b3ee24352a1d96d81a60f34475fd8e56a45
   lanes:
     - task: T-007
@@ -106,21 +107,25 @@ wave_2:
       task_thread_id: pending-task-list-resolution
       worktree: 'C:\Users\jensh\.codex\worktrees\b9a4\PB-W00-control'
       head: 43956fb9e6f1c3cc88cff0f8385f7dd7ef1ebb4e
-      handoff: ready
+      handoff: integrated
+      integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
     - task: T-043
       outcome: isolated-public-alpha-database-runway
       client_thread_id: client-new-thread:79f73bc9-6fb3-497f-8e13-1090909474c6
       task_thread_id: pending-task-list-resolution
       worktree: 'C:\Users\jensh\.codex\worktrees\cbbe\PB-W00-control'
       head: e0e0825c35b5f0863e43b677a416c4f819419716
-      handoff: ready
+      handoff: integrated
+      integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
+      database_identity: aaemu12_database_public_alpha_v1
     - task: T-044
       outcome: offline-combat-stealth-qualification-harness
       client_thread_id: client-new-thread:eec3a1e8-c920-4a9c-b140-0b64c5f36a4c
       task_thread_id: pending-task-list-resolution
       worktree: 'C:\Users\jensh\.codex\worktrees\a9a5\PB-W00-control'
       head: 9ba012805124e667185257449d7ec15ce147406f
-      handoff: ready
+      handoff: integrated
+      integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
   integration_task:
     task: T-045
     state: blocked-retained-red
@@ -131,9 +136,13 @@ wave_2:
     full_unit: 1788-passed-4-intentional-skips-1-failed-before-focused-green-correction
   recovery_integration_task:
     task: T-046
-    state: setup-in-progress
+    state: completed
     client_thread_id: client-new-thread:6ff6c6dc-8216-4872-950e-cecb0d27547b
     task_thread_id: pending-task-list-resolution
     retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+    tested_module_source: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+    integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
+    evidence_receipt: aaemu12-wave2-integration-v1
   runtime_lease: unclaimed
-  runtime_start: prohibited-until-integration-and-registration
+  runtime_database_identity: aaemu12_database_public_alpha_v1
+  runtime_start: prohibited-until-T-036-assignment-and-lease-claim
