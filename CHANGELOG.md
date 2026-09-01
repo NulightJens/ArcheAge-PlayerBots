@@ -4,6 +4,11 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ## Unreleased
 
+### Loopback command fixtures
+
+- Fixed fresh AAEmu 1.2 loopback `@system` actors to retain the registered `MainWorld` and that world's spawn transform without creating or registering a player, account, or connection. Worldless early-start requests and administrative access remain unchanged.
+- Kept the `spawnpassive` null-world guard fail-closed; deterministic controller and command tests prove an active-world system actor now advances to ordinary NPC-template validation instead of the T-054 missing-world rejection.
+
 ### Staged quest controls
 
 - Added an exact-target non-lethal health floor to `/botattackobject`, allowing normal bot combat to disengage at a requested 1-99% threshold for quest-item interactions without mutating target HP.

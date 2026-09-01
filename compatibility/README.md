@@ -6,9 +6,9 @@ The patches are intentionally visible and reviewable. They are applied to an AAE
 
 ## ArcheAge 1.2 host hooks
 
-`aaemu-1.2-r208022-v3.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and adds the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs. Version 3 also registers the GM-only `/botquest` quest-development command alongside the version 2 class, gear, and kit integration. Login and Game log `Selected Login database schema: <database>` and `Selected Game database schema: <database>` from their resolved `MySQLProvider.Database` values before either updater runs; each message contains only its schema name and no connection or credential fields.
+`aaemu-1.2-r208022-v3.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and adds the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs. Version 3 also registers the GM-only `/botquest` quest-development command alongside the version 2 class, gear, and kit integration. Login and Game log `Selected Login database schema: <database>` and `Selected Game database schema: <database>` from their resolved `MySQLProvider.Database` values before either updater runs; each message contains only its schema name and no connection or credential fields. The accompanying 1.2 module source gives every fresh loopback `@system` actor the registered `MainWorld` and that same world's spawn transform without registering a player.
 
-SHA-256: `b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91`
+SHA-256: `0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e`
 
 The released `aaemu-1.2-r208022.patch` and the version 2 patch remain unchanged; neither is the active Unreleased installer contract.
 

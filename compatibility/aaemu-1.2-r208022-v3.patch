@@ -498,7 +498,7 @@ index c25a30ca64d8f762b33e4b260aaccd11c3e25c93..403332171f6b92a88a10082885b54dd3
  using AAEmu.Game.Core.Managers.Id;
  using AAEmu.Game.Core.Managers.Stream;
  using AAEmu.Game.Core.Managers.UnitManagers;
-@@ -31,11 +34,19 @@ public sealed class GameService : IHostedService, IDisposable
+@@ -31,18 +34,32 @@ public sealed class GameService : IHostedService, IDisposable
      public static TimeSpan TimeSinceStart => s_timeProvider.GetUtcNow().UtcDateTime.Subtract(StartTime);
  
      private readonly ManagerOrchestrator _orchestrator;
@@ -518,7 +518,7 @@ index c25a30ca64d8f762b33e4b260aaccd11c3e25c93..403332171f6b92a88a10082885b54dd3
          s_timeProvider = timeProvider;
          StartTime = timeProvider.GetUtcNow().UtcDateTime;
      }
-@@ -43,6 +54,12 @@ public sealed class GameService : IHostedService, IDisposable
+ 
 +    internal static void LogSelectedGameDatabaseSchema(string database)
 +    {
 +        Logger.Info($"Selected Game database schema: {database}");

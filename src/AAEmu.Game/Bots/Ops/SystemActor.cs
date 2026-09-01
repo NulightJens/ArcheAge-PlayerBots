@@ -1,6 +1,7 @@
 using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Units;
+using AAEmu.Game.Models.Game.World;
 using AAEmu.Game.Models.Game.World.Transform;
 
 namespace AAEmu.Game.Bots.Ops;
@@ -21,12 +22,16 @@ internal sealed class SystemActor : Character
     public static SystemActor Create()
     {
         WorldSpawnPosition spawnPosition = null;
+#if !PLAYERBOTS_AAEMU_3_0
+        WorldInstance world = null;
+#endif
         try
         {
 #if PLAYERBOTS_AAEMU_3_0
             spawnPosition = WorldManager.Instance.GetWorld(WorldManager.DefaultInstanceId)?.SpawnPosition;
 #else
-            spawnPosition = WorldManager.Instance.MainWorld?.Template?.SpawnPosition;
+            world = WorldManager.Instance.MainWorld;
+            spawnPosition = world?.Template?.SpawnPosition;
 #endif
         }
         catch (Exception)
@@ -34,6 +39,10 @@ internal sealed class SystemActor : Character
             // Unit tests and early headless callers may not have a WorldManager yet.
         }
 
-        return new SystemActor(spawnPosition);
+        var actor = new SystemActor(spawnPosition);
+#if !PLAYERBOTS_AAEMU_3_0
+        actor.ParentWorld = world;
+#endif
+        return actor;
     }
 }
