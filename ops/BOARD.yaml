@@ -846,7 +846,7 @@ tasks:
     title: Reprove one-zone autonomy with widened observer pre-arm window
     track: AAEmu12
     status: blocked
-    integration: pending
+    integration: retained-fail-integrated-by-T-095
     depends_on: [T-087, T-091, T-093]
     runtime_lease: aaemu12
     gate: serialized-one-zone-autonomy-proof-v4
@@ -867,8 +867,8 @@ tasks:
   - id: T-095
     title: Independently integrate the T-094 retained FAIL evidence
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-094]
     runtime_lease: null
     gate: immutable-t094-fail-evidence-verification
@@ -880,11 +880,15 @@ tasks:
     owner_thread_id: 01a05e67-3355-7330-aea6-453cf311e49b
     worktree: 'C:\Users\jensh\.codex\worktrees\0c40\PB-W00-control'
     dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
+    replay_commit: 65b6cec7e612f5d5d3945d8fee0a6cdfd463889e
+    integrated_commit: 0030c1b534cdce3e312a8653a8dd21544e420143
+    evidence_receipt: ops/evidence/aaemu12-t094-fail-integration-v1.yaml
+    result: PASS-receipt-integrity-subject-remains-FAIL-3244-payloads-1001-client-rows
 
   - id: T-096
     title: Support the widened Activity Director initial delay
     track: AAEmu12
-    status: active
+    status: done
     integration: pending
     depends_on: [T-094]
     runtime_lease: null
@@ -895,6 +899,23 @@ tasks:
     owner_thread_id: 01a05e67-6053-7232-9328-22b789946651
     worktree: 'C:\Users\jensh\.codex\worktrees\661e\PB-W00-control'
     dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
+    candidate_commit: 859e0daf64df482fcb17d83e16344387453a19b7
+    result: PASS-40-focused-build-0-errors-patch-clean-apply
+
+  - id: T-097
+    title: Integrate and install widened Director delay support
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-095, T-096]
+    runtime_lease: aaemu12-build-only
+    gate: source-install-build-full-suite-integration
+    contract: ops/tasks/T-097/CONTRACT.md
+    candidate_commit: 859e0daf64df482fcb17d83e16344387453a19b7
+    candidate_parent: 1ebfd0ec47138ebf15268befde9ed1671aa05ef8
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
