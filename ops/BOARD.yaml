@@ -709,12 +709,16 @@ tasks:
   - id: T-087
     title: Integrate per-bot passive fixture anchors
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-086]
-    runtime_lease: aaemu12-build-only-pending-thread-binding
+    runtime_lease: aaemu12-build-only
     gate: focused-build-and-full-aaemu12-suite
     contract: ops/tasks/T-087/CONTRACT.md
+    owner_client_thread_id: client-new-thread:b707adcd-da74-4fef-9e66-b615a1ff6cf6
+    owner_thread_id: 01a05ddf-2e99-72b2-8e54-76681b976592
+    worktree: 'C:\Users\jensh\.codex\worktrees\3ace\PB-W00-control'
+    dispatch_base: f5df7623d33587a8b0bc4737733e8cec8b00b2cf
     candidate: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
     candidate_parent: 0da7166627f53118184687736132a88cdb668e1e
 
