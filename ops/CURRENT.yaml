@@ -227,7 +227,10 @@ wave_2:
     patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
   system_actor_world_recovery_integration_task:
     task: T-056
-    state: ready
+    state: active
+    client_thread_id: client-new-thread:08dbaead-1b07-4f00-89d6-e4d9ce4ba3bd
+    task_thread_id: 01a05af9-afa4-78a0-ad93-e8373d5d9aa4
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\cc3e\\PB-W00-control'
   startup_log_recovery_integration_task:
     task: T-053
     state: completed
