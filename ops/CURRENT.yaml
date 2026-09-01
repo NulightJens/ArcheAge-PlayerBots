@@ -111,10 +111,10 @@ prepared_workstreams:
     head: 07e230ab959c4147318d3b5228dee492ff18c4fb
     handoff: ops/tasks/T-066/HANDOFF.md
   - task: T-067
-    state: ready
-    client_thread_id: pending-thread-creation
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
+    state: active
+    client_thread_id: client-new-thread:85417e89-8c24-49e9-84ed-8e2ad2753f6e
+    task_thread_id: 01a05c52-d3b2-7913-95d2-7f0f426bad22
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\d453\PB-W00-control'
     base: 07e230ab959c4147318d3b5228dee492ff18c4fb
     blocker_receipt: ops/evidence/aaemu12-t065-one-bot-autonomy-v2.yaml
     head: pending

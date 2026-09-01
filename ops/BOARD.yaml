@@ -388,11 +388,14 @@ tasks:
   - id: T-067
     title: Expose lifecycle progression and resource deltas
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-063, T-065]
     runtime_lease: none
     gate: focused-aaemu12-tests
+    owner_client_thread_id: client-new-thread:85417e89-8c24-49e9-84ed-8e2ad2753f6e
+    owner_thread_id: 01a05c52-d3b2-7913-95d2-7f0f426bad22
+    worktree: 'C:\Users\jensh\.codex\worktrees\d453\PB-W00-control'
 
   - id: T-041
     title: One-zone Autonomous Activity Director
