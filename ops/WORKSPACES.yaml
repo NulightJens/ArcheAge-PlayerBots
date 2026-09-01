@@ -44,10 +44,10 @@ workspaces:
     expected_state: receipted-module-install-changes
     lease: aaemu12
     installed_module_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\modules\archeage-playerbots'
-    installed_module_head: 68aaaa3334a408d1d6d21e44472a8984e78618c2
-    installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
-    compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
-    evidence_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
+    installed_module_head: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+    installed_module_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+    compatibility_patch_sha256: 395a83ab5bf6a4f4f1c0d56289590d6a36ad36b3ab5f87e1701d6aa17ffbefcd
+    evidence_receipt: ops/evidence/aaemu12-activity-director-integration-v1.yaml
 
   aaemu12_database_public_alpha_v1:
     role: isolated-public-alpha-runtime-database
@@ -102,6 +102,13 @@ workspaces:
     access: task-evidence-write
     lease: aaemu12
     expected_state: immutable-retained-pass
+
+  aaemu12_t041_evidence_v1:
+    role: one-zone-autonomous-director-runtime-evidence
+    path: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: absent-before-first-run-then-immutable
 
   aaemu12_client:
     role: matching-client-fixture

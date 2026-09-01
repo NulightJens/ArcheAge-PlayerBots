@@ -2,7 +2,7 @@ schema_version: 1
 id: T-041
 title: One-zone Autonomous Activity Director
 track: AAEmu12
-status: blocked
+status: prepared
 integration: pending
 outcome: Maintain configured population bounds while persistent bots independently select and complete safe one-zone activities with qualified lifecycle, navigation, combat, recovery, operator visibility, and deterministic cleanup.
 depends_on: [T-080, T-084]
@@ -10,4 +10,34 @@ runtime:
   required: true
   lease: aaemu12
 gate: serialized-one-zone-autonomy-proof
-activation_requirement: All dependencies accepted and integration write scope assigned.
+branch: codex-managed-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+inputs:
+  dispatch_base: pending-control-commit
+  integration_head: f42206c60df4955213eb6d26f3f093a76d4fe56f
+  tested_module_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+  installed_module_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+  integration_receipt: ops/evidence/aaemu12-activity-director-integration-v1.yaml
+  single_bot_receipt: ops/evidence/aaemu12-t079-one-bot-autonomy-v6.yaml
+  qualified_zone_id: 221
+  persistent_bot_ids: [20001, 20002, 20003]
+  evidence_workspace: aaemu12_t041_evidence_v1
+write_scope:
+  - ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
+  - ops/tasks/T-041/HANDOFF.md
+  - 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
+  - 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\Configurations\BotConfig.json'
+  - registered-runtime-log-and-process-output-under-exact-lease
+gates:
+  - exact-committed-task-thread-worktree-and-runtime-lease-binding
+  - installed-director-and-host-fingerprint-preflight
+  - zero-to-target-director-bootstrap-with-prearmed-observers
+  - two-three-bot-autonomous-completion-and-refill-waves
+  - maximum-bound-and-operator-visibility-proof
+  - distinct-pid-restart-and-director-rebootstrap
+  - exact-runtime-config-restoration-and-graceful-cleanup
+validation_boundary: Runtime evidence only. Do not edit product source, tests, scripts, compatibility patches, manifests, global ledgers, predecessor evidence, databases, clients, scale, soak, packaging, or AAEmu 3.0. Do not start runtime until PB-000 commits the exact owner and lease binding.
+contract: ops/tasks/T-041/CONTRACT.md
+handoff: ops/tasks/T-041/HANDOFF.md

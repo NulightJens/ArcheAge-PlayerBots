@@ -623,8 +623,8 @@ tasks:
   - id: T-083
     title: Serialize Activity Director startup and shutdown
     track: AAEmu12
-    status: review
-    integration: pending
+    status: done
+    integration: integrated-by-T-084
     depends_on: [T-081, T-082]
     runtime_lease: none
     gate: focused-aaemu12-director-concurrency-tests
@@ -638,23 +638,31 @@ tasks:
   - id: T-084
     title: Integrate the serialized one-zone Activity Director
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-082, T-083]
     runtime_lease: aaemu12-build-only
     gate: full-aaemu12-suite
     owner_client_thread_id: client-new-thread:55a250ad-f763-479b-b034-630fedd586b3
     owner_thread_id: 01a05d70-6f07-7b61-abad-eafc8d12a307
     worktree: 'C:\Users\jensh\.codex\worktrees\439d\PB-W00-control'
+    integrated_commit: f42206c60df4955213eb6d26f3f093a76d4fe56f
+    tested_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+    installed_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+    result: PASS-154-focused-1830-unit-4-intentional-skips-build-0-errors
 
   - id: T-041
     title: One-zone Autonomous Activity Director
     track: AAEmu12
-    status: blocked
+    status: prepared
     integration: pending
     depends_on: [T-080, T-084]
     runtime_lease: aaemu12
     gate: serialized-one-zone-autonomy-proof
+    zone_id: 221
+    configured_bot_ids: [20001, 20002, 20003]
+    configured_population: {minimum: 2, target: 3, maximum: 3}
+    contract: ops/tasks/T-041/CONTRACT.md
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

@@ -2,8 +2,8 @@ schema_version: 1
 id: T-083
 title: Serialize Activity Director startup and shutdown
 track: AAEmu12
-status: review
-integration: pending
+status: done
+integration: integrated-by-T-084
 outcome: Produce one replacement Activity Director candidate that retains T-081's accepted source behavior while serializing GameService construction, publication, recurring scheduling, cancellation, and shutdown against every concurrent start/stop interleaving.
 depends_on: [T-081, T-082]
 runtime:
@@ -43,3 +43,4 @@ handoff: ops/tasks/T-083/HANDOFF.md
 source_head: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
 source_parent: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
 result: concurrency-source-green-15-service-154-focused-build-0-errors
+integrated_by: T-084

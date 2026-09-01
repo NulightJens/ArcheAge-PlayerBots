@@ -36,12 +36,13 @@ compatibility_track:
   policy: frozen-release-boundary-regression-only
 
 current_milestone:
-  id: M-004
-  name: Single-bot autonomous gameplay loop
+  id: M-005
+  name: One-zone autonomous population director
   acceptance: >-
-    One persistent bot repeatedly selects and completes an activity through
-    normal spawn, travel, mortal combat, progression, recovery, logout, and
-    clean restart without per-action operator control.
+    Three configured persistent bots are admitted by the Activity Director in
+    one qualified zone, independently complete repeated safe activity cycles,
+    self-logout, refill to the configured target without per-action operator
+    control, and survive a clean distinct-PID restart.
 
 program_rules:
   one_outcome_per_task: true
