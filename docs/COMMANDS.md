@@ -200,4 +200,13 @@ Invoke-RestMethod -Method Post `
   -ContentType 'application/json' -Body $body
 ```
 
+Each request creates a fresh, unregistered actor. When active bots exist, the
+actor copies the matching world, instance, non-zero zone, coordinates, and
+rotation from the qualified bot with the lowest character ID. Bots with no
+world, a mismatched instance, ZoneId `0`, or a non-finite transform are ignored.
+If no bot qualifies, the actor remains worldless: worldless commands such as
+`addbot` still work, while world-positioned commands such as `spawnpassive`
+fail closed at their existing world guard. Add a qualified bot before invoking
+world-positioned fixture commands through the loopback API.
+
 > **Security:** `@system` has administrator access and no user authentication. Keep the command API bound to `127.0.0.1`; never expose its port publicly.

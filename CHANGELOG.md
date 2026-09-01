@@ -6,8 +6,8 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ### Loopback command fixtures
 
-- Fixed fresh AAEmu 1.2 loopback `@system` actors to retain the registered `MainWorld` and that world's spawn transform without creating or registering a player, account, or connection. Worldless early-start requests and administrative access remain unchanged.
-- Kept the `spawnpassive` null-world guard fail-closed; deterministic controller and command tests prove an active-world system actor now advances to ordinary NPC-template validation instead of the T-054 missing-world rejection.
+- Fixed fresh AAEmu 1.2 loopback `@system` actors to snapshot the lowest-character-ID qualified active bot's matching world, instance, non-zero zone, coordinates, and rotation without creating or registering a player, account, or connection.
+- Excluded worldless, mismatched-instance, ZoneId-0, and non-finite bot anchors. When no bot qualifies, worldless commands such as `addbot` remain available while `spawnpassive` keeps its existing fail-closed world guard instead of using the T-057 `(0,0,0)` / ZoneId `0` main-world template origin.
 
 ### Staged quest controls
 
