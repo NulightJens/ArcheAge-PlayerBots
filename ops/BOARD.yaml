@@ -282,12 +282,14 @@ tasks:
   - id: T-060
     title: AAEmu 1.2 live headless combat and stealth attempt v5
     track: AAEmu12
-    status: ready
+    status: active
     integration: runtime-pending
     depends_on: [T-059]
     runtime_lease: aaemu12
     gate: serialized-live-aaemu12-proof
     archeage_client_allowed: false
+    owner_client_thread_id: client-new-thread:a4beac22-f41f-4789-a907-5f40fee9f877
+    owner_thread_id: 01a05b47-b0b7-71b3-90df-be5f07c6e81f
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification

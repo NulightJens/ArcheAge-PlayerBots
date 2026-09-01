@@ -2,14 +2,14 @@ schema_version: 1
 id: T-060
 title: AAEmu 1.2 live headless combat and stealth attempt v5
 track: AAEmu12
-status: ready
+status: active
 integration: runtime-pending
 outcome: Produce a fresh immutable live-headless AAEmu 1.2 receipt for matched Idle controls, mortal combat, stealth reacquisition and release, cleanup, graceful shutdown, and clean restart after the qualified active-bot anchor integration.
 depends_on: [T-059]
-branch: codex-managed-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+branch: codex-managed-detached-worktree
+worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\160a\\PB-W00-control'
+owner_client_thread_id: client-new-thread:a4beac22-f41f-4789-a907-5f40fee9f877
+owner_thread_id: 01a05b47-b0b7-71b3-90df-be5f07c6e81f
 
 inputs:
   pre_preparation_integration_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a

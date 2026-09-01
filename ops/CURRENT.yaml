@@ -269,9 +269,12 @@ wave_2:
     evidence_receipt: aaemu12-qualified-anchor-integration-v1
   live_headless_physical_v5:
     task: T-060
-    state: ready-unassigned
+    state: active-lease-owned
     external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v5'
     archeage_client_allowed: false
+    client_thread_id: client-new-thread:a4beac22-f41f-4789-a907-5f40fee9f877
+    task_thread_id: 01a05b47-b0b7-71b3-90df-be5f07c6e81f
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\160a\\PB-W00-control'
     tested_module_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
     installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
   startup_log_recovery_integration_task:
@@ -284,6 +287,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: available-clean-after-T-057
+  runtime_lease: claimed-by-T-060-live-headless-v5
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-PB-000-commits-a-new-exact-task-and-thread-claim
+  runtime_start: authorized-only-for-T-060-thread-01a05b47-b0b7-71b3-90df-be5f07c6e81f
