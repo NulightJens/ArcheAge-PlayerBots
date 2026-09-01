@@ -2,7 +2,7 @@ schema_version: 1
 id: T-088
 title: Reprove one-zone autonomy with isolated anchored fixtures
 track: AAEmu12
-status: active
+status: blocked
 integration: pending
 outcome: Produce one fresh immutable live AAEmu 1.2 proof that the Activity Director bootstraps, all three configured bots independently complete two autonomous one-kill lifecycles using separated anchored passive fixtures, each normal logout is refilled, and a distinct-PID restart reboots and holds target population.
 depends_on: [T-087]
@@ -40,3 +40,5 @@ gates:
 validation_boundary: Runtime evidence only. Do not edit product/module/host source, tests, tools, scripts, manifests, global ledgers/lease, predecessor evidence, client files, database state, scale, soak, packaging, or AAEmu 3.0. Never start/control/query MySQL or a database or start/control the ArcheAge client. Never issue directed bot gameplay commands.
 contract: ops/tasks/T-088/CONTRACT.md
 handoff: ops/tasks/T-088/HANDOFF.md
+candidate_commit: 7919a43fc370ea5f59edd77112385366f4928a94
+result: INCOMPLETE-client-sampler-exit-before-derived-ledger-runtime-never-started

@@ -729,7 +729,7 @@ tasks:
   - id: T-088
     title: Reprove one-zone autonomy with isolated anchored fixtures
     track: AAEmu12
-    status: active
+    status: blocked
     integration: pending
     depends_on: [T-087]
     runtime_lease: aaemu12
@@ -743,6 +743,30 @@ tasks:
     owner_thread_id: 01a05df1-47a7-7b70-b851-dbea1c6a69f7
     worktree: 'C:\Users\jensh\.codex\worktrees\578d\PB-W00-control'
     dispatch_base: 4e89fff7b1ca89cf44fda28099c6ee657629bc95
+    candidate_commit: 7919a43fc370ea5f59edd77112385366f4928a94
+    result: INCOMPLETE-client-sampler-exit-before-derived-ledger-runtime-never-started
+
+  - id: T-089
+    title: Integrate the T-088 pre-runtime INCOMPLETE receipt
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-088]
+    runtime_lease: none
+    gate: t088-immutable-evidence-and-cleanup-verification
+    contract: ops/tasks/T-089/CONTRACT.md
+    candidate: 7919a43fc370ea5f59edd77112385366f4928a94
+    candidate_parent: 8abf3f3fd714680bf354a4fd2c1a6259b8171b8d
+
+  - id: T-090
+    title: Add a portable continuous client-process observer
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-088]
+    runtime_lease: none
+    gate: windows-powershell-and-pwsh-observer-tests
+    contract: ops/tasks/T-090/CONTRACT.md
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -752,4 +776,4 @@ tasks:
     depends_on: [T-088]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-088-fresh-isolated-fixture-runtime-proof-not-yet-passed-and-integrated
+    blocker: T-088-retained-incomplete-awaiting-sampler-correction-and-fresh-successor-proof

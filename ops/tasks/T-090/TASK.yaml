@@ -1,0 +1,34 @@
+schema_version: 1
+id: T-090
+title: Add a portable continuous client-process observer
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Replace the failed ad-hoc T-088 sampler with a reusable fail-closed observer that continuously records client-process absence, raw snapshot hashes and a derived ledger under both Windows PowerShell and pwsh, using only framework APIs and cooperative shutdown.
+depends_on: [T-088]
+runtime:
+  required: false
+  lease: null
+branch: codex-managed-worktree
+worktree: pending-thread-binding
+owner_client_thread_id: pending-thread-binding
+owner_thread_id: pending-thread-binding
+inputs:
+  dispatch_base: pending-preparation-commit
+  retained_sampler: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2\client-sampler\client-process-sampler.ps1'
+  retained_error: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2\client-sampler\sampler-error.json'
+write_scope:
+  - scripts/autonomy/Observe-ClientProcessAbsence.ps1
+  - scripts/autonomy/tests/Test-ClientProcessObserver.ps1
+  - ops/tasks/T-090/HANDOFF.md
+gates:
+  - retained-t088-sampler-diagnosis
+  - framework-sha256-without-get-filehash
+  - first-derived-row-before-ready-marker
+  - continuous-ledger-gap-and-nonzero-count-summary
+  - cooperative-sentinel-shutdown
+  - fail-closed-existing-output-and-error-cases
+  - windows-powershell-and-pwsh-tests
+validation_boundary: Repository script and isolated tests only. Do not write registered host/module/config, runtime/evidence roots, Login/Game/MySQL/database/client, global ledgers/lease, product source, compatibility patches, full suite, scale, soak, packaging, or AAEmu 3.0.
+contract: ops/tasks/T-090/CONTRACT.md
+handoff: ops/tasks/T-090/HANDOFF.md
