@@ -44,10 +44,10 @@ workspaces:
     expected_state: receipted-module-install-changes
     lease: aaemu12
     installed_module_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\modules\archeage-playerbots'
-    installed_module_head: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
-    installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
-    compatibility_patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
-    evidence_receipt: ops/evidence/aaemu12-startup-log-integration-v2.yaml
+    installed_module_head: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+    installed_module_tree: 1f3befa4dc3c01222b057c28279e82d25fcc176e
+    compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+    evidence_receipt: ops/evidence/aaemu12-system-actor-integration-v1.yaml
 
   aaemu12_database_public_alpha_v1:
     role: isolated-public-alpha-runtime-database

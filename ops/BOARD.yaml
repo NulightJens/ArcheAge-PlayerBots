@@ -215,30 +215,44 @@ tasks:
   - id: T-055
     title: Give the loopback system actor an AAEmu 1.2 world context
     track: AAEmu12
-    status: review
-    integration: source-complete
+    status: done
+    integration: integrated
     depends_on: [T-054]
     gate: deterministic-system-actor-tests
     owner_client_thread_id: client-new-thread:fb760fa2-cf61-400b-87c8-2f8cc691870c
     owner_thread_id: 01a05aeb-e957-7143-8656-e1f71514c74c
     source_head: 68cf32fbe3012364fb0e1dec2c8f6278015e35eb
+    integrated_commit: d26211711cb8597d00deab1be4ca7a731f428c71
 
   - id: T-056
     title: Integrate the system-actor world-context correction
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-055]
     gate: full-aaemu12-suite
     owner_client_thread_id: client-new-thread:08dbaead-1b07-4f00-89d6-e4d9ce4ba3bd
     owner_thread_id: 01a05af9-afa4-78a0-ad93-e8373d5d9aa4
+    tested_module_source: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+    integrated_commit: d26211711cb8597d00deab1be4ca7a731f428c71
+    evidence_receipt: aaemu12-system-actor-integration-v1
+
+  - id: T-057
+    title: AAEmu 1.2 live headless combat and stealth attempt v4
+    track: AAEmu12
+    status: ready
+    integration: runtime-pending
+    depends_on: [T-056]
+    runtime_lease: aaemu12
+    gate: serialized-live-aaemu12-proof
+    archeage_client_allowed: false
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-054]
+    depends_on: [T-057]
     runtime_lease: aaemu12
 
   - id: T-041

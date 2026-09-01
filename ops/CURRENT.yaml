@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-system-actor-world-context-recovery
+phase: wave-2-live-headless-physical-v4-ready
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: a177607645cded9b318a6298ec5c44b0df2cc429
-  tested_module_source: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
-  integration_evidence: ops/evidence/aaemu12-startup-log-integration-v2.yaml
+  integrated_head: d26211711cb8597d00deab1be4ca7a731f428c71
+  tested_module_source: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+  integration_evidence: ops/evidence/aaemu12-system-actor-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -52,8 +52,8 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Dispatch T-055 as source-only work with no runtime or client authority.
-  - Integrate and deploy the correction through a dedicated Integrator task, then claim aaemu12 for a fresh immutable physical attempt in public-alpha-v4.
+  - Dispatch T-057, resolve its final thread identity, and commit the exclusive aaemu12 lease claim before any live service starts.
+  - Run only the live headless Login/GameServer/API gate in fresh immutable public-alpha-v4; never launch the ArcheAge client.
   - Retain lifecycle-scoped recurrence evidence for the accepted non-blocking shutdown races.
   - Keep T-037 and T-041 blocked until the new physical attempt passes.
 
@@ -218,19 +218,29 @@ wave_2:
     blocker: synthetic-system-actor-parent-world-null
   system_actor_world_recovery_source_task:
     task: T-055
-    state: source-complete-review
+    state: integrated
     outcome: assign-the-active-world-and-matching-spawn-position-to-fresh-system-actors
     client_thread_id: client-new-thread:fb760fa2-cf61-400b-87c8-2f8cc691870c
     task_thread_id: 01a05aeb-e957-7143-8656-e1f71514c74c
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\8fd0\\PB-W00-control'
     head: 68cf32fbe3012364fb0e1dec2c8f6278015e35eb
     patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+    integrated_commit: d26211711cb8597d00deab1be4ca7a731f428c71
   system_actor_world_recovery_integration_task:
     task: T-056
-    state: active
+    state: completed
     client_thread_id: client-new-thread:08dbaead-1b07-4f00-89d6-e4d9ce4ba3bd
     task_thread_id: 01a05af9-afa4-78a0-ad93-e8373d5d9aa4
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\cc3e\\PB-W00-control'
+    tested_module_source: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+    installed_module_tree: 1f3befa4dc3c01222b057c28279e82d25fcc176e
+    integrated_commit: d26211711cb8597d00deab1be4ca7a731f428c71
+    evidence_receipt: aaemu12-system-actor-integration-v1
+  live_headless_physical_v4:
+    task: T-057
+    state: ready
+    external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v4'
+    archeage_client_allowed: false
   startup_log_recovery_integration_task:
     task: T-053
     state: completed
