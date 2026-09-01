@@ -131,7 +131,9 @@ wave_2:
     full_unit: 1788-passed-4-intentional-skips-1-failed-before-focused-green-correction
   recovery_integration_task:
     task: T-046
-    state: ready
+    state: setup-in-progress
+    client_thread_id: client-new-thread:6ff6c6dc-8216-4872-950e-cecb0d27547b
+    task_thread_id: pending-task-list-resolution
     retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
   runtime_lease: unclaimed
   runtime_start: prohibited-until-integration-and-registration

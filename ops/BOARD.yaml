@@ -96,11 +96,12 @@ tasks:
   - id: T-046
     title: Wave 2 recovery integration qualification
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-045]
     gate: full-aaemu12-suite
     retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+    owner_client_thread_id: client-new-thread:6ff6c6dc-8216-4872-950e-cecb0d27547b
 
   - id: T-036
     title: AAEmu 1.2 mortal-combat and stealth closure
