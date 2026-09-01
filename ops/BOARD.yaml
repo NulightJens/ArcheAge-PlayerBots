@@ -255,30 +255,46 @@ tasks:
   - id: T-058
     title: Give the system actor a qualified active-bot world anchor
     track: AAEmu12
-    status: review
-    integration: source-complete
+    status: done
+    integration: integrated
     depends_on: [T-057]
     gate: deterministic-system-actor-anchor-tests
     owner_client_thread_id: client-new-thread:162b3705-4db6-4460-969f-2b43edd88f06
     owner_thread_id: 01a05b29-8864-78a0-8fe5-ac293959432d
     source_head: 5bd425327367b72871aef2eae7e51655a53f7bbc
+    integrated_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+    integrated_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a
 
   - id: T-059
     title: Integrate the qualified system-actor anchor correction
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-058]
     gate: full-aaemu12-suite
     owner_client_thread_id: client-new-thread:63a930ce-fc1c-41ca-97f7-ad8aab5d7bfe
     owner_thread_id: 01a05b39-e25a-7162-97c0-fb208699541e
+    tested_module_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+    installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+    integrated_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a
+    evidence_receipt: aaemu12-qualified-anchor-integration-v1
+
+  - id: T-060
+    title: AAEmu 1.2 live headless combat and stealth attempt v5
+    track: AAEmu12
+    status: ready
+    integration: runtime-pending
+    depends_on: [T-059]
+    runtime_lease: aaemu12
+    gate: serialized-live-aaemu12-proof
+    archeage_client_allowed: false
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-057]
+    depends_on: [T-060]
     runtime_lease: aaemu12
 
   - id: T-041

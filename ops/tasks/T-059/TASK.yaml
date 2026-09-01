@@ -2,8 +2,8 @@ schema_version: 1
 id: T-059
 title: Integrate the qualified system-actor anchor correction
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently replay, deploy, build, and fully verify the accepted T-058 qualified-anchor correction on the registered AAEmu 1.2 integration boundary.
 depends_on: [T-058]
 branch: codex/t059-qualified-anchor-integration
@@ -43,3 +43,7 @@ runtime:
 gates: [full-aaemu12-suite]
 validation_boundary: Integration/install/build/test only. Do not start Login, GameServer, MySQL, or the ArcheAge client; access databases; claim or edit the runtime lease; edit global ledgers; change retained evidence; reapply/regenerate compatibility patches; or touch AAEmu 3.0.
 handoff: ops/tasks/T-059/HANDOFF.md
+integrated_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a
+tested_module_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+evidence_receipt: ops/evidence/aaemu12-qualified-anchor-integration-v1.yaml

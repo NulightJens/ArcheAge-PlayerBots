@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-qualified-system-actor-anchor-recovery
+phase: wave-2-live-headless-physical-v5-preparation
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: d26211711cb8597d00deab1be4ca7a731f428c71
-  tested_module_source: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
-  integration_evidence: ops/evidence/aaemu12-system-actor-integration-v1.yaml
+  integrated_head: cc197aa452b05ad6149641dc2bd8ad465cdc127a
+  tested_module_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+  integration_evidence: ops/evidence/aaemu12-qualified-anchor-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,16 +30,16 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: growing-log-and-exact-game-schema-proof-integrated-runtime-retry-ready
+    state: qualified-anchor-integrated-live-headless-v5-ready
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-startup-log-integration-v2
+    evidence_receipt: aaemu12-qualified-anchor-integration-v1
     database_identity: aaemu12_database_public_alpha_v1
-    compatibility_patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
-    build: 0-errors-75-warnings
-    focused_tests: 129-passed-0-skipped-0-failed
-    unit_tests: 1790-passed-4-intentional-skips-0-failed
+    compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+    build: 0-errors-76-warnings
+    focused_tests: 70-passed-0-skipped-0-failed
+    unit_tests: 1796-passed-4-intentional-skips-0-failed
     runtime_boundary: No server process or database was started; physical runtime acceptance remains pending.
 
 control_tower:
@@ -52,8 +52,8 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Dispatch T-058 as source-only work with no runtime or client authority.
-  - Integrate/deploy the qualified-anchor correction, then claim one exact task/thread for a fresh immutable live-headless attempt in public-alpha-v5.
+  - Assign T-060, then commit one exact T-060 task/thread runtime-lease claim before any Login or Game process starts.
+  - Run the fresh immutable live-headless attempt in public-alpha-v5 without launching or controlling the ArcheAge client.
   - Retain lifecycle-scoped recurrence evidence for the accepted non-blocking shutdown races.
   - Keep T-037 and T-041 blocked until the new physical attempt passes.
 
@@ -250,17 +250,30 @@ wave_2:
     blocker: system-actor-mainworld-template-origin-zone-zero
   qualified_system_actor_anchor_source_task:
     task: T-058
-    state: source-complete-review
+    state: integrated
     client_thread_id: client-new-thread:162b3705-4db6-4460-969f-2b43edd88f06
     task_thread_id: 01a05b29-8864-78a0-8fe5-ac293959432d
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\4dee\\PB-W00-control'
     head: 5bd425327367b72871aef2eae7e51655a53f7bbc
+    integrated_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+    integrated_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a
   qualified_system_actor_anchor_integration_task:
     task: T-059
-    state: active
+    state: completed
     client_thread_id: client-new-thread:63a930ce-fc1c-41ca-97f7-ad8aab5d7bfe
     task_thread_id: 01a05b39-e25a-7162-97c0-fb208699541e
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\04ce\\PB-W00-control'
+    tested_module_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+    installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+    integrated_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a
+    evidence_receipt: aaemu12-qualified-anchor-integration-v1
+  live_headless_physical_v5:
+    task: T-060
+    state: ready-unassigned
+    external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v5'
+    archeage_client_allowed: false
+    tested_module_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+    installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
   startup_log_recovery_integration_task:
     task: T-053
     state: completed
