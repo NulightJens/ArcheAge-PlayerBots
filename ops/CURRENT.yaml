@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-v5-runtime-proof
+phase: single-bot-autonomy-v5-incomplete-receipt-integration
 verdict: active
 
 source:
@@ -206,7 +206,7 @@ prepared_workstreams:
     handoff: ops/tasks/T-074/HANDOFF.md
     integrity: 382-of-382-payloads-length-and-sha256-green
   - task: T-075
-    state: active
+    state: incomplete-receipt-review-pre-addbot-observer-parser
     client_thread_id: client-new-thread:18eac77e-1067-4eb7-955f-d1108cce9b2c
     task_thread_id: 01a05cc7-e6bd-70c0-a554-4245ac292feb
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\11c9\PB-W00-control'
@@ -216,6 +216,14 @@ prepared_workstreams:
     evidence_root: 'D:\Codex-Labs\evidence\T-075\one-bot-autonomy-v5'
     evidence_receipt: ops/evidence/aaemu12-t075-one-bot-autonomy-v5.yaml
     handoff: ops/tasks/T-075/HANDOFF.md
+    head: f24f0f246adfdcf6ce2c692fc43eccd5b0c1d834
+    verdict: INCOMPLETE-observer-parser-absent-optional-obj-capture
+    cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
+  - task: T-076
+    state: ready
+    base: pending-control-dispatch-commit
+    source_commit: f24f0f246adfdcf6ce2c692fc43eccd5b0c1d834
+    handoff: ops/tasks/T-076/HANDOFF.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
@@ -460,6 +468,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: claimed-by-T-075-one-bot-autonomy-v5
+  runtime_lease: released-after-T-075-incomplete-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: authorized-only-for-exact-T-075-thread-after-committed-lease-verification
+  runtime_start: prohibited-until-exact-new-runtime-task-is-bound-and-committed-to-lease
