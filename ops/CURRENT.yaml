@@ -51,7 +51,7 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Wire the minimal production single-bot lifecycle/activity selector and autonomous normal logout requester proven missing by T-061.
+  - T-063 wires the minimal production single-bot lifecycle/activity selector and autonomous normal logout requester proven missing by T-061.
   - Integrate and build that focused correction before assigning the runtime lease to a new immutable T-061 proof version.
   - Keep the independent T-062 atomic combat fan-out correction source-only; it does not satisfy or block the one-bot product gate.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.

@@ -318,6 +318,15 @@ tasks:
     gate: deterministic-harness-tests
     runtime_lease: none
 
+  - id: T-063
+    title: Wire single-bot lifecycle activity and logout
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-061, T-039]
+    gate: focused-aaemu12-tests
+    runtime_lease: none
+
   - id: T-041
     title: One-zone Autonomous Activity Director
     track: AAEmu12
