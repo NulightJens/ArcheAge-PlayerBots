@@ -569,11 +569,12 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
     proof: 40-focused-build-0-errors-79-warnings-full-1863-pass-4-intentional-skips-once
   - task: T-102
-    state: prepared-awaiting-exact-source-worker-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-source-worker
+    client_thread_id: client-new-thread:89f2a6d0-b593-4bbc-a387-9678a481e9a2
+    task_thread_id: 01a05eed-ea43-71b0-baf8-76b6b0ef7630
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\dbb1\PB-W00-control'
     base: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
+    dispatch_base: 968720578b8e1e85e925e63ac584e410bcc71635
     contract: ops/tasks/T-102/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f

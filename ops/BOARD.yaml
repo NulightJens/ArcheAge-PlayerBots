@@ -1016,15 +1016,16 @@ tasks:
   - id: T-102
     title: Expose exact bot transform telemetry for fixture preflight
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-101]
     runtime_lease: null
     gate: focused-invariant-botdebug-transform-telemetry
     contract: ops/tasks/T-102/CONTRACT.md
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:89f2a6d0-b593-4bbc-a387-9678a481e9a2
+    owner_thread_id: 01a05eed-ea43-71b0-baf8-76b6b0ef7630
+    worktree: 'C:\Users\jensh\.codex\worktrees\dbb1\PB-W00-control'
+    dispatch_base: 968720578b8e1e85e925e63ac584e410bcc71635
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

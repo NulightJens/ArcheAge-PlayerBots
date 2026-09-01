@@ -2,17 +2,17 @@ schema_version: 1
 id: T-102
 title: Expose exact bot transform telemetry for fixture preflight
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Append invariant round-trip world, instance, zone, position, and yaw telemetry to botdebug so a runtime worker can predict exact passive-fixture geometry before one-shot world mutation, without changing existing diagnostics or bot state.
 depends_on: [T-101]
 runtime: {required: false, lease: null}
 branch: task/T-102-botdebug-transform-telemetry
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\dbb1\PB-W00-control'
+owner_client_thread_id: client-new-thread:89f2a6d0-b593-4bbc-a387-9678a481e9a2
+owner_thread_id: 01a05eed-ea43-71b0-baf8-76b6b0ef7630
 inputs:
-  dispatch_base: pending-control-commit
+  dispatch_base: 968720578b8e1e85e925e63ac584e410bcc71635
   source_base: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
   installed_module_source: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
   compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
