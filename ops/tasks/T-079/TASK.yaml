@@ -2,8 +2,8 @@ schema_version: 1
 id: T-079
 title: AAEmu 1.2 single-bot autonomy proof v6
 track: AAEmu12
-status: active
-integration: pending
+status: review
+integration: runtime-pass-receipt-pending
 outcome: Produce a new immutable runtime receipt proving or falsifying three complete autonomous gameplay iterations by one persistent bot with the integrated observer pre-armed, directly sampled recovery-window brain/mover suspension, natural debt-free recovery, exact progression, normal self-logout, and restart persistence.
 depends_on: [T-073, T-078]
 runtime:
@@ -37,3 +37,6 @@ minimum_successful_iterations: 3
 failure_policy: Stop at the first smallest verified functional or evidence blocker, retain FAIL or INCOMPLETE evidence, clean up gracefully, and do not activate larger populations.
 validation_boundary: Runtime and evidence only. Use the integrated observer unchanged. Managed addbot and inert opportunity staging are allowed only at declared boundaries. Do not issue botstate, target, travel, attack, loot/progression, recovery, or logout gameplay commands. Do not edit source/tooling, deployed host files, global ledgers, databases, clients, retained evidence, or AAEmu 3.0.
 handoff: ops/tasks/T-079/HANDOFF.md
+attempt_commit: ad8c0cf2aa9eed46c936c835931ce344341f7d09
+evidence_receipt: ops/evidence/aaemu12-t079-one-bot-autonomy-v6.yaml
+result: PASS-three-serial-autonomous-iterations-plus42xp-restart-persistence-cleanup

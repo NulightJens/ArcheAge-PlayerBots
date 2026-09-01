@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-v6-runtime-proof
+phase: single-bot-autonomy-v6-pass-receipt-integration
 verdict: active
 
 source:
@@ -251,7 +251,7 @@ prepared_workstreams:
     head: a406a3598213745ac3bead7dc5ba7ce009cf50e3
     proof: 64-deterministic-assertions-green-zero-fixture-copies
   - task: T-079
-    state: active
+    state: pass-receipt-review
     client_thread_id: client-new-thread:aaa2aa85-cbf0-4f6b-9dcc-5ac9bdd5eacb
     task_thread_id: 01a05cfc-1ebf-79a2-94d8-4d287c3990ab
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\3058\PB-W00-control'
@@ -262,6 +262,14 @@ prepared_workstreams:
     evidence_root: 'D:\Codex-Labs\evidence\T-079\one-bot-autonomy-v6'
     evidence_receipt: ops/evidence/aaemu12-t079-one-bot-autonomy-v6.yaml
     handoff: ops/tasks/T-079/HANDOFF.md
+    head: ad8c0cf2aa9eed46c936c835931ce344341f7d09
+    verdict: PASS-three-iterations-plus42xp-restart-persistence-cleanup
+    manifest_sha256: fe00f692aec54da1760ef6e99645f1d21a13bc902f7fc3c7cc81b6d3ae4c5a4e
+  - task: T-080
+    state: ready
+    base: pending-control-dispatch-commit
+    source_commit: ad8c0cf2aa9eed46c936c835931ce344341f7d09
+    handoff: ops/tasks/T-080/HANDOFF.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
@@ -506,6 +514,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: claimed-by-T-079-one-bot-autonomy-v6
+  runtime_lease: released-after-T-079-pass-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: authorized-only-for-exact-T-079-thread-after-committed-lease-verification
+  runtime_start: prohibited-until-exact-new-runtime-task-is-bound-and-committed-to-lease
