@@ -188,10 +188,12 @@ wave_2:
     retained_predecessor: aaemu12-t036-combat-stealth-v1
   recovery_source_task:
     task: T-051
-    state: active
+    state: handoff-ready
     client_thread_id: client-new-thread:d7e98349-adf1-4f47-8f52-b8c21b6cc68a
     task_thread_id: 01a05a9f-d70b-7c70-b913-199fae63a0cd
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\ee21\\PB-W00-control'
+    head: 09dc81467805b6d857dd2f2e173080c863870e49
+    patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
   retained_error_analysis_task:
     task: T-052
     state: completed-non-blocking
@@ -205,6 +207,9 @@ wave_2:
     task: T-054
     state: blocked-on-T-051-integration-and-T-052-classification
     external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v3'
+  recovery_integration_task:
+    task: T-053
+    state: ready
   runtime_lease: released-after-T-050-incomplete-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
   runtime_start: prohibited-until-fresh-versioned-task-and-lease-claim
