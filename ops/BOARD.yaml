@@ -297,14 +297,17 @@ tasks:
   - id: T-061
     title: AAEmu 1.2 single-bot autonomous gameplay loop
     track: AAEmu12
-    status: active
-    integration: pending
+    status: blocked
+    integration: runtime-fail-retained
     depends_on: [T-060, T-038, T-039, T-040]
     runtime_lease: aaemu12
     gate: serialized-one-bot-autonomy-proof
     owner_client_thread_id: client-new-thread:2efc106d-b61c-4459-a184-43af18cf5195
     owner_thread_id: 01a05bf9-cfbf-7942-853c-310035ae673a
     worktree: 'C:\Users\jensh\.codex\worktrees\f81e\PB-W00-control'
+    attempt_commit: e07b88a3f090ddc4d0cbde48f3f55925a3e8bb8c
+    evidence_receipt: aaemu12-t061-one-bot-autonomy-v1
+    blocker: free-idle-bot-has-no-production-lifecycle-activity-selector-or-autonomous-logout-requester
 
   - id: T-062
     title: Atomic shared-target combat fan-out

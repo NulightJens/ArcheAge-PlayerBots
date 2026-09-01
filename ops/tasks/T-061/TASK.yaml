@@ -2,8 +2,8 @@ schema_version: 1
 id: T-061
 title: AAEmu 1.2 single-bot autonomous gameplay loop
 track: AAEmu12
-status: active
-integration: pending
+status: blocked
+integration: runtime-fail-retained
 outcome: Repeatedly prove one persistent bot can select and complete an ArcheAge-native activity through managed spawn, travel, mortal combat, progression, recovery, normal logout, and clean restart without per-action operator commands.
 depends_on: [T-060, T-038, T-039, T-040]
 runtime:

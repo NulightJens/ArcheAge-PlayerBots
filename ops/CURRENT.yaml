@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-gate-active
+phase: single-bot-autonomy-source-correction
 verdict: active
 
 source:
@@ -30,17 +30,17 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-after-t060-incomplete
+    state: stopped-clean-after-t061-fail
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-t060-combat-stealth-v5
+    evidence_receipt: aaemu12-t061-one-bot-autonomy-v1
     database_identity: aaemu12_database_public_alpha_v1
     compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
     build: 0-errors-76-warnings
     focused_tests: 70-passed-0-skipped-0-failed
     unit_tests: 1796-passed-4-intentional-skips-0-failed
-    runtime_boundary: T-060 stopped fail-closed at cohort 25 after exact kills at 1, 5, and 10; cleanup proves zero bots, processes, clients, and required listeners. T-061 remains physically unstarted.
+    runtime_boundary: T-061 proved one free bot remains inactive Idle with no selected activity, travel, target, combat, progression, recovery, or autonomous logout; cleanup proves zero bots, processes, clients, and required listeners.
 
 control_tower:
   permanent_task:
@@ -51,9 +51,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-061 exclusively owns the AAEmu 1.2 lease and must prove three complete one-bot autonomous gameplay iterations before any larger cohort.
-  - 'Use T-060 only as retained INCOMPLETE evidence: cohorts 1, 5, and 10 killed exact targets, while the shared 148-HP cohort-25 target died during fan-out and despawned before complete dead-state observability.'
-  - Dispatch a source-only bounded follow-up for durable fan-out target qualification or exact post-despawn death observability without blocking the one-bot gate.
+  - Wire the minimal production single-bot lifecycle/activity selector and autonomous normal logout requester proven missing by T-061.
+  - Integrate and build that focused correction before assigning the runtime lease to a new immutable T-061 proof version.
+  - Keep the independent T-062 atomic combat fan-out correction source-only; it does not satisfy or block the one-bot product gate.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
@@ -281,6 +281,16 @@ wave_2:
     result: INCOMPLETE-cohorts-1-5-10-exact-kills-cohort25-fanout-target-despawn
     blocker: shared-low-hp-fixture-fanout-and-dead-object-observability
     cleanup: zero-bots-processes-clients-listeners-live-logs-graceful-game-then-login
+  single_bot_autonomy_v1:
+    task: T-061
+    state: blocked-retained-fail-missing-activity-activation
+    task_thread_id: 01a05bf9-cfbf-7942-853c-310035ae673a
+    worktree: 'C:\Users\jensh\.codex\worktrees\f81e\PB-W00-control'
+    attempt_commit: e07b88a3f090ddc4d0cbde48f3f55925a3e8bb8c
+    evidence_receipt: aaemu12-t061-one-bot-autonomy-v1
+    result: FAIL-zero-successful-autonomous-iterations
+    blocker: missing-production-single-bot-lifecycle-activity-selection-activation-and-autonomous-logout
+    cleanup: zero-bots-processes-clients-listeners-live-logs-graceful-game-then-login
   startup_log_recovery_integration_task:
     task: T-053
     state: completed
@@ -291,6 +301,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: claimed-by-T-061-one-bot-autonomy-v1
+  runtime_lease: released-after-T-061-fail-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: authorized-only-for-T-061-thread-01a05bf9-cfbf-7942-853c-310035ae673a
+  runtime_start: not-authorized-until-next-exact-thread-lease-claim
