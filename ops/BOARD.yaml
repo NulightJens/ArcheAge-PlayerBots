@@ -592,8 +592,8 @@ tasks:
   - id: T-081
     title: Implement the one-zone Autonomous Activity Director
     track: AAEmu12
-    status: review
-    integration: pending
+    status: blocked
+    integration: source-rejected-by-T-082
     depends_on: [T-080]
     runtime_lease: none
     gate: focused-aaemu12-activity-director-tests
@@ -603,18 +603,31 @@ tasks:
     source_head: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
     source_parent: 069960e3d977767a3738b729c8e9f83767a78e8e
     result: focused-source-green-131-unique-tests-build-0-errors
+    blocker: GameService-start-stop-publication-and-scheduler-cancellation-race
 
   - id: T-082
     title: Integrate and qualify the one-zone Activity Director
     track: AAEmu12
-    status: active
-    integration: pending
+    status: blocked
+    integration: rejection-handoff-integrated
     depends_on: [T-081]
     runtime_lease: aaemu12-build-only
     gate: full-aaemu12-suite
     owner_client_thread_id: client-new-thread:c37a90bf-63e3-4155-ae31-148e873f2937
     owner_thread_id: 01a05d51-0b47-7b90-b202-9457829b6b24
     worktree: 'C:\Users\jensh\.codex\worktrees\e3d2\PB-W00-control'
+    handoff_commit: 4be88728f069cb03106b81c56a5499605683c0f4
+    result: REJECTED-T081-before-replay-host-write-or-full-suite
+    blocker: GameService-start-stop-publication-and-scheduler-cancellation-race
+
+  - id: T-083
+    title: Serialize Activity Director startup and shutdown
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-081, T-082]
+    runtime_lease: none
+    gate: focused-aaemu12-director-concurrency-tests
 
   - id: T-041
     title: One-zone Autonomous Activity Director

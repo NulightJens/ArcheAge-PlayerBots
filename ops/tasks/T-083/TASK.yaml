@@ -1,0 +1,39 @@
+schema_version: 1
+id: T-083
+title: Serialize Activity Director startup and shutdown
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Produce one replacement Activity Director candidate that retains T-081's accepted source behavior while serializing GameService construction, publication, recurring scheduling, cancellation, and shutdown against every concurrent start/stop interleaving.
+depends_on: [T-081, T-082]
+runtime:
+  required: false
+  lease: null
+branch: codex-managed-detached-worktree
+inputs:
+  dispatch_base: pending-control-tower-commit
+  rejected_candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
+  rejected_candidate_parent: 069960e3d977767a3738b729c8e9f83767a78e8e
+  blocker_handoff: ops/tasks/T-082/HANDOFF.md
+write_scope:
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - playerbots.module.json
+  - src/AAEmu.Game/Bots/Ops/BotActivityDirectorTask.cs
+  - src/AAEmu.Game/Bots/Host/BotHostTask.cs
+  - src/AAEmu.Game/Bots/Life/BotLifeController.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+  - src/AAEmu.Game/Configurations/BotConfig.json
+  - src/AAEmu.Game/Scripts/Commands/BotMetricsCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Ops/BotActivityDirectorTaskTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/tasks/T-081/HANDOFF.md
+  - ops/tasks/T-083/HANDOFF.md
+gates:
+  - t081-byte-replay-plus-bounded-race-correction
+  - deterministic-concurrent-start-stop-tests
+  - focused-aaemu12-activity-director-tests
+  - compatibility-patch-hash-consistency
+validation_boundary: Source and focused tests only in a new isolated source/build copy. Do not start or control runtime, MySQL, databases, or clients; write the registered host/module; edit global ledgers/lease, retained evidence, scale, soak, packaging, unrelated PlayerBots code, or AAEmu 3.0.
+handoff: ops/tasks/T-083/HANDOFF.md

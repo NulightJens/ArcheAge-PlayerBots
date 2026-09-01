@@ -2,8 +2,8 @@ schema_version: 1
 id: T-081
 title: Implement the one-zone Autonomous Activity Director
 track: AAEmu12
-status: review
-integration: pending
+status: blocked
+integration: source-rejected-by-T-082
 outcome: Replace one-shot forced-state auto-spawn with a production-started, gracefully stopped, deterministic one-zone population reconciler whose configured persistent identities independently run the accepted lifecycle and refill toward bounded population targets.
 depends_on: [T-080]
 runtime:
@@ -41,3 +41,4 @@ handoff: ops/tasks/T-081/HANDOFF.md
 source_head: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
 source_parent: 069960e3d977767a3738b729c8e9f83767a78e8e
 result: focused-source-green-131-unique-tests-build-0-errors
+blocker: GameService-start-stop-publication-and-scheduler-cancellation-race

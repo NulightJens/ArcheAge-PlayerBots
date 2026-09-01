@@ -2,8 +2,8 @@ schema_version: 1
 id: T-082
 title: Integrate and qualify the one-zone Activity Director
 track: AAEmu12
-status: active
-integration: pending
+status: blocked
+integration: rejection-handoff-integrated
 outcome: Independently review, replay, install, build, full-suite qualify, and saved-branch integrate the exact T-081 Activity Director candidate without starting a runtime or changing its product boundary.
 depends_on: [T-081]
 runtime:
@@ -45,3 +45,6 @@ gates:
   - saved-integration-branch-fast-forward
 validation_boundary: Integration/install/build/test only under the exact committed build-only lease. Do not start or control Login, GameServer, MySQL, database, or client; edit global ledgers/lease, reinterpret T-081, change product source beyond byte-identical replay, touch retained runtime evidence, scale, soak, packaging, or AAEmu 3.0.
 handoff: ops/tasks/T-082/HANDOFF.md
+handoff_commit: 4be88728f069cb03106b81c56a5499605683c0f4
+result: REJECTED-T081-before-replay-host-write-or-full-suite
+blocker: GameService-start-stop-publication-and-scheduler-cancellation-race

@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-build-only-T-082
-    owner_task: T-082
-    owner_thread_id: 01a05d51-0b47-7b90-b202-9457829b6b24
+    status: released-after-T-082-source-rejection-no-host-write
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
-    cleanup_receipt: null
+    released_at: 2026-09-01
+    cleanup_receipt: ops/tasks/T-082/HANDOFF.md
     baseline_evidence: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: T-082 thread 01a05d51-0b47-7b90-b202-9457829b6b24 may non-destructively install the accepted module candidate, write build/test outputs, and inspect process/listener state only. It must not start, stop, or control Login, GameServer, MySQL, any database, or the ArcheAge client; it must not query MySQL data. Authority ends after a committed T-082 handoff and PB-000 release.
+    authority_limit: No task may write the registered AAEmu 1.2 host/module or start or control Login or GameServer until PB-000 commits an exact replacement owner task and thread. No task may start, stop, query, or control MySQL, any database, or the ArcheAge client.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

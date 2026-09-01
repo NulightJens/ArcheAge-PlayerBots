@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: one-zone-activity-director-integration
+phase: one-zone-activity-director-concurrency-correction
 verdict: active
 
 source:
@@ -54,9 +54,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Dispatch T-081 to implement the production one-zone Activity Director at the existing GameService startup/shutdown seam and qualify it with focused deterministic AAEmu 1.2 tests.
-  - Dispatch T-082 only after T-081 hands off a clean candidate; require independent review, host install/build, focused tests, and the next single full-suite wave gate.
-  - Keep T-041 runtime proof blocked until T-082 accepts the exact Director source and installed fingerprints; then prove bounded autonomous refill in one nonzero zone.
+  - Dispatch T-083 to replace the rejected T-081 candidate with a serialized GameService Director lifecycle and deterministic concurrent start/stop proof.
+  - Dispatch a fresh dedicated integrator only after T-083 hands off a clean replacement; require host install/build, focused tests, and the still-unconsumed single full-suite wave gate.
+  - Keep T-041 runtime proof blocked until that integrator accepts the exact replacement source and installed fingerprints; then prove bounded autonomous refill in one nonzero zone.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
@@ -277,7 +277,7 @@ prepared_workstreams:
     head: a76ca2476e85f134aec94081f50ca4ba3c5112da
     proof: 6490-of-6490-payloads-and-49-of-49-semantic-assertions-green
   - task: T-081
-    state: review-source-green
+    state: blocked-rejected-start-stop-race
     client_thread_id: client-new-thread:963fb064-2584-494d-925a-da542c1873cc
     task_thread_id: 01a05d32-e0c1-76f0-8aba-f91070c448da
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\c891\PB-W00-control'
@@ -286,7 +286,7 @@ prepared_workstreams:
     head: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
     proof: 131-unique-focused-tests-build-0-errors-patch-apply-and-sha-green
   - task: T-082
-    state: active-integration-build-only-lease
+    state: blocked-rejected-handoff-integrated
     client_thread_id: client-new-thread:c37a90bf-63e3-4155-ae31-148e873f2937
     task_thread_id: 01a05d51-0b47-7b90-b202-9457829b6b24
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\e3d2\PB-W00-control'
@@ -294,6 +294,13 @@ prepared_workstreams:
     candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
     candidate_parent: 069960e3d977767a3738b729c8e9f83767a78e8e
     handoff: ops/tasks/T-082/HANDOFF.md
+    head: 4be88728f069cb03106b81c56a5499605683c0f4
+    result: REJECTED-before-replay-host-write-build-tests-or-full-suite
+  - task: T-083
+    state: prepared-source-correction
+    rejected_candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
+    blocker_handoff: ops/tasks/T-082/HANDOFF.md
+    handoff: ops/tasks/T-083/HANDOFF.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
