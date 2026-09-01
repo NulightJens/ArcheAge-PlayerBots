@@ -321,7 +321,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-activity-director-integration-v1.yaml
     proof: 154-unique-focused-1830-full-unit-4-intentional-skips-build-0-errors
   - task: T-041
-    state: active-exact-runtime-lease-bound
+    state: review-retained-fail-wave1-lowest-id-monopoly
     client_thread_id: client-new-thread:0ae842b1-85c3-4b16-b0e0-987df65f75c0
     task_thread_id: 01a05d8b-5c96-71c2-9e14-40959480d28f
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\3daa\PB-W00-control'
@@ -331,6 +331,17 @@ prepared_workstreams:
     configured_population: {minimum: 2, target: 3, maximum: 3}
     evidence_root: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
     contract: ops/tasks/T-041/CONTRACT.md
+    candidate_commit: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
+    verdict: FAIL-bot-20001-received-all-three-wave1-kill-credits
+    manifest_sha256: a141d75bffc87ef37e6a01f53d71261c2f5b441885522637a4a4adb190460a00
+    cleanup: graceful-game-then-login-zero-processes-listeners-live-logs-config-exactly-restored
+  - task: T-085
+    state: prepared-awaiting-thread-binding
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: pending-control-commit
+    candidate: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
+    contract: ops/tasks/T-085/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

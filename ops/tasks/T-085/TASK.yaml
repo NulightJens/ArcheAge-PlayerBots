@@ -1,0 +1,35 @@
+schema_version: 1
+id: T-085
+title: Integrate and verify the T-041 runtime FAIL receipt
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Independently verify the immutable T-041 payload manifest and declared runtime semantics, then integrate the exact two-file FAIL receipt onto the saved integration branch without touching the retained runtime or releasing its lease.
+depends_on: [T-041]
+runtime:
+  required: false
+  lease: null
+branch: codex-managed-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+inputs:
+  dispatch_base: pending-control-commit
+  integration_head_before_dispatch: 4383c072fbf34ad0c42db248d39e704f8aa42db1
+  candidate_commit: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
+  candidate_parent: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
+  candidate_manifest_sha256: a141d75bffc87ef37e6a01f53d71261c2f5b441885522637a4a4adb190460a00
+  external_evidence_root: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
+write_scope:
+  - ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
+  - ops/tasks/T-041/HANDOFF.md
+  - ops/evidence/aaemu12-t041-fail-integration-v1.yaml
+  - ops/tasks/T-085/HANDOFF.md
+gates:
+  - exact-candidate-two-file-scope
+  - immutable-manifest-completeness-length-and-sha256
+  - t041-declared-semantics-and-cleanup-verification
+  - saved-integration-branch-fast-forward
+validation_boundary: Read-only external evidence review and Git integration only. Do not start, stop, or control Login, GameServer, MySQL, any database, or the ArcheAge client; edit runtime config, product source, tooling, global ledgers/lease, retained evidence, scale, soak, packaging, or AAEmu 3.0; or run a full suite.
+contract: ops/tasks/T-085/CONTRACT.md
+handoff: ops/tasks/T-085/HANDOFF.md
