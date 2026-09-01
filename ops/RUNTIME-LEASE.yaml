@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: available-for-versioned-runtime-recovery
-    owner_task: null
-    owner_thread_id: null
+    status: claimed-by-T-050
+    owner_task: T-050
+    owner_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -14,9 +14,9 @@ runtimes:
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-08-31
     released_at: 2026-08-31
-    cleanup_receipt: ops/evidence/aaemu12-t036-combat-stealth-v1.yaml
+    cleanup_receipt: pending-T-050-zero-bot-graceful-stop-and-restart-proof
     baseline_evidence: ops/evidence/aaemu12-startup-schema-integration-v1.yaml
-    availability_limit: PB-000 must claim and assign the fresh T-050 physical attempt before Login or Game starts.
+    availability_limit: Exclusive to T-050 until PB-000 records committed cleanup evidence and releases the lease.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

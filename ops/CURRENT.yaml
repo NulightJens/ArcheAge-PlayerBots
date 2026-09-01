@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-physical-retry-ready
+phase: wave-2-physical-retry-active
 verdict: active
 
 source:
@@ -175,9 +175,11 @@ wave_2:
     evidence_receipt: aaemu12-startup-schema-integration-v1
   physical_retry:
     task: T-050
-    state: ready
+    state: setup-in-progress
+    client_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
+    task_thread_id: pending-task-list-resolution
     external_evidence: 'D:\Codex-Labs\evidence\T-036\public-alpha-v2'
     retained_predecessor: aaemu12-t036-combat-stealth-v1
-  runtime_lease: unclaimed
+  runtime_lease: claimed-by-T-050
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-T-050-assignment-and-lease-claim
+  runtime_start: authorized-only-after-T-050-synchronizes-this-claim

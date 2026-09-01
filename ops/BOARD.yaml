@@ -148,11 +148,12 @@ tasks:
   - id: T-050
     title: AAEmu 1.2 mortal-combat and stealth recovery attempt
     track: AAEmu12
-    status: ready
+    status: active
     integration: runtime-pending
     depends_on: [T-049]
     runtime_lease: aaemu12
     gate: serialized-live-aaemu12-proof
+    owner_client_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification

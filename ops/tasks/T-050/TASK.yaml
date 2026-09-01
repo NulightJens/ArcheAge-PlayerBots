@@ -8,6 +8,7 @@ outcome: Complete a fresh immutable physical combat/stealth qualification after 
 depends_on: [T-049]
 branch: assigned-by-codex
 worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
 
 inputs:
   integration_commit: da570e3cc3936917c097ddd2302525f56125c916
