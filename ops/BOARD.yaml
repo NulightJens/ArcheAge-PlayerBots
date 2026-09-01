@@ -927,7 +927,7 @@ tasks:
     title: Reprove one-zone autonomy after Director delay correction
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated-by-T-099
     depends_on: [T-097]
     runtime_lease: aaemu12
     gate: serialized-one-zone-autonomy-proof-v5
@@ -946,12 +946,13 @@ tasks:
     evidence_receipt: ops/evidence/aaemu12-t098-one-zone-autonomy-v5.yaml
     manifest_sha256: 1ab0074aad22af52abcef062982a10ad7c48146facabdde092e691c341127e42
     result: FAIL-first-anchored-fixture-inconsistent-world-or-instance-boundary
+    integrated_commit: 1ab6c2e80a4c7e209149a804cdff6ae209142501
 
   - id: T-099
     title: Integrate retained T-098 fixture-anchor failure evidence
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-098]
     runtime_lease: null
     gate: independent-runtime-evidence-replay-and-validation
@@ -963,13 +964,32 @@ tasks:
     owner_thread_id: 01a05eae-177d-7161-a57e-4ed8719fd920
     worktree: 'C:\Users\jensh\.codex\worktrees\4c45\PB-W00-control'
     dispatch_base: 5bc8e004b8df2bddf46bbac0e209768a7161644c
+    replay_commit: 84fbbb15cb9befe4dd78b26a57ce3cebd2d6d2ca
+    replay_tree: c6386496258ad4a4be08d636125f9ee3250a4093
+    integrated_commit: 1ab6c2e80a4c7e209149a804cdff6ae209142501
+    integrated_tree: 9f592e9b77695f8a0486727bd5a5bdc1c72c6040
+    evidence_receipt: ops/evidence/aaemu12-t098-fail-integration-v1.yaml
+    result: PASS-receipt-integrity-subject-retained-FAIL
+
+  - id: T-100
+    title: Accept valid default-world bot anchors
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-099]
+    runtime_lease: null
+    gate: focused-default-world-anchor-source-correction
+    contract: ops/tasks/T-100/CONTRACT.md
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [fresh-post-T-098-source-correction-runtime-pass]
+    depends_on: [fresh-post-T-100-runtime-pass]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
     blocker: T-098-is-retained-FAIL-at-fixture-anchor-boundary-and-successor-source-correction-runtime-pass-is-not-yet-proven-and-integrated

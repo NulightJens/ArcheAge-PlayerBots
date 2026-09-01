@@ -1,0 +1,33 @@
+schema_version: 1
+id: T-100
+title: Accept valid default-world bot anchors
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Correct the anchored passive-fixture guard so pinned AAEmu's valid default world-template ID 0 is accepted while missing templates and every real world/instance/zone/staleness inconsistency still fail closed, with focused regression proof and an isolated build.
+depends_on: [T-099]
+runtime: {required: false, lease: null}
+branch: task/T-100-default-world-anchor
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-commit
+  source_base: 1ab6c2e80a4c7e209149a804cdff6ae209142501
+  retained_fail_receipt: ops/evidence/aaemu12-t098-fail-integration-v1.yaml
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/evidence/aaemu12-passive-anchor-default-world-zero-v1.yaml
+  - ops/tasks/T-100/HANDOFF.md
+gates:
+  - valid-default-world-template-zero-anchor-succeeds
+  - null-template-real-instance-world-zone-and-staleness-guards-remain-fail-closed
+  - zero-world-id-propagates-to-spawn-position-without-transform-or-target-mutation
+  - focused-command-tests-green
+  - isolated-aaemu12-build-zero-errors
+  - compatibility-patch-sha-unchanged-and-clean-apply
+validation_boundary: Module source, focused tests, isolated AAEmu 1.2 build, receipt, and handoff only. Do not edit global ledgers/lease, installed/reference host, deployed config, external runtime evidence, database, client, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite.
+contract: ops/tasks/T-100/CONTRACT.md
+handoff: ops/tasks/T-100/HANDOFF.md

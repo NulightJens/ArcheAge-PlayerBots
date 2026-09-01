@@ -2,8 +2,8 @@ schema_version: 1
 id: T-099
 title: Integrate retained T-098 fixture-anchor failure evidence
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently validate the complete sealed T-098 evidence root and exact two-file candidate, replay it onto the saved lineage only as a retained FAIL, and commit a durable integration receipt without runtime, source, build, or test activity.
 depends_on: [T-098]
 runtime: {required: false, lease: null}
@@ -31,3 +31,8 @@ gates:
 validation_boundary: Evidence integration only. Never start or control runtime, observers, client, or database; never edit source/tests/tools/scripts/patches/global ledgers/lease/external evidence; never run build or test suites; never reinterpret T-098 as PASS.
 contract: ops/tasks/T-099/CONTRACT.md
 handoff: ops/tasks/T-099/HANDOFF.md
+replay_commit: 84fbbb15cb9befe4dd78b26a57ce3cebd2d6d2ca
+replay_tree: c6386496258ad4a4be08d636125f9ee3250a4093
+integrated_commit: 1ab6c2e80a4c7e209149a804cdff6ae209142501
+integrated_tree: 9f592e9b77695f8a0486727bd5a5bdc1c72c6040
+result: PASS-receipt-integrity-subject-retained-FAIL

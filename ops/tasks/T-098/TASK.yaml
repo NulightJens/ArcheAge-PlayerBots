@@ -3,7 +3,7 @@ id: T-098
 title: Reprove one-zone autonomy after Director delay correction
 track: AAEmu12
 status: done
-integration: pending
+integration: integrated-by-T-099
 outcome: Produce a fresh immutable live AAEmu 1.2 proof that honors the 180-second Director delay, pre-arms all three observers, gives all three bots two independently credited autonomous lifecycles with refills, and preserves target population across a distinct-PID restart.
 depends_on: [T-097]
 runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
@@ -40,3 +40,4 @@ handoff: ops/tasks/T-098/HANDOFF.md
 candidate_commit: e7361e10c8c1d722c3f18481af07e6173030fb30
 candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903
 result: FAIL-first-anchored-fixture-inconsistent-world-or-instance-boundary
+integrated_commit: 1ab6c2e80a4c7e209149a804cdff6ae209142501

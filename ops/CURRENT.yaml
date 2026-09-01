@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: integrate-t098-retained-fixture-anchor-fail
+phase: correct-default-world-active-bot-anchor
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: 71d13ca70b7c6f530a48ece85ced7041adaa7e1b
+  integrated_head: 1ab6c2e80a4c7e209149a804cdff6ae209142501
   tested_module_source: 761ffa1e0bd76d06532688f34b45e192a493b239
-  integration_evidence: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
+  integration_evidence: ops/evidence/aaemu12-t098-fail-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,12 +30,12 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-config-restored-t098-fail-awaiting-independent-integration
+    state: stopped-clean-config-restored-t098-fail-integrated-awaiting-t100-source
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
     evidence_receipt: aaemu12-t098-one-zone-autonomy-v5-candidate-e7361e10c8c1d722c3f18481af07e6173030fb30
-    integration_receipt: aaemu12-activity-director-delay-range-integration-v1
+    integration_receipt: aaemu12-t098-fail-integration-v1
     installed_module_source: 761ffa1e0bd76d06532688f34b45e192a493b239
     installed_module_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
     database_identity: aaemu12_database_public_alpha_v1
@@ -44,7 +44,7 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 40-passed-0-skipped-0-failed
     unit_tests: 1851-passed-4-intentional-skips-0-failed-exactly-one-invocation
-    runtime_boundary: T-098 physically passed the 180000 ms delay and ordered three-bot bootstrap at 180055.392 ms, then retained FAIL because the exact first anchored passive fixture was rejected as an inconsistent world or instance boundary. No fixture spawned, later fixtures/waves/restart were not attempted, cleanup was graceful, and config bytes were restored. T-099 must independently integrate this FAIL before source correction.
+    runtime_boundary: T-099 independently integrated T-098 as retained FAIL. T-098 passed the 180000 ms delay and ordered three-bot bootstrap at 180055.392 ms, but the first exact anchored fixture was rejected because SpawnPassiveNpcCommand treats the valid pinned-host default world-template ID 0 as absent/inconsistent. No fixture spawned; cleanup/config restoration are independently green. T-100 must correct this source guard before a fresh runtime successor.
 
 control_tower:
   permanent_task:
@@ -55,9 +55,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-099 to an exact evidence Integrator thread/worktree and independently validate/replay candidate e7361e10c8c1d722c3f18481af07e6173030fb30.
-  - After T-099, isolate and correct the active-bot anchor world/instance inconsistency with focused source tests; account for the retained 12.163 m anchor separation before any one-shot runtime successor.
-  - Run a fresh versioned successor proving fixtures, both three-bot lifecycle/refill waves, and distinct-PID restart/dwell before activating T-037.
+  - Bind T-100 to an exact isolated source worktree and distinguish a missing world template from valid default template ID 0 while preserving all other fail-closed anchor checks.
+  - Independently integrate/install the T-100 correction with focused tests, isolated build, and the next permitted full-suite wave gate.
+  - Run a fresh versioned runtime successor whose pre-command geometry predicts every one-shot fixture pairwise separation at least 15 m, then prove both lifecycle/refill waves and distinct-PID restart/dwell before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
@@ -524,7 +524,7 @@ prepared_workstreams:
     manifest_sha256: 1ab0074aad22af52abcef062982a10ad7c48146facabdde092e691c341127e42
     result: FAIL-first-anchored-fixture-inconsistent-world-or-instance-boundary-after-delay-pass-180055.392ms
   - task: T-099
-    state: active-exact-thread-bound-evidence-integrator
+    state: done-integrated-retained-fail-receipt
     client_thread_id: client-new-thread:f98964db-737c-4e57-81d2-22c6fb4b9bc0
     task_thread_id: 01a05eae-177d-7161-a57e-4ed8719fd920
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\4c45\PB-W00-control'
@@ -534,6 +534,20 @@ prepared_workstreams:
     source_candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903
     external_evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
     contract: ops/tasks/T-099/CONTRACT.md
+    replay_commit: 84fbbb15cb9befe4dd78b26a57ce3cebd2d6d2ca
+    replay_tree: c6386496258ad4a4be08d636125f9ee3250a4093
+    integrated_head: 1ab6c2e80a4c7e209149a804cdff6ae209142501
+    integrated_tree: 9f592e9b77695f8a0486727bd5a5bdc1c72c6040
+    evidence_receipt: ops/evidence/aaemu12-t098-fail-integration-v1.yaml
+    result: PASS-receipt-integrity-subject-retained-FAIL
+  - task: T-100
+    state: prepared-awaiting-exact-source-worker-binding
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    base: 1ab6c2e80a4c7e209149a804cdff6ae209142501
+    cause: SpawnPassiveNpcCommand-invalidly-rejects-valid-default-world-template-id-zero
+    contract: ops/tasks/T-100/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

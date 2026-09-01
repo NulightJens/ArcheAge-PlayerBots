@@ -3,7 +3,7 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-098-clean-retained-fail-awaiting-evidence-integration
+    status: released-after-T-098-retained-fail-integration-awaiting-source-correction
     owner_task: null
     owner_thread_id: null
     workspace_id: aaemu12_integration
@@ -17,7 +17,7 @@ runtimes:
     cleanup_receipt: e7361e10c8c1d722c3f18481af07e6173030fb30:ops/evidence/aaemu12-t098-one-zone-autonomy-v5.yaml
     baseline_evidence: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact task/thread/worktree claim. T-098 stopped Game then Login gracefully, stopped all observers cooperatively, restored exact BotConfig.json bytes, left zero relevant processes/listeners/live logs and zero bots/runtimes, and sealed its retained FAIL root. T-099 is evidence-only and receives no runtime authority.
+    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact task/thread/worktree claim. T-099 independently integrated T-098's graceful cleanup, exact config restoration, zero relevant processes/listeners/live logs/bots/runtimes, and sealed retained FAIL root. T-100 is isolated module source work and receives no runtime or installed-host authority.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
