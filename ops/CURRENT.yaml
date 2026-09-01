@@ -257,7 +257,10 @@ wave_2:
     head: 5bd425327367b72871aef2eae7e51655a53f7bbc
   qualified_system_actor_anchor_integration_task:
     task: T-059
-    state: ready
+    state: active
+    client_thread_id: client-new-thread:63a930ce-fc1c-41ca-97f7-ad8aab5d7bfe
+    task_thread_id: 01a05b39-e25a-7162-97c0-fb208699541e
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\04ce\\PB-W00-control'
   startup_log_recovery_integration_task:
     task: T-053
     state: completed

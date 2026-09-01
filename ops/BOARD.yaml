@@ -266,10 +266,12 @@ tasks:
   - id: T-059
     title: Integrate the qualified system-actor anchor correction
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-058]
     gate: full-aaemu12-suite
+    owner_client_thread_id: client-new-thread:63a930ce-fc1c-41ca-97f7-ad8aab5d7bfe
+    owner_thread_id: 01a05b39-e25a-7162-97c0-fb208699541e
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
