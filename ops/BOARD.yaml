@@ -638,11 +638,14 @@ tasks:
   - id: T-084
     title: Integrate the serialized one-zone Activity Director
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-082, T-083]
     runtime_lease: aaemu12-build-only
     gate: full-aaemu12-suite
+    owner_client_thread_id: client-new-thread:55a250ad-f763-479b-b034-630fedd586b3
+    owner_thread_id: 01a05d70-6f07-7b61-abad-eafc8d12a307
+    worktree: 'C:\Users\jensh\.codex\worktrees\439d\PB-W00-control'
 
   - id: T-041
     title: One-zone Autonomous Activity Director

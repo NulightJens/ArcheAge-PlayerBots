@@ -2,7 +2,7 @@ schema_version: 1
 id: T-084
 title: Integrate the serialized one-zone Activity Director
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Independently review, replay, install, build, full-suite qualify, and saved-branch integrate the exact T-083 serialized Activity Director replacement without starting a runtime or changing its product boundary.
 depends_on: [T-082, T-083]
@@ -11,6 +11,9 @@ runtime:
   lease: aaemu12-build-only
   archeage_client_allowed: false
 branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\439d\PB-W00-control'
+owner_client_thread_id: client-new-thread:55a250ad-f763-479b-b034-630fedd586b3
+owner_thread_id: 01a05d70-6f07-7b61-abad-eafc8d12a307
 inputs:
   integration_head_before_dispatch: 3502c673de66585068c8644acee705f3a3d45624
   source_candidate: b1ffc8006aaa4a4eb4da54a4993057eb8969df96

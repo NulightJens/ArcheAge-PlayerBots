@@ -307,7 +307,11 @@ prepared_workstreams:
     head: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
     proof: 15-service-concurrency-and-154-focused-tests-build-0-errors-patch-sha-green
   - task: T-084
-    state: prepared-integration
+    state: active-integration-build-only-lease
+    client_thread_id: client-new-thread:55a250ad-f763-479b-b034-630fedd586b3
+    task_thread_id: 01a05d70-6f07-7b61-abad-eafc8d12a307
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\439d\PB-W00-control'
+    base: b19e6286f5a46c69095376a65e311b1286e2e453
     candidate: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
     candidate_parent: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
     handoff: ops/tasks/T-084/HANDOFF.md
