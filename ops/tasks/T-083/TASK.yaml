@@ -2,7 +2,7 @@ schema_version: 1
 id: T-083
 title: Serialize Activity Director startup and shutdown
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Produce one replacement Activity Director candidate that retains T-081's accepted source behavior while serializing GameService construction, publication, recurring scheduling, cancellation, and shutdown against every concurrent start/stop interleaving.
 depends_on: [T-081, T-082]
@@ -10,8 +10,11 @@ runtime:
   required: false
   lease: null
 branch: codex-managed-detached-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\26e1\PB-W00-control'
+owner_client_thread_id: client-new-thread:f554b91d-0373-48c4-81ae-e08565340f39
+owner_thread_id: 01a05d5b-8036-7883-8ad6-89b80e334290
 inputs:
-  dispatch_base: pending-control-tower-commit
+  dispatch_base: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
   rejected_candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
   rejected_candidate_parent: 069960e3d977767a3738b729c8e9f83767a78e8e
   blocker_handoff: ops/tasks/T-082/HANDOFF.md

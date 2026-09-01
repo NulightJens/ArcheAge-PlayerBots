@@ -297,7 +297,11 @@ prepared_workstreams:
     head: 4be88728f069cb03106b81c56a5499605683c0f4
     result: REJECTED-before-replay-host-write-build-tests-or-full-suite
   - task: T-083
-    state: prepared-source-correction
+    state: active-source-correction
+    client_thread_id: client-new-thread:f554b91d-0373-48c4-81ae-e08565340f39
+    task_thread_id: 01a05d5b-8036-7883-8ad6-89b80e334290
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\26e1\PB-W00-control'
+    base: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
     rejected_candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
     blocker_handoff: ops/tasks/T-082/HANDOFF.md
     handoff: ops/tasks/T-083/HANDOFF.md

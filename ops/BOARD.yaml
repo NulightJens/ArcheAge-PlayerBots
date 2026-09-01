@@ -623,11 +623,14 @@ tasks:
   - id: T-083
     title: Serialize Activity Director startup and shutdown
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-081, T-082]
     runtime_lease: none
     gate: focused-aaemu12-director-concurrency-tests
+    owner_client_thread_id: client-new-thread:f554b91d-0373-48c4-81ae-e08565340f39
+    owner_thread_id: 01a05d5b-8036-7883-8ad6-89b80e334290
+    worktree: 'C:\Users\jensh\.codex\worktrees\26e1\PB-W00-control'
 
   - id: T-041
     title: One-zone Autonomous Activity Director
