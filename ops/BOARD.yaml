@@ -162,14 +162,16 @@ tasks:
   - id: T-051
     title: Stable exact-schema startup guard for growing AAEmu logs
     track: AAEmu12
-    status: review
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-050]
     gate: deterministic-harness-tests
     owner_client_thread_id: client-new-thread:d7e98349-adf1-4f47-8f52-b8c21b6cc68a
     owner_thread_id: 01a05a9f-d70b-7c70-b913-199fae63a0cd
     source_head: 09dc81467805b6d857dd2f2e173080c863870e49
     patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
+    integrated_source: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+    integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
 
   - id: T-052
     title: Diagnose retained AAEmu 1.2 Game startup errors
@@ -186,17 +188,20 @@ tasks:
   - id: T-053
     title: Integrate stable exact-schema startup correction
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-051]
     gate: full-aaemu12-suite
     owner_client_thread_id: client-new-thread:1d47aee2-eca1-4548-aae1-50ae4f89ef08
     owner_thread_id: 01a05ab1-8b08-72f1-b0dd-d846709bb6c4
+    integrated_source: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+    integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
+    evidence_receipt: aaemu12-startup-log-integration-v2
 
   - id: T-054
     title: AAEmu 1.2 combat and stealth physical attempt v3
     track: AAEmu12
-    status: blocked
+    status: ready
     integration: runtime-pending
     depends_on: [T-053]
     runtime_lease: aaemu12

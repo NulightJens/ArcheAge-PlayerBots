@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-startup-gate-recovery
+phase: wave-2-physical-retry-ready
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: da570e3cc3936917c097ddd2302525f56125c916
-  tested_module_source: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
-  integration_evidence: ops/evidence/aaemu12-startup-schema-integration-v1.yaml
+  integrated_head: a177607645cded9b318a6298ec5c44b0df2cc429
+  tested_module_source: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+  integration_evidence: ops/evidence/aaemu12-startup-log-integration-v2.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,16 +30,16 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: startup-proof-integrated-runtime-retry-ready
+    state: growing-log-and-exact-game-schema-proof-integrated-runtime-retry-ready
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-startup-schema-integration-v1
+    evidence_receipt: aaemu12-startup-log-integration-v2
     database_identity: aaemu12_database_public_alpha_v1
-    compatibility_patch_sha256: 5b44353fef730367b6dfe29baaa0c5141374163f6616549b6724cead91d82ac3
+    compatibility_patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
     build: 0-errors-75-warnings
-    focused_tests: 120-passed-0-skipped-0-failed
-    unit_tests: 1789-passed-4-intentional-skips-0-failed
+    focused_tests: 129-passed-0-skipped-0-failed
+    unit_tests: 1790-passed-4-intentional-skips-0-failed
     runtime_boundary: No server process or database was started; physical runtime acceptance remains pending.
 
 control_tower:
@@ -52,9 +52,9 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Run T-051 to correct growing-log scalar handling and add exact selected Game-schema startup proof.
-  - Run T-052 in parallel to classify the retained BaseBaiLoader and missing-world startup errors without touching runtime state.
-  - Independently integrate the accepted correction, then dispatch a fresh immutable physical attempt in public-alpha-v3.
+  - Assign and claim aaemu12 for T-054, then run the fresh immutable physical attempt in public-alpha-v3.
+  - Retain lifecycle-scoped recurrence evidence for the accepted non-blocking shutdown races.
+  - Release the lease only after committed cleanup/restart evidence; activate T-037 only if T-054 passes.
   - Keep T-037 and T-041 blocked until their declared dependencies are accepted.
 
 prepared_workstreams:
@@ -136,7 +136,7 @@ wave_2:
     retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
     retained_handoff_commit: 4d1a472
     full_unit: 1788-passed-4-intentional-skips-1-failed-before-focused-green-correction
-  recovery_integration_task:
+  wave2_recovery_integration_task:
     task: T-046
     state: completed
     client_thread_id: client-new-thread:6ff6c6dc-8216-4872-950e-cecb0d27547b
@@ -156,7 +156,7 @@ wave_2:
     evidence_receipt: aaemu12-t036-combat-stealth-v1
     result: INCOMPLETE-startup-guard-before-game
     cleanup: login-graceful-game-never-started-zero-processes-five-ports-free
-  recovery_source_task:
+  selected_schema_recovery_source_task:
     task: T-048
     state: integrated
     client_thread_id: client-new-thread:881e830f-eaed-46f2-abb5-ab300f7089d0
@@ -165,7 +165,7 @@ wave_2:
     worktree: 'C:\Users\jensh\.codex\worktrees\6038\PB-W00-control'
     head: dc9340fc61d1090e61eda99e55f0cd993b2af898
     integrated_commit: da570e3cc3936917c097ddd2302525f56125c916
-  recovery_integration_task:
+  selected_schema_recovery_integration_task:
     task: T-049
     state: completed
     client_thread_id: client-new-thread:d720cd48-efde-46ec-81d1-d501386a8059
@@ -186,14 +186,16 @@ wave_2:
     cleanup: game-login-graceful-zero-processes-five-ports-free-runtime-logs-empty
     external_evidence: 'D:\Codex-Labs\evidence\T-036\public-alpha-v2'
     retained_predecessor: aaemu12-t036-combat-stealth-v1
-  recovery_source_task:
+  startup_log_recovery_source_task:
     task: T-051
-    state: handoff-ready
+    state: integrated
     client_thread_id: client-new-thread:d7e98349-adf1-4f47-8f52-b8c21b6cc68a
     task_thread_id: 01a05a9f-d70b-7c70-b913-199fae63a0cd
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\ee21\\PB-W00-control'
     head: 09dc81467805b6d857dd2f2e173080c863870e49
     patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
+    integrated_source: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+    integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
   retained_error_analysis_task:
     task: T-052
     state: completed-non-blocking
@@ -205,14 +207,18 @@ wave_2:
     v3_observation: retain-and-classify-recurrence-against-readiness-shutdown-and-cleanup-markers
   next_physical_retry:
     task: T-054
-    state: blocked-on-T-051-integration-and-T-052-classification
+    state: ready
     external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v3'
-  recovery_integration_task:
+  startup_log_recovery_integration_task:
     task: T-053
-    state: active-preflight
+    state: completed
     client_thread_id: client-new-thread:1d47aee2-eca1-4548-aae1-50ae4f89ef08
     task_thread_id: 01a05ab1-8b08-72f1-b0dd-d846709bb6c4
     worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\f9ea\\PB-W00-control'
+    tested_module_source: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+    installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
+    integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
+    evidence_receipt: aaemu12-startup-log-integration-v2
   runtime_lease: released-after-T-050-incomplete-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
   runtime_start: prohibited-until-fresh-versioned-task-and-lease-claim

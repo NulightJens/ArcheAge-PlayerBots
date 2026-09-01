@@ -15,7 +15,7 @@ runtimes:
     claimed_at: 2026-08-31
     released_at: 2026-08-31
     cleanup_receipt: ops/evidence/aaemu12-t050-combat-stealth-v2.yaml
-    baseline_evidence: ops/evidence/aaemu12-startup-schema-integration-v1.yaml
+    baseline_evidence: ops/evidence/aaemu12-startup-log-integration-v2.yaml
     availability_limit: Fresh versioned physical task and committed lease claim required before Login or Game starts.
 
   aaemu30:

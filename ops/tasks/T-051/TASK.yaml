@@ -2,8 +2,8 @@ schema_version: 1
 id: T-051
 title: Stable exact-schema startup guard for growing AAEmu logs
 track: AAEmu12
-status: review
-integration: pending
+status: done
+integration: integrated
 outcome: Make live growing-log startup evidence scalar-safe and require exact emitted selected Game and Login schemas before runtime readiness.
 depends_on: [T-050]
 branch: codex-managed-detached-worktree
