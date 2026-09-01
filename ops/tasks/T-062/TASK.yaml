@@ -2,14 +2,15 @@ schema_version: 1
 id: T-062
 title: Atomic shared-target combat fan-out
 track: AAEmu12
-status: ready
+status: completed
 integration: pending
 outcome: Replace unsafe per-bot shared-target attack fan-out with one atomic all-bot contained-attack stimulus so a mortal fixture cannot disappear before every cohort member is armed.
 depends_on: [T-060, T-044]
 branch: codex-managed-detached-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+worktree: 'C:\Users\jensh\.codex\worktrees\f8c6\PB-W00-control'
+owner_client_thread_id: client-new-thread:94a6b91f-5fa0-4de9-aa6a-cafa679bec2e
+owner_thread_id: 01a05bf9-cc4e-7072-8f2d-c35505c6de39
+head: 4c2d9e8ccdfa1255cef396388ebba2423aa35624
 runtime:
   required: false
 gates: [focused-aaemu12-tests, deterministic-harness-tests]

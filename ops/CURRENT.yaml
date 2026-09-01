@@ -53,10 +53,26 @@ control_tower:
 next_transition:
   - T-063 wires the minimal production single-bot lifecycle/activity selector and autonomous normal logout requester proven missing by T-061.
   - Integrate and build that focused correction before assigning the runtime lease to a new immutable T-061 proof version.
-  - Keep the independent T-062 atomic combat fan-out correction source-only; it does not satisfy or block the one-bot product gate.
+  - Retain completed T-062 atomic combat fan-out at 4c2d9e8ccdfa1255cef396388ebba2423aa35624 for a later integration wave; it does not satisfy or block the one-bot product gate.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
+  - task: T-062
+    state: completed-pending-integration
+    client_thread_id: client-new-thread:94a6b91f-5fa0-4de9-aa6a-cafa679bec2e
+    task_thread_id: 01a05bf9-cc4e-7072-8f2d-c35505c6de39
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\f8c6\PB-W00-control'
+    base: 10fb2de0038ecb43d3f2e6cf15f5789e2b5926dd
+    head: 4c2d9e8ccdfa1255cef396388ebba2423aa35624
+    handoff: ops/tasks/T-062/HANDOFF.md
+  - task: T-063
+    state: active
+    client_thread_id: client-new-thread:bbef8555-49ae-4e70-b136-c85ff5f490af
+    task_thread_id: 01a05c0d-ae83-7842-b358-82baab117774
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\2130\PB-W00-control'
+    base: f22ae76d8a401ad374f74df55a6ef6a675c3ad1f
+    head: pending
+    handoff: pending
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
