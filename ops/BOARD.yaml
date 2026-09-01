@@ -729,16 +729,20 @@ tasks:
   - id: T-088
     title: Reprove one-zone autonomy with isolated anchored fixtures
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-087]
-    runtime_lease: aaemu12-pending-thread-binding
+    runtime_lease: aaemu12
     gate: serialized-one-zone-autonomy-proof-v2
     zone_id: 221
     configured_bot_ids: [20001, 20002, 20003]
     configured_population: {minimum: 2, target: 3, maximum: 3}
     contract: ops/tasks/T-088/CONTRACT.md
     evidence_root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
+    owner_client_thread_id: client-new-thread:6e47bdff-97cd-45cf-9d1d-5f439ce9943b
+    owner_thread_id: 01a05df1-47a7-7b70-b851-dbea1c6a69f7
+    worktree: 'C:\Users\jensh\.codex\worktrees\578d\PB-W00-control'
+    dispatch_base: 4e89fff7b1ca89cf44fda28099c6ee657629bc95
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

@@ -375,7 +375,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
     proof: 28-focused-1847-full-unit-4-intentional-skips-build-0-errors
   - task: T-088
-    state: prepared-awaiting-thread-binding
+    state: active-exact-thread-bound-runtime
+    client_thread_id: client-new-thread:6e47bdff-97cd-45cf-9d1d-5f439ce9943b
+    task_thread_id: 01a05df1-47a7-7b70-b851-dbea1c6a69f7
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\578d\PB-W00-control'
+    base: 4e89fff7b1ca89cf44fda28099c6ee657629bc95
     source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
     installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
     evidence_root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
