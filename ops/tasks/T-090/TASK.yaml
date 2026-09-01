@@ -2,7 +2,7 @@ schema_version: 1
 id: T-090
 title: Add a portable continuous client-process observer
 track: AAEmu12
-status: active
+status: done
 integration: pending
 outcome: Replace the failed ad-hoc T-088 sampler with a reusable fail-closed observer that continuously records client-process absence, raw snapshot hashes and a derived ledger under both Windows PowerShell and pwsh, using only framework APIs and cooperative shutdown.
 depends_on: [T-088]
@@ -32,3 +32,5 @@ gates:
 validation_boundary: Repository script and isolated tests only. Do not write registered host/module/config, runtime/evidence roots, Login/Game/MySQL/database/client, global ledgers/lease, product source, compatibility patches, full suite, scale, soak, packaging, or AAEmu 3.0.
 contract: ops/tasks/T-090/CONTRACT.md
 handoff: ops/tasks/T-090/HANDOFF.md
+source_head: e03ca62e623350cfd88e9f1abe09e6b810b8626a
+result: PASS-powershell-105-and-pwsh-105-assertions

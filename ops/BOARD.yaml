@@ -749,8 +749,8 @@ tasks:
   - id: T-089
     title: Integrate the T-088 pre-runtime INCOMPLETE receipt
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-088]
     runtime_lease: none
     gate: t088-immutable-evidence-and-cleanup-verification
@@ -761,11 +761,14 @@ tasks:
     owner_thread_id: 01a05dfc-6107-74d0-ae13-9c46df5cd6d5
     worktree: 'C:\Users\jensh\.codex\worktrees\c4fe\PB-W00-control'
     dispatch_base: 5308fe24ae64de7b9c080a4094dde6290e379e35
+    integrated_commit: e7235fd7b2b3d2d10c4491b824f7ffe471bc0f15
+    replay_commit: f5f7897335b77fadb4b585aca179c1e3a94cba79
+    result: PASS-18-payloads-68-semantic-assertions-subject-remains-incomplete
 
   - id: T-090
     title: Add a portable continuous client-process observer
     track: AAEmu12
-    status: active
+    status: done
     integration: pending
     depends_on: [T-088]
     runtime_lease: none
@@ -775,6 +778,20 @@ tasks:
     owner_thread_id: 01a05dfc-60e5-71a2-945f-8b938195c8ee
     worktree: 'C:\Users\jensh\.codex\worktrees\99a2\PB-W00-control'
     dispatch_base: 5308fe24ae64de7b9c080a4094dde6290e379e35
+    source_head: e03ca62e623350cfd88e9f1abe09e6b810b8626a
+    result: PASS-powershell-105-and-pwsh-105-assertions
+
+  - id: T-091
+    title: Integrate the portable client-process observer
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-090]
+    runtime_lease: none
+    gate: independent-windows-powershell-and-pwsh-observer-tests
+    contract: ops/tasks/T-091/CONTRACT.md
+    candidate: e03ca62e623350cfd88e9f1abe09e6b810b8626a
+    candidate_parent: 13522612e1af23c7066bd7836da412d02f018fad
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

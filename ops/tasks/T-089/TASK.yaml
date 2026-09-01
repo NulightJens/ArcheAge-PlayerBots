@@ -2,8 +2,8 @@ schema_version: 1
 id: T-089
 title: Integrate the T-088 pre-runtime INCOMPLETE receipt
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently verify the immutable T-088 manifest, sampler failure, untouched config and zero-runtime cleanup, then integrate only the truthful two-file INCOMPLETE receipt onto the saved branch.
 depends_on: [T-088]
 runtime:
@@ -33,3 +33,6 @@ gates:
 validation_boundary: Read-only external evidence verification and Git integration only. Do not touch registered host/module/config, Login, GameServer, MySQL/database, client, global ledgers/lease, source/tooling, retained evidence, full suite, scale, soak, packaging, or AAEmu 3.0.
 contract: ops/tasks/T-089/CONTRACT.md
 handoff: ops/tasks/T-089/HANDOFF.md
+integrated_commit: e7235fd7b2b3d2d10c4491b824f7ffe471bc0f15
+replay_commit: f5f7897335b77fadb4b585aca179c1e3a94cba79
+result: PASS-18-payloads-68-semantic-assertions-subject-remains-incomplete

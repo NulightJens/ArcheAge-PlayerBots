@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: client-process-observer-correction-and-evidence-integration
+phase: portable-client-observer-integration
 verdict: active
 
 source:
@@ -54,9 +54,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Independently verify and integrate retained T-088 INCOMPLETE evidence without touching runtime state.
-  - Add and independently qualify a repository-owned Windows PowerShell-compatible continuous client-process observer that uses framework SHA-256 and cooperative stop.
-  - Dispatch a fresh successor runtime proof only after the observer is integrated; use a new task, binding, lease, and versioned evidence root.
+  - Independently replay and rerun the T-090 observer under Windows PowerShell and pwsh without a runtime lease.
+  - Integrate the observer only if both 105-assertion gates remain green and its three candidate blobs are exact.
+  - Dispatch a fresh successor runtime proof after T-091; use a new task, binding, runtime lease, and versioned evidence root.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
@@ -389,7 +389,7 @@ prepared_workstreams:
     manifest_sha256: d2447105376fd7bfcbc24d77183f38afa16dc10806b32b656c9c7fb3079763ae
     cleanup: runtime-never-started-config-untouched-zero-processes-listeners-live-logs
   - task: T-089
-    state: active-exact-thread-bound
+    state: done-integrated
     client_thread_id: client-new-thread:8e87e7b2-ae31-4c10-a3c9-83b22656b91a
     task_thread_id: 01a05dfc-6107-74d0-ae13-9c46df5cd6d5
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\c4fe\PB-W00-control'
@@ -397,14 +397,25 @@ prepared_workstreams:
     candidate: 7919a43fc370ea5f59edd77112385366f4928a94
     candidate_parent: 8abf3f3fd714680bf354a4fd2c1a6259b8171b8d
     contract: ops/tasks/T-089/CONTRACT.md
+    head: e7235fd7b2b3d2d10c4491b824f7ffe471bc0f15
+    replay_commit: f5f7897335b77fadb4b585aca179c1e3a94cba79
+    evidence_receipt: ops/evidence/aaemu12-t088-incomplete-integration-v1.yaml
+    proof: 18-of-18-payloads-and-68-of-68-semantic-assertions-green
   - task: T-090
-    state: active-exact-thread-bound
+    state: done-candidate-pending-integration
     client_thread_id: client-new-thread:9137a173-88d6-4ca4-9773-70e37d83150f
     task_thread_id: 01a05dfc-60e5-71a2-945f-8b938195c8ee
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\99a2\PB-W00-control'
     base: 5308fe24ae64de7b9c080a4094dde6290e379e35
     retained_sampler: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2\client-sampler\client-process-sampler.ps1'
     contract: ops/tasks/T-090/CONTRACT.md
+    head: e03ca62e623350cfd88e9f1abe09e6b810b8626a
+    proof: powershell-105-and-pwsh-105-assertions-green
+  - task: T-091
+    state: prepared-awaiting-thread-binding
+    candidate: e03ca62e623350cfd88e9f1abe09e6b810b8626a
+    candidate_parent: 13522612e1af23c7066bd7836da412d02f018fad
+    contract: ops/tasks/T-091/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
