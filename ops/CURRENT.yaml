@@ -156,7 +156,9 @@ wave_2:
     cleanup: login-graceful-game-never-started-zero-processes-five-ports-free
   recovery_source_task:
     task: T-048
-    state: ready
+    state: setup-in-progress
+    client_thread_id: client-new-thread:881e830f-eaed-46f2-abb5-ab300f7089d0
+    task_thread_id: pending-task-list-resolution
     outcome: exact-selected-schema-startup-proof
   runtime_lease: released-after-T-036-incomplete-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1

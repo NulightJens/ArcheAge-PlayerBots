@@ -8,6 +8,7 @@ outcome: Make the pinned Login host emit and the runtime guard validate the exac
 depends_on: [T-036]
 branch: assigned-by-codex
 worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:881e830f-eaed-46f2-abb5-ab300f7089d0
 
 inputs:
   incomplete_receipt: ops/evidence/aaemu12-t036-combat-stealth-v1.yaml
