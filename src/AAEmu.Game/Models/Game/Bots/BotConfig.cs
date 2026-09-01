@@ -24,6 +24,7 @@ namespace AAEmu.Game.Models.Game.Bots
 
     public class BotConfig : Singleton<BotConfig>, ILoadable
     {
+        private const int ActivityDirectorInitialDelayMaximumMs = 300000;
         private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
         /// <summary>Fallback hazard radius in metres when an area-trigger row has no positive radius; 40 m covers the legacy hazard envelope.</summary>
         public const float DefaultHazardRadius = 40f;
@@ -193,7 +194,10 @@ namespace AAEmu.Game.Models.Game.Bots
             ExpireActionTimeMs = Math.Max(0, ExpireActionTimeMs);
             GlobalSkillDelayMs = Math.Max(0, GlobalSkillDelayMs);
             ActivityDirectorCharacterIds ??= [];
-            ActivityDirectorInitialDelayMs = Math.Clamp(ActivityDirectorInitialDelayMs, 0, 60000);
+            ActivityDirectorInitialDelayMs = Math.Clamp(
+                ActivityDirectorInitialDelayMs,
+                0,
+                ActivityDirectorInitialDelayMaximumMs);
             ActivityDirectorReconciliationIntervalMs = Math.Clamp(
                 ActivityDirectorReconciliationIntervalMs,
                 100,
@@ -204,7 +208,10 @@ namespace AAEmu.Game.Models.Game.Bots
         public BotActivityDirectorConfiguration GetActivityDirectorConfiguration()
         {
             var characterIds = ActivityDirectorCharacterIds?.ToArray() ?? [];
-            var initialDelay = TimeSpan.FromMilliseconds(Math.Clamp(ActivityDirectorInitialDelayMs, 0, 60000));
+            var initialDelay = TimeSpan.FromMilliseconds(Math.Clamp(
+                ActivityDirectorInitialDelayMs,
+                0,
+                ActivityDirectorInitialDelayMaximumMs));
             var interval = TimeSpan.FromMilliseconds(Math.Clamp(ActivityDirectorReconciliationIntervalMs, 100, 60000));
             var backoff = TimeSpan.FromMilliseconds(Math.Clamp(ActivityDirectorRetryBackoffMs, 100, 600000));
 

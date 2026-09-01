@@ -474,7 +474,7 @@ public class BotConfigTests
         var config = new BotConfig
         {
             ActivityDirectorCharacterIds = null,
-            ActivityDirectorInitialDelayMs = 70000,
+            ActivityDirectorInitialDelayMs = 300001,
             ActivityDirectorReconciliationIntervalMs = 0,
             ActivityDirectorRetryBackoffMs = 700000
         };
@@ -482,21 +482,34 @@ public class BotConfigTests
         config.Validate();
 
         await Assert.That(config.ActivityDirectorCharacterIds).IsEmpty();
-        await Assert.That(config.ActivityDirectorInitialDelayMs).IsEqualTo(60000);
+        await Assert.That(config.ActivityDirectorInitialDelayMs).IsEqualTo(300000);
         await Assert.That(config.ActivityDirectorReconciliationIntervalMs).IsEqualTo(100);
         await Assert.That(config.ActivityDirectorRetryBackoffMs).IsEqualTo(600000);
     }
 
     [Test]
-    [Arguments(-1)]
-    [Arguments(60001)]
-    public async Task Validate_ActivityDirectorInitialDelay_ClampsToSupportedRange(int delay)
+    [Arguments(-1, 0)]
+    [Arguments(60000, 60000)]
+    [Arguments(180000, 180000)]
+    [Arguments(300000, 300000)]
+    [Arguments(300001, 300000)]
+    public async Task Validate_ActivityDirectorInitialDelay_ClampsToSupportedRange(int delay, int expected)
     {
         var config = new BotConfig { ActivityDirectorInitialDelayMs = delay };
 
         config.Validate();
 
-        await Assert.That(config.ActivityDirectorInitialDelayMs).IsEqualTo(delay < 0 ? 0 : 60000);
+        await Assert.That(config.ActivityDirectorInitialDelayMs).IsEqualTo(expected);
+    }
+
+    [Test]
+    public async Task ActivityDirectorConfiguration_RuntimeConversionCarriesWidenedInitialDelay()
+    {
+        var config = new BotConfig { ActivityDirectorInitialDelayMs = 180000 };
+
+        var result = config.GetActivityDirectorConfiguration();
+
+        await Assert.That(result.InitialDelay).IsEqualTo(TimeSpan.FromMilliseconds(180000));
     }
 
     [Test]
