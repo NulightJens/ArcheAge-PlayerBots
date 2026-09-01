@@ -1,0 +1,180 @@
+schema_version: 1
+id: aaemu12-passive-anchor-default-world-zero-integration-v1
+recorded_at: '2026-09-01T15:33:52-06:00'
+verdict: PASS-integration-install-build-focused-full-unit
+
+fingerprint:
+  task: T-101
+  dispatch_base: a05e94fd8d7f58bce12a968aa1d5b09de78f4a14
+  binding_commit: 13f681f48698de3572b5b774d9b9e689f414a491
+  integration_parent: 13f681f48698de3572b5b774d9b9e689f414a491
+  lease_commit: 13f681f48698de3572b5b774d9b9e689f414a491
+  lease: aaemu12-build-only
+  lease_owner_thread: 01a05ed6-653f-71d3-ac72-1d6a0db3a85c
+  lease_owner_client_thread: client-new-thread:bca8601b-bcaf-4f63-9d54-0884679ece77
+  candidate: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
+  candidate_parent: 96b8b5004a89a0dec6522753f64d03fd1d732c5b
+  candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
+  candidate_parent_tree: a039fd91ff33114c104b51cfe8aa1632dda477df
+  replay_source: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+  replay_parent: 13f681f48698de3572b5b774d9b9e689f414a491
+  replay_tree: 7afaac89eb0d5ef53475064134e69b7e7527eb58
+  candidate_patch_id: 80faacf109fc2c169084c775fe9afb393b21e9f7
+  replay_patch_id: 80faacf109fc2c169084c775fe9afb393b21e9f7
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  installed_module_commit: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+  installed_module_tree: 7afaac89eb0d5ef53475064134e69b7e7527eb58
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  gate_definition_version: 1
+
+accepted_input:
+  exact_sole_parent: true
+  candidate_declared_path_count: 4
+  unexpected_candidate_path_count: 0
+  replayed_blob_count: 4
+  replayed_blob_mismatch_count: 0
+  stable_patch_id_equal: true
+  candidate_parent_source_matches_binding_source: true
+  candidate_parent_tests_match_binding_tests: true
+  control_tower_binding_preserved: true
+  writer_branch_merged: false
+  t098_retained_fail_preserved: true
+  candidate_paths:
+    - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+    - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+    - ops/evidence/aaemu12-passive-anchor-default-world-zero-v1.yaml
+    - ops/tasks/T-100/HANDOFF.md
+  exact_blob_identity:
+    command_source: 27d6e77bd0c0720f21a85a949bc0881fbb8fd34e
+    command_tests: 20781ea7f0e6395ca2d272a601b1e848685c6c6f
+    source_receipt: d126c34fa2aa565779af68b41cd3f84b1f7346d3
+    source_handoff: e10fa1c14cc9bce0007fe8921f24fbb5c4d6aace
+
+independent_review:
+  verdict: passed
+  defect: valid pinned-host default-world template ID 0 was conflated with a missing world template
+  correction: require a non-null world template, then preserve its ID including 0
+  missing_template_error: 'Active bot anchor 20001 does not have a world template.'
+  existing_world_instance_zone_finite_identity_and_post_snapshot_guards_preserved: true
+  bot_transform_target_combat_or_movement_mutation_added: false
+  product_defects_found: none
+
+environment:
+  os: Microsoft Windows NT 10.0.26200.0
+  architecture: X64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+
+host_preflight:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean_detached: true
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  host_status_entry_count: 30
+  host_tracked_patch_path_count: 28
+  host_untracked_entries:
+    - SQL/updates/2026-08-25_aaemu_game_bot_archetype_plans.sql
+    - modules/archeage-playerbots/
+  prior_installed_module_commit: 761ffa1e0bd76d06532688f34b45e192a493b239
+  prior_installed_module_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+  prior_installed_module_clean: true
+  strict_reference_apply_check: passed
+  complete_integration_host_reverse_check: passed
+
+installation:
+  method: clean-installed-module-detached-switch-to-exact-replay-object
+  tracked_path_deletions: 0
+  installed_module_transition:
+    from: 761ffa1e0bd76d06532688f34b45e192a493b239
+    to: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+  installed_module_tree: 7afaac89eb0d5ef53475064134e69b7e7527eb58
+  installed_module_clean: true
+  exact_four_blob_identity: true
+  host_overlay_transition: unchanged
+  installer_check_only_after: passed-installed-supported
+  installer_normal_invocations: 0
+  final_host_status_entry_count: 30
+  final_host_tracked_patch_path_count: 28
+  final_host_patch_reverse_check: passed
+
+results:
+  preparatory_test_project_build:
+    purpose: refresh-focused-test-binary-before-authoritative-clean-solution-build
+    warnings: 74
+    errors: 0
+  focused:
+    framework: TUnit-1.54.0.0
+    runtime: net10.0-x64
+    command: >-
+      AAEmu.UnitTests.exe --treenode-filter
+      /*/AAEmu.UnitTests.Game.Scripts.Commands/SpawnPassiveNpcCommandTests/*
+      --minimum-expected-tests 40 --no-progress --no-ansi --output Detailed
+    total: 40
+    succeeded: 40
+    skipped: 0
+    failed: 0
+  build:
+    command: dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false --nologo --verbosity minimal
+    elapsed: '00:01:39.29'
+    errors: 0
+    warnings: 79
+  full_unit:
+    command: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+    invocations: 1
+    total: 1867
+    succeeded: 1863
+    skipped: 4
+    failed: 0
+    duration: '00:00:24.302'
+    intentional_skips:
+      - Legacy_Primeval_Pve_MatchesGolden
+      - Legacy_Darkrunner_Pvp_MatchesGolden
+      - Legacy_Primeval_Pvp_MatchesGolden
+      - Legacy_Darkrunner_Pve_MatchesGolden
+  final_reference_clean: true
+  final_installed_module_clean: true
+  final_source_and_installed_tree_equal: true
+
+artifact_hashes:
+  game_assembly_sha256: 54f822be1721e00fedfc998a02115c19c573015822c904c7dc6e055c8b1fbfff
+  test_assembly_sha256: 28b0b999b52b71be59352b8e3c6bf1d19a7dca2c7514cc37ca3d858560525d73
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+  test_report_sha256: 26c91cef27d21a029f78eac950ca96c6c2f9fb4f159b3e42287d189cda5b6b93
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_failures:
+  product_or_gate_failures: none
+  warnings:
+    - The clean build retained 79 pinned package, compiler, analyzer, and test-analyzer warnings, including existing SQLitePCLRaw.lib.e_sqlite3 and SSH.NET high-severity advisories.
+  operator_probes:
+    - The first read-only untracked-set preflight used PowerShell wildcard question marks and stopped on an invalid comparison; the corrected exact-regex preflight passed before any host write.
+    - The preparatory unit-test-project build retained 74 warnings; the subsequent contracted no-incremental solution build is authoritative.
+
+runtime_state:
+  runtime_started_stopped_or_controlled: false
+  runtime_observer_started_or_controlled: false
+  database_or_client_accessed: false
+  mysql_queried_started_stopped_or_controlled: false
+  deployed_runtime_configuration_edited: false
+  aaemu_game_login_process_count_after: 0
+  occupied_required_port_count_after: 0
+  required_ports_observed_free: [1234, 1237, 1239, 1250, 1280]
+
+retained_boundaries:
+  - T-098 remains an immutable retained FAIL; this source/install/unit PASS does not reinterpret its runtime evidence.
+  - Physical default-world fixture placement, both autonomous lifecycle/refill waves, and distinct-PID restart/dwell remain unproven.
+  - No database, client, scale, soak, packaging, release-readiness, or AAEmu 3.0 behavior is proven.
+  - T-037 remains blocked until a fresh post-correction runtime proof passes and is independently integrated.
+
+authorization:
+  saved_branch_fast_forward_after_scoped_artifact_commit: true
+  fresh_versioned_runtime_successor_may_be_prepared_after_build_lease_release: true
+  exact_runtime_proof_source: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+  exact_runtime_proof_tree: 7afaac89eb0d5ef53475064134e69b7e7527eb58
+  control_tower_action: >-
+    After the saved integration branch contains the scoped T-101 artifact
+    commit, PB-000 may release the build-only lease and prepare a fresh
+    versioned runtime successor against this exact replay source and tree.
+    Physical fixture placement remains unproven until that successor passes.
