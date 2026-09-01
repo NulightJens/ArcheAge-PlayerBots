@@ -493,10 +493,11 @@ prepared_workstreams:
     candidate_commit: 859e0daf64df482fcb17d83e16344387453a19b7
     proof: 40-focused-build-0-errors-40-retained-warnings-patch-sha-unchanged-clean-apply
   - task: T-097
-    state: prepared-awaiting-exact-thread-binding-and-build-lease
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-build-install-integrator
+    client_thread_id: client-new-thread:0e011ddf-ffdc-4c8c-a595-aee28b756ec7
+    task_thread_id: 01a05e7a-7318-7611-aa5e-d6fc1a52ab84
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\ef38\PB-W00-control'
+    dispatch_base: 8515e189fd775e8a83853e6cca62d7f517cce48c
     source_candidate: 859e0daf64df482fcb17d83e16344387453a19b7
     source_candidate_parent: 1ebfd0ec47138ebf15268befde9ed1671aa05ef8
     contract: ops/tasks/T-097/CONTRACT.md

@@ -2,7 +2,7 @@ schema_version: 1
 id: T-097
 title: Integrate and install widened Director delay support
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Independently replay T-096 onto the saved lineage, install the exact corrected module into the registered AAEmu 1.2 integration checkout, rerun focused tests and clean build, consume exactly one full-suite gate, and fast-forward the saved branch with a durable integration receipt.
 depends_on: [T-095, T-096]
@@ -11,11 +11,11 @@ runtime:
   lease: aaemu12-build-only
   archeage_client_allowed: false
 branch: codex-managed-worktree
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\ef38\PB-W00-control'
+owner_client_thread_id: client-new-thread:0e011ddf-ffdc-4c8c-a595-aee28b756ec7
+owner_thread_id: 01a05e7a-7318-7611-aa5e-d6fc1a52ab84
 inputs:
-  dispatch_base: pending-control-commit
+  dispatch_base: 8515e189fd775e8a83853e6cca62d7f517cce48c
   candidate_commit: 859e0daf64df482fcb17d83e16344387453a19b7
   candidate_parent: 1ebfd0ec47138ebf15268befde9ed1671aa05ef8
   host_base: 62e3eb1d87da01194802ac886cd500134facad28
