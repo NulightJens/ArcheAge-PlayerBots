@@ -381,10 +381,10 @@ function Test-T044StealthPhase {
     Test-T044StimulusSet (Get-T044Property $Phase 'stimuli') `
         @($ExpectedStimuli | ForEach-Object { Get-T044CommandKey $_ }) $label $Incomplete
     $apply = @((Get-T044Property $Phase 'stimuli') | Where-Object {
-        (Get-T044CommandKey $_) -eq "botbuffnpc|$AttackerBotId $TargetObjectId $BuffId"
+        (Get-T044CommandKey $_) -eq "botbuffnpc|$AttackerBotId $TargetObjectId $BuffId 1"
     }) | Select-Object -First 1
     $remove = @((Get-T044Property $Phase 'stimuli') | Where-Object {
-        (Get-T044CommandKey $_) -eq "botbuffnpc|$AttackerBotId $TargetObjectId -$BuffId"
+        (Get-T044CommandKey $_) -eq "botbuffnpc|$AttackerBotId $TargetObjectId -$BuffId 1"
     }) | Select-Object -First 1
     if ((@((Get-T044Property $apply 'messages')) -join ' ') -notmatch 'stealth=True') {
         Add-T044Reason $Incomplete "$label did not retain server confirmation that buff $BuffId is stealth."
@@ -794,7 +794,7 @@ function New-T044QualificationPlan {
             [pscustomobject]@{ command = 'botstate'; arguments = "$attacker idle" },
             [pscustomobject]@{ command = 'botmetrics'; arguments = 'reset' },
             [pscustomobject]@{ command = 'botmetrics'; arguments = 'snapshot' },
-            [pscustomobject]@{ command = 'botbuffnpc'; arguments = "$attacker $targetId $buffId" },
+            [pscustomobject]@{ command = 'botbuffnpc'; arguments = "$attacker $targetId $buffId 1" },
             [pscustomobject]@{ command = 'botattackobject'; arguments = "$attacker $targetId" },
             [pscustomobject]@{ command = 'botdebug'; arguments = "$attacker" }
         )
@@ -802,7 +802,7 @@ function New-T044QualificationPlan {
             $phaseStimuli += [pscustomobject]@{ command = 'botdebug'; arguments = "$attacker" }
         }
         $phaseStimuli += @(
-            [pscustomobject]@{ command = 'botbuffnpc'; arguments = "$attacker $targetId -$buffId" },
+            [pscustomobject]@{ command = 'botbuffnpc'; arguments = "$attacker $targetId -$buffId 1" },
             [pscustomobject]@{ command = 'botdebug'; arguments = "$attacker" }
         )
         if ($kind -eq 'release') {

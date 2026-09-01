@@ -48,7 +48,7 @@ public class BotCommandsTests
         _previousArchetypeManager = BotArchetypeManager.Instance;
         _previousDuelManagerResolver = BotDuelCommand.DuelManagerResolver;
         _previousBuffTemplateResolver = BotBuffCommand.BuffTemplateResolver;
-        _previousBuffNpcResolver = BotBuffNpcCommand.NpcResolver;
+        _previousBuffNpcResolver = BotBuffCommand.NpcResolver;
         _previousAttackObjectNpcResolver = BotAttackObjectCommand.NpcResolver;
 
         _botManager = new BotManager(_ => null, onlineLookup: _ => null);
@@ -64,7 +64,7 @@ public class BotCommandsTests
         BotTestFixture.RegisterSingletons(_previousBotManager, _previousCombatManager, _previousArchetypeManager);
         BotDuelCommand.DuelManagerResolver = _previousDuelManagerResolver;
         BotBuffCommand.BuffTemplateResolver = _previousBuffTemplateResolver;
-        BotBuffNpcCommand.NpcResolver = _previousBuffNpcResolver;
+        BotBuffCommand.NpcResolver = _previousBuffNpcResolver;
         BotAttackObjectCommand.NpcResolver = _previousAttackObjectNpcResolver;
     }
 
@@ -912,16 +912,18 @@ public class BotCommandsTests
             MaxHp = 100,
             Buffs = buffs.Object
         };
-        BotBuffNpcCommand.NpcResolver = (candidate, objId) =>
+        BotBuffCommand.NpcResolver = (candidate, objId) =>
             ReferenceEquals(candidate, bot) && objId == npc.ObjId ? npc : null;
         BotBuffCommand.BuffTemplateResolver = id => id == 599
             ? new BuffTemplate { Id = 599, Duration = 45000, Stealth = true }
             : null;
 
-        var applied = Execute(new BotBuffNpcCommand(), "2", "9901", "599", "1");
+        var command = new BotBuffCommand();
+        var applied = Execute(command, "2", "9901", "599", "1");
         var wasApplied = npc.Buffs.CheckBuff(599);
-        var removed = Execute(new BotBuffNpcCommand(), "2", "9901", "-599");
+        var removed = Execute(command, "2", "9901", "-599", "1");
 
+        await Assert.That(command.CommandNames).Contains("botbuffnpc");
         await Assert.That(wasApplied).IsTrue();
         await Assert.That(npc.Buffs.CheckBuff(599)).IsFalse();
         await Assert.That(appliedBuff).IsNotNull();

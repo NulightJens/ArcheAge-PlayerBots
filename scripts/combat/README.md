@@ -92,7 +92,7 @@ $response = Invoke-RestMethod -Method Post `
    `/botdebug <id>` health result for every cohort bot. Stealth phases must also
    retain `/botdebug` search samples as structured `active`, `elapsedSeconds`,
    and `radiusMeters` values. The supplied target is stealthed and unstealthed
-   with the generated `/botbuffnpc <attackerBotId> <npcObjId> <buffId|-buffId>`
+   with the generated `/botbuffnpc <attackerBotId> <npcObjId> <buffId|-buffId> 1`
    stimuli.
 
 5. After every Idle or combat phase, execute the generated per-ID `removebot`

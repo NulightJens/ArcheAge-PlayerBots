@@ -47,7 +47,7 @@ function New-Resources {
 
 function New-Stimuli($Definitions) {
     return @($Definitions | ForEach-Object {
-        $message = if ($_.command -eq 'botbuffnpc' -and $_.arguments -match '\s-(\d+)$') {
+        $message = if ($_.command -eq 'botbuffnpc' -and $_.arguments -match '\s-(\d+)\s+\d+$') {
             "Removed buff $($Matches[1]) from deterministic NPC fixture."
         }
         elseif ($_.command -eq 'botbuffnpc') {

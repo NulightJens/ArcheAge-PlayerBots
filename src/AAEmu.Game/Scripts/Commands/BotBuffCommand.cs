@@ -19,22 +19,36 @@ public sealed class BotBuffCommand : ICommand
 {
     internal static Func<uint, BuffTemplate> BuffTemplateResolver { get; set; } =
         static id => SkillManager.Instance.GetBuffTemplate(id);
+    internal static Func<Character, uint, Npc> NpcResolver { get; set; } =
+        static (bot, objId) => bot?.ParentWorld?.GetNpc(objId);
 
-    public string[] CommandNames { get; set; } = ["botbuff"];
+    public string[] CommandNames { get; set; } = ["botbuff", "botbuffnpc"];
 
     public void OnLoad()
     {
         CommandManager.Instance.Register(CommandNames, this);
     }
 
-    public string GetCommandLineHelp() => "<botId> <buffId|-buffId> [abLevel]";
+    public string GetCommandLineHelp() =>
+        "<botId> <buffId|-buffId> [abLevel] | botbuffnpc <botId> <npcObjId> <buffId|-buffId> <abLevel>";
 
     public string GetCommandHelpText() =>
         "Applies a buff directly to a bot, or removes it when the buff id is negative. " +
+        "The botbuffnpc alias applies the same operation to one exact living NPC object. " +
         "This command is intended for repeatable GM/development testing and does not require a selected target.";
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
     {
+        // CommandManager resolves aliases to the configured primary command
+        // before authorization and execution. Keep the exact-NPC qualifier as
+        // a four-argument alias form so it shares botbuff's existing access
+        // policy without introducing an unregistered command identity.
+        if (args.Length == 4)
+        {
+            ExecuteNpc(args, messageOutput);
+            return;
+        }
+
         if (!BotCommandArgs.TryBotId(args, 0, out var botId, out _) || args.Length is < 2 or > 3 ||
             !int.TryParse(args[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var signedBuffId) ||
             signedBuffId == 0)
@@ -52,6 +66,42 @@ public sealed class BotBuffCommand : ICommand
 
         if (!TryChangeBuff(bot, bot, signedBuffId, abLevel: args.Length == 3 ? args[2] : null,
                 targetLabel: $"bot '{bot.Name}'", out var result, out var error))
+        {
+            CommandManager.SendErrorText(this, messageOutput, error);
+            return;
+        }
+
+        CommandManager.SendNormalText(this, messageOutput, result);
+    }
+
+    private void ExecuteNpc(string[] args, IMessageOutput messageOutput)
+    {
+        if (!BotCommandArgs.TryBotId(args, 0, out var botId, out _) ||
+            !uint.TryParse(args[1], NumberStyles.None, CultureInfo.InvariantCulture, out var npcObjId) || npcObjId == 0 ||
+            !int.TryParse(args[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var signedBuffId) || signedBuffId == 0 ||
+            !uint.TryParse(args[3], NumberStyles.None, CultureInfo.InvariantCulture, out var abLevel) || abLevel == 0)
+        {
+            CommandManager.SendDefaultHelpText(this, messageOutput);
+            return;
+        }
+
+        var bot = BotManager.Instance.GetBot(botId);
+        if (bot == null)
+        {
+            BotCommandArgs.SendUnknownBot(this, messageOutput, botId);
+            return;
+        }
+
+        var npc = NpcResolver(bot, npcObjId);
+        if (npc == null || npc.IsDead)
+        {
+            CommandManager.SendErrorText(this, messageOutput,
+                $"Living NPC object {npcObjId} was not found in bot {botId}'s world.");
+            return;
+        }
+
+        if (!TryChangeBuff(npc, bot, signedBuffId, abLevel.ToString(CultureInfo.InvariantCulture),
+                $"NPC object {npcObjId}", out var result, out var error))
         {
             CommandManager.SendErrorText(this, messageOutput, error);
             return;
@@ -115,64 +165,5 @@ public sealed class BotBuffCommand : ICommand
         target.Buffs.AddBuff(buff);
         result = $"Applied buff {buffId} to {targetLabel} (stealth={template.Stealth}, abLevel={parsedAbLevel}).";
         return true;
-    }
-}
-
-/// <summary>
-/// Applies or removes a verified buff on one exact NPC object in a retained
-/// bot's world. This closes the server-only stealth-fixture seam without a
-/// client selection or a data-pack-specific implicit target.
-/// </summary>
-public sealed class BotBuffNpcCommand : ICommand
-{
-    internal static Func<Character, uint, Npc> NpcResolver { get; set; } =
-        static (bot, objId) => bot?.ParentWorld?.GetNpc(objId);
-
-    public string[] CommandNames { get; set; } = ["botbuffnpc"];
-
-    public void OnLoad()
-    {
-        CommandManager.Instance.Register(CommandNames, this);
-    }
-
-    public string GetCommandLineHelp() => "<botId> <npcObjId> <buffId|-buffId> [abLevel]";
-
-    public string GetCommandHelpText() =>
-        "Applies or removes a buff on one exact living NPC object in the supplied bot's world for repeatable server-side qualification.";
-
-    public void Execute(Character character, string[] args, IMessageOutput messageOutput)
-    {
-        if (args.Length is < 3 or > 4 ||
-            !BotCommandArgs.TryBotId(args, 0, out var botId, out _) ||
-            !uint.TryParse(args[1], NumberStyles.None, CultureInfo.InvariantCulture, out var npcObjId) || npcObjId == 0 ||
-            !int.TryParse(args[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var signedBuffId) || signedBuffId == 0)
-        {
-            CommandManager.SendDefaultHelpText(this, messageOutput);
-            return;
-        }
-
-        var bot = BotManager.Instance.GetBot(botId);
-        if (bot == null)
-        {
-            BotCommandArgs.SendUnknownBot(this, messageOutput, botId);
-            return;
-        }
-
-        var npc = NpcResolver(bot, npcObjId);
-        if (npc == null || npc.IsDead)
-        {
-            CommandManager.SendErrorText(this, messageOutput,
-                $"Living NPC object {npcObjId} was not found in bot {botId}'s world.");
-            return;
-        }
-
-        if (!BotBuffCommand.TryChangeBuff(npc, bot, signedBuffId, args.Length == 4 ? args[3] : null,
-                $"NPC object {npcObjId}", out var result, out var error))
-        {
-            CommandManager.SendErrorText(this, messageOutput, error);
-            return;
-        }
-
-        CommandManager.SendNormalText(this, messageOutput, result);
     }
 }

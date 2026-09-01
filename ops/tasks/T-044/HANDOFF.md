@@ -17,7 +17,7 @@
 - Added exact lost-target retention and bounded exact-NPC reacquisition behavior
   in `BotCombatState`, `BotCombatTask`, `BotCombatManager`, and
   `BotAttackObjectCommand`.
-- Added `/botbuffnpc <botId> <npcObjId> <buffId|-buffId> [abLevel]` through the
+- Added `/botbuffnpc <botId> <npcObjId> <buffId|-buffId> <abLevel>` through the
   existing bot-buff command seam so T-036 can apply and remove a verified stealth
   buff from the exact retained NPC target.
 - Added deterministic manager, combat-task, and command tests, including a
