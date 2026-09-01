@@ -112,13 +112,24 @@ tasks:
   - id: T-036
     title: AAEmu 1.2 mortal-combat and stealth closure
     track: AAEmu12
-    status: active
-    integration: runtime-pending
+    status: blocked
+    integration: runtime-incomplete-retained
     depends_on: [T-043, T-044, T-046]
     runtime_lease: aaemu12
     gate: serialized-live-aaemu12-proof
     owner_client_thread_id: client-new-thread:a9f5a4a5-8adf-4765-a624-7673a9cb7559
     owner_thread_id: 01a05a64-9193-7c02-8f34-10219e4043a4
+    attempt_commit: e8c14e71906023e1df371cc6a24d4edcf7db7c46
+    evidence_receipt: aaemu12-t036-combat-stealth-v1
+    blocker: pinned-login-does-not-emit-exact-selected-schema-for-startup-guard
+
+  - id: T-048
+    title: Exact AAEmu 1.2 selected-schema startup proof
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-036]
+    gate: deterministic-harness-tests
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification

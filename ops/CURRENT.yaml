@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-physical-combat-active
+phase: wave-2-startup-gate-recovery
 verdict: active
 
 source:
@@ -51,8 +51,8 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Claim the aaemu12 lease and run T-036 against database identity aaemu12_database_public_alpha_v1.
-  - Release the lease only after zero-bot cleanup, graceful Login/Game shutdown, process/listener checks, and committed T-036 evidence.
+  - Run T-048 to add and deterministically validate credential-free exact selected-schema startup evidence on AAEmu 1.2.
+  - Independently integrate the correction, then dispatch a new immutable T-036 physical attempt under a fresh aaemu12 lease claim.
   - Keep T-037 and T-041 blocked until their declared dependencies are accepted.
 
 prepared_workstreams:
@@ -145,11 +145,19 @@ wave_2:
     evidence_receipt: aaemu12-wave2-integration-v1
   physical_gate:
     task: T-036
-    state: setup-in-progress
+    state: incomplete-startup-guard-blocked
     client_thread_id: client-new-thread:a9f5a4a5-8adf-4765-a624-7673a9cb7559
     task_thread_id: 01a05a64-9193-7c02-8f34-10219e4043a4
     worktree: 'C:\Users\jensh\.codex\worktrees\36de\PB-W00-control'
     contract_commit: f1c0563c71e85ae2cd32bf1209f001ae63151cf4
-  runtime_lease: claimed-by-T-036
+    attempt_commit: e8c14e71906023e1df371cc6a24d4edcf7db7c46
+    evidence_receipt: aaemu12-t036-combat-stealth-v1
+    result: INCOMPLETE-startup-guard-before-game
+    cleanup: login-graceful-game-never-started-zero-processes-five-ports-free
+  recovery_source_task:
+    task: T-048
+    state: ready
+    outcome: exact-selected-schema-startup-proof
+  runtime_lease: released-after-T-036-incomplete-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: authorized-only-after-T-036-synchronizes-this-claim
+  runtime_start: prohibited-until-T-048-integration-and-new-lease-claim
