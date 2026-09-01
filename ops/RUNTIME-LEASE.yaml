@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: available-clean-after-T-054
-    owner_task: null
-    owner_thread_id: null
+    status: claimed-by-T-057-live-headless-only
+    owner_task: T-057
+    owner_thread_id: 01a05b06-ee62-77e0-81fe-684c85116af2
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,10 +13,10 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-08-31
-    released_at: 2026-08-31
-    cleanup_receipt: ops/evidence/aaemu12-t054-combat-stealth-v3.yaml
-    baseline_evidence: ops/evidence/aaemu12-startup-log-integration-v2.yaml
-    availability_limit: No task may start Login, GameServer, or the client until PB-000 commits a new exact task/thread claim.
+    released_at: null
+    cleanup_receipt: pending-T-057-zero-bot-graceful-stop-and-distinct-pid-restart-proof
+    baseline_evidence: ops/evidence/aaemu12-system-actor-integration-v1.yaml
+    availability_limit: Exclusive to T-057 thread 01a05b06-ee62-77e0-81fe-684c85116af2 for AAEmu.Login, AAEmu.Game, and loopback API only; launching or controlling the ArcheAge client is prohibited.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
