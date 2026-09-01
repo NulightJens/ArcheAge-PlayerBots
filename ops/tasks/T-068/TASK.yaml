@@ -2,14 +2,14 @@ schema_version: 1
 id: T-068
 title: Integrate progression and resource observability
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Independently replay the accepted T-067 read-only progression/resource observability correction, install the exact result into the registered AAEmu 1.2 integration host, and qualify one immutable source/install identity with a clean build and exactly one complete unit-suite invocation.
 depends_on: [T-067]
 branch: codex-managed-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+worktree: 'C:\Users\jensh\.codex\worktrees\da8a\PB-W00-control'
+owner_client_thread_id: client-new-thread:148eafb1-d1fd-4f79-a728-807f9394898f
+owner_thread_id: 01a05c68-05eb-73f2-ab73-a046fa8a1de3
 inputs:
   integration_head: 7b1ff7b879f40bf2bea8ed82d715534e4c75e3c1
   t067_candidate: 4253d0875c5165095621e1e6ff4c672fa21a51d8

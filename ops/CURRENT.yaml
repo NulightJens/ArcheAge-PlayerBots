@@ -121,10 +121,10 @@ prepared_workstreams:
     handoff: ops/tasks/T-067/HANDOFF.md
     proof: 169-passed-0-failed-build-0-errors-77-retained-warnings
   - task: T-068
-    state: ready
-    client_thread_id: pending-thread-creation
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
+    state: active
+    client_thread_id: client-new-thread:148eafb1-d1fd-4f79-a728-807f9394898f
+    task_thread_id: 01a05c68-05eb-73f2-ab73-a046fa8a1de3
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\da8a\PB-W00-control'
     base: 7b1ff7b879f40bf2bea8ed82d715534e4c75e3c1
     candidate: 4253d0875c5165095621e1e6ff4c672fa21a51d8
     head: pending

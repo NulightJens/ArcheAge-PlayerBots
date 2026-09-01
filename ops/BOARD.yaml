@@ -401,11 +401,14 @@ tasks:
   - id: T-068
     title: Integrate progression and resource observability
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-067]
     runtime_lease: none
     gate: full-aaemu12-suite
+    owner_client_thread_id: client-new-thread:148eafb1-d1fd-4f79-a728-807f9394898f
+    owner_thread_id: 01a05c68-05eb-73f2-ab73-a046fa8a1de3
+    worktree: 'C:\Users\jensh\.codex\worktrees\da8a\PB-W00-control'
 
   - id: T-041
     title: One-zone Autonomous Activity Director
