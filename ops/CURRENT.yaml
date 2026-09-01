@@ -582,10 +582,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-v1.yaml
     proof: 46-focused-0-fail-build-0-errors-72-warnings-patch-sha-unchanged-clean-apply
   - task: T-103
-    state: prepared-awaiting-exact-build-integrator-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-build-install-integrator
+    client_thread_id: client-new-thread:e747efcd-103d-472e-978c-d58eec8ed76d
+    task_thread_id: 01a05f03-6e3a-75a3-9235-bb44950b3dde
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\b1da\PB-W00-control'
+    dispatch_base: 14e6951f6e9c97243d7cc84502a2a25e9cedebec
     candidate: 70b577861a5f8fef8df4be40c61af3ba66298ed3
     candidate_parent: 9a94b21fd4f9855346109cfe7b5b941df13e6b4b
     candidate_tree: 2476ff1be7040f028882d54ef44b5371e4ed9f14

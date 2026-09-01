@@ -1035,15 +1035,16 @@ tasks:
   - id: T-103
     title: Integrate and install exact bot transform telemetry
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-102]
     runtime_lease: aaemu12-build-only
     gate: exact-replay-install-focused-build-full-suite-integration
     contract: ops/tasks/T-103/CONTRACT.md
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:e747efcd-103d-472e-978c-d58eec8ed76d
+    owner_thread_id: 01a05f03-6e3a-75a3-9235-bb44950b3dde
+    worktree: 'C:\Users\jensh\.codex\worktrees\b1da\PB-W00-control'
+    dispatch_base: 14e6951f6e9c97243d7cc84502a2a25e9cedebec
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
