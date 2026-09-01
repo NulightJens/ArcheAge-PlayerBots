@@ -2,7 +2,7 @@ schema_version: 1
 id: T-094
 title: Reprove one-zone autonomy with widened observer pre-arm window
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Produce a fresh immutable live AAEmu 1.2 proof that pre-arms all three autonomy observers before admission, continuously observes zero client processes, gives all three bots two independently credited autonomous lifecycles with refills, and preserves target population across a distinct-PID restart.
 depends_on: [T-087, T-091, T-093]
@@ -11,11 +11,11 @@ runtime:
   lease: aaemu12
   archeage_client_allowed: false
 branch: codex-managed-worktree
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\2ba4\PB-W00-control'
+owner_client_thread_id: client-new-thread:339575d7-83e5-488c-abfb-7fe729feba00
+owner_thread_id: 01a05e46-6402-7da0-b59e-7c757b6d0c68
 inputs:
-  dispatch_base: pending-after-T-093-integration
+  dispatch_base: e70eb8d195a209ccef1c753ac48c6cc01fa89b86
   host_base: 62e3eb1d87da01194802ac886cd500134facad28
   installed_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
   installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
@@ -24,6 +24,8 @@ inputs:
   observer_integration_commit: fdb47f9dc2dc2ca82c8fb95e67171b05d6baf02a
   observer_script_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
   retained_predecessor_candidate: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
+  retained_predecessor_integration: cb52f2c224bb4cfbbc1807fdfff0f8aff3517070
+  retained_predecessor_receipt: ops/evidence/aaemu12-t092-fail-integration-v1.yaml
   retained_predecessor_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
   evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
 write_scope:
