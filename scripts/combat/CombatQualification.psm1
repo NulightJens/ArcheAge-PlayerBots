@@ -758,10 +758,10 @@ function New-T044QualificationPlan {
         ) + @($debugStimuli)
         $combatStimuli = @($spawnStimuli) + @($idleStimuli) + @(
             [pscustomobject]@{ command = 'botmetrics'; arguments = 'reset' },
+            [pscustomobject]@{ command = 'botmetrics'; arguments = 'snapshot' },
+            [pscustomobject]@{ command = 'botattackobject'; arguments = "all $(Get-T044Property $target 'objectId')" },
             [pscustomobject]@{ command = 'botmetrics'; arguments = 'snapshot' }
-        ) + @($ids | ForEach-Object {
-            [pscustomobject]@{ command = 'botattackobject'; arguments = "$_ $(Get-T044Property $target 'objectId')" }
-        }) + @([pscustomobject]@{ command = 'botmetrics'; arguments = 'snapshot' }) + @($debugStimuli)
+        ) + @($debugStimuli)
         $cleanupStimuli = @($ids | ForEach-Object { [pscustomobject]@{ command = 'removebot'; arguments = "$_" } })
         [pscustomobject]@{
             size = $size

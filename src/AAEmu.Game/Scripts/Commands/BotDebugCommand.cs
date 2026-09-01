@@ -93,8 +93,34 @@ namespace AAEmu.Game.Scripts.Commands
             // Also check task status
             CommandManager.SendNormalText(this, messageOutput, $"Movement task running: {BotManager.Instance.IsMovementTaskRunning(botId)}");
             CommandManager.SendNormalText(this, messageOutput, $"Combat task running: {BotCombatManager.Instance.IsTaskRunning(botId)}");
+            var runtime = BotHost.Instance.GetRuntime(botId);
+            if (runtime != null)
+            {
+                var life = runtime.LifeController.Inspect();
+                var transition = life.LastTransition;
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life: state={life.Life.State}, entered_at={Timestamp(life.Life.EnteredAt)}, profile={life.ProfileId}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life transition: event={transition?.Event.Kind.ToString() ?? "none"}, " +
+                    $"outcome={transition?.Outcome.ToString() ?? "none"}, reason={transition?.Reason.ToString() ?? "none"}, " +
+                    $"at={Timestamp(transition?.Event.At)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life decision: activity={life.Activity ?? "none"}, reason={life.DecisionReason ?? "none"}, " +
+                    $"at={Timestamp(life.DecisionAt)}");
+                var callback = !life.LogoutCallbackAt.HasValue
+                    ? "not_requested"
+                    : !life.LogoutSucceeded.HasValue
+                        ? "pending"
+                        : life.LogoutSucceeded.Value ? "succeeded" : "failed";
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life logout: callback={callback}, requested_at={Timestamp(life.LogoutRequestedAt)}, " +
+                    $"callback_at={Timestamp(life.LogoutCallbackAt)}, completed_at={Timestamp(life.LogoutCompletedAt)}");
+            }
             var hostMetrics = BotHost.Instance.Metrics;
             CommandManager.SendNormalText(this, messageOutput, $"Host metrics: bots={hostMetrics.LastTickBots}, active={hostMetrics.ActiveBots}, tick_ms_ema={hostMetrics.TickMsEma:F2}, max={hostMetrics.MaxTickMs:F2}, skipped={hostMetrics.SkippedTicks}, brain_steps={hostMetrics.BrainStepsTotal}, mover_steps={hostMetrics.MoverStepsTotal}");
         }
+
+        private static string Timestamp(DateTimeOffset? value) =>
+            value?.ToUniversalTime().ToString("O") ?? "none";
     }
 }

@@ -13,6 +13,11 @@ cleanup, graceful shutdown, and a clean restart. Missing or ambiguous material
 is INCOMPLETE. A complete observation that violates a behavioral expectation
 is FAIL.
 
+Each combat cohort is fully added, placed in Idle, and snapshotted before one
+`botattackobject all <targetObjId>` stimulus synchronously arms the complete
+cohort against its shared mortal target. Per-bot `botdebug` observations and
+`removebot` cleanup remain explicit by ID.
+
 ## Offline proof
 
 Run the deterministic synthetic fixtures from the module source checkout:
@@ -70,8 +75,12 @@ $segmentSha256 = [Convert]::ToHexString(
 
 4. Execute each `stimuli` entry exactly in plan order through the loopback
    command API. Record the HTTP outcome, response messages, and errors in the
-   corresponding evidence entry. The generated plan expands every bot ID; it
-   never uses an implicit `all` selector.
+   corresponding evidence entry. Cohort setup expands every supplied bot ID
+   for `addbot` and `botstate`, retains the starting metrics snapshot, and then
+   uses exactly one `botattackobject all <targetObjId>` command. That existing
+   server command performs the ordered fan-out synchronously before bot ticks
+   can kill and despawn the shared target. Debug and cleanup commands remain
+   expanded per ID.
 
 ```powershell
 $api = 'http://127.0.0.1:1280'

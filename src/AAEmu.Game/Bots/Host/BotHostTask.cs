@@ -15,6 +15,7 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
     private readonly BotHost _host;
     private readonly List<BotRuntime> _retiredRuntimes = [];
+    private readonly List<BotRuntime> _logoutRequests = [];
     private int _running;
     private DateTime _lastMetricsLogAt = DateTime.MinValue;
 
@@ -64,7 +65,8 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
 
     private void ExecuteTickCore(long start)
     {
-        var now = _host.TimeProvider.GetUtcNow().UtcDateTime;
+        var nowOffset = _host.TimeProvider.GetUtcNow();
+        var now = nowOffset.UtcDateTime;
         var config = BotConfig.Instance;
         var configuredPercent = (int)Math.Clamp(config.ActivityPercent, 0, 100);
         var effectivePercent = BotActivityGovernor.EffectiveActivePercent(
@@ -77,6 +79,8 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
         var windowIndex = now.Ticks / windowLength;
         var runtimes = _host.GetRuntimeSnapshot();
         _retiredRuntimes.Clear();
+        _logoutRequests.Clear();
+        var isSoleRuntime = runtimes.Length == 1;
 
         for (var i = 0; i < runtimes.Length; i++)
         {
@@ -100,6 +104,18 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                         continue;
                     }
 
+                    var logoutRequested = runtime.LifeController.Step(
+                        runtime,
+                        isSoleRuntime,
+                        nowOffset);
+                    if (logoutRequested)
+                    {
+                        _logoutRequests.Add(runtime);
+                        continue;
+                    }
+                    if (runtime.LifeController.ShouldSuspendRuntime)
+                        continue;
+
                     runtime.Social.GuardLeader();
                     StepMover(runtime, now, config);
                     // A brain captured before Unregister may complete the one already-started step; no step starts after OnCancel.
@@ -107,6 +123,15 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                 }
 
                 StepBrain(runtime, brain, now, windowIndex, effectivePercent, config);
+
+                lock (runtime.SyncRoot)
+                {
+                    if (!runtime.Retired &&
+                        runtime.LifeController.Step(runtime, isSoleRuntime, nowOffset))
+                    {
+                        _logoutRequests.Add(runtime);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -120,6 +145,11 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
 
         foreach (var runtime in _retiredRuntimes)
             _host.Unregister(runtime);
+
+        // Lifecycle evaluation only queues a request. The normal persisted
+        // DespawnBot path runs after all runtime iteration and SyncRoot locks.
+        foreach (var runtime in _logoutRequests)
+            InvokeLogout(runtime);
 
         var activeBots = 0;
         for (var i = 0; i < runtimes.Length; i++)
@@ -139,6 +169,28 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
             _lastMetricsLogAt = now;
             _host.LogMetrics();
         }
+    }
+
+    private void InvokeLogout(BotRuntime runtime)
+    {
+        var callbackAt = _host.TimeProvider.GetUtcNow();
+        if (!runtime.LifeController.TryBeginLogoutCallback(callbackAt))
+            return;
+
+        var succeeded = false;
+        try
+        {
+            succeeded = _host.LogoutBot(runtime.Bot.Id);
+        }
+        catch (Exception exception)
+        {
+            Logger.Error(exception, $"BOT id={runtime.Bot.Id} ev=life_logout_callback_failed");
+        }
+
+        runtime.LifeController.RecordLogoutResult(
+            runtime.Bot.Id,
+            succeeded,
+            _host.TimeProvider.GetUtcNow());
     }
 
     private void StepMover(BotRuntime runtime, DateTime now, BotConfig config)

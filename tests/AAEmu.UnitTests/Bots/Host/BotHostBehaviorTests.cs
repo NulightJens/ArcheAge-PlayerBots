@@ -1,12 +1,18 @@
+using System.Numerics;
+using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Bots.Life;
+using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Bots.Kernel;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Units;
+using AAEmu.Game.Models.Game.NPChar;
 using AAEmu.Game.Models.Tasks.Bots;
 using AAEmu.UnitTests.Bots.Sim;
 using AAEmu.UnitTests.Utils.Mocks;
+using Microsoft.Extensions.Time.Testing;
 
 namespace AAEmu.UnitTests.Bots.Host;
 
@@ -565,6 +571,138 @@ public class BotHostBehaviorTests
     }
 
     [Test]
+    public async Task OneKillLifecycle_UsesAuthoritativeCreditAndInvokesLogoutOutsideIterationAndLock()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 0, 0, TimeSpan.Zero));
+        BotRuntime runtime = null;
+        var callbackCount = 0;
+        var callbackState = BotLifeState.Offline;
+        var callbackHeldRuntimeLock = true;
+        var callbackRunning = -1;
+        var host = MakeLifecycleHost(time, _ =>
+        {
+            callbackCount++;
+            callbackState = runtime.LifeController.Inspect().Life.State;
+            callbackHeldRuntimeLock = Monitor.IsEntered(runtime.SyncRoot);
+            callbackRunning = Volatile.Read(ref runtime.Running);
+            return true;
+        });
+        runtime = MakeLifecycleRuntime(6301, time);
+
+        host.Register(runtime);
+        try
+        {
+            host.HostTask.Execute();
+
+            await Assert.That(runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Grinding);
+            await Assert.That(runtime.CombatState.KillGoal).IsEqualTo(1);
+            await Assert.That(runtime.CombatState.Target).IsNull();
+            await Assert.That(runtime.Bot.CurrentTarget).IsNull();
+            await Assert.That(runtime.MovementState.Destination).IsNull();
+
+            var victim = new Npc { ObjId = 9901, TemplateId = 42, Hp = 0, MaxHp = 100 };
+            runtime.Bot.Events.OnKill(victim, new OnKillArgs { Killer = runtime.Bot, Victim = victim });
+            runtime.CombatState.KillGoal = null;
+            runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+            time.Advance(TimeSpan.FromMilliseconds(100));
+
+            host.HostTask.Execute();
+            host.HostTask.Execute();
+
+            var life = runtime.LifeController.Inspect();
+            await Assert.That(runtime.CombatState.KillCount).IsEqualTo(1);
+            await Assert.That(callbackCount).IsEqualTo(1);
+            await Assert.That(callbackState).IsEqualTo(BotLifeState.Despawning);
+            await Assert.That(callbackHeldRuntimeLock).IsFalse();
+            await Assert.That(callbackRunning).IsEqualTo(0);
+            await Assert.That(life.Life.State).IsEqualTo(BotLifeState.Offline);
+            await Assert.That(life.LogoutSucceeded).IsTrue();
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
+    public async Task LogoutCallbackFailure_IsRecordedAndNeverRetried()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 5, 0, TimeSpan.Zero));
+        var callbackCount = 0;
+        var host = MakeLifecycleHost(time, _ =>
+        {
+            callbackCount++;
+            throw new InvalidOperationException("simulated logout failure");
+        });
+        var runtime = MakeLifecycleRuntime(6302, time);
+        var mover = (BotSim.SimMover)runtime.Mover;
+
+        host.Register(runtime);
+        try
+        {
+            host.HostTask.Execute();
+            runtime.CombatState.KillCount = 1;
+            runtime.CombatState.KillGoal = null;
+            runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+
+            host.HostTask.Execute();
+            time.Advance(TimeSpan.FromMilliseconds(100));
+            host.HostTask.Execute();
+
+            var life = runtime.LifeController.Inspect();
+            await Assert.That(callbackCount).IsEqualTo(1);
+            await Assert.That(life.Life.State).IsEqualTo(BotLifeState.Despawning);
+            await Assert.That(life.LogoutSucceeded).IsFalse();
+            await Assert.That(life.LastTransition?.Event.Kind).IsEqualTo(BotLifeEventKind.LogoutRequested);
+            await Assert.That(mover.StepCount).IsEqualTo(1);
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
+    public async Task ReaddingPersistentIdentity_ResetsControllerAndPermitsFreshIteration()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 10, 0, TimeSpan.Zero));
+        var host = MakeLifecycleHost(time, _ => false);
+        var controller = new BotLifeController();
+        var first = MakeLifecycleRuntime(6303, time, controller);
+        host.Register(first);
+        host.HostTask.Execute();
+        first.CombatState.KillCount = 1;
+        first.CombatState.KillGoal = null;
+        first.CombatState.TransitionTo(BotCombatStateType.Idle);
+        host.HostTask.Execute();
+        host.Unregister(first.Bot.Id);
+
+        time.Advance(TimeSpan.FromSeconds(1));
+        var second = MakeLifecycleRuntime(6303, time, controller);
+        host.Register(second);
+        try
+        {
+            var fresh = controller.Inspect();
+            await Assert.That(fresh.Life.State).IsEqualTo(BotLifeState.Idle);
+            await Assert.That(fresh.Activity).IsNull();
+            await Assert.That(fresh.DecisionAt).IsNull();
+            await Assert.That(fresh.LogoutRequestedAt).IsNull();
+            await Assert.That(fresh.LogoutSucceeded).IsNull();
+
+            host.HostTask.Execute();
+
+            var restarted = controller.Inspect();
+            await Assert.That(restarted.Life.State).IsEqualTo(BotLifeState.Active);
+            await Assert.That(restarted.Activity).IsEqualTo("grind");
+            await Assert.That(second.CombatState.KillGoal).IsEqualTo(1);
+        }
+        finally
+        {
+            host.Unregister(second.Bot.Id);
+        }
+    }
+
+    [Test]
     public async Task TickMetrics_TickMsEmaMovesForSlowBrain()
     {
         var sim = new BotSim();
@@ -756,6 +894,50 @@ public class BotHostBehaviorTests
         : BotMovementTask(bot, state, broadcaster)
     {
         internal override void Step() => throw new InvalidOperationException("simulated mover failure");
+    }
+
+    private static BotHost MakeLifecycleHost(FakeTimeProvider time, Func<uint, bool> logout)
+    {
+        var taskManager = Mock.Of<ITaskManager>();
+        taskManager.Schedule(Any<AAEmu.Game.Models.Tasks.Task>(), Any<TimeSpan?>(), Any<TimeSpan?>(), Any<int>())
+            .Returns(true);
+        return new BotHost(taskManager.Object, time, logoutBot: logout);
+    }
+
+    private static BotRuntime MakeLifecycleRuntime(
+        uint id,
+        FakeTimeProvider time,
+        BotLifeController controller = null)
+    {
+        var bot = BotTestFixture.MakeBot(id, Vector3.Zero);
+        bot.Hp = 100;
+        bot.MaxHp = 100;
+        var world = BotTestFixture.MakeWorld();
+        BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+        var movement = new BotMovementState();
+        var combat = new BotCombatState();
+        var blackboard = new BotBlackboard();
+        blackboard.Register(BotValues.NearbyHostileNpcIds, new ManualValue<List<uint>>([9901u]));
+        world.AddObject(new Npc { ObjId = 9901, Hp = 100, MaxHp = 100 });
+        var broadcaster = new BotMovementBroadcaster(bot, time);
+        var mover = new BotSim.SimMover(bot, movement, broadcaster);
+        var brain = new BotCombatTask(
+            bot,
+            combat,
+            broadcaster,
+            onCancel: null,
+            blackboard: blackboard,
+            timeProvider: time);
+        return new BotRuntime(
+            bot,
+            movement,
+            combat,
+            broadcaster,
+            mover,
+            brain,
+            blackboard,
+            new BotConfig { UseEngine = false },
+            controller);
     }
 
     private sealed class BlockingBrain(AAEmu.Game.Models.Game.Char.Character bot, BotCombatState state, BotMovementBroadcaster broadcaster)

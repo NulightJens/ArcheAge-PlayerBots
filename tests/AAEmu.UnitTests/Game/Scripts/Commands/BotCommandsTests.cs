@@ -3,6 +3,8 @@ using System.Globalization;
 using System.Numerics;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
+using AAEmu.Game.Bots.Blackboard;
+using AAEmu.Game.Bots.Host;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
@@ -19,6 +21,7 @@ using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Units.Static;
 using AAEmu.Game.Models.Game.World;
+using AAEmu.Game.Models.Tasks.Bots;
 using AAEmu.Game.Scripts.Commands;
 using AAEmu.Game.Utils.Scripts;
 using AAEmu.UnitTests.Utils.Mocks;
@@ -840,6 +843,60 @@ public class BotCommandsTests
             message.Contains("radius=4.50") &&
             message.Contains("angle=1.25") &&
             message.Contains("last_known=<10, 20, 30>"));
+    }
+
+    [Test]
+    public async Task BotDebug_AutonomousDecision_ExposesLifeTransitionReasonAndTimestamps()
+    {
+        var bot = AddDebugBot(4);
+        var world = BotTestFixture.MakeWorld();
+        BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+        var movement = _botManager.GetBotState(bot.Id);
+        var combat = new BotCombatState();
+        _combatManager.States[bot.Id] = combat;
+        var blackboard = new BotBlackboard();
+        blackboard.Register(BotValues.NearbyHostileNpcIds, new ManualValue<List<uint>>([9901u]));
+        world.AddObject(new Npc { ObjId = 9901, Hp = 100, MaxHp = 100 });
+        var broadcaster = new BotMovementBroadcaster(bot, BotHost.Instance.TimeProvider);
+        var mover = new BotMovementTask(bot, movement, broadcaster);
+        var brain = new BotCombatTask(
+            bot,
+            combat,
+            broadcaster,
+            onCancel: null,
+            blackboard: blackboard,
+            timeProvider: BotHost.Instance.TimeProvider);
+        var runtime = new BotRuntime(
+            bot,
+            movement,
+            combat,
+            broadcaster,
+            mover,
+            brain,
+            blackboard,
+            new BotConfig { UseEngine = false });
+        BotHost.Instance.Register(runtime);
+        try
+        {
+            runtime.LifeController.Step(runtime, true, BotHost.Instance.TimeProvider.GetUtcNow());
+
+            var output = Execute(new BotDebugCommand(), "4");
+
+            await Assert.That(output.Messages).Contains(message =>
+                message.Contains("Life: state=Active") && message.Contains("entered_at=2026-"));
+            await Assert.That(output.Messages).Contains(message =>
+                message.Contains("Life transition: event=ActivityRequested") &&
+                message.Contains("outcome=Accepted") &&
+                message.Contains("reason=StateChanged") &&
+                message.Contains("at=2026-"));
+            await Assert.That(output.Messages).Contains(message =>
+                message.Contains("Life decision: activity=grind, reason=nearby_mortal") &&
+                message.Contains("at=2026-"));
+        }
+        finally
+        {
+            BotHost.Instance.Unregister(runtime.Bot.Id);
+        }
     }
 
     [Test]

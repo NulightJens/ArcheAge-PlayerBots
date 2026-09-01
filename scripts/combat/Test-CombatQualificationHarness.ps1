@@ -244,9 +244,62 @@ function New-PassEvidence($Plan) {
     }
 }
 
-$plan = New-T044QualificationPlan -InputObject (New-PlanInput)
+$planInput = New-PlanInput
+$plan = New-T044QualificationPlan -InputObject $planInput
 Assert-Equal (($plan.cohorts.size | Sort-Object) -join ',') '1,5,10,25,50,100' 'explicit cohort ladder'
 Assert-Equal @($plan.cohorts | Where-Object size -eq 100)[0].botIds.Count 100 '100-bot supplied identity count'
+Assert-Equal @($plan.cohorts.target.objectId | Sort-Object -Unique).Count 6 'six distinct combat target identities'
+
+foreach ($cohort in $plan.cohorts) {
+    $size = [int]$cohort.size
+    $ids = @($cohort.botIds | ForEach-Object { [uint]$_ })
+    $targetId = [uint]$cohort.target.objectId
+    $expectedTargetId = [uint]@($planInput.targets.combat | Where-Object cohortSize -eq $size)[0].objectId
+    Assert-Equal $targetId $expectedTargetId "cohort-$size supplied target identity"
+    $combatStimuli = @($cohort.combat.stimuli)
+    $attackStimuli = @($combatStimuli | Where-Object command -eq 'botattackobject')
+    Assert-Equal $attackStimuli.Count 1 "cohort-$size atomic attack count"
+    Assert-Equal $attackStimuli[0].arguments "all $targetId" "cohort-$size atomic attack selector and target"
+
+    $expectedCombatKeys = @($ids | ForEach-Object { "addbot|$_" }) +
+        @($ids | ForEach-Object { "botstate|$_ idle" }) + @(
+            'botmetrics|reset',
+            'botmetrics|snapshot',
+            "botattackobject|all $targetId",
+            'botmetrics|snapshot'
+        ) + @($ids | ForEach-Object { "botdebug|$_" })
+    $actualCombatKeys = @($combatStimuli | ForEach-Object { "$($_.command)|$($_.arguments)" })
+    Assert-Equal ($actualCombatKeys -join "`n") ($expectedCombatKeys -join "`n") "cohort-$size atomic combat ordering"
+
+    $expectedControlKeys = @($ids | ForEach-Object { "addbot|$_" }) +
+        @($ids | ForEach-Object { "botstate|$_ idle" }) + @(
+            'botmetrics|reset',
+            'botmetrics|snapshot',
+            'botmetrics|snapshot'
+        ) + @($ids | ForEach-Object { "botdebug|$_" })
+    $actualControlKeys = @($cohort.control.stimuli | ForEach-Object { "$($_.command)|$($_.arguments)" })
+    Assert-Equal ($actualControlKeys -join "`n") ($expectedControlKeys -join "`n") "cohort-$size per-ID control debug coverage"
+
+    $expectedCleanupKeys = @($ids | ForEach-Object { "removebot|$_" })
+    foreach ($phaseName in @('control', 'combat')) {
+        $actualCleanupKeys = @($cohort.$phaseName.cleanupStimuli | ForEach-Object { "$($_.command)|$($_.arguments)" })
+        Assert-Equal ($actualCleanupKeys -join "`n") ($expectedCleanupKeys -join "`n") "cohort-$size $phaseName per-ID cleanup coverage"
+    }
+}
+
+$secondPlan = New-T044QualificationPlan -InputObject (New-PlanInput)
+$planJson = $plan | ConvertTo-Json -Depth 100 -Compress
+$secondPlanJson = $secondPlan | ConvertTo-Json -Depth 100 -Compress
+Assert-Equal $secondPlanJson $planJson 'byte-stable repeated plan generation'
+
+$overwriteRefused = $false
+try {
+    & (Join-Path $PSScriptRoot 'New-CombatQualificationPlan.ps1') -InputPath $PSCommandPath -OutputPath $PSCommandPath
+}
+catch {
+    $overwriteRefused = $_.Exception.Message -like 'Refusing to overwrite retained plan output:*'
+}
+Assert-Equal $overwriteRefused $true 'retained plan overwrite refusal'
 
 $passEvidence = New-PassEvidence $plan
 $pass = Test-T044QualificationEvidence -Plan $plan -Evidence $passEvidence
@@ -300,4 +353,4 @@ Assert-Equal (Test-T044QualificationEvidence $plan $restartIdentityGap).verdict 
 $partial = [pscustomobject]@{ schemaVersion = 't044.combat-qualification.v1'; gateDefinitionVersion = 1; runId = $plan.runId }
 Assert-Equal (Test-T044QualificationEvidence $plan $partial).verdict 'INCOMPLETE' 'malformed partial evidence'
 
-Write-Output 'T-044 deterministic harness fixtures: PASS (13 verdict scenarios, no sleeps)'
+Write-Output 'T-044 deterministic harness fixtures: PASS (13 verdict scenarios, 6 atomic cohort plans, byte-stable generation, overwrite refused, no sleeps)'
