@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: one-zone-activity-director-concurrency-correction
+phase: serialized-one-zone-activity-director-integration
 verdict: active
 
 source:
@@ -54,9 +54,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Dispatch T-083 to replace the rejected T-081 candidate with a serialized GameService Director lifecycle and deterministic concurrent start/stop proof.
-  - Dispatch a fresh dedicated integrator only after T-083 hands off a clean replacement; require host install/build, focused tests, and the still-unconsumed single full-suite wave gate.
-  - Keep T-041 runtime proof blocked until that integrator accepts the exact replacement source and installed fingerprints; then prove bounded autonomous refill in one nonzero zone.
+  - Dispatch T-084 to independently review the T-083 serialized replacement, install/build it under an exact build-only lease, run focused tests, and consume exactly one full-suite wave gate.
+  - Keep T-041 runtime proof blocked until T-084 accepts the exact replacement source and installed fingerprints; then prove bounded autonomous refill in one nonzero zone.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
@@ -297,7 +296,7 @@ prepared_workstreams:
     head: 4be88728f069cb03106b81c56a5499605683c0f4
     result: REJECTED-before-replay-host-write-build-tests-or-full-suite
   - task: T-083
-    state: active-source-correction
+    state: review-source-green
     client_thread_id: client-new-thread:f554b91d-0373-48c4-81ae-e08565340f39
     task_thread_id: 01a05d5b-8036-7883-8ad6-89b80e334290
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\26e1\PB-W00-control'
@@ -305,6 +304,13 @@ prepared_workstreams:
     rejected_candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
     blocker_handoff: ops/tasks/T-082/HANDOFF.md
     handoff: ops/tasks/T-083/HANDOFF.md
+    head: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
+    proof: 15-service-concurrency-and-154-focused-tests-build-0-errors-patch-sha-green
+  - task: T-084
+    state: prepared-integration
+    candidate: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
+    candidate_parent: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
+    handoff: ops/tasks/T-084/HANDOFF.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

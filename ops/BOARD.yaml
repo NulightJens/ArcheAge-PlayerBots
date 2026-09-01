@@ -623,7 +623,7 @@ tasks:
   - id: T-083
     title: Serialize Activity Director startup and shutdown
     track: AAEmu12
-    status: active
+    status: review
     integration: pending
     depends_on: [T-081, T-082]
     runtime_lease: none
@@ -631,13 +631,25 @@ tasks:
     owner_client_thread_id: client-new-thread:f554b91d-0373-48c4-81ae-e08565340f39
     owner_thread_id: 01a05d5b-8036-7883-8ad6-89b80e334290
     worktree: 'C:\Users\jensh\.codex\worktrees\26e1\PB-W00-control'
+    source_head: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
+    source_parent: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
+    result: concurrency-source-green-15-service-154-focused-build-0-errors
+
+  - id: T-084
+    title: Integrate the serialized one-zone Activity Director
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-082, T-083]
+    runtime_lease: aaemu12-build-only
+    gate: full-aaemu12-suite
 
   - id: T-041
     title: One-zone Autonomous Activity Director
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-080, T-082]
+    depends_on: [T-080, T-084]
     runtime_lease: aaemu12
     gate: serialized-one-zone-autonomy-proof
 

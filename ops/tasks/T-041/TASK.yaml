@@ -5,7 +5,7 @@ track: AAEmu12
 status: blocked
 integration: pending
 outcome: Maintain configured population bounds while persistent bots independently select and complete safe one-zone activities with qualified lifecycle, navigation, combat, recovery, operator visibility, and deterministic cleanup.
-depends_on: [T-080, T-082]
+depends_on: [T-080, T-084]
 runtime:
   required: true
   lease: aaemu12
