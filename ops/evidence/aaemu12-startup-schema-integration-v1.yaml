@@ -1,0 +1,168 @@
+schema_version: 1
+id: aaemu12-startup-schema-integration-v1
+recorded_at: 2026-08-31
+verdict: green-review-install-build-focused-full-unit
+
+fingerprint:
+  source_commit: dc9340fc61d1090e61eda99e55f0cd993b2af898
+  reconstructed_module_commit: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+  reconstructed_module_tree: 92d100838dd4b963edc25245729ea29759deb05a
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: 5b44353fef730367b6dfe29baaa0c5141374163f6616549b6724cead91d82ac3
+  login_service_sha256: 3b3f7d2f6578ef90ed43d96b553dab8b32954cc0676f18056ded7b8f35390d4f
+  login_assembly_sha256: 19ec1faa892e4db157c0bde9c9f8d5e9a1da463d5d40d74e6cfad9de0bc3031d
+  test_assembly_sha256: e4e0cd10f4a1e5207e3ca143c831c74231d4b269d9444dff3bc15cd5cded3625
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+  installed_sql_sha256: c5bd4d43fb767837c7042dd2cc968decb69393876e5e5520a74aa721cc4eee5c
+  client_provenance_sha256_or_not_applicable: not-applicable-no-client-started
+  database_provenance_or_not_accessed: not-accessed
+  gate_definition_version: 1
+  command_and_environment_fingerprint: b7b840d51b7373b745b584954132a61dd9040e6fd4146db9f1a6a7786b339c45
+  command_and_environment_fingerprint_algorithm: sha256-utf8-lf-with-final-lf
+
+source_review:
+  dispatch_ancestor: 3fc60d88dec7854a1b5a48f03fd84fed273bb067
+  control_setup_commit: 0c4c98bb9c72562b560bd0e1f808eb8d61685fc4
+  source_parent: 58f86b47b7f62f3861b597de268b8a798a5c763a
+  source_commit_tree: d7daf3e2f1a4f9c246b8b0b9bb422d543de94cf7
+  source_stable_patch_id: 38a61c6b11018b01cac8ea9577696dd090062a13
+  reconstructed_stable_patch_id: 38a61c6b11018b01cac8ea9577696dd090062a13
+  replay_verdict: exact-payload-identity
+  independent_review:
+    login_hunk: resolved-database-only-before-updater
+    startup_predicate: exact-literal-schema-line-plus-internal-network-and-loopback-listener
+    start_script: consumes-shared-strict-predicate-before-game-start
+    deterministic_failures: thirteen-pass-and-fail-closed-fixtures
+    documentation_and_manifest: consistent-with-active-patch
+    verified_defects_corrected: none
+
+environment:
+  os: windows-10.0.26200-x64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  dotnet_test_runtime: 10.0.10
+  reference_workspace: aaemu12_reference
+  integration_workspace: aaemu12_integration
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_module_commit: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+  installed_module_tree: 92d100838dd4b963edc25245729ea29759deb05a
+
+gate_material:
+  t048_handoff_sha256: 063dc43f2e6fc7b79b51882cf5699f18a8d25178930d2d430e6f5ed78b37b4ab
+  prior_integration_receipt_sha256: 1a3e9fbb9cdc8d12150a85cb5210952799231ae3598f2f1b120b88b89ce344d2
+  t049_task_sha256: 185516b4c81254b502e27e9c40f21812e10f18baa86ab58df531c379e9039424
+  t049_contract_sha256: 94cbda322cbe3e18aa56c97f1bca64b55dd24f05164dbe2c4deec3ba55a7ad2e
+  start_script_sha256: f7b2cbb9cdb1a184416da7b66a59223141512b4f043edf1467f2aeaa30405b7b
+  startup_guard_module_sha256: 09dba0b346a8363ccf650d88e70f30f04dc77219cfab9e43034c5ff082820da8
+  startup_guard_test_sha256: 383ef5018e12d01ef3a54a8758787c401ea5028e92befd80f3b667262528254f
+
+host_installation:
+  prior_receipt_match:
+    host_base: passed
+    prior_complete_patch_reverse_check: passed
+    prior_patch_sha256: afbb6aa2c5d379eb76ad339642c190f4185b4981815aa27c68d0680d28edd046
+    prior_installed_module_commit: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+    prior_installed_module_tree: dea8946532f2ece2ca12cf0d209af1843a0c4338
+  incremental_login_include:
+    apply_check_whitespace_error_all: passed
+    apply_exact_include: passed
+    new_tracked_host_paths: [AAEmu.Login/LoginService.cs]
+  reconstructed_install:
+    installer_check: passed-installed-supported
+    installer: passed-idempotent
+    complete_patch_reverse_check: passed
+    installed_module_clean: true
+    reference_checkout_clean: true
+
+command_environment_material: |-
+  gate_definition_version=1
+  os=Microsoft Windows 10.0.26200-x64
+  powershell=7.6.4
+  dotnet_sdk=10.0.302
+  dotnet_test_runtime=10.0.10
+  workspace=aaemu12_integration
+  host_base=62e3eb1d87da01194802ac886cd500134facad28
+  module_source=78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+  compatibility_patch_sha256=5b44353fef730367b6dfe29baaa0c5141374163f6616549b6724cead91d82ac3
+  login_service_sha256=3b3f7d2f6578ef90ed43d96b553dab8b32954cc0676f18056ded7b8f35390d4f
+  login_assembly_sha256=19ec1faa892e4db157c0bde9c9f8d5e9a1da463d5d40d74e6cfad9de0bc3031d
+  test_assembly_sha256=e4e0cd10f4a1e5207e3ca143c831c74231d4b269d9444dff3bc15cd5cded3625
+  install_check=Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12 -CheckOnly
+  install=Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12
+  build=dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false
+  startup_guard=pwsh -NoLogo -NoProfile -File scripts/scale/Test-ScaleRuntimeStartupGuard.ps1
+  focused_manager=AAEmu.UnitTests.exe --treenode-filter /*/*/BotCombatManagerTests/* --minimum-expected-tests 13 --no-progress --no-ansi --output Detailed
+  focused_state=AAEmu.UnitTests.exe --treenode-filter /*/*/BotCombatStateTests/* --minimum-expected-tests 38 --no-progress --no-ansi --output Detailed
+  focused_task=AAEmu.UnitTests.exe --treenode-filter /*/*/BotCombatTaskTests/* --minimum-expected-tests 15 --no-progress --no-ansi --output Detailed
+  focused_commands=AAEmu.UnitTests.exe --treenode-filter /*/*/BotCommandsTests/* --minimum-expected-tests 43 --no-progress --no-ansi --output Detailed
+  focused_passive_npc=AAEmu.UnitTests.exe --treenode-filter /*/*/SpawnPassiveNpcCommandTests/* --minimum-expected-tests 8 --no-progress --no-ansi --output Detailed
+  focused_access=AAEmu.UnitTests.exe --treenode-filter /*/*/BotAccessLevelsTests/* --minimum-expected-tests 3 --no-progress --no-ansi --output Detailed
+  full=dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+
+results:
+  startup_guard:
+    assertions: 13
+    runtime_processes_started: 0
+    verdict: passed
+  powershell_parser:
+    files: 3
+    verdict: passed
+  manifest_hash_reproduction:
+    host_tracks: 2
+    install_fields: 3
+    verdict: passed
+  credential_scan:
+    added_login_source_lines: 2
+    resolved_property: MySQLProvider.Database
+    credential_or_connection_fields: 0
+    verdict: passed
+  deterministic_evidence:
+    assertions: 53
+    retained_translator_attempts: 18
+    verdict: passed
+  deterministic_combat:
+    scenarios: 13
+    sleeps: 0
+    verdict: passed
+  build:
+    errors: 0
+    warnings: 75
+    worker_count: 1
+    node_reuse: false
+  focused:
+    total: 120
+    succeeded: 120
+    skipped: 0
+    failed: 0
+    BotCombatManagerTests: 13
+    BotCombatStateTests: 38
+    BotCombatTaskTests: 15
+    BotCommandsTests: 43
+    SpawnPassiveNpcCommandTests: 8
+    BotAccessLevelsTests: 3
+  full_unit:
+    invocations: 1
+    total: 1793
+    succeeded: 1789
+    skipped: 4
+    failed: 0
+  git_diff_check: passed
+  post_suite_complete_patch_reverse_check: passed
+
+retained_failures:
+  product_or_gate_failures: none
+  operator_checks:
+    - A read-only preflight wrapper had an invalid PowerShell interpolated-variable delimiter and stopped before its checks; the corrected wrapper passed.
+    - The corrected wrapper's first module-tree probe left HEAD^{tree} unquoted, so PowerShell parsed the braces; the quoted probe returned the expected tree and all substantive checks passed.
+    - Optional receipt-parser probes found no YAML package in the Windows alias or bundled Python/Node runtimes; structural key and embedded-fingerprint checks passed instead.
+  warnings:
+    - The build retained 75 dependency, compiler, analyzer, and test-analyzer warnings, including the existing SQLitePCLRaw.lib.e_sqlite3 and SSH.NET high-severity advisories.
+
+retained_boundaries:
+  - No client, Login server, Game server, or MySQL process was started, stopped, or controlled.
+  - No database was queried, mutated, provisioned, migrated, or otherwise accessed.
+  - No runtime lease was claimed or edited.
+  - The clean AAEmu 1.2 reference, global ledgers, workspace registry, client fixtures, AAEmu 3.0 host, and retained worker worktrees were not modified.
+  - No physical selected-schema emission, mortal-combat, stealth, cleanup, restart, client, scale, resource-budget, or Population Director acceptance is claimed.
+  - Generated test reports and deterministic harness artifacts remain outside the committed evidence receipt.
