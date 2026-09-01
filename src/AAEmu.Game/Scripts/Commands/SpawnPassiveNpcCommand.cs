@@ -257,6 +257,12 @@ public sealed class SpawnPassiveNpcCommand : ICommand
             return false;
         }
 
+        if (world.Template == null)
+        {
+            error = MissingWorldTemplateError(anchorBotId);
+            return false;
+        }
+
         Transform transformSnapshot = null;
         try
         {
@@ -268,10 +274,10 @@ public sealed class SpawnPassiveNpcCommand : ICommand
                 return false;
             }
 
-            var worldId = world.Template?.Id ?? 0;
+            var worldId = world.Template.Id;
             var zoneId = transformSnapshot.ZoneId;
             var instanceId = transformSnapshot.InstanceId;
-            if (worldId == 0 || world.Id != instanceId || transform.WorldId != worldId ||
+            if (world.Id != instanceId || transform.WorldId != worldId ||
                 positionSnapshot.ZoneId != zoneId || zoneId == 0)
             {
                 error = $"Active bot anchor {anchorBotId} has an inconsistent world or instance boundary.";
@@ -344,7 +350,13 @@ public sealed class SpawnPassiveNpcCommand : ICommand
             return false;
         }
 
-        if (anchor.World.Template?.Id != anchor.WorldId ||
+        if (anchor.World.Template == null)
+        {
+            error = MissingWorldTemplateError(anchor.BotId);
+            return false;
+        }
+
+        if (anchor.World.Template.Id != anchor.WorldId ||
             anchor.World.Id != anchor.InstanceId ||
             transform.WorldId != anchor.WorldId ||
             transform.ZoneId != anchor.ZoneId ||
@@ -420,6 +432,11 @@ public sealed class SpawnPassiveNpcCommand : ICommand
     private static string StaleAnchorError(uint anchorBotId)
     {
         return $"Active bot anchor {anchorBotId} became stale while its transform was captured.";
+    }
+
+    private static string MissingWorldTemplateError(uint anchorBotId)
+    {
+        return $"Active bot anchor {anchorBotId} does not have a world template.";
     }
 
     internal static DummyAiCharacter ApplyPassiveAi(Npc npc, Action<NpcAi> registerAi)

@@ -316,6 +316,46 @@ public class SpawnPassiveNpcCommandTests
     }
 
     [Test]
+    public async Task ResolveAnchor_InconsistentWorldIdFailsClosed()
+    {
+        var (world, bot) = CreateQualifiedAnchor();
+        BotTestFixture.SetPrivateField(bot.Transform, "<WorldId>k__BackingField", world.Template.Id + 1);
+
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out var error);
+        anchor?.Dispose();
+
+        await Assert.That(resolved).IsFalse();
+        await Assert.That(anchor).IsNull();
+        await Assert.That(error)
+            .IsEqualTo("Active bot anchor 20001 has an inconsistent world or instance boundary.");
+    }
+
+    [Test]
+    public async Task ResolveAnchor_MissingWorldTemplateFailsClosedWithPreciseError()
+    {
+        var (world, bot) = CreateQualifiedAnchor();
+        var template = world.Template;
+        try
+        {
+            BotTestFixture.SetPrivateField<WorldTemplate>(world, "<Template>k__BackingField", null);
+
+            var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+                bot.Id, _ => bot, out var anchor, out var error);
+            anchor?.Dispose();
+
+            await Assert.That(resolved).IsFalse();
+            await Assert.That(anchor).IsNull();
+            await Assert.That(error)
+                .IsEqualTo("Active bot anchor 20001 does not have a world template.");
+        }
+        finally
+        {
+            BotTestFixture.SetPrivateField(world, "<Template>k__BackingField", template);
+        }
+    }
+
+    [Test]
     public async Task ResolveAnchor_ConcurrentDepartureFailsAsStale()
     {
         var (_, bot) = CreateQualifiedAnchor();
@@ -370,6 +410,45 @@ public class SpawnPassiveNpcCommandTests
     }
 
     [Test]
+    public async Task ResolveAnchor_DefaultWorldTemplateZeroSnapshotsWithoutMutationOrTargetControl()
+    {
+        var (world, bot) = CreateQualifiedAnchor(worldTemplateId: 0);
+        var previousTarget = new Npc { ObjId = 99001 };
+        bot.CurrentTarget = previousTarget;
+        bot.IsInBattle = true;
+        var originalPosition = bot.Transform.World.Position;
+        var originalRotation = bot.Transform.World.Rotation;
+
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out var error);
+        using var anchorScope = anchor;
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(error).IsNull();
+        await Assert.That(world.Template.Id).IsEqualTo(0u);
+        await Assert.That(anchor.WorldId).IsEqualTo(0u);
+        await Assert.That(anchor.ZoneId).IsEqualTo(601u);
+        await Assert.That(anchor.InstanceId).IsEqualTo(43u);
+        await Assert.That(anchor.Transform.GameObject).IsNull();
+        await Assert.That(anchor.Transform.Parent).IsNull();
+        await Assert.That(float.IsFinite(anchor.Transform.World.Position.X)).IsTrue();
+        await Assert.That(float.IsFinite(anchor.Transform.World.Position.Y)).IsTrue();
+        await Assert.That(float.IsFinite(anchor.Transform.World.Position.Z)).IsTrue();
+        await Assert.That(float.IsFinite(anchor.Transform.World.Rotation.X)).IsTrue();
+        await Assert.That(float.IsFinite(anchor.Transform.World.Rotation.Y)).IsTrue();
+        await Assert.That(float.IsFinite(anchor.Transform.World.Rotation.Z)).IsTrue();
+        await Assert.That(bot.ParentWorld).IsSameReferenceAs(world);
+        await Assert.That(bot.CurrentTarget).IsSameReferenceAs(previousTarget);
+        await Assert.That(bot.IsInBattle).IsTrue();
+        await Assert.That(bot.Transform.World.Position).IsEqualTo(originalPosition);
+        await Assert.That(bot.Transform.World.Rotation).IsEqualTo(originalRotation);
+
+        var detachedPosition = anchor.Transform.World.Position;
+        bot.Transform.Local.SetPosition(999f, 998f, 997f);
+        await Assert.That(anchor.Transform.World.Position).IsEqualTo(detachedPosition);
+    }
+
+    [Test]
     public async Task CreateSpawnPosition_UsesDetachedAnchorAndPreservesTerrainWorldZoneAndInstanceAudit()
     {
         var (world, bot) = CreateQualifiedAnchor();
@@ -403,6 +482,208 @@ public class SpawnPassiveNpcCommandTests
         await Assert.That(anchor.Transform.World.Rotation).IsEqualTo(sourceRotation);
         await Assert.That(SpawnPassiveNpcCommand.AnchorAudit(anchor))
             .IsEqualTo("anchorBotId=20001, anchorZone=601, anchorInstance=43, ");
+    }
+
+    [Test]
+    public async Task CreateSpawnPosition_DefaultWorldTemplateZeroPreservesWorldZoneInstanceAndDetachedSource()
+    {
+        var (world, bot) = CreateQualifiedAnchor(worldTemplateId: 0);
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out var error);
+        using var anchorScope = anchor;
+        var sourcePosition = anchor.Transform.World.Position;
+        var sourceRotation = anchor.Transform.World.Rotation;
+        (uint zoneId, float x, float y, float z)? heightRequest = null;
+
+        var spawnPosition = SpawnPassiveNpcCommand.CreateSpawnPosition(
+            anchor.Transform,
+            12f,
+            anchor.WorldId,
+            (zoneId, x, y, z) =>
+            {
+                heightRequest = (zoneId, x, y, z);
+                return 333.25f;
+            });
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(error).IsNull();
+        await Assert.That(world.Template.Id).IsEqualTo(0u);
+        await Assert.That(anchor.WorldId).IsEqualTo(0u);
+        await Assert.That(spawnPosition.WorldId).IsEqualTo(0u);
+        await Assert.That(spawnPosition.ZoneId).IsEqualTo(anchor.ZoneId);
+        await Assert.That(anchor.InstanceId).IsEqualTo(world.Id);
+        await Assert.That(spawnPosition.Z).IsEqualTo(333.25f);
+        await Assert.That(float.IsFinite(spawnPosition.X)).IsTrue();
+        await Assert.That(float.IsFinite(spawnPosition.Y)).IsTrue();
+        await Assert.That(float.IsFinite(spawnPosition.Z)).IsTrue();
+        await Assert.That(heightRequest.Value.zoneId).IsEqualTo(anchor.ZoneId);
+        await Assert.That(anchor.Transform.World.Position).IsEqualTo(sourcePosition);
+        await Assert.That(anchor.Transform.World.Rotation).IsEqualTo(sourceRotation);
+        await Assert.That(SpawnPassiveNpcCommand.AnchorAudit(anchor))
+            .IsEqualTo("anchorBotId=20001, anchorZone=601, anchorInstance=43, ");
+    }
+
+    [Test]
+    public async Task IsAnchorStillCurrent_MissingWorldTemplateFailsClosedWithPreciseError()
+    {
+        var (world, bot) = CreateQualifiedAnchor();
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        var template = world.Template;
+        bool current;
+        string error;
+        try
+        {
+            BotTestFixture.SetPrivateField<WorldTemplate>(world, "<Template>k__BackingField", null);
+            current = SpawnPassiveNpcCommand.IsAnchorStillCurrent(anchor, _ => bot, out error);
+        }
+        finally
+        {
+            BotTestFixture.SetPrivateField(world, "<Template>k__BackingField", template);
+        }
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(current).IsFalse();
+        await Assert.That(error)
+            .IsEqualTo("Active bot anchor 20001 does not have a world template.");
+    }
+
+    [Test]
+    public async Task IsAnchorStillCurrent_ResolverIdentityChangeFailsAsStale()
+    {
+        var (_, bot) = CreateQualifiedAnchor();
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        var replacement = BotTestFixture.MakeBot(bot.Id, Vector3.Zero);
+
+        var current = SpawnPassiveNpcCommand.IsAnchorStillCurrent(
+            anchor, _ => replacement, out var error);
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(current).IsFalse();
+        await Assert.That(error)
+            .IsEqualTo("Active bot anchor 20001 became stale while its transform was captured.");
+    }
+
+    [Test]
+    public async Task IsAnchorStillCurrent_ParentWorldChangeFailsAsStale()
+    {
+        var (world, bot) = CreateQualifiedAnchor();
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        bool current;
+        string error;
+        try
+        {
+            BotTestFixture.SetPrivateField<WorldInstance>(bot, "_parentWorld", null);
+            current = SpawnPassiveNpcCommand.IsAnchorStillCurrent(anchor, _ => bot, out error);
+        }
+        finally
+        {
+            BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+        }
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(current).IsFalse();
+        await Assert.That(error)
+            .IsEqualTo("Active bot anchor 20001 became stale while its transform was captured.");
+    }
+
+    [Test]
+    public async Task IsAnchorStillCurrent_TransformSwapFailsAsStale()
+    {
+        var (_, bot) = CreateQualifiedAnchor();
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        var originalTransform = bot.Transform;
+        using var replacementTransform = new Transform(bot);
+        bool current;
+        string error;
+        try
+        {
+            bot.Transform = replacementTransform;
+            current = SpawnPassiveNpcCommand.IsAnchorStillCurrent(anchor, _ => bot, out error);
+        }
+        finally
+        {
+            bot.Transform = originalTransform;
+        }
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(current).IsFalse();
+        await Assert.That(error)
+            .IsEqualTo("Active bot anchor 20001 became stale while its transform was captured.");
+    }
+
+    [Test]
+    public async Task IsAnchorStillCurrent_LiveZoneChangeFailsClosed()
+    {
+        var (_, bot) = CreateQualifiedAnchor();
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        BotTestFixture.SetPrivateField(bot.Transform, "_zoneId", anchor.ZoneId + 1);
+
+        var current = SpawnPassiveNpcCommand.IsAnchorStillCurrent(anchor, _ => bot, out var error);
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(current).IsFalse();
+        await Assert.That(error)
+            .IsEqualTo("Active bot anchor 20001 has an inconsistent world or instance boundary.");
+    }
+
+    [Test]
+    public async Task IsAnchorStillCurrent_LiveInstanceChangeFailsClosed()
+    {
+        var (_, bot) = CreateQualifiedAnchor();
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        BotTestFixture.SetPrivateField(bot.Transform, "_instanceId", anchor.InstanceId + 1);
+
+        var current = SpawnPassiveNpcCommand.IsAnchorStillCurrent(anchor, _ => bot, out var error);
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(current).IsFalse();
+        await Assert.That(error)
+            .IsEqualTo("Active bot anchor 20001 has an inconsistent world or instance boundary.");
+    }
+
+    [Test]
+    public async Task IsAnchorStillCurrent_LiveWorldIdChangeFailsClosed()
+    {
+        var (_, bot) = CreateQualifiedAnchor();
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        BotTestFixture.SetPrivateField(bot.Transform, "<WorldId>k__BackingField", anchor.WorldId + 1);
+
+        var current = SpawnPassiveNpcCommand.IsAnchorStillCurrent(anchor, _ => bot, out var error);
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(current).IsFalse();
+        await Assert.That(error)
+            .IsEqualTo("Active bot anchor 20001 has an inconsistent world or instance boundary.");
+    }
+
+    [Test]
+    public async Task IsAnchorStillCurrent_LiveNonFiniteTransformFailsClosed()
+    {
+        var (_, bot) = CreateQualifiedAnchor();
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        bot.Transform.Local.SetPosition(float.PositiveInfinity, 202.5f, 303.5f);
+
+        var current = SpawnPassiveNpcCommand.IsAnchorStillCurrent(anchor, _ => bot, out var error);
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(current).IsFalse();
+        await Assert.That(error).IsEqualTo("Active bot anchor 20001 has a non-finite transform.");
     }
 
     [Test]
