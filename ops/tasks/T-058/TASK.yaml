@@ -1,0 +1,36 @@
+schema_version: 1
+id: T-058
+title: Give the system actor a qualified active-bot world anchor
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Make each fresh loopback @system actor use a deterministic active bot's valid non-zero-zone world transform when world-positioned commands need an operational anchor, while preserving worldless headless commands before bots exist.
+depends_on: [T-057]
+branch: codex-managed-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+
+inputs:
+  incomplete_receipt: ops/evidence/aaemu12-t057-combat-stealth-v4.yaml
+  incomplete_handoff: ops/tasks/T-057/HANDOFF.md
+  host_reference: aaemu12_reference
+  host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_module_source: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+  active_patch: compatibility/aaemu-1.2-r208022-v3.patch
+  active_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+
+write_scope:
+  - src/AAEmu.Game/Bots/Ops/SystemActor.cs
+  - tests/AAEmu.UnitTests/Services/WebApi/CommandControllerTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - docs/COMMANDS.md
+  - CHANGELOG.md
+  - ops/tasks/T-058/HANDOFF.md
+
+runtime:
+  required: false
+  lease: null
+gates: [deterministic-system-actor-anchor-tests, focused-aaemu12-tests]
+validation_boundary: Source and deterministic fixture work only. Do not edit or deploy AAEmu hosts, start Login/GameServer/MySQL or the ArcheAge client, access databases, alter global ledgers or the runtime lease, change compatibility patch identities, or touch AAEmu 3.0.
+handoff: ops/tasks/T-058/HANDOFF.md

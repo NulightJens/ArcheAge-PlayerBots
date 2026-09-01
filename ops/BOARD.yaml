@@ -240,14 +240,25 @@ tasks:
   - id: T-057
     title: AAEmu 1.2 live headless combat and stealth attempt v4
     track: AAEmu12
-    status: active
-    integration: runtime-pending
+    status: blocked
+    integration: runtime-incomplete-retained
     depends_on: [T-056]
     runtime_lease: aaemu12
     gate: serialized-live-aaemu12-proof
     archeage_client_allowed: false
     owner_client_thread_id: client-new-thread:53878ca2-3750-4d8d-9d68-ba764743c5d8
     owner_thread_id: 01a05b06-ee62-77e0-81fe-684c85116af2
+    attempt_commit: 3ca0edd67cf7eb4ab24886d798de7feb595572e0
+    evidence_receipt: aaemu12-t057-combat-stealth-v4
+    blocker: synthetic-system-actor-physical-origin-zone-zero-five-targets-zero-casts-zero-kills
+
+  - id: T-058
+    title: Give the system actor a qualified active-bot world anchor
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-057]
+    gate: deterministic-system-actor-anchor-tests
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
