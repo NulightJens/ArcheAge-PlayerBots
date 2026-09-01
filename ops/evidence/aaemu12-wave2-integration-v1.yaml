@@ -1,0 +1,179 @@
+schema_version: 1
+id: aaemu12-wave2-integration-v1
+recorded_at: 2026-08-31
+verdict: green-review-install-build-focused-full-unit
+
+fingerprint:
+  module_source_commit: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: afbb6aa2c5d379eb76ad339642c190f4185b4981815aa27c68d0680d28edd046
+  client_provenance_sha256_or_not_applicable: not-applicable-no-client-started
+  database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+  gate_definition_version: 1
+  command_and_environment_fingerprint: 973cdea6a15d4410c677572871765914ca8741f47793fe37239f86b345dcf423
+
+source_review:
+  dispatch_ancestor: 02d09510192662f26f2ca8d3ca3cff139d584130
+  control_setup_ancestor: f46e5c29b108b720bdd23d45b2d450bda79ccbd5
+  retained_candidate: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+  retained_candidate_tree: eff995d75715a4a8a3a4f155e9a3294c20988e17
+  reconstructed_candidate: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+  reconstructed_candidate_tree: dea8946532f2ece2ca12cf0d209af1843a0c4338
+  retained_payload_compare: identical-for-scripts-product-tests-and-worker-receipts
+  retained_commits:
+    T-007: 0dd9e80a375d419d9cf724a30ad16f23af889803
+    T-043: 1453c04138e076b4c22c9b9549ce16fbc53ec3b8
+    T-044: 568af9c3adac6d667524df2c0176a60e37ae9274
+    restart_binding_correction: bc872d2614718dee177f5f7e219ee43866f9c5ee
+    botbuffnpc_alias_correction: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+  replayed_commits:
+    T-007: be144a30ae8e75944bacba54ad3f29e2fd52f15d
+    T-043: 81702626628e0029693cf2ff8883c0ea98a19d54
+    T-044: 2b6684b56f33b8c4ad889947f4d193be1c0da591
+    restart_binding_correction: e4c9c498163c2924606d08aadb03c76bb3940fb6
+    botbuffnpc_alias_correction: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+  stable_patch_ids:
+    T-007: 8d8757b0433260d88c2bc074c3045af08d227596
+    T-043: 0c64e68ed0ed2cbbddbdb5d6af618e707994146d
+    T-044: 6c78b0fb4e1028ce685e5004093c3dd23a4a8b0d
+    restart_binding_correction: 7c74b1cb2d98e0ecfef2a8c01f5212f65889a4ca
+    botbuffnpc_alias_correction: e8c168e8df939bbb41817e44bc12d5b825f935be
+  correction_review:
+    restart_binding: passed-prior-pid-and-normalized-start-time-bound-to-qualified-process
+    botbuffnpc_alias: passed-alias-resolves-to-authorized-botbuff-primary-with-required-fourth-argument
+    T-046_corrections: none
+
+environment:
+  os: windows-10.0.26200-x64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  dotnet_test_runtime: 10.0.10
+  reference_workspace: aaemu12_reference
+  integration_workspace: aaemu12_integration
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_module_commit: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+  installed_module_tree: dea8946532f2ece2ca12cf0d209af1843a0c4338
+  installed_sql_sha256: c5bd4d43fb767837c7042dd2cc968decb69393876e5e5520a74aa721cc4eee5c
+  test_assembly_sha256: e4e0cd10f4a1e5207e3ca143c831c74231d4b269d9444dff3bc15cd5cded3625
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+
+gate_material:
+  gates_sha256: b841263c534f420be9588837ccdc44923ff0f791f2834075629bed7f88335344
+  task_sha256: dcb499ca6d0f1cf409469252e4014b9526c9513abeb4d304092d94bf0e1110c6
+  contract_sha256: 93d5909fc0d8abfd8e8c18e5ca18cd1750e5266697f4da1c6f637826b2c968dd
+
+database_receipt_validation:
+  receipt: ops/evidence/aaemu12-database-public-alpha-v1.yaml
+  receipt_sha256: 63c23627653cc110bb28f59c573eb47ed82e23ad02536a5e2254b312b3a3819a
+  verdict: validated-retained-artifacts-without-schema-access
+  donor_workspace: aaemu12_legacy_t022
+  donor_head: 72fd2cc70bba3887e093e8a3800f13fed9b3e111
+  donor_clean: true
+  output_directory: 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1'
+  exact_file_count: 4
+  artifact_aggregate_sha256: 6761dfe203981f2626c360e9f8692efbd9daf6c444bb7dbc67fa0cc298a96a32
+  retained_bot_ids_sha256: 4990553caca2e0843b3a063e3ebd804f34eac75da58b97901982141e756b6203
+  seed_evidence_sha256: 890db05931c77f2f51524bcc54dcb59866f914414c575f8c5a9f36725a49bdb0
+  game_dump_sha256: b28d6d8462961d1d76118fad299679ed5ab9f17bca769659704f6031c8fb0c0c
+  login_dump_sha256: 95fecd268a8b26712cdcbf8a53bb2a4194420af8b00e222cb630bf43c4ddd943
+  manifest_count: 100
+  distinct_bot_ids: 100
+  bot_id_range: [20001, 20100]
+  game_database: aaemu_playerbots_game_public_alpha_v1
+  login_database: aaemu_playerbots_login_public_alpha_v1
+  template_character_id: 2
+  seed_version: t021-seed-v1
+  schema_queries_or_mutations: none
+  historical_receipt_patch_sha256: 9c877d395b7f6dc7dc47dbf1bd4927af3a5d08392434c758cea364385a6ba15e
+  historical_patch_discrepancy: retained-receipt-field-is-frozen-aaemu30-patch
+  canonical_aaemu12_patch_sha256: afbb6aa2c5d379eb76ad339642c190f4185b4981815aa27c68d0680d28edd046
+
+command_environment_material: |-
+  gate_definition_version=1
+  gates_sha256=b841263c534f420be9588837ccdc44923ff0f791f2834075629bed7f88335344
+  os=windows-10.0.26200-x64
+  powershell=7.6.4
+  dotnet_sdk=10.0.302
+  dotnet_test_runtime=10.0.10
+  workspace=aaemu12_integration
+  host_base=62e3eb1d87da01194802ac886cd500134facad28
+  module_source=9938495eb7f1904ac4575bc0db42fc28a7f35851
+  test_assembly_sha256=e4e0cd10f4a1e5207e3ca143c831c74231d4b269d9444dff3bc15cd5cded3625
+  database_receipt_sha256=63c23627653cc110bb28f59c573eb47ed82e23ad02536a5e2254b312b3a3819a
+  database_provenance=abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+  install_check=Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12 -CheckOnly
+  install=Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12
+  build=dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false
+  focused_manager=AAEmu.UnitTests.exe --treenode-filter /*/*/BotCombatManagerTests/* --minimum-expected-tests 13 --no-progress --no-ansi --output Detailed
+  focused_state=AAEmu.UnitTests.exe --treenode-filter /*/*/BotCombatStateTests/* --minimum-expected-tests 38 --no-progress --no-ansi --output Detailed
+  focused_task=AAEmu.UnitTests.exe --treenode-filter /*/*/BotCombatTaskTests/* --minimum-expected-tests 15 --no-progress --no-ansi --output Detailed
+  focused_commands=AAEmu.UnitTests.exe --treenode-filter /*/*/BotCommandsTests/* --minimum-expected-tests 43 --no-progress --no-ansi --output Detailed
+  focused_passive_npc=AAEmu.UnitTests.exe --treenode-filter /*/*/SpawnPassiveNpcCommandTests/* --minimum-expected-tests 8 --no-progress --no-ansi --output Detailed
+  focused_access=AAEmu.UnitTests.exe --treenode-filter /*/*/BotAccessLevelsTests/* --minimum-expected-tests 3 --no-progress --no-ansi --output Detailed
+  full=dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+
+commands:
+  deterministic_evidence: pwsh -NoLogo -NoProfile -File scripts/evidence/tests/Test-EvidenceReceipt.ps1
+  deterministic_harness: pwsh -NoLogo -NoProfile -File scripts/combat/Test-CombatQualificationHarness.ps1
+  install_check: Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12 -CheckOnly
+  install: Install-PlayerBots.ps1 -AAEmuRoot <aaemu12_integration> -Track AAEmu12
+  build: dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false
+  focused_manager: AAEmu.UnitTests.exe --treenode-filter '/*/*/BotCombatManagerTests/*' --minimum-expected-tests 13 --no-progress --no-ansi --output Detailed
+  focused_state: AAEmu.UnitTests.exe --treenode-filter '/*/*/BotCombatStateTests/*' --minimum-expected-tests 38 --no-progress --no-ansi --output Detailed
+  focused_task: AAEmu.UnitTests.exe --treenode-filter '/*/*/BotCombatTaskTests/*' --minimum-expected-tests 15 --no-progress --no-ansi --output Detailed
+  focused_commands: AAEmu.UnitTests.exe --treenode-filter '/*/*/BotCommandsTests/*' --minimum-expected-tests 43 --no-progress --no-ansi --output Detailed
+  focused_passive_npc: AAEmu.UnitTests.exe --treenode-filter '/*/*/SpawnPassiveNpcCommandTests/*' --minimum-expected-tests 8 --no-progress --no-ansi --output Detailed
+  focused_access: AAEmu.UnitTests.exe --treenode-filter '/*/*/BotAccessLevelsTests/*' --minimum-expected-tests 3 --no-progress --no-ansi --output Detailed
+  full_unit: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+
+results:
+  deterministic_evidence:
+    assertions: 53
+    retained_translator_attempts: 18
+    verdict: passed
+  deterministic_harness:
+    scenarios: 13
+    sleeps: 0
+    verdict: passed
+  installer_check: passed-installed-supported
+  installer: passed-idempotent
+  host_patch_reverse_check: passed
+  build_errors: 0
+  build_warnings: 75
+  focused:
+    total: 120
+    succeeded: 120
+    skipped: 0
+    failed: 0
+    BotCombatManagerTests: 13
+    BotCombatStateTests: 38
+    BotCombatTaskTests: 15
+    BotCommandsTests: 43
+    SpawnPassiveNpcCommandTests: 8
+    BotAccessLevelsTests: 3
+  full_unit:
+    invocations: 1
+    total: 1793
+    succeeded: 1789
+    skipped: 4
+    failed: 0
+  git_diff_check: passed
+  reference_checkout_clean_after_gate: true
+  installed_module_checkout_clean_after_gate: true
+  control_integration_worktree_clean_before_fast_forward: true
+
+retained_failures:
+  product_or_gate_failures: none
+  operator_checks:
+    - Two read-only PowerShell fingerprint probes used reserved automatic variable names and were immediately rerun with task-specific names.
+    - One read-only dump scan used a Windows-incompatible wildcard path; the corrected directory-plus-glob scan found zero prohibited statements.
+  warnings:
+    - The build retained 75 dependency, compiler, analyzer, and test-analyzer warnings, including the existing SQLitePCLRaw.lib.e_sqlite3 and SSH.NET high-severity advisories.
+
+retained_boundaries:
+  - No client, Login server, Game server, or MySQL process was started, stopped, or controlled.
+  - Neither isolated schema was queried or mutated; provisioning was not rerun.
+  - The aaemu12 runtime lease, global ledgers, workspace registry, AAEmu 3.0, client fixtures, and retained worker worktrees were not changed.
+  - No physical mortal-combat, stealth, cleanup, restart, client, scale, resource-budget, or Population Director acceptance is claimed.
+  - The generated HTML test report remains outside Git in the integration host TestResults directory.
