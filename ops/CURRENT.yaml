@@ -1,11 +1,11 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-v3-fail-receipt-integration
+phase: lifecycle-natural-recovery-source-correction
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+  integrated_head: 2f0cedd6d2400c3f435f2d01415df27b357a13eb
   tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
   integration_evidence: ops/evidence/aaemu12-progression-observability-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
@@ -30,11 +30,11 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-and-qualified-for-t069
+    state: stopped-clean-after-t069-fail
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-t065-one-bot-autonomy-v2
+    evidence_receipt: aaemu12-t069-one-bot-autonomy-v3
     integration_receipt: aaemu12-progression-observability-integration-v1
     installed_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
     installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
@@ -43,7 +43,7 @@ runtime:
     build: 0-errors-76-warnings
     focused_tests: 182-passed-0-skipped-0-failed
     unit_tests: 1806-passed-4-intentional-skips-0-failed
-    runtime_boundary: T-065 proved autonomous grind selection, exact-target mortal combat, one successful cast, authoritative kill credit, and normal self-logout to zero bots/runtimes; T-068 now qualifies native activation-to-logout progression/resource observability for a fresh v3 proof.
+    runtime_boundary: T-069 proved natural pre-activity full recovery, autonomous selection/combat/kill, +14 XP, one exact progression record, and normal self-logout; the bot logged out with new MP debt 6921/6966, so the recovery boundary failed and later iterations/restart were not run.
 
 control_tower:
   permanent_task:
@@ -54,8 +54,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-070 must integrate T-069 as a truthful FAIL receipt, then PB-000 must release the clean aaemu12 lease.
-  - Dispatch only the smallest lifecycle recovery correction that waits for a natural targetless, noncombat, debt-free completion boundary before normal logout.
+  - T-071 must add only a bounded, targetless, noncombat natural recovery wait between completed combat and the existing completion snapshot/logout path.
+  - Integrate/build T-071 before assigning another fresh immutable one-bot proof version.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
@@ -135,7 +135,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-progression-observability-integration-v1.yaml
     handoff: ops/tasks/T-068/HANDOFF.md
   - task: T-069
-    state: fail-receipt-review-new-mp-debt-at-completion
+    state: blocked-retained-fail-new-mp-debt-at-completion
     client_thread_id: client-new-thread:546e51bc-826e-42df-aa7e-fa4c1965d2d6
     task_thread_id: 01a05c73-58af-7d72-94ef-bca2b2dd39e7
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\dd82\PB-W00-control'
@@ -149,12 +149,21 @@ prepared_workstreams:
     handoff: ops/tasks/T-069/HANDOFF.md
     cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
   - task: T-070
-    state: active
+    state: done-integrated
     client_thread_id: client-new-thread:9d7435c9-4545-4bb2-8752-190ec4219a49
     task_thread_id: 01a05c84-116f-7d30-bd6f-8f733677bc29
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\4538\PB-W00-control'
     base: 88182ede5f32399d0ffd8684391fb8a5260c7b0e
     source_commit: 1f26c4309868b379ab0fb64cad59ae48a6a75648
+    head: 2f0cedd6d2400c3f435f2d01415df27b357a13eb
+    handoff: ops/tasks/T-070/HANDOFF.md
+  - task: T-071
+    state: ready
+    client_thread_id: pending-thread-creation
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: 2f0cedd6d2400c3f435f2d01415df27b357a13eb
+    blocker_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
     head: pending
     handoff: pending
   - task: T-038
@@ -401,6 +410,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: claimed-by-T-069-one-bot-autonomy-v3
+  runtime_lease: released-after-T-069-fail-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: authorized-only-for-exact-T-069-thread-after-committed-lease-verification
+  runtime_start: not-authorized-until-next-exact-thread-lease-claim

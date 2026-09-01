@@ -1,0 +1,29 @@
+schema_version: 1
+id: T-071
+title: Wait for natural debt-free lifecycle completion
+track: AAEmu12
+status: ready
+integration: pending
+outcome: After the bounded one-kill activity is complete, keep the bot targetless and noncombat while natural world recovery clears HP/MP debt, then capture the completion snapshot and invoke the existing normal logout path exactly once.
+depends_on: [T-069, T-070]
+branch: codex-managed-detached-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+runtime:
+  required: false
+  lease: null
+inputs:
+  dispatch_base: 2f0cedd6d2400c3f435f2d01415df27b357a13eb
+  blocker_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+  tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
+write_scope:
+  - src/AAEmu.Game/Bots/Life/BotLifeController.cs
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Life/BotLifeControllerTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/tasks/T-071/HANDOFF.md
+gates: [focused-aaemu12-tests]
+validation_boundary: Source-only bounded lifecycle recovery. Do not start/control AAEmu, MySQL, or clients; edit deployed hosts, databases, global ledgers/leases, target/combat/loot/progression behavior, retained evidence, AAEmu 3.0, or unrelated PlayerBots systems.
+handoff: ops/tasks/T-071/HANDOFF.md
