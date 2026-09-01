@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: add-fixture-preflight-transform-telemetry
+phase: integrate-install-fixture-preflight-transform-telemetry
 verdict: active
 
 source:
@@ -30,7 +30,7 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-build-qualified-awaiting-t102-source
+    state: stopped-clean-build-qualified-awaiting-t103-integration
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
@@ -44,7 +44,7 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 40-passed-0-skipped-0-failed
     unit_tests: 1863-passed-4-intentional-skips-0-failed-exactly-one-invocation
-    runtime_boundary: T-101 integrated, installed, and fully qualified the default-world anchor correction. Physical fixture placement remains unproven. Retained T-098 samples expose positions but not exact yaw, so T-102 must add read-only round-trip transform telemetry before a successor can precompute safe one-shot fixture geometry.
+    runtime_boundary: T-102 passed isolated source proof for invariant round-trip transform telemetry as candidate 70b577861a5f8fef8df4be40c61af3ba66298ed3. It is not installed or full-suite qualified yet. T-103 must independently replay/install/qualify it before a successor may sample live yaw and precompute safe one-shot fixture geometry; physical fixture placement remains unproven.
 
 control_tower:
   permanent_task:
@@ -55,8 +55,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-102 to an exact isolated source worktree and append invariant round-trip transform telemetry to botdebug without changing existing diagnostics or bot state.
-  - Independently integrate/install T-102 and qualify its focused/build/full-suite wave before runtime.
+  - Bind T-103 to an exact isolated Integrator worktree and build-only lease, then replay/install T-102 candidate 70b577861a5f8fef8df4be40c61af3ba66298ed3 byte-identically.
+  - Rerun all 46 focused BotCommandsTests, one clean build, and exactly one complete AAEmu 1.2 suite; do not start runtime.
   - Run a fresh versioned runtime successor that uses raw transform telemetry to predict every one-shot fixture coordinate and requires pairwise separation at least 15 m before any fixture command, then prove both lifecycle/refill waves and distinct-PID restart/dwell before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
@@ -569,13 +569,27 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
     proof: 40-focused-build-0-errors-79-warnings-full-1863-pass-4-intentional-skips-once
   - task: T-102
-    state: active-exact-thread-bound-source-worker
+    state: done-source-pass-awaiting-independent-integration
     client_thread_id: client-new-thread:89f2a6d0-b593-4bbc-a387-9678a481e9a2
     task_thread_id: 01a05eed-ea43-71b0-baf8-76b6b0ef7630
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\dbb1\PB-W00-control'
     base: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
     dispatch_base: 968720578b8e1e85e925e63ac584e410bcc71635
     contract: ops/tasks/T-102/CONTRACT.md
+    candidate_commit: 70b577861a5f8fef8df4be40c61af3ba66298ed3
+    candidate_parent: 9a94b21fd4f9855346109cfe7b5b941df13e6b4b
+    candidate_tree: 2476ff1be7040f028882d54ef44b5371e4ed9f14
+    evidence_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-v1.yaml
+    proof: 46-focused-0-fail-build-0-errors-72-warnings-patch-sha-unchanged-clean-apply
+  - task: T-103
+    state: prepared-awaiting-exact-build-integrator-binding
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    candidate: 70b577861a5f8fef8df4be40c61af3ba66298ed3
+    candidate_parent: 9a94b21fd4f9855346109cfe7b5b941df13e6b4b
+    candidate_tree: 2476ff1be7040f028882d54ef44b5371e4ed9f14
+    contract: ops/tasks/T-103/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

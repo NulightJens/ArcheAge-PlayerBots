@@ -3,7 +3,7 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-101-green-install-awaiting-telemetry-source
+    status: released-after-T-101-green-install-awaiting-exact-T-103-binding
     owner_task: null
     owner_thread_id: null
     workspace_id: aaemu12_integration
@@ -17,7 +17,7 @@ runtimes:
     cleanup_receipt: ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
     baseline_evidence: ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact claim. T-101 installed and qualified replay source/tree e0af81eb43d244d69114f3e69fbf5efbdfdc9d96 / 7afaac89eb0d5ef53475064134e69b7e7527eb58 with focused 40, zero-error build, and exactly one green full suite; runtime remained stopped. T-102 is isolated source work with no runtime or installed-host authority.
+    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact T-103 claim. T-101 installed and qualified replay source/tree e0af81eb43d244d69114f3e69fbf5efbdfdc9d96 / 7afaac89eb0d5ef53475064134e69b7e7527eb58 with focused 40, zero-error build, and exactly one green full suite; runtime remained stopped. T-102 completed isolated source proof with no runtime or installed-host access.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

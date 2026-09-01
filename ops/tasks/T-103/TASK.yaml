@@ -1,0 +1,42 @@
+schema_version: 1
+id: T-103
+title: Integrate and install exact bot transform telemetry
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Independently replay T-102 byte-identically onto the saved lineage, install that exact replay into the registered AAEmu 1.2 module, qualify all focused bot-command tests, one clean build, and exactly one full-suite wave, then fast-forward the saved branch with a durable receipt.
+depends_on: [T-102]
+runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-commit
+  saved_head: pending-control-commit
+  source_candidate: 70b577861a5f8fef8df4be40c61af3ba66298ed3
+  source_candidate_parent: 9a94b21fd4f9855346109cfe7b5b941df13e6b4b
+  source_candidate_tree: 2476ff1be7040f028882d54ef44b5371e4ed9f14
+  source_candidate_patch_id: ed539b217262a89a3a7d20b32810582d7a9d5e9c
+  prior_installed_source: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+  prior_installed_tree: 7afaac89eb0d5ef53475064134e69b7e7527eb58
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/evidence/aaemu12-botdebug-transform-telemetry-v1.yaml
+  - ops/tasks/T-102/HANDOFF.md
+  - ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
+  - ops/tasks/T-103/HANDOFF.md
+external_write_scope:
+  - aaemu12_integration host/module install and build/test outputs under exact build-only lease
+gates:
+  - exact-candidate-parent-tree-scope-patch-id-and-byte-identical-replay
+  - exact-installed-replay-source-tree-and-unchanged-patch
+  - focused-46-bot-command-tests-green
+  - clean-build-zero-errors
+  - exactly-one-full-suite-1864-pass-4-intentional-skips-zero-fail
+  - saved-branch-fast-forward-and-clean-installed-state
+validation_boundary: Source integration/install/build/test only. Never start Login/Game/runtime observers, edit deployed BotConfig.json, access/control MySQL/database or ArcheAge client, edit global ledgers/lease, external runtime evidence, reference checkout, AAEmu 3.0, scale, soak, or packaging.
+contract: ops/tasks/T-103/CONTRACT.md
+handoff: ops/tasks/T-103/HANDOFF.md
