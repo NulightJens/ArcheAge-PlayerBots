@@ -541,10 +541,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t098-fail-integration-v1.yaml
     result: PASS-receipt-integrity-subject-retained-FAIL
   - task: T-100
-    state: prepared-awaiting-exact-source-worker-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-source-worker
+    client_thread_id: client-new-thread:ab3a1f91-8c01-4547-9d8f-c2d4d86ea83b
+    task_thread_id: 01a05ec5-b802-7013-bfc5-8a126484eb60
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c413\PB-W00-control'
+    dispatch_base: c0d08ddd3c2db5e542f17ec8b25751814ae344f9
     base: 1ab6c2e80a4c7e209149a804cdff6ae209142501
     cause: SpawnPassiveNpcCommand-invalidly-rejects-valid-default-world-template-id-zero
     contract: ops/tasks/T-100/CONTRACT.md

@@ -974,15 +974,16 @@ tasks:
   - id: T-100
     title: Accept valid default-world bot anchors
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-099]
     runtime_lease: null
     gate: focused-default-world-anchor-source-correction
     contract: ops/tasks/T-100/CONTRACT.md
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:ab3a1f91-8c01-4547-9d8f-c2d4d86ea83b
+    owner_thread_id: 01a05ec5-b802-7013-bfc5-8a126484eb60
+    worktree: 'C:\Users\jensh\.codex\worktrees\c413\PB-W00-control'
+    dispatch_base: c0d08ddd3c2db5e542f17ec8b25751814ae344f9
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
