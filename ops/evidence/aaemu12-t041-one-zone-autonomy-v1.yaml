@@ -1,0 +1,217 @@
+schema_version: 1
+id: aaemu12-t041-one-zone-autonomy-v1
+recorded_at: '2026-09-01T09:38:00-06:00'
+verdict: FAIL
+
+fingerprint:
+  task: T-041
+  binding_commit: 4383c072fbf34ad0c42db248d39e704f8aa42db1
+  task_thread_id: 01a05d8b-5c96-71c2-9e14-40959480d28f
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\3daa\PB-W00-control'
+  dispatch_head: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  module_source_commit: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+  installed_module_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+  compatibility_patch_sha256: 395a83ab5bf6a4f4f1c0d56289590d6a36ad36b3ab5f87e1701d6aa17ffbefcd
+  installed_host_patch_stable_id: 51cf303462d170dd61551ee2f4d410ac0e293ce8
+  game_assembly_sha256: 98f9ce66a8648d13aa79494e3bae2831df3df2365cab8cb2f55372c5f0ce7516
+  database_identity: aaemu12_database_public_alpha_v1
+
+preflight:
+  exact_committed_task_thread_worktree_and_lease_binding: true
+  task_dispatch_head_exact_and_clean: true
+  control_at_binding_commit_and_clean: true
+  reference_head_exact_and_clean: true
+  installed_module_head_tree_exact_and_clean: true
+  integration_host_status_entry_count: 30
+  installed_host_overlay_exact: true
+  fresh_evidence_root_was_absent: true
+  game_database: aaemu_playerbots_game_public_alpha_v1
+  login_database: aaemu_playerbots_login_public_alpha_v1
+  aaemu_game_login_process_count: 0
+  archeage_client_process_count: 0
+  occupied_required_port_count: 0
+  runtime_log_entry_count: 0
+  mysql_observed_process_ids: [6308, 8076]
+  direct_database_access: false
+
+configuration:
+  deployed_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\Configurations\BotConfig.json'
+  original_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  configured_sha256: 8704a503d2beadb7e5e6a241ed8a61ffe7b72d14fc0e0fcebf4ae1f46a19021d
+  changed_properties: 9
+  director:
+    enabled: true
+    zone_id: 221
+    character_ids: [20001, 20002, 20003]
+    minimum_population: 2
+    target_population: 3
+    maximum_population: 3
+    initial_delay_ms: 60000
+    reconciliation_interval_ms: 15000
+    retry_backoff_ms: 30000
+  restored_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  restored_exact_original_bytes: true
+
+runtime_start:
+  runner: scripts/scale/Start-ScaleGateRuntime.ps1
+  login_process_id: 10964
+  game_process_id: 123512
+  exact_schemas_emitted: true
+  exact_five_loopback_listeners_present: true
+  observer_processes:
+    20001: 122200
+    20002: 124456
+    20003: 85164
+  observer_boundary:
+    each_armed_offline_sample: 0
+    each_live_offline_sample: 1
+    each_boundary_preceded_first_admission: true
+    first_online_samples: {20001: 35, 20002: 64, 20003: 93}
+  zero_archeage_client_at_retained_boundary_snapshots: true
+  continuous_client_sampling_retained: false
+  mysql_process_ids_unchanged: [6308, 8076]
+
+director_bootstrap:
+  start_count: 1
+  enabled_and_valid: true
+  zone_id: 221
+  configured_bounds: {minimum: 2, target: 3, maximum: 3}
+  initial_admission_order: [20001, 20002, 20003]
+  one_admission_per_reconciliation_tick: true
+  qualified_default_world_zone_each: true
+  initial_attempts: 3
+  initial_successes: 3
+  initial_failures: 0
+  maximum_live_qualified_observed: 3
+  live_wrong_zone_observed: 0
+  duplicate_concurrent_admissions_observed: 0
+
+wave_1:
+  safe_boundary_samples: {20001: 412, 20002: 412, 20003: 413}
+  all_targetless_noncombat_stationary_full_resource: true
+  fixture_command: spawnpassive 10004 12
+  fixture_count: 3
+  fixture_object_ids: [44963, 44974, 44975]
+  all_three_selected_activity: grind
+  all_three_selected_reason: nearby_mortal
+  navigation_samples: {20001: 2, 20002: 4, 20003: 2}
+  combat_samples: {20001: 12, 20002: 133, 20003: 130}
+  kill_credit_distribution: {20001: 3, 20002: 0, 20003: 0}
+  credited_targets_by_20001: [44963, 44975, 44974]
+  bot_20001:
+    recovery_pending_observer_samples: 5
+    experience_before: 8082084
+    experience_after: 8082126
+    experience_delta: 42
+    debt_free_completion: true
+    normal_self_logout: true
+    director_refill_succeeded: true
+  bot_20002:
+    native_kill_credit: false
+    positive_progression: false
+    debt_free_completion: false
+    normal_self_logout: false
+  bot_20003:
+    native_kill_credit: false
+    positive_progression: false
+    debt_free_completion: false
+    normal_self_logout: false
+  material_failure: >-
+    All three declared fixtures were killed and credited to bot 20001. Bots
+    20002 and 20003 selected nearby_mortal and entered combat but received no
+    native kill credit. Dead or uncredited targets cannot count as their
+    completion, so the required all-three wave failed.
+  retry_attempted: false
+  additional_fixture_staged: false
+
+metrics:
+  snapshot_count: 4
+  final_runtime_count: 3
+  final_host_bot_count: 3
+  cast_attempts: 4
+  cast_successes: 4
+  cast_failures: 0
+  observed_kills: 3
+  credited_kills: 3
+  tick_errors: 0
+  runtime_overlaps: 0
+  director_attempts: 4
+  director_successes: 4
+  director_failures: 0
+  director_refills: 1
+
+operator_inventory:
+  exact_transport_count: 8
+  botmetrics_snapshot: 4
+  roster_get: 1
+  spawnpassive_10004_12: 3
+  addbot: 0
+  removebot: 0
+  directed_gameplay_commands: 0
+  command_request_response_hash_failures: 0
+  fixture_limit_observed: true
+
+observer_verification:
+  total_derived_samples: 2080
+  total_raw_responses: 2056
+  post_api_shutdown_transport_errors: 24
+  raw_hash_failures: 0
+  source_hashes_unchanged: true
+
+stopped_boundaries:
+  wave_2_attempted: false
+  restart_attempted: false
+  reason: Contract required stopping at the first material invalid wave-1 gate without retry.
+
+cleanup:
+  game_stopped_before_login: true
+  game_stop: graceful-ctrl-c-exited
+  login_stop: graceful-ctrl-c-exited
+  observer_stop: console-interrupt-exited
+  forced_termination: false
+  shutdown_cleanup_marker_count: 1
+  shutdown_cleanup_marker: BOT ev=shutdown_cleanup remaining_bots=0 remaining_runtimes=0
+  final_aaemu_game_login_process_count: 0
+  final_observer_process_count: 0
+  final_archeage_client_process_count: 0
+  final_occupied_required_port_count: 0
+  final_runtime_log_entry_count: 0
+  mysql_process_ids_unchanged: [6308, 8076]
+  direct_database_queries_or_mutations: 0
+  reference_and_installed_module_clean: true
+  host_overlay_unchanged: true
+  bot_config_restored_exactly: true
+
+retained_anomalies:
+  - category: native-post-readiness-shutdown-race
+    game_error_log_sha256: 1760ece520bcc4d8ba8cf04148190edc0d0aa8fb924bd64acc66e90600826cab
+    finding: >-
+      PhysicsThread accessed the disposed IServiceProvider after the Director
+      stop and zero-bot/zero-runtime cleanup marker. It did not prevent graceful
+      process exit or final process, listener, log, and config restoration.
+  - category: continuous-client-observation-boundary
+    finding: >-
+      Preflight and cleanup client-process snapshots were zero, but continuous
+      client-process sampling was not retained between those boundaries.
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
+  attempt_summary_sha256: c3915b6555b12751e611518f6c59bc5ad17c4026036d795900db1c0189c5fd9c
+  manifest_payload_file_count: 6271
+  manifest_payload_total_bytes: 28811374
+  manifest_sha256: a141d75bffc87ef37e6a01f53d71261c2f5b441885522637a4a4adb190460a00
+  manifest_validation: 6271-of-6271-length-and-sha256-matched-zero-unlisted
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_boundaries:
+  - Wave 1 did not produce one credited completion for each configured identity.
+  - Wave 2, second refill, distinct-PID restart, Director rebootstrap, and two-minute reconciled restart dwell were not attempted.
+  - Continuous client-process sampling was not retained between zero boundary snapshots.
+  - Scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+
+control_actions:
+  integrator: Integrate this task commit as the retained T-041 FAIL receipt; it changes only this receipt and the concise handoff.
+  pb_000_release: Release the aaemu12 lease only after accepting cleanup, exact config restoration, and the sealed FAIL evidence.
+  downstream: Keep T-037 blocked. Do not reuse or overwrite this evidence root; any recovery requires a new source task and a fresh versioned runtime proof.
