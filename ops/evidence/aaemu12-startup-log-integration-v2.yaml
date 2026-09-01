@@ -1,0 +1,199 @@
+schema_version: 1
+id: aaemu12-startup-log-integration-v2
+recorded_at: '2026-08-31T20:08:16-06:00'
+verdict: green-review-replay-install-build-focused-full-unit
+
+fingerprint:
+  task: T-053
+  task_thread_id: 01a05ab1-8b08-72f1-b0dd-d846709bb6c4
+  immutable_source_boundary: e3b440d6ad9dc49012090639450d5f423fddfb85
+  resolved_assignment_commit: d1206ec072eb620a69f7c6b575ebc9f319a2ffdf
+  source_candidate: 09dc81467805b6d857dd2f2e173080c863870e49
+  source_parent: c7ea086e32351dc64702ce5539f375a6929c8c96
+  source_candidate_tree: 05d1e2f6bbe76dc5aeea5dc4ea0d29801dcda464
+  replay_source_commit: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+  replay_source_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
+  replay_stable_patch_id: 288aa54a4483a42821cad180901b7398d18318cc
+  installed_module_commit: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+  installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
+  game_service_blob: 403332171f6b92a88a10082885b54dd302fd6026
+  game_service_tests_blob: 843d861208dfad4f5be58e1d38b96ed0311ca869
+  game_service_sha256: 0df5b8125e42ac5ce4ca0ece3177e28a21f516e34331e47a2485365f86c07da7
+  game_service_tests_sha256: e08922e9720612934aabce30e689ecea244d786516239c0bb1286c9bd7a43b30
+  game_assembly_sha256: 474ebe9b6fec0f6774c5d74e2fa85bea391554356a09d55176ac9f9009ce0020
+  test_assembly_sha256: 95b619ccf26ae0ec142c5e2bb6e9ef374d5783423f44d2876eff1b29b3af7b81
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+  gate_definition_version: 2
+
+accepted_inputs:
+  t051:
+    worktree_clean: true
+    exact_parent: true
+    declared_file_count: 8
+    unexpected_file_count: 0
+    compatibility_patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
+    handoff_sha256: 79a82a124f1773e352b9411555894fd396ecb4a937125d83c5b715d7ec56d28f
+  t052:
+    verdict: accepted-non-blocking-native-post-readiness-shutdown-races
+    handoff_sha256: 5e37b252e84a0fe5dbeea129213b4ec8e12891cbe749bd83bd6759febd7632bf
+  t050:
+    verdict_preserved: INCOMPLETE
+    receipt_sha256: 903756f2d50336fa74627f415de7167936f48d39dbbc7237f3753d78f4459b0d
+    reinterpreted: false
+
+source_replay:
+  method: cherry-pick-no-commit-then-independent-commit
+  assignment_ancestry: expected-control-only-between-immutable-boundary-and-resolved-assignment
+  candidate_and_replay_stable_patch_id_match: true
+  candidate_and_replay_file_blobs_match: 8
+  unexpected_payload_files: 0
+  git_diff_check: passed
+
+environment:
+  os: Microsoft Windows 10.0.26200
+  architecture: X64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+  scratch_workspace: 'D:\Codex-Labs\aaemu-1.2-r208022-t053-scratch-v1'
+
+host_preflight:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean: true
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  prior_installed_module_commit: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+  prior_installed_module_tree: 92d100838dd4b963edc25245729ea29759deb05a
+  prior_installed_module_clean: true
+  prior_compatibility_patch_sha256: 5b44353fef730367b6dfe29baaa0c5141374163f6616549b6724cead91d82ac3
+  prior_complete_patch_reverse_check: passed
+  tracked_and_untracked_host_entry_count_before: 30
+  aaemu_game_login_process_count_before: 0
+  occupied_required_port_count_before: 0
+
+patch_reconstruction:
+  base: 62e3eb1d87da01194802ac886cd500134facad28
+  checkout_path: 'D:\Codex-Labs\aaemu-1.2-r208022-t053-scratch-v1'
+  retained_after_proof: true
+  clean_apply_check_whitespace_error_all: passed
+  clean_apply: passed
+  reconstructed_file_count: 28
+  reconstructed_diff_check: passed
+  game_service_blob: 403332171f6b92a88a10082885b54dd302fd6026
+  game_service_tests_blob: 843d861208dfad4f5be58e1d38b96ed0311ca869
+
+installation:
+  overwritten_host_files:
+    - AAEmu.Game/GameService.cs
+    - AAEmu.UnitTests/Services/GameServiceTests.cs
+  other_host_files_overwritten: 0
+  reapply_complete_patch: false
+  installed_module_fast_forward:
+    from: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+    to: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+  installed_module_clean: true
+  installer_check_only: passed-installed-supported
+  installer_idempotent_run: passed-already-installed
+  complete_patch_reverse_check: passed
+  tracked_and_untracked_host_entry_count_after: 30
+
+results:
+  powershell_parser:
+    files: 3
+    errors: 0
+  manifest_hash_reproduction:
+    host_tracks: 2
+    install_fields: 3
+    mismatches: 0
+  credential_scan:
+    exact_game_schema_message_occurrences: 1
+    resolved_database_calls: 1
+    credential_or_connection_fields: 0
+  deterministic_startup_guard:
+    assertions: 32
+    runtime_processes_started: 0
+    verdict: passed
+  deterministic_evidence:
+    assertions: 53
+    retained_translator_attempts: 18
+    verdict: passed
+  deterministic_combat:
+    scenarios: 13
+    sleeps: 0
+    verdict: passed
+  build:
+    command: dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false
+    errors: 0
+    warnings: 75
+    worker_count: 1
+    node_reuse: false
+  focused:
+    total: 129
+    succeeded: 129
+    skipped: 0
+    failed: 0
+    GameServiceTests: 9
+    BotCombatManagerTests: 13
+    BotCombatStateTests: 38
+    BotCombatTaskTests: 15
+    BotCommandsTests: 43
+    SpawnPassiveNpcCommandTests: 8
+    BotAccessLevelsTests: 3
+  full_unit:
+    command: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+    invocations: 1
+    total: 1794
+    succeeded: 1790
+    skipped: 4
+    failed: 0
+    intentional_skips:
+      - Legacy_Primeval_Pve_MatchesGolden
+      - Legacy_Primeval_Pvp_MatchesGolden
+      - Legacy_Darkrunner_Pvp_MatchesGolden
+      - Legacy_Darkrunner_Pve_MatchesGolden
+  final_git_diff_check: passed
+  final_complete_patch_reverse_check: passed
+  final_reference_clean: true
+  final_installed_module_clean: true
+
+retained_artifacts:
+  scratch_checkout: 'D:\Codex-Labs\aaemu-1.2-r208022-t053-scratch-v1'
+  test_report: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.UnitTests\bin\Debug\net10.0\TestResults\AAEmu.UnitTests-windows-net10.0-report.html'
+  test_report_sha256: 9bc334c67b3489ba121491c5abb299f605cdb30aba630f1ef0a6a00fe87f773d
+  deterministic_evidence_harness_quarantine_event: 20260901T020459684Z-b1db4bf7
+  deterministic_evidence_harness_manifest: 'C:\Users\jensh\.codex\quarantine\20260901T020459684Z-b1db4bf7\manifest.json'
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_failures:
+  product_or_gate_failures: none
+  warnings:
+    - The build retained 75 dependency, compiler, analyzer, and test-analyzer warnings, including existing SQLitePCLRaw.lib.e_sqlite3 and SSH.NET high-severity advisories.
+  operator_probes:
+    - A preflight wrapper used PowerShell's reserved Host variable; it stopped before resolving or changing the integration host, and the corrected probe passed.
+    - The first manifest verifier assumed install.migration instead of install.databaseMigration; it stopped before tests, and the corrected five-hash reproduction passed.
+    - The first credential probe inspected one physical source line although the logger path spans a helper and call; the corrected exact helper-and-call proof passed.
+
+runtime_state:
+  runtime_started: false
+  runtime_lease_claimed_or_edited: false
+  database_or_client_accessed: false
+  aaemu_game_login_process_count_after: 0
+  occupied_required_port_count_after: 0
+  required_ports_observed_free: [1234, 1237, 1239, 1250, 1280]
+
+retained_boundaries:
+  - No Login, Game, client, or MySQL runtime was started, stopped, or controlled.
+  - No database, client fixture, retained T-050 evidence, global ledger, runtime lease, or AAEmu 3.0 file was accessed or changed.
+  - No physical selected-schema emission, combat, stealth, cleanup, restart, scale, soak, or Population Director acceptance is claimed.
+  - T-050 remains INCOMPLETE; this receipt authorizes only PB-000 acceptance and a separately dispatched T-054 physical attempt.
+
+authorization:
+  control_tower_action: >-
+    Fast-forward integration/aaemu12-world through the T-053 handoff commit,
+    record c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe and tree
+    3db93b130aa80ff658a673a12ae36205d368cf8b as the tested and installed
+    module identity, accept this receipt, and then dispatch T-054 against a
+    fresh runtime lease and immutable public-alpha-v3 evidence boundary.
