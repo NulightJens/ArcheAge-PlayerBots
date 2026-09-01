@@ -1,0 +1,293 @@
+schema_version: 1
+id: aaemu12-t079-one-bot-autonomy-v6
+recorded_at: 2026-09-01
+verdict: PASS
+
+fingerprint:
+  lease_control_commit: 5b3f37e5f324eb84dd17d180b002ff48f312e603
+  task_thread_id: 01a05cfc-1ebf-79a2-94d8-4d287c3990ab
+  task_worktree_head_before_receipt: f12d8b16c14c4eab4ac7afe2e1422e04e1953ec6
+  observer_integration_commit: a406a3598213745ac3bead7dc5ba7ce009cf50e3
+  module_source_commit: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+  installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  database_identity: aaemu12_database_public_alpha_v1
+  game_executable_sha256: c10fcd802124406f349253cfafd9413e1768605b90f36110d40c248a85fbc79e
+  game_assembly_sha256: 022412f2712d0246e66713b2536d045bc987e4bb5b9aed61a1b1fc82d63d6471
+  login_executable_sha256: 96ef53555b53e532608eb0352ab993e30968eaae55d6d3e2ae9c83ba7c8c389e
+  game_config_sha256: d87acc71056021abe64aaeca29d37fa6cb60015109cbd81df92c9fef4b98ca1c
+  login_config_sha256: 2b18234b5306f7cd3a44138e94520ec27b3462aa8553f2fcdadad176d3fd58e1
+  playerbots_manifest_sha256: ce77c9a3b6f83a66199da55c57847de08ecd0f98cf9d1cdd0579c89ab7c8c076
+  compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+
+preflight:
+  exact_committed_lease_assignment_proved: true
+  exact_task_thread_and_worktree_binding_proved: true
+  task_dispatch_head_exact_and_clean: true
+  control_at_lease_commit_and_clean: true
+  reference_head_exact_and_clean: true
+  installed_module_head_tree_exact_and_clean: true
+  observer_tree_diff_from_integration_empty: true
+  integration_host_status_entry_count: 30
+  integration_host_status_snapshot: 3ba59378bacebcfafe53e84f59201a0eba09140b
+  registered_host_overlay_matches_receipt: true
+  game_database: aaemu_playerbots_game_public_alpha_v1
+  login_database: aaemu_playerbots_login_public_alpha_v1
+  required_loopback_ports: [1234, 1237, 1239, 1250, 1280]
+  aaemu_game_login_process_count: 0
+  archeage_client_process_count: 0
+  occupied_required_port_count: 0
+  runtime_log_entry_count: 0
+  fresh_evidence_root_was_absent: true
+  mysql_observed_process_ids: [6308, 8076]
+  direct_database_access: false
+  preflight_sha256: 862c95efcef1fd64ba4a390490c78e8cda8abf11d7e11761ed6615bb07c169cd
+
+runtime_start:
+  runner: scripts/scale/Start-ScaleGateRuntime.ps1
+  exact_schemas_emitted: true
+  exact_five_loopback_listeners_present: true
+  login_process_id: 77144
+  game_process_id: 72376
+  initial_runtime_count: 0
+  initial_bot_count: 0
+  initial_online_character_count: 0
+  roster_entry_count: 104
+  persistent_bot_id: 20001
+  persistent_bot_name: ScaleBot000
+  persistent_bot_level: 51
+  original_roster_response_preserved: true
+  normalized_roster_array_preserved_separately: true
+  normalized_roster_sha256: be37a6ec04e785be440d194b8d50c6fc5967c7970325f430dddaed79bf075790
+  zero_archeage_client_processes: true
+  mysql_process_ids_unchanged: [6308, 8076]
+  runner_receipt_sha256: a3e7d7d3cfe49eedadb8a5ae6d693cb7fb603e08148521576abe83710f881973
+
+counted_iterations:
+  required: 3
+  started: 3
+  successful: 3
+  stopped_on_invalid_gate: false
+  bot_id: 20001
+  operator_gameplay_commands_issued: 0
+  forbidden_gameplay_commands_issued: 0
+  allowed_addbot_commands: 3
+  allowed_inert_fixture_commands: 3
+  iteration_1:
+    observer_armed_offline_sample: 0
+    observer_live_offline_sample: 1
+    observer_sample_count: 713
+    observer_raw_hash_failures: 0
+    pre_fixture_safe_sample: 592
+    fixture_command: spawnpassive 10004 12
+    fixture_object_id: 37945
+    fixture_inert: true
+    activity: grind
+    activity_reason: nearby_mortal
+    exact_target_selected: true
+    navigation_present: true
+    cast_damage_authoritative_kill_and_credit: true
+    experience_before: 8082042
+    experience_after: 8082056
+    experience_delta: 14
+    inventory_changed: false
+    recovery_pending_sample_count: 6
+    recovery_pending_span_ms: 1000
+    recovery_pending_brain_steps: 37
+    recovery_pending_mover_steps: 76
+    brain_and_mover_suspended_through_pending: true
+    completion_hp: 9516/9516
+    completion_mp: 6966/6966
+    progression_records: 1
+    normal_self_logout: true
+    first_offline_sample: 625
+    zero_population_after: true
+    analysis_sha256: 4e7574f51731d671003684b065fc06b298dfdf47c1e7e2c989214cc015556e8b
+  iteration_2:
+    observer_armed_offline_sample: 0
+    observer_live_offline_sample: 1
+    observer_sample_count: 312
+    observer_raw_hash_failures: 0
+    pre_fixture_safe_sample: 192
+    fixture_command: spawnpassive 10004 12
+    fixture_object_id: 44966
+    fixture_inert: true
+    activity: grind
+    activity_reason: nearby_mortal
+    exact_target_selected: true
+    navigation_present: true
+    cast_damage_authoritative_kill_and_credit: true
+    experience_before: 8082056
+    experience_after: 8082070
+    experience_delta: 14
+    inventory_changed: false
+    recovery_pending_sample_count: 11
+    recovery_pending_span_ms: 3000
+    recovery_pending_brain_steps: 56
+    recovery_pending_mover_steps: 112
+    brain_and_mover_suspended_through_pending: true
+    completion_hp: 9516/9516
+    completion_mp: 6966/6966
+    progression_records: 1
+    normal_self_logout: true
+    first_offline_sample: 229
+    zero_population_after: true
+    analysis_sha256: fa7e46e5b2b65c026a4c9021a59baaaf6fbca8477b11ccdbb8ccf30e95d165ea
+  iteration_3:
+    observer_armed_offline_sample: 0
+    observer_live_offline_sample: 1
+    observer_sample_count: 302
+    observer_raw_hash_failures: 0
+    pre_fixture_safe_sample: 196
+    fixture_command: spawnpassive 10004 12
+    fixture_object_id: 37936
+    fixture_inert: true
+    activity: grind
+    activity_reason: nearby_mortal
+    exact_target_selected: true
+    navigation_present: true
+    cast_damage_authoritative_kill_and_credit: true
+    experience_before: 8082070
+    experience_after: 8082084
+    experience_delta: 14
+    inventory_changed: false
+    recovery_pending_sample_count: 8
+    recovery_pending_span_ms: 2000
+    recovery_pending_brain_steps: 74
+    recovery_pending_mover_steps: 143
+    brain_and_mover_suspended_through_pending: true
+    completion_hp: 9516/9516
+    completion_mp: 6966/6966
+    progression_records: 1
+    normal_self_logout: true
+    first_offline_sample: 221
+    zero_population_after: true
+    analysis_sha256: 83bd2a5c056d5e550f665f6d4ba8c04d94e359b6156c4632bfe87516837c304d
+  cumulative:
+    level_before: 51
+    level_after: 51
+    experience_before: 8082042
+    experience_after: 8082084
+    experience_delta: 42
+    inventory_fingerprint_before: 4593ed30d0396ab84ace8095908c1d2144263c55ac01b01d3a18b4525686ffd1
+    inventory_fingerprint_after: 4593ed30d0396ab84ace8095908c1d2144263c55ac01b01d3a18b4525686ffd1
+    spawn_count: 3
+    despawn_count: 3
+    cast_attempts: 3
+    cast_successes: 3
+    observed_kills: 3
+    credited_kills: 3
+    tick_errors: 0
+
+restart_persistence:
+  game_stopped_before_login: true
+  first_stop_game_process_id: 72376
+  first_stop_login_process_id: 77144
+  restart_runner: scripts/scale/Start-ScaleGateRuntime.ps1
+  restart_login_process_id: 81896
+  restart_game_process_id: 121812
+  distinct_login_and_game_process_ids: true
+  exact_schemas_and_five_loopback_listeners_present: true
+  post_restart_runtime_count: 0
+  post_restart_bot_count: 0
+  post_restart_online_character_count: 0
+  post_restart_roster_entry_count: 104
+  post_restart_roster_sha256: be37a6ec04e785be440d194b8d50c6fc5967c7970325f430dddaed79bf075790
+  roster_exactly_matches_initial: true
+  persistent_identity_preserved: true
+  persistent_bot_id: 20001
+  persistent_bot_name: ScaleBot000
+  persistent_bot_level: 51
+  last_directly_observed_pre_restart_experience: 8082084
+  exact_post_restart_experience_queried: false
+  exact_post_restart_experience_boundary: >-
+    Direct database access was prohibited. Restart persistence therefore proves
+    the same 104-entry roster hash, bot ID, name, and retained level through
+    read-only API/observer material without claiming an unqueried XP value.
+  uncounted_readd_used: true
+  uncounted_readd_fixture_staged: false
+  restart_log_spawnpassive_line_count: 0
+  uncounted_readd_object_id: 26384
+  uncounted_readd_safe_full_resource_observer_sample: 646
+  uncounted_readd_removed_only_at_final_cleanup: true
+  first_offline_after_remove_sample: 719
+  restart_observer_sample_count: 794
+  restart_observer_raw_hash_failures: 0
+  post_remove_runtime_count: 0
+  post_remove_bot_count: 0
+  post_remove_online_character_count: 0
+  post_remove_cast_attempts: 0
+  post_remove_credited_kills: 0
+  restart_runner_receipt_sha256: 7c6ee56fa88919c200133e102376acec8df5b071ad70cf6e9f1644a141fa4552
+  persistence_sha256: ce950bb87fa58478e4d647e69cb154d8914fa696a20f654c2c316db6a42722ff
+
+cleanup:
+  final_runtime_count: 0
+  final_bot_count: 0
+  final_online_character_count: 0
+  game_stopped_before_login: true
+  game_process_id: 121812
+  login_process_id: 81896
+  game_stop: graceful-ctrl-c-exited
+  login_stop: graceful-ctrl-c-exited
+  forced_termination: false
+  shutdown_cleanup_marker_count: 1
+  shutdown_cleanup_marker: BOT ev=shutdown_cleanup remaining_bots=0 remaining_runtimes=0
+  final_aaemu_game_login_process_count: 0
+  final_observer_process_count: 0
+  final_archeage_client_process_count: 0
+  final_occupied_required_port_count: 0
+  final_runtime_log_entry_count: 0
+  mysql_process_ids_unchanged: [6308, 8076]
+  direct_database_queries_or_mutations: 0
+  reference_and_installed_module_clean: true
+  host_overlay_unchanged: true
+  observer_and_runtime_artifact_hashes_unchanged: true
+  final_state_sha256: f8c22f767093c368a332ca535dd9254a1c693c11f283988d142c33a9a10599bd
+
+retained_warning:
+  category: native-post-readiness-shutdown-race
+  finding: >-
+    The known PhysicsThread disposed-service-provider warning occurred after
+    the first graceful Game shutdown and the zero-bot/zero-runtime cleanup
+    marker. It did not prevent clean restart or final process, listener, bot,
+    runtime, and active-log cleanup.
+  pre_restart_game_error_log_sha256: 6b73b4ef413972fdee81e4170e68836fbce6f65c32f7c19d2d3b55bf3fd7c8d5
+
+retained_superseded_artifacts:
+  - path: restart/readd-metrics.response.bin and restart/readd-metrics.transport.json
+    reason: Immutable GET botmetrics HTTP 404 capture; corrected by the successful POST snapshot capture.
+  - path: restart/readd-botmetrics.response.bin and restart/readd-botmetrics.transport.json
+    reason: Immutable empty-argument HTTP 400 capture; corrected by the successful POST snapshot capture.
+  - path: restart/persistence.json
+    reason: Immutable parser artifact with null metric fields; superseded by restart/persistence-verified.json.
+  - path: cleanup/final-state.json
+    reason: Immutable empty-array serialization artifact; superseded by cleanup/final-state-verified.json.
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-079\one-bot-autonomy-v6'
+  attempt_summary_sha256: 8c81d44afd0cd298ba8adf4205822a3e4a4b5c9304bca0cd2c51c09c0b919980
+  manifest_payload_file_count: 6490
+  manifest_payload_total_bytes: 51584593
+  manifest_sha256: fe00f692aec54da1760ef6e99645f1d21a13bc902f7fc3c7cc81b6d3ae4c5a4e
+  manifest_validation: 6490-of-6490-length-and-sha256-matched-zero-unlisted
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_boundaries:
+  - Exactly three autonomous gameplay iterations were counted; no fourth iteration or larger population was attempted.
+  - Each counted iteration used one managed addbot and one inert spawnpassive opportunity after a freshly verified safe observer boundary.
+  - No botstate, activity, destination, target, attack, loot/progression, recovery, or logout gameplay command was issued.
+  - The restart re-add was uncounted, staged no fixture or gameplay opportunity, and was removed only during final cleanup.
+  - No source, tooling, deployed host file, database, client, global ledger, runtime lease, or predecessor evidence was changed.
+  - No direct MySQL command, client control, destructive reset, forced termination, evidence retry, scale, or AAEmu 3.0 work occurred.
+
+control_actions:
+  integrator: Integrate this commit as the T-079 PASS runtime receipt; it changes only this receipt and the concise handoff.
+  pb_000_release: >-
+    Release the aaemu12 lease after accepting the three-iteration PASS,
+    restart-persistence proof, and final zero-process/free-port/empty-log cleanup.
+  downstream: >-
+    The single-bot one-kill autonomy runtime boundary is physically proven for
+    AAEmu 1.2 r208022. Advance dependent planning only through Control Tower
+    ledger edits; this task does not alter BOARD.yaml or CURRENT.yaml.
