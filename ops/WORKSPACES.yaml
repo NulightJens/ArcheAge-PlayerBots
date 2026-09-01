@@ -141,9 +141,9 @@ workspaces:
   aaemu12_t104_evidence_v6:
     role: one-zone-autonomous-director-runtime-evidence-v6
     path: 'D:\Codex-Labs\evidence\T-104\one-zone-autonomy-v6'
-    access: task-evidence-write
+    access: evidence-only
     lease: aaemu12
-    expected_state: absent-before-first-run-then-immutable
+    expected_state: immutable-retained-fail
 
   aaemu12_client:
     role: matching-client-fixture

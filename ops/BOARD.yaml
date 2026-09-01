@@ -1056,7 +1056,7 @@ tasks:
   - id: T-104
     title: Prove safe two-wave one-zone autonomy with live transform preflight
     track: AAEmu12
-    status: active
+    status: done
     integration: pending
     depends_on: [T-103]
     runtime_lease: aaemu12
@@ -1067,13 +1067,31 @@ tasks:
     worktree: 'C:\Users\jensh\.codex\worktrees\7259\PB-W00-control'
     dispatch_base: dc9a1f721e1cb1e972a3a1d8c58a51f3c5add056
     evidence_root: 'D:\Codex-Labs\evidence\T-104\one-zone-autonomy-v6'
+    candidate_commit: 3b0627f857c8e573cf67450b585e284f3f8ac0e9
+    candidate_parent: dde605d10912e8f282ce263680b70d1f02133249
+    candidate_tree: 41319cfb1568da0219d5a5d2445a8902c9e9eea7
+    evidence_receipt: ops/evidence/aaemu12-t104-one-zone-autonomy-v6.yaml
+    result: FAIL-no-eligible-ownership-tuple-zero-fixture-commands-clean-sealed
+
+  - id: T-105
+    title: Independently integrate retained T-104 runtime failure
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-104]
+    runtime_lease: null
+    gate: sealed-fail-evidence-replay-and-integration
+    contract: ops/tasks/T-105/CONTRACT.md
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-104-pass-independently-integrated]
+    depends_on: [fresh-post-angular-placement-runtime-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-103-telemetry-is-integrated-and-installed-but-T-104-safe-physical-two-wave-restart-proof-has-not-yet-passed-and-been-independently-integrated
+    blocker: T-104-retained-fail-proves-forward-distance-only-placement-cannot-meet-unique-ownership-for-live-collinear-geometry-angular-placement-source-correction-and-fresh-runtime-pass-remain-required

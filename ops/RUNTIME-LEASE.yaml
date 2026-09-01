@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-runtime-by-T-104
-    owner_task: T-104
-    owner_thread_id: 01a05f1e-79b2-7cd1-beef-446c870c4f9a
+    status: released-after-T-104-clean-retained-fail
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
-    cleanup_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
-    baseline_evidence: ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
+    released_at: 2026-09-01
+    cleanup_receipt: ops/evidence/aaemu12-t104-one-zone-autonomy-v6.yaml
+    baseline_evidence: ops/evidence/aaemu12-t104-one-zone-autonomy-v6.yaml
     archeage_client_allowed: false
-    authority_limit: T-104 in worktree C:\Users\jensh\.codex\worktrees\7259\PB-W00-control may use only installed source/tree bf0ae36fc65eea4f341b936c9f7a961e9d474580 / 7f33545311c972d7a0ed31fa7f75a016df3571f7 to create the fresh registered v6 evidence root, edit only the nine contracted deployed BotConfig.json assignments with exact byte restoration, launch the exact client/autonomy observers, and start/control Login then Game only through accepted loopback/graceful paths for the T-104 two-wave/restart proof. It may observe MySQL process identity through OS metadata only but never connect/query/control it. Module/reference source writes, build/test/full-suite actions, database or ArcheAge client access/control, predecessor evidence, global ledgers/lease/workspace registry, AAEmu 3.0, scale, soak, packaging, force-stop, deletion, retries after one-shot fixture errors, and every other lease use are prohibited. No other task may touch the aaemu12 lease-controlled workspace until PB-000 records release.
+    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact claim. T-104 stopped Game then Login gracefully, restored exact config bytes, ended observers cooperatively, proved zero required processes/listeners/live logs, and sealed its retained FAIL. T-105 is evidence-only and has no runtime-host authority.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

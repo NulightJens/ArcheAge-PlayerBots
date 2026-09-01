@@ -1,0 +1,38 @@
+schema_version: 1
+id: T-105
+title: Independently integrate retained T-104 runtime failure
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Independently verify the immutable T-104 v6 evidence root and exact two-path candidate, replay its retained FAIL receipt/handoff onto the saved lineage, record an integration receipt, and fast-forward the saved branch without reinterpreting failure as acceptance.
+depends_on: [T-104]
+runtime: {required: false, lease: null}
+branch: codex-managed-worktree
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-commit
+  source_candidate: 3b0627f857c8e573cf67450b585e284f3f8ac0e9
+  source_candidate_parent: dde605d10912e8f282ce263680b70d1f02133249
+  source_candidate_tree: 41319cfb1568da0219d5a5d2445a8902c9e9eea7
+  source_candidate_patch_id: 0ee155feca30e139f0325bdb29c0f9e926504302
+  evidence_root: 'D:\Codex-Labs\evidence\T-104\one-zone-autonomy-v6'
+  manifest_sha256: cbe9026f8e27ac0503521370a84be286b01ca38935cc8e3da4552e40bc31f7a0
+write_scope:
+  - ops/evidence/aaemu12-t104-one-zone-autonomy-v6.yaml
+  - ops/tasks/T-104/HANDOFF.md
+  - ops/evidence/aaemu12-t104-fail-integration-v1.yaml
+  - ops/tasks/T-105/HANDOFF.md
+external_read_scope:
+  - aaemu12_t104_evidence_v6 immutable root only
+gates:
+  - exact-candidate-parent-tree-two-path-scope-patch-id-and-blob-replay
+  - complete-sealed-manifest-rehash-and-path-safety
+  - independent-client-and-autonomy-raw-integrity-replay
+  - independent-delay-bootstrap-transform-and-1331-tuple-geometry-recomputation
+  - zero-fixture-command-world-mutation-and-cleanup-evidence
+  - retained-fail-integration-and-saved-branch-fast-forward
+validation_boundary: Immutable evidence verification and retained FAIL integration only. Do not write external evidence, runtime host/module/config/reference, global ledgers/lease/workspace registry, database, client, source/tests, AAEmu 3.0, scale, soak, or packaging. Do not run build, focused tests, full suite, Login, Game, or observers.
+contract: ops/tasks/T-105/CONTRACT.md
+handoff: ops/tasks/T-105/HANDOFF.md

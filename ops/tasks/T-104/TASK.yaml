@@ -2,7 +2,7 @@ schema_version: 1
 id: T-104
 title: Prove safe two-wave one-zone autonomy with live transform preflight
 track: AAEmu12
-status: active
+status: done
 integration: pending
 outcome: Run a fresh sealed physical proof that uses exact live transform telemetry to authorize safe uniquely owned passive fixtures before mutation, then proves two independent three-bot lifecycle/refill waves and a clean distinct-PID restart with sustained target population.
 depends_on: [T-103]
@@ -42,3 +42,7 @@ gates:
 validation_boundary: Physical AAEmu 1.2 one-zone runtime proof only. Do not edit module source, tests, global ledgers/lease/workspace registry, registered reference, database, client, AAEmu 3.0, scale, soak, packaging, or predecessor evidence. No directed gameplay commands, fixture retries, runtime force-stop, or destructive cleanup.
 contract: ops/tasks/T-104/CONTRACT.md
 handoff: ops/tasks/T-104/HANDOFF.md
+candidate_commit: 3b0627f857c8e573cf67450b585e284f3f8ac0e9
+candidate_parent: dde605d10912e8f282ce263680b70d1f02133249
+candidate_tree: 41319cfb1568da0219d5a5d2445a8902c9e9eea7
+result: FAIL-no-eligible-ownership-tuple-zero-fixture-commands-clean-sealed
