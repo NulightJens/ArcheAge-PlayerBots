@@ -1,0 +1,27 @@
+schema_version: 1
+id: T-070
+title: Integrate T-069 runtime receipt
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Independently verify and branch-integrate the exact two-file T-069 FAIL runtime receipt without changing its verdict, evidence, or cleanup boundary.
+depends_on: [T-069]
+branch: codex-managed-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+inputs:
+  integration_head: 88182ede5f32399d0ffd8684391fb8a5260c7b0e
+  source_candidate: 1f26c4309868b379ab0fb64cad59ae48a6a75648
+  source_parent: bbd6d8912be17d7084c439f2bbb42871b248fa16
+  evidence_manifest_sha256: 0397ae08227fdc8c2952ef99208da592e8315471173efba068a5c4523f33b558
+write_scope:
+  - ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+  - ops/tasks/T-069/HANDOFF.md
+  - ops/tasks/T-070/HANDOFF.md
+runtime:
+  required: false
+  lease: null
+gates: [receipt-integrity-review]
+validation_boundary: Receipt review and integration only. Do not start or control any runtime, MySQL, or client; do not access databases; edit global ledgers/leases; change source/deployed hosts; reinterpret T-069; modify external evidence; or touch AAEmu 3.0.
+handoff: ops/tasks/T-070/HANDOFF.md

@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-runtime-proof-v3
+phase: single-bot-autonomy-v3-fail-receipt-integration
 verdict: active
 
 source:
@@ -54,8 +54,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-069 must prove or falsify three complete single-bot gameplay iterations plus restart persistence using exact native progression/resource snapshots in a new immutable evidence root.
-  - Keep T-065 as INCOMPLETE and never reuse its evidence root.
+  - T-070 must integrate T-069 as a truthful FAIL receipt, then PB-000 must release the clean aaemu12 lease.
+  - Dispatch only the smallest lifecycle recovery correction that waits for a natural targetless, noncombat, debt-free completion boundary before normal logout.
+  - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
@@ -134,7 +135,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-progression-observability-integration-v1.yaml
     handoff: ops/tasks/T-068/HANDOFF.md
   - task: T-069
-    state: active-runtime-authorized
+    state: fail-receipt-review-new-mp-debt-at-completion
     client_thread_id: client-new-thread:546e51bc-826e-42df-aa7e-fa4c1965d2d6
     task_thread_id: 01a05c73-58af-7d72-94ef-bca2b2dd39e7
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\dd82\PB-W00-control'
@@ -142,6 +143,18 @@ prepared_workstreams:
     tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
     installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
     evidence_root: 'D:\Codex-Labs\evidence\T-069\one-bot-autonomy-v3'
+    head: 1f26c4309868b379ab0fb64cad59ae48a6a75648
+    verdict: FAIL-new-mp-debt-at-completion
+    evidence_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+    handoff: ops/tasks/T-069/HANDOFF.md
+    cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
+  - task: T-070
+    state: ready
+    client_thread_id: pending-thread-creation
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: 88182ede5f32399d0ffd8684391fb8a5260c7b0e
+    source_commit: 1f26c4309868b379ab0fb64cad59ae48a6a75648
     head: pending
     handoff: pending
   - task: T-038

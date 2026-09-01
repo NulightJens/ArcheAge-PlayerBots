@@ -2,8 +2,8 @@ schema_version: 1
 id: T-069
 title: AAEmu 1.2 single-bot autonomy proof v3
 track: AAEmu12
-status: active
-integration: runtime-proof-active
+status: review
+integration: runtime-fail-receipt-pending
 outcome: Produce a new immutable runtime receipt proving or falsifying three complete autonomous gameplay iterations by one persistent bot using qualified native progression/resource snapshots, a safe natural recovery boundary, normal self-logout, and restart persistence without per-action operator control.
 depends_on: [T-065, T-068]
 runtime:
@@ -33,3 +33,6 @@ minimum_successful_iterations: 3
 failure_policy: Stop at the first smallest verified functional blocker, retain FAIL or INCOMPLETE evidence, clean up gracefully, and do not activate larger populations.
 validation_boundary: Runtime and evidence only. Managed addbot and inert opportunity staging are allowed at declared boundaries; read-only observation is allowed. Do not issue botstate, target, travel, attack, loot/progression, recovery, or logout gameplay commands. Do not edit source, deployed host files, global ledgers, databases, clients, retained evidence, or AAEmu 3.0.
 handoff: ops/tasks/T-069/HANDOFF.md
+attempt_commit: 1f26c4309868b379ab0fb64cad59ae48a6a75648
+evidence_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+blocker: unsafe-resource-boundary-new-mp-debt-at-completion
