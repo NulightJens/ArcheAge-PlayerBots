@@ -1,0 +1,25 @@
+schema_version: 1
+id: T-062
+title: Atomic shared-target combat fan-out
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Replace unsafe per-bot shared-target attack fan-out with one atomic all-bot contained-attack stimulus so a mortal fixture cannot disappear before every cohort member is armed.
+depends_on: [T-060, T-044]
+branch: codex-managed-detached-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+runtime:
+  required: false
+gates: [focused-aaemu12-tests, deterministic-harness-tests]
+inputs:
+  dispatch_base: b380c5ee164ab968d72892f545c3415e0b891580
+  blocker_receipt: ops/evidence/aaemu12-t060-combat-stealth-v5.yaml
+write_scope:
+  - scripts/combat/CombatQualification.psm1
+  - scripts/combat/Test-CombatQualificationHarness.ps1
+  - scripts/combat/README.md
+  - ops/tasks/T-062/HANDOFF.md
+validation_boundary: Source-only deterministic harness correction. Do not start or control AAEmu, MySQL, or any client; do not edit deployed hosts, databases, global ledgers, release metadata, AAEmu 3.0, or unrelated PlayerBots behavior.
+handoff: ops/tasks/T-062/HANDOFF.md

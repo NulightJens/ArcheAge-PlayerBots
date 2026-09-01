@@ -61,6 +61,13 @@ workspaces:
     database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
     credentials: not-recorded
 
+  aaemu12_t061_evidence_v1:
+    role: retained-single-bot-autonomy-runtime-evidence
+    path: 'D:\Codex-Labs\evidence\T-061\one-bot-autonomy-v1'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: absent-before-first-run-then-immutable
+
   aaemu12_client:
     role: matching-client-fixture
     path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'

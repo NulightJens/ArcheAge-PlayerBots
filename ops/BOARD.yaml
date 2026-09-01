@@ -303,6 +303,15 @@ tasks:
     runtime_lease: aaemu12
     gate: serialized-one-bot-autonomy-proof
 
+  - id: T-062
+    title: Atomic shared-target combat fan-out
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-060, T-044]
+    gate: deterministic-harness-tests
+    runtime_lease: none
+
   - id: T-041
     title: One-zone Autonomous Activity Director
     track: AAEmu12
