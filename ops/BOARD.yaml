@@ -291,17 +291,29 @@ tasks:
     owner_client_thread_id: client-new-thread:a4beac22-f41f-4789-a907-5f40fee9f877
     owner_thread_id: 01a05b47-b0b7-71b3-90df-be5f07c6e81f
 
-  - id: T-037
-    title: AAEmu 1.2 scale budget and recovery qualification
+  - id: T-061
+    title: AAEmu 1.2 single-bot autonomous gameplay loop
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-060]
+    depends_on: [T-060, T-038, T-039, T-040]
     runtime_lease: aaemu12
+    gate: serialized-one-bot-autonomy-proof
 
   - id: T-041
-    title: One-zone Population Director
+    title: One-zone Autonomous Activity Director
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-037, T-038, T-039, T-040]
+    depends_on: [T-061]
+    runtime_lease: aaemu12
+    gate: serialized-one-zone-autonomy-proof
+
+  - id: T-037
+    title: AAEmu 1.2 functional scale budget and recovery qualification
+    track: AAEmu12
+    status: blocked
+    integration: pending
+    depends_on: [T-041]
+    runtime_lease: aaemu12
+    gate: serialized-functional-scale-proof

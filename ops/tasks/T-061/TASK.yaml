@@ -1,0 +1,15 @@
+schema_version: 1
+id: T-061
+title: AAEmu 1.2 single-bot autonomous gameplay loop
+track: AAEmu12
+status: blocked
+integration: pending
+outcome: Repeatedly prove one persistent bot can select and complete an ArcheAge-native activity through managed spawn, travel, mortal combat, progression, recovery, normal logout, and clean restart without per-action operator commands.
+depends_on: [T-060, T-038, T-039, T-040]
+runtime:
+  required: true
+  lease: aaemu12
+gate: serialized-one-bot-autonomy-proof
+minimum_successful_iterations: 3
+failure_policy: Diagnose and correct the smallest verified functional blocker before repeating the one-bot gate; do not activate larger cohorts.
+activation_requirement: T-060 evidence and graceful cleanup accepted, runtime lease available, and bounded source or adapter corrections decomposed into independent tasks when required.

@@ -3,8 +3,9 @@ program_id: archeage-playerbots
 name: ArcheAge PlayerBots
 objective: >-
   Deliver a shareable, installable PlayerBots module that produces believable,
-  recoverable world population and provides the identity foundation required
-  for governance and social systems.
+  recoverable player-like world population through autonomous ArcheAge-native
+  activity, with performance, social, and governance systems built on that
+  proven gameplay foundation.
 
 canonical_source:
   repository: 'C:\Users\jensh\Documents\Codex\2026-08-29\archeage-playerbots-module'
@@ -36,11 +37,11 @@ compatibility_track:
 
 current_milestone:
   id: M-004
-  name: One-zone Population Director
+  name: Single-bot autonomous gameplay loop
   acceptance: >-
-    A configurable one-zone director maintains qualified population density,
-    persistent identities, lifecycle recovery, and bounded navigation during a
-    30-minute soak followed by normal logout and clean restart.
+    One persistent bot repeatedly selects and completes an activity through
+    normal spawn, travel, mortal combat, progression, recovery, logout, and
+    clean restart without per-action operator control.
 
 program_rules:
   one_outcome_per_task: true

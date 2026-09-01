@@ -1,6 +1,6 @@
 schema_version: 1
-updated_at: 2026-08-31
-phase: wave-2-live-headless-physical-v5-preparation
+updated_at: 2026-09-01
+phase: wave-2-live-headless-physical-v5-roadmap-recentered
 verdict: active
 
 source:
@@ -51,11 +51,10 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Assign T-060, then commit one exact T-060 task/thread runtime-lease claim before any Login or Game process starts.
-  - Run the fresh immutable live-headless attempt in public-alpha-v5 without launching or controlling the ArcheAge client.
-  - Retain lifecycle-scoped recurrence evidence for the accepted non-blocking shutdown races.
-  - Keep T-037 and T-041 blocked until the new physical attempt passes.
+  - Allow only T-060 to finish its bounded live-headless diagnostic, retain its exact functional and resource evidence, then shut down gracefully and release the lease.
+  - Treat zero mortal kills or unchanged mortal target health as a functional failure even when command and scheduler metrics are green.
+  - After T-060 cleanup, activate T-061 to close and repeatedly prove the single-bot autonomous gameplay loop before any larger cohort.
+  - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
   - task: T-038

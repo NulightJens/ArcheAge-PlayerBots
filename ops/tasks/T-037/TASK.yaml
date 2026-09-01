@@ -1,13 +1,15 @@
 schema_version: 1
 id: T-037
-title: AAEmu 1.2 scale budget and recovery qualification
+title: AAEmu 1.2 functional scale budget and recovery qualification
 track: AAEmu12
 status: blocked
 integration: pending
-outcome: Approve a whole-server population/resource budget and normal-logout recovery envelope from an empty-server baseline.
-depends_on: [T-036]
+outcome: Approve a whole-server population and recovery envelope only for incrementally tested cohorts that retain the accepted one-zone autonomous activity loop.
+depends_on: [T-041]
 runtime:
   required: true
   lease: aaemu12
-cohorts: [0, 10, 50, 100, highest-qualified]
-activation_requirement: T-036 accepted and runtime lease available.
+gate: serialized-functional-scale-proof
+cohorts: [0, 1, 5, 10, 25, 50, 100, highest-qualified]
+failure_policy: Stop escalation at the first functional, cleanup, stability, or resource failure and diagnose that smallest failed cohort before continuing.
+activation_requirement: T-041 accepted and runtime lease available.

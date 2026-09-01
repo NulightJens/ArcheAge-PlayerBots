@@ -1,12 +1,13 @@
 schema_version: 1
 id: T-041
-title: One-zone Population Director
+title: One-zone Autonomous Activity Director
 track: AAEmu12
 status: blocked
 integration: pending
-outcome: Maintain configured population density in one zone using persistent identities, lifecycle transitions, qualified navigation, and the approved resource budget.
-depends_on: [T-037, T-038, T-039, T-040]
+outcome: Maintain configured population bounds while persistent bots independently select and complete safe one-zone activities with qualified lifecycle, navigation, combat, recovery, operator visibility, and deterministic cleanup.
+depends_on: [T-061]
 runtime:
   required: true
   lease: aaemu12
+gate: serialized-one-zone-autonomy-proof
 activation_requirement: All dependencies accepted and integration write scope assigned.

@@ -1,10 +1,20 @@
 # Roadmap
 
-The goal is believable, useful, lightweight party members and world population. ArcheAge-native systems remain the baseline unless a measured gap requires more logic.
+The goal is believable, useful, lightweight party members and autonomous world
+population. The upstream
+[`mod-playerbots`](https://github.com/mod-playerbots/mod-playerbots) capability
+model guides sequencing: first prove player-like activity, progression,
+recovery, and persistence; then scale it; then add broader social and world
+systems. ArcheAge-native systems remain the implementation baseline unless a
+measured gap requires more logic.
 
 ## Active track policy
 
-AAEmu 1.2 r208022 is the sole active feature and runtime target until the one-zone Population Director passes its soak and recovery gate. AAEmu 3.0 is a frozen compatibility checkpoint: preserve its accepted source, patch, assets, and evidence, and run its clean install/build/adapter regression only at major milestone or release boundaries. Current task dispatch and dependencies live in `ops/BOARD.yaml` and `ops/ROADMAP.md`.
+AAEmu 1.2 r208022 is the sole active feature and runtime target through the
+one-zone public alpha. AAEmu 3.0 is a frozen compatibility checkpoint: preserve
+its accepted source, patch, assets, and evidence, and run only its clean
+install/build/adapter regression at the release boundary. Current task dispatch
+and dependencies live in `ops/BOARD.yaml` and `ops/ROADMAP.md`.
 
 ## 0.1 release candidate: foundation
 
@@ -17,7 +27,9 @@ Status: released as `0.1.0-rc.2`; accepted fixes continue under Unreleased.
 - Death, invalid-target, kill-credit, and follow recovery.
 - Human GM commands and runtime diagnostics.
 - Exact population metrics and isolated scale harness.
-- Physical execution at 100, 500, and 1,000 bots.
+- Historical physical execution at 100, 500, and 1,000 controlled bots. This
+  remains retained foundation evidence, not acceptance of the current AAEmu
+  1.2 autonomous gameplay loop or its resource ceiling.
 
 ## 0.2: believable combat
 
@@ -29,7 +41,11 @@ Status: released as `0.1.0-rc.2`; accepted fixes continue under Unreleased.
 - Completed: Primeval's moving-hostile gate. A level-50 melee fixture moved 18.13 m while Primeval reported movement in 10 of 24 retained samples; Endless Arrows starts overlapped the moving segment. The companion 30-second sample produced 16 Endless Arrows in 22 offensive casts (72.73%). The isolated repeat had 12/12 successful casts, a 0.7 ms bot-host p95, zero scans, zero path requests, zero skipped ticks, zero overlaps, and zero tick errors.
 - Completed: the continuously moving-owner Cleric gate. The leader moved 34.66 m over 10.038 seconds while the Cleric preserved the follow target in all 37 samples, moved 19.29 m toward a 53.23%-health party member, completed Antithesis before the movement window ended, crossed the 85% support threshold, and resumed leader-directed movement. The four-runtime sample had one successful cast, a 1.2 ms bot-host p95, and no cast failure, path request, skipped tick, runtime overlap, or tick error.
 - Automated: stealth loss preempts continuously available rotations, search diagnostics expose the last-known state, and search scans are metered. Physical release and reacquisition remain open.
-- Run mortal-combat cohorts at 1, 5, 10, 25, 50, and 100 bots with matched Idle controls.
+- Current: finish T-060 as a bounded diagnostic. Successful commands and low
+  tick cost are not a combat pass when mortal target health is unchanged or
+  credited kills remain zero.
+- Next: close one-bot authoritative damage, kill credit, combat exit, and
+  recovery before running a larger cohort.
 
 Mortal fixtures must be staged away from the human observer and unrelated respawning hostiles. The moving-hostile cleanup exposed this harness requirement when the observer and one melee bot died outside the isolated Primeval measurement; both recovered, but that cleanup is not an accepted death-free cohort.
 
@@ -56,19 +72,54 @@ Mortal fixtures must be staged away from the human observer and unrelated respaw
 - Retained negative evidence: quest 3427's Cave Bat objective is physically inside a cave while the current simple heightmap mover projects to the exterior surface. The first attempt exposed that mismatch; after the safety correction, the same live fixture was rejected before combat instead of stranding the bot above the target.
 - Completed once on 3.0: quest 312 started at Apothecary Nestelle with its native sphere objective at 0/1. From an isolated staged point 95.4 meters away, `/botquest travel` derived the one same-world 30-meter sphere and exact heightmap destination, normal bot movement entered it, AAEmu finalized the sphere act, and native auto-complete moved the lifecycle to completed.
 - Automated contract: travel requires exactly one active `QuestActObjSphere`, an unsatisfied native objective, a static rather than NPC-centered sphere, exactly one same-world geometry result, true 3D distance no greater than 100 meters, and a finite heightmap surface that remains at least 0.25 meters inside the sphere. It clears follow/formations/combat, holds safely in forced Idle, and delegates both motion and objective credit to the existing mover and AAEmu sphere trigger.
-- Next: add one separately measured emote objective executor, then define the first bounded objective-transition policy without autonomous quest selection.
-- Autonomous quest selection, routing, and chaining remain deferred until those objective executors and navigation boundaries pass independently.
+- After the one-bot combat gate, expose the already-qualified bounded objective
+  executors through the first fail-closed autonomous activity-selection policy.
+- Full quest selection, routing, and chaining remain later capabilities; the
+  one-zone alpha requires only activities whose objective and navigation
+  contracts already pass independently.
 
-## 0.4: population operations
+## 0.4: single-bot autonomous loop
 
-- Approve a whole-server reserve and latency budget from an empty-server baseline.
-- Run the highest budget-qualified cohort for 30 minutes plus normal-logout recovery.
-- Introduce a one-zone Population Director with explicit activity and density limits.
-- Expand only after zone-level resource and player-experience acceptance.
+- Complete at least three managed iterations of autonomous activity selection,
+  fail-closed travel, mortal combat and kill credit, loot or progression,
+  recovery, normal logout, and clean restart.
+- Preserve identity, roster, and relevant progress across restart.
+- Permit synthetic commands to stage and observe acceptance, never to replace
+  the bot's decisions.
+- Stop on the smallest functional failure; do not scale broken behavior.
+
+## 0.5: one-zone Autonomous Activity Director
+
+- Maintain configured population bounds rather than only issuing add/remove
+  commands.
+- Rotate bots independently through qualified wandering, grinding, bounded
+  quests, rest, recovery, and social activities.
+- Expose identity, activity, failure, throttling, and cleanup diagnostics.
+- Require authoritative completed activity; population density alone is not a
+  pass.
+
+## 0.6: functional scale and public-alpha soak
+
+- Qualify 0, 1, 5, 10, 25, 50, 100, and the highest safe population in order.
+- Stop escalation at the first gameplay, cleanup, stability, or resource
+  failure and diagnose that smallest cohort.
+- Establish the whole-server reserve and latency ceiling only from cohorts
+  whose autonomous activity remains functional.
+- Run the highest accepted cohort for a 30-minute activity soak followed by
+  normal logout, graceful shutdown, zero unintended retained bots, and clean
+  restart.
+
+## 0.7 and later: broader player simulation
+
+- Add groups, dungeons, PvP, economy, professions, and multi-zone travel after
+  the one-zone public alpha.
+- Add residency, ownership, governance, and territorial conflict only after the
+  underlying autonomous population is believable and recoverable.
 
 ## ArcheAge 3.0
 
-Status: frozen compatibility checkpoint; no new 3.0 feature or physical acceptance work during the AAEmu 1.2 Population Director milestone.
+Status: frozen compatibility checkpoint; no new 3.0 feature or physical
+acceptance work during the AAEmu 1.2 one-zone public-alpha milestone.
 
 - Completed: pinned NL0bP/AAEmu base `8c1c943bb2309eefffb9da2aa99a408d0acbb095` for client `3.0.4.2 r336598`.
 - Completed: compile-time compatibility layer, version-specific Game/test MSBuild targets, and reviewed 24-file alpha-v4 host patch.
@@ -84,7 +135,9 @@ Status: frozen compatibility checkpoint; no new 3.0 feature or physical acceptan
 - Completed once: the staged exact-NPC quest 330 accept/report flow, including graceful-restart and bot-reload persistence plus fail-closed distance and unrelated-quest checks.
 - Completed once: quest 620's selected exact-NPC hunt loop completed three native kills, released combat state at the native goal, and reported normally; a vertically unreachable cave fixture now fails closed during preflight.
 - Completed once: quest 312's selected static sphere objective ran 95.4 meters through the normal mover, finalized through AAEmu's native enter-sphere event, and auto-completed without fabricated progress.
-- Next: repeat the login/lifecycle/class/gear and representative quest gates from a clean start, then run four-role party/combat and 0/10/50/100 resource/recovery gates.
+- Next: at the AAEmu 1.2 public-alpha release boundary, run only the clean
+  install/build/adapter regression. Further 3.0 runtime feature qualification
+  remains frozen.
 - Promotion rule: 3.0 remains server-start-validated alpha until every runtime gate passes; configuration, a successful build, or server startup alone is not a support claim.
 
 ## Shelved experiments
