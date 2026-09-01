@@ -1,11 +1,11 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-runtime-v2-active
+phase: progression-resource-observability-source-correction
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: 4d8d085e73a2cbcc05f5d37b68abc2e1122a041d
+  integrated_head: 07e230ab959c4147318d3b5228dee492ff18c4fb
   tested_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
   integration_evidence: ops/evidence/aaemu12-lifecycle-fanout-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
@@ -30,11 +30,11 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-after-t061-fail
+    state: stopped-clean-after-t065-incomplete
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-t061-one-bot-autonomy-v1
+    evidence_receipt: aaemu12-t065-one-bot-autonomy-v2
     integration_receipt: aaemu12-lifecycle-fanout-integration-v1
     installed_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
     installed_module_tree: 6803d1d7e1d287798390e5aed0b835b9c8f12aef
@@ -43,7 +43,7 @@ runtime:
     build: 0-errors-76-warnings
     focused_tests: 141-passed-0-skipped-0-failed
     unit_tests: 1803-passed-4-intentional-skips-0-failed
-    runtime_boundary: T-061 proved one free bot remains inactive Idle with no selected activity, travel, target, combat, progression, recovery, or autonomous logout; cleanup proves zero bots, processes, clients, and required listeners.
+    runtime_boundary: T-065 proved autonomous grind selection, exact-target mortal combat, one successful cast, authoritative kill credit, and normal self-logout to zero bots/runtimes; exact progression delta and recovery state remained unobservable, so iterations two and three were not staged.
 
 control_tower:
   permanent_task:
@@ -54,8 +54,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-066 integrates the exact T-065 INCOMPLETE receipt at 630c6c9d24505dc074e0da31ed1d633f84014c0d without changing its verdict.
-  - Release the AAEmu 1.2 lease only after that receipt is branch-integrated, then dispatch the smallest read-only progression/resource observability source correction.
+  - T-067 adds only read-only activation-to-logout progression and resource snapshots to structured lifecycle logs and botdebug.
+  - Integrate/build T-067 before assigning a fresh immutable runtime-proof version; keep T-065 as INCOMPLETE and never reuse its evidence root.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
 prepared_workstreams:
@@ -90,7 +90,7 @@ prepared_workstreams:
     installed_module_tree: 6803d1d7e1d287798390e5aed0b835b9c8f12aef
     evidence_receipt: aaemu12-lifecycle-fanout-integration-v1
   - task: T-065
-    state: active-runtime-lease-owner
+    state: blocked-retained-incomplete-progression-observability
     client_thread_id: client-new-thread:5bfce600-5bf5-4894-af66-c0945b368375
     task_thread_id: 01a05c3c-9169-7eb3-b0a6-3ecaf41ecf16
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\beca\PB-W00-control'
@@ -102,12 +102,22 @@ prepared_workstreams:
     verdict: INCOMPLETE-absent-authoritative-progression-delta
     handoff: ops/tasks/T-065/HANDOFF.md
   - task: T-066
-    state: active
+    state: done-integrated
     client_thread_id: client-new-thread:5f2ae548-ae67-4f17-ac9b-635105b4e911
     task_thread_id: 01a05c4b-c985-7890-9909-c80061c13c0e
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\7745\PB-W00-control'
     base: 04912db77beaac540a45d455fe852ebd6f4284de
     source_commit: 630c6c9d24505dc074e0da31ed1d633f84014c0d
+    head: 07e230ab959c4147318d3b5228dee492ff18c4fb
+    handoff: ops/tasks/T-066/HANDOFF.md
+  - task: T-067
+    state: ready
+    client_thread_id: pending-thread-creation
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: 07e230ab959c4147318d3b5228dee492ff18c4fb
+    blocker_receipt: ops/evidence/aaemu12-t065-one-bot-autonomy-v2.yaml
+    head: pending
     handoff: pending
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f

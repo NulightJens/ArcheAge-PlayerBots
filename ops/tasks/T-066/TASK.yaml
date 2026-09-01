@@ -2,8 +2,8 @@ schema_version: 1
 id: T-066
 title: Integrate T-065 runtime receipt
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently verify and branch-integrate the exact two-file T-065 INCOMPLETE runtime receipt without changing its verdict, evidence, or cleanup boundary.
 depends_on: [T-065]
 branch: codex-managed-worktree
@@ -25,3 +25,4 @@ runtime:
 gates: [receipt-integrity-review]
 validation_boundary: Receipt review and integration only. Do not start or control any runtime, MySQL, or client; do not access databases; edit global ledgers/leases; change source/deployed hosts; reinterpret T-065; modify external evidence; or touch AAEmu 3.0.
 handoff: ops/tasks/T-066/HANDOFF.md
+integrated_commit: 07e230ab959c4147318d3b5228dee492ff18c4fb

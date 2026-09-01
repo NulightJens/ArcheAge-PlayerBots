@@ -360,26 +360,39 @@ tasks:
   - id: T-065
     title: AAEmu 1.2 single-bot autonomy proof v2
     track: AAEmu12
-    status: active
-    integration: runtime-proof-active
+    status: blocked
+    integration: runtime-incomplete-retained
     depends_on: [T-061, T-064]
     runtime_lease: aaemu12
     gate: serialized-one-bot-autonomy-proof-v2
     owner_client_thread_id: client-new-thread:5bfce600-5bf5-4894-af66-c0945b368375
     owner_thread_id: 01a05c3c-9169-7eb3-b0a6-3ecaf41ecf16
     worktree: 'C:\Users\jensh\.codex\worktrees\beca\PB-W00-control'
+    attempt_commit: 630c6c9d24505dc074e0da31ed1d633f84014c0d
+    evidence_receipt: aaemu12-t065-one-bot-autonomy-v2
+    blocker: absent-authoritative-progression-before-after-delta-and-unproven-resource-recovery-boundary
 
   - id: T-066
     title: Integrate T-065 runtime receipt
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-065]
     runtime_lease: none
     gate: receipt-integrity-review
     owner_client_thread_id: client-new-thread:5f2ae548-ae67-4f17-ac9b-635105b4e911
     owner_thread_id: 01a05c4b-c985-7890-9909-c80061c13c0e
     worktree: 'C:\Users\jensh\.codex\worktrees\7745\PB-W00-control'
+    integrated_commit: 07e230ab959c4147318d3b5228dee492ff18c4fb
+
+  - id: T-067
+    title: Expose lifecycle progression and resource deltas
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-063, T-065]
+    runtime_lease: none
+    gate: focused-aaemu12-tests
 
   - id: T-041
     title: One-zone Autonomous Activity Director
