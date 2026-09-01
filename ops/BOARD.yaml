@@ -975,7 +975,7 @@ tasks:
     title: Accept valid default-world bot anchors
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated-by-T-101
     depends_on: [T-099]
     runtime_lease: null
     gate: focused-default-world-anchor-source-correction
@@ -988,12 +988,13 @@ tasks:
     candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
     evidence_receipt: ops/evidence/aaemu12-passive-anchor-default-world-zero-v1.yaml
     result: PASS-40-focused-build-0-errors-72-retained-warnings-patch-unchanged
+    integrated_commit: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
 
   - id: T-101
     title: Integrate and install default-world anchor correction
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-100]
     runtime_lease: aaemu12-build-only
     gate: source-install-focused-build-full-suite-integration
@@ -1005,13 +1006,32 @@ tasks:
     owner_thread_id: 01a05ed6-653f-71d3-ac72-1d6a0db3a85c
     worktree: 'C:\Users\jensh\.codex\worktrees\18a8\PB-W00-control'
     dispatch_base: a05e94fd8d7f58bce12a968aa1d5b09de78f4a14
+    replay_commit: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+    replay_tree: 7afaac89eb0d5ef53475064134e69b7e7527eb58
+    integrated_commit: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
+    integrated_tree: 14421e2ecfe9c557268552d359f6a32aea10e359
+    evidence_receipt: ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
+    result: PASS-40-focused-build-0-errors-79-warnings-full-1863-pass-4-intentional-skips-once
+
+  - id: T-102
+    title: Expose exact bot transform telemetry for fixture preflight
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-101]
+    runtime_lease: null
+    gate: focused-invariant-botdebug-transform-telemetry
+    contract: ops/tasks/T-102/CONTRACT.md
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [fresh-post-T-101-runtime-pass]
+    depends_on: [fresh-post-transform-telemetry-integration-runtime-pass]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-098-is-retained-FAIL-at-fixture-anchor-boundary-and-successor-source-correction-runtime-pass-is-not-yet-proven-and-integrated
+    blocker: T-098-is-retained-FAIL-at-fixture-anchor-boundary-T-101-correction-is-integrated-but-exact-transform-preflight-and-a-fresh-successor-runtime-pass-are-not-yet-proven-and-integrated

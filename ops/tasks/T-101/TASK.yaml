@@ -2,8 +2,8 @@ schema_version: 1
 id: T-101
 title: Integrate and install default-world anchor correction
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently replay T-100 onto the saved lineage, install the exact replay into the registered AAEmu 1.2 integration module, reprove the focused guard, clean build, and exactly one full-suite wave gate, then fast-forward the saved branch with a durable receipt.
 depends_on: [T-100]
 runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
@@ -37,3 +37,9 @@ gates:
 validation_boundary: Source integration/install/build/test only. Never start Login/Game/runtime observers, edit deployed BotConfig.json, access/control MySQL/database or ArcheAge client, edit global ledgers/lease, external runtime evidence, reference checkout, AAEmu 3.0, scale, soak, or packaging.
 contract: ops/tasks/T-101/CONTRACT.md
 handoff: ops/tasks/T-101/HANDOFF.md
+replay_commit: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+replay_tree: 7afaac89eb0d5ef53475064134e69b7e7527eb58
+integrated_commit: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
+integrated_tree: 14421e2ecfe9c557268552d359f6a32aea10e359
+installed_game_assembly_sha256: 54f822be1721e00fedfc998a02115c19c573015822c904c7dc6e055c8b1fbfff
+result: PASS-40-focused-build-0-errors-79-warnings-full-1863-pass-4-intentional-skips-once

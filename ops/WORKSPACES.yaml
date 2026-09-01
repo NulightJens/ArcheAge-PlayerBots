@@ -1,6 +1,6 @@
 schema_version: 1
 owner: PB-000 Control Tower
-updated_at: 2026-08-31
+updated_at: 2026-09-01
 
 selection_rules:
   - Resolve locations by workspace ID, never by nearest name or directory age.
@@ -44,10 +44,10 @@ workspaces:
     expected_state: receipted-module-install-changes
     lease: aaemu12
     installed_module_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\modules\archeage-playerbots'
-    installed_module_head: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
-    installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+    installed_module_head: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+    installed_module_tree: 7afaac89eb0d5ef53475064134e69b7e7527eb58
     compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
-    evidence_receipt: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
+    evidence_receipt: ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
 
   aaemu12_database_public_alpha_v1:
     role: isolated-public-alpha-runtime-database

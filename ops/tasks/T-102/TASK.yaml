@@ -1,0 +1,34 @@
+schema_version: 1
+id: T-102
+title: Expose exact bot transform telemetry for fixture preflight
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Append invariant round-trip world, instance, zone, position, and yaw telemetry to botdebug so a runtime worker can predict exact passive-fixture geometry before one-shot world mutation, without changing existing diagnostics or bot state.
+depends_on: [T-101]
+runtime: {required: false, lease: null}
+branch: task/T-102-botdebug-transform-telemetry
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-commit
+  source_base: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
+  installed_module_source: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/evidence/aaemu12-botdebug-transform-telemetry-v1.yaml
+  - ops/tasks/T-102/HANDOFF.md
+gates:
+  - invariant-round-trip-transform-line
+  - valid-default-world-zero-instance-zone-position-yaw-preserved
+  - existing-botdebug-output-retained
+  - no-transform-target-combat-movement-or-runtime-mutation
+  - complete-focused-bot-command-tests-green
+  - isolated-aaemu12-build-zero-errors
+  - compatibility-patch-sha-unchanged-and-clean-apply
+validation_boundary: Module source, focused BotCommandsTests, isolated AAEmu 1.2 build, receipt, and handoff only. Do not edit global ledgers/lease, installed/reference host, runtime config/evidence, database, client, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite.
+contract: ops/tasks/T-102/CONTRACT.md
+handoff: ops/tasks/T-102/HANDOFF.md
