@@ -226,10 +226,12 @@ tasks:
   - id: T-056
     title: Integrate the system-actor world-context correction
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-055]
     gate: full-aaemu12-suite
+    owner_client_thread_id: client-new-thread:08dbaead-1b07-4f00-89d6-e4d9ce4ba3bd
+    owner_thread_id: 01a05af9-afa4-78a0-ad93-e8373d5d9aa4
 
   - id: T-037
     title: AAEmu 1.2 scale budget and recovery qualification
