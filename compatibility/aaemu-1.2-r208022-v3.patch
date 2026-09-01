@@ -1,5 +1,5 @@
 diff --git a/AAEmu.Game/AAEmu.Game.csproj b/AAEmu.Game/AAEmu.Game.csproj
-index 942e08a62..a00165eba 100644
+index 942e08a6..a00165eb 100644
 --- a/AAEmu.Game/AAEmu.Game.csproj
 +++ b/AAEmu.Game/AAEmu.Game.csproj
 @@ -99,4 +99,6 @@
@@ -10,7 +10,7 @@ index 942e08a62..a00165eba 100644
 +          Condition="Exists('..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Game.targets')" />
  </Project>
 diff --git a/AAEmu.Game/Configurations/AccessLevels.json b/AAEmu.Game/Configurations/AccessLevels.json
-index 06130ba25..c288b494e 100644
+index 06130ba2..c288b494 100644
 --- a/AAEmu.Game/Configurations/AccessLevels.json
 +++ b/AAEmu.Game/Configurations/AccessLevels.json
 @@ -8,6 +8,10 @@
@@ -110,7 +110,7 @@ index 06130ba25..c288b494e 100644
 \ No newline at end of file
 +}
 diff --git a/AAEmu.Game/Core/Managers/DuelManager.cs b/AAEmu.Game/Core/Managers/DuelManager.cs
-index f462ce0ca..4c7f00ffa 100644
+index f462ce0c..4c7f00ff 100644
 --- a/AAEmu.Game/Core/Managers/DuelManager.cs
 +++ b/AAEmu.Game/Core/Managers/DuelManager.cs
 @@ -1,5 +1,6 @@
@@ -167,7 +167,7 @@ index f462ce0ca..4c7f00ffa 100644
              duel.Challenger.IsInBattle = false;
              duel.Challenged.IsInBattle = false;
 diff --git a/AAEmu.Game/Core/Managers/ExpeditionManager.cs b/AAEmu.Game/Core/Managers/ExpeditionManager.cs
-index 70ae67456..d60da993c 100644
+index 70ae6745..d60da993 100644
 --- a/AAEmu.Game/Core/Managers/ExpeditionManager.cs
 +++ b/AAEmu.Game/Core/Managers/ExpeditionManager.cs
 @@ -384,7 +384,11 @@ public class ExpeditionManager(IExpeditionIdManager expeditionIdManager, ITeamMa
@@ -184,7 +184,7 @@ index 70ae67456..d60da993c 100644
  
          var characterMember = expedition?.GetMember(character);
 diff --git a/AAEmu.Game/Core/Managers/ITeamManager.cs b/AAEmu.Game/Core/Managers/ITeamManager.cs
-index 4ca2f1c6a..ad08f8415 100644
+index 4ca2f1c6..ad08f841 100644
 --- a/AAEmu.Game/Core/Managers/ITeamManager.cs
 +++ b/AAEmu.Game/Core/Managers/ITeamManager.cs
 @@ -8,5 +8,6 @@ public interface ITeamManager : ILoadable
@@ -195,7 +195,7 @@ index 4ca2f1c6a..ad08f8415 100644
      void MemberRemoveFromTeam(Character unit, Character source, RiskyAction leaveType);
  }
 diff --git a/AAEmu.Game/Core/Managers/ITickManager.cs b/AAEmu.Game/Core/Managers/ITickManager.cs
-index 2e10b30fd..7de689262 100644
+index 2e10b30f..7de68926 100644
 --- a/AAEmu.Game/Core/Managers/ITickManager.cs
 +++ b/AAEmu.Game/Core/Managers/ITickManager.cs
 @@ -3,5 +3,6 @@ namespace AAEmu.Game.Core.Managers;
@@ -206,7 +206,7 @@ index 2e10b30fd..7de689262 100644
      void Stop();
  }
 diff --git a/AAEmu.Game/Core/Managers/TeamManager.cs b/AAEmu.Game/Core/Managers/TeamManager.cs
-index 5f4b56076..61168fb9d 100644
+index 5f4b5607..61168fb9 100644
 --- a/AAEmu.Game/Core/Managers/TeamManager.cs
 +++ b/AAEmu.Game/Core/Managers/TeamManager.cs
 @@ -119,6 +119,8 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
@@ -387,7 +387,7 @@ index 5f4b56076..61168fb9d 100644
  
      public void Load()
 diff --git a/AAEmu.Game/Core/Managers/TickManager.cs b/AAEmu.Game/Core/Managers/TickManager.cs
-index f62666fcc..7252fcdfb 100644
+index f62666fc..7252fcdf 100644
 --- a/AAEmu.Game/Core/Managers/TickManager.cs
 +++ b/AAEmu.Game/Core/Managers/TickManager.cs
 @@ -7,9 +7,11 @@ namespace AAEmu.Game.Core.Managers;
@@ -426,7 +426,7 @@ index f62666fcc..7252fcdfb 100644
          sw.Stop();
      }
 diff --git a/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs b/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
-index 2629f79fb..b120ffd3f 100644
+index 2629f79f..b120ffd3 100644
 --- a/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
 +++ b/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
 @@ -445,6 +445,9 @@ public class CharacterManager(
@@ -440,7 +440,7 @@ index 2629f79fb..b120ffd3f 100644
          return Math.Max(character.AccessLevel, accountDetails.AccessLevel);
      }
 diff --git a/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs b/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs
-index 7634b1edc..bb18e5b3c 100644
+index 7634b1ed..bb18e5b3 100644
 --- a/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs
 +++ b/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs
 @@ -15,6 +15,18 @@ public class AreaTriggerManager : Singleton<AreaTriggerManager>, IAreaTriggerMan
@@ -463,7 +463,7 @@ index 7634b1edc..bb18e5b3c 100644
      {
          TickManager.Instance.OnTick.Subscribe(Tick, TimeSpan.FromMilliseconds(200), true);
 diff --git a/AAEmu.Game/Core/Managers/World/ZoneManager.cs b/AAEmu.Game/Core/Managers/World/ZoneManager.cs
-index 173721385..c39485ddf 100644
+index 17372138..c39485dd 100644
 --- a/AAEmu.Game/Core/Managers/World/ZoneManager.cs
 +++ b/AAEmu.Game/Core/Managers/World/ZoneManager.cs
 @@ -38,6 +38,16 @@ public class ZoneManager(IWorldManager worldManager) : Singleton<ZoneManager>, I
@@ -484,7 +484,7 @@ index 173721385..c39485ddf 100644
      {
          var res = new List<uint>();
 diff --git a/AAEmu.Game/GameService.cs b/AAEmu.Game/GameService.cs
-index c25a30ca6..57a123573 100644
+index c25a30ca..57a12357 100644
 --- a/AAEmu.Game/GameService.cs
 +++ b/AAEmu.Game/GameService.cs
 @@ -3,7 +3,10 @@ using System.Diagnostics;
@@ -678,7 +678,7 @@ index c25a30ca6..57a123573 100644
  
          // SpawnManager.Instance.Stop(); Moved to World Instance
 diff --git a/AAEmu.Game/Models/Game/Char/Character.cs b/AAEmu.Game/Models/Game/Char/Character.cs
-index 1c3f40cc7..b031afadc 100644
+index 1c3f40cc..b031afad 100644
 --- a/AAEmu.Game/Models/Game/Char/Character.cs
 +++ b/AAEmu.Game/Models/Game/Char/Character.cs
 @@ -1466,10 +1466,7 @@ public partial class Character : Unit, ICharacter
@@ -749,7 +749,7 @@ index 1c3f40cc7..b031afadc 100644
          if (DateTime.UtcNow.Subtract(delta) - LastPacketActivityTime > maxAllowedInactivityTime)
          {
 diff --git a/AAEmu.Game/Models/Game/Char/CharacterEvents.cs b/AAEmu.Game/Models/Game/Char/CharacterEvents.cs
-index af10a760a..4fd6c8ee1 100644
+index af10a760..4fd6c8ee 100644
 --- a/AAEmu.Game/Models/Game/Char/CharacterEvents.cs
 +++ b/AAEmu.Game/Models/Game/Char/CharacterEvents.cs
 @@ -8,6 +8,7 @@ public class CharacterEvents : UnitEvents
@@ -774,7 +774,7 @@ index af10a760a..4fd6c8ee1 100644
  {
      public Character Player { get; set; }
 diff --git a/AAEmu.Game/Models/Game/NPChar/Npc.cs b/AAEmu.Game/Models/Game/NPChar/Npc.cs
-index 7e306b064..b55e77a39 100644
+index 7e306b06..b55e77a3 100644
 --- a/AAEmu.Game/Models/Game/NPChar/Npc.cs
 +++ b/AAEmu.Game/Models/Game/NPChar/Npc.cs
 @@ -33,6 +33,8 @@ public partial class Npc : Unit
@@ -787,7 +787,7 @@ index 7e306b064..b55e77a39 100644
      /// <summary>
      /// This is the "Idle Animation Id" that is used in UnitModelChangePosture, it can change depending on the time of the day
 diff --git a/AAEmu.Game/Models/Game/Skills/Effects/ImpulseEffect.cs b/AAEmu.Game/Models/Game/Skills/Effects/ImpulseEffect.cs
-index b91cca892..2345940ee 100644
+index b91cca89..2345940e 100644
 --- a/AAEmu.Game/Models/Game/Skills/Effects/ImpulseEffect.cs
 +++ b/AAEmu.Game/Models/Game/Skills/Effects/ImpulseEffect.cs
 @@ -42,7 +42,7 @@ public class ImpulseEffect : EffectTemplate
@@ -800,7 +800,7 @@ index b91cca892..2345940ee 100644
  
          var impulse = new Vector3(ImpulseX + VelImpulseX, ImpulseY + VelImpulseY, ImpulseZ + VelImpulseZ);
 diff --git a/AAEmu.Game/Models/Game/Skills/Effects/PhysicalExplosionEffect.cs b/AAEmu.Game/Models/Game/Skills/Effects/PhysicalExplosionEffect.cs
-index 20d686d50..da0e13c5d 100644
+index 20d686d5..da0e13c5 100644
 --- a/AAEmu.Game/Models/Game/Skills/Effects/PhysicalExplosionEffect.cs
 +++ b/AAEmu.Game/Models/Game/Skills/Effects/PhysicalExplosionEffect.cs
 @@ -31,7 +31,7 @@ public class PhysicalExplosionEffect : EffectTemplate
@@ -813,7 +813,7 @@ index 20d686d50..da0e13c5d 100644
  
          var casterPos = caster.Transform.World.Position;
 diff --git a/AAEmu.Game/Models/Game/Skills/Effects/SpecialEffects/KnockBack.cs b/AAEmu.Game/Models/Game/Skills/Effects/SpecialEffects/KnockBack.cs
-index 31110c637..f3a5b67cb 100644
+index 31110c63..f3a5b67c 100644
 --- a/AAEmu.Game/Models/Game/Skills/Effects/SpecialEffects/KnockBack.cs
 +++ b/AAEmu.Game/Models/Game/Skills/Effects/SpecialEffects/KnockBack.cs
 @@ -33,7 +33,7 @@ public class KnockBack : SpecialEffectAction
@@ -826,7 +826,7 @@ index 31110c637..f3a5b67cb 100644
  
          var knockDistMeters = value1 / 1000f;
 diff --git a/AAEmu.Game/Models/Game/World/GameObject.cs b/AAEmu.Game/Models/Game/World/GameObject.cs
-index 27d1bea70..31467a869 100644
+index 27d1bea7..31467a86 100644
 --- a/AAEmu.Game/Models/Game/World/GameObject.cs
 +++ b/AAEmu.Game/Models/Game/World/GameObject.cs
 @@ -48,6 +48,10 @@ public class GameObject : IGameObject
@@ -851,7 +851,7 @@ index 27d1bea70..31467a869 100644
              character.SendPacket(packet);
          if (self && this is Character chr)
 diff --git a/AAEmu.Game/Program.cs b/AAEmu.Game/Program.cs
-index d01aa6edd..f67fa5e82 100644
+index d01aa6ed..f67fa5e8 100644
 --- a/AAEmu.Game/Program.cs
 +++ b/AAEmu.Game/Program.cs
 @@ -1,7 +1,13 @@
@@ -920,7 +920,7 @@ index d01aa6edd..f67fa5e82 100644
                  // -- Orchestrator --
                  // Expose the ServiceCollection itself so ManagerOrchestrator can inspect registrations.
 diff --git a/AAEmu.Game/Scripts/Commands/Kit.cs b/AAEmu.Game/Scripts/Commands/Kit.cs
-index e5034ef58..c0fb913bd 100644
+index e5034ef5..c0fb913b 100644
 --- a/AAEmu.Game/Scripts/Commands/Kit.cs
 +++ b/AAEmu.Game/Scripts/Commands/Kit.cs
 @@ -1,6 +1,7 @@
@@ -957,7 +957,7 @@ index e5034ef58..c0fb913bd 100644
              {
                  character.SendMessage($"[Items] added {itemsAdded} items to {targetPlayer.Name}'s inventory");
 diff --git a/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs b/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs
-index 4c4817541..9327094e4 100644
+index 4c481754..9327094e 100644
 --- a/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs
 +++ b/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs
 @@ -1,4 +1,5 @@
@@ -979,7 +979,7 @@ index 4c4817541..9327094e4 100644
              return BadRequestJson(new ErrorModel($"Character \"{commandCharacter}\" not found"));
  
 diff --git a/AAEmu.Login/LoginService.cs b/AAEmu.Login/LoginService.cs
-index c106ab755..5b65cc7f8 100644
+index c106ab75..5b65cc7f 100644
 --- a/AAEmu.Login/LoginService.cs
 +++ b/AAEmu.Login/LoginService.cs
 @@ -18,6 +18,8 @@ public sealed class LoginService(
@@ -992,7 +992,7 @@ index c106ab755..5b65cc7f8 100644
          // Check for updates
          await using (var connection = connectionFactory.CreateConnection())
 diff --git a/AAEmu.UnitTests/AAEmu.UnitTests.csproj b/AAEmu.UnitTests/AAEmu.UnitTests.csproj
-index cfd84120a..fcbfb6914 100644
+index cfd84120..fcbfb691 100644
 --- a/AAEmu.UnitTests/AAEmu.UnitTests.csproj
 +++ b/AAEmu.UnitTests/AAEmu.UnitTests.csproj
 @@ -19,4 +19,6 @@
@@ -1003,7 +1003,7 @@ index cfd84120a..fcbfb6914 100644
 +          Condition="Exists('..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Tests.targets')" />
  </Project>
 diff --git a/AAEmu.UnitTests/Game/Core/Managers/ManagerOrchestratorTests.cs b/AAEmu.UnitTests/Game/Core/Managers/ManagerOrchestratorTests.cs
-index 7ed2fe37f..b57465f6c 100644
+index 7ed2fe37..b57465f6 100644
 --- a/AAEmu.UnitTests/Game/Core/Managers/ManagerOrchestratorTests.cs
 +++ b/AAEmu.UnitTests/Game/Core/Managers/ManagerOrchestratorTests.cs
 @@ -1,4 +1,6 @@
@@ -1045,7 +1045,7 @@ index 7ed2fe37f..b57465f6c 100644
 \ No newline at end of file
 +}
 diff --git a/AAEmu.UnitTests/Game/Core/Managers/TeamManagerTests.cs b/AAEmu.UnitTests/Game/Core/Managers/TeamManagerTests.cs
-index 7704b6b9b..75ced3f87 100644
+index 7704b6b9..75ced3f8 100644
 --- a/AAEmu.UnitTests/Game/Core/Managers/TeamManagerTests.cs
 +++ b/AAEmu.UnitTests/Game/Core/Managers/TeamManagerTests.cs
 @@ -1,9 +1,12 @@
@@ -1177,7 +1177,7 @@ index 7704b6b9b..75ced3f87 100644
 +    }
 +}
 diff --git a/AAEmu.UnitTests/Game/Core/Managers/UnitManagers/CharacterManagerTests.cs b/AAEmu.UnitTests/Game/Core/Managers/UnitManagers/CharacterManagerTests.cs
-index f04033b5f..b149dda32 100644
+index f04033b5..b149dda3 100644
 --- a/AAEmu.UnitTests/Game/Core/Managers/UnitManagers/CharacterManagerTests.cs
 +++ b/AAEmu.UnitTests/Game/Core/Managers/UnitManagers/CharacterManagerTests.cs
 @@ -462,6 +462,38 @@ public class CharacterManagerTests
@@ -1220,7 +1220,7 @@ index f04033b5f..b149dda32 100644
  
      #region PlayerRoll Tests
 diff --git a/AAEmu.UnitTests/Services/GameServiceTests.cs b/AAEmu.UnitTests/Services/GameServiceTests.cs
-index c7919db94..b55d592c8 100644
+index c7919db9..b55d592c 100644
 --- a/AAEmu.UnitTests/Services/GameServiceTests.cs
 +++ b/AAEmu.UnitTests/Services/GameServiceTests.cs
 @@ -1,8 +1,16 @@
