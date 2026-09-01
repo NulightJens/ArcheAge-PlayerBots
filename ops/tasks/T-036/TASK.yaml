@@ -7,6 +7,8 @@ integration: runtime-pending
 outcome: Close physical stealth loss/reacquisition and mortal-combat cohorts with isolated fixtures and matched Idle controls.
 depends_on: [T-043, T-044, T-046]
 owner_client_thread_id: client-new-thread:a9f5a4a5-8adf-4765-a624-7673a9cb7559
+owner_thread_id: 01a05a64-9193-7c02-8f34-10219e4043a4
+worktree: 'C:\Users\jensh\.codex\worktrees\36de\PB-W00-control'
 
 inputs:
   integration_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
