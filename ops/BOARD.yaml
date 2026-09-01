@@ -992,7 +992,7 @@ tasks:
   - id: T-101
     title: Integrate and install default-world anchor correction
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-100]
     runtime_lease: aaemu12-build-only
@@ -1001,9 +1001,10 @@ tasks:
     source_candidate_parent: 96b8b5004a89a0dec6522753f64d03fd1d732c5b
     source_candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
     contract: ops/tasks/T-101/CONTRACT.md
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:bca8601b-bcaf-4f63-9d54-0884679ece77
+    owner_thread_id: 01a05ed6-653f-71d3-ac72-1d6a0db3a85c
+    worktree: 'C:\Users\jensh\.codex\worktrees\18a8\PB-W00-control'
+    dispatch_base: a05e94fd8d7f58bce12a968aa1d5b09de78f4a14
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

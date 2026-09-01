@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-100-source-pass-awaiting-build-integrator-binding
-    owner_task: null
-    owner_thread_id: null
+    status: claimed-build-install-by-T-101
+    owner_task: T-101
+    owner_thread_id: 01a05ed6-653f-71d3-ac72-1d6a0db3a85c
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: 2026-09-01
-    cleanup_receipt: e7361e10c8c1d722c3f18481af07e6173030fb30:ops/evidence/aaemu12-t098-one-zone-autonomy-v5.yaml
+    released_at: null
+    cleanup_receipt: ops/evidence/aaemu12-t098-fail-integration-v1.yaml
     baseline_evidence: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact T-101 task/thread/worktree build-only claim. T-100 passed in an isolated proof workspace and did not touch the registered integration host or runtime.
+    authority_limit: T-101 in worktree C:\Users\jensh\.codex\worktrees\18a8\PB-W00-control may replay candidate 043bf7aff4619808a050538c6763f0c6ab2e2ee8, install its exact replay source into the registered AAEmu 1.2 integration module, verify the unchanged compatibility patch, run the focused 40, one clean build, and exactly one full AAEmu 1.2 suite, then write only its contracted integration receipt/handoff and fast-forward the saved branch. Login/Game/runtime observer start or control, deployed BotConfig.json edits, MySQL/database query or control, ArcheAge client start/control, reference checkout writes, external runtime evidence, force-stop, and every other lease use are prohibited. No other task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 records release.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

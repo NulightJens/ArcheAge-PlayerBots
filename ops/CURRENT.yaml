@@ -30,7 +30,7 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-config-restored-t098-fail-integrated-awaiting-t100-source
+    state: stopped-clean-build-install-claimed-by-t101
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
@@ -55,7 +55,7 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-101 to an exact Integrator worktree and build-only aaemu12 lease, then replay/install T-100 candidate 043bf7aff4619808a050538c6763f0c6ab2e2ee8.
+  - Execute T-101 under its exact Integrator worktree and build-only aaemu12 lease, replaying/installing T-100 candidate 043bf7aff4619808a050538c6763f0c6ab2e2ee8.
   - Rerun all 40 focused command tests, one clean build, and exactly one complete AAEmu 1.2 suite; do not start runtime.
   - Run a fresh versioned runtime successor whose pre-command geometry predicts every one-shot fixture pairwise separation at least 15 m, then prove both lifecycle/refill waves and distinct-PID restart/dwell before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
@@ -553,10 +553,11 @@ prepared_workstreams:
     candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
     proof: 40-focused-0-fail-build-0-errors-72-warnings-patch-sha-unchanged-clean-apply
   - task: T-101
-    state: prepared-awaiting-exact-integrator-binding-and-build-lease
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-build-install-integrator
+    client_thread_id: client-new-thread:bca8601b-bcaf-4f63-9d54-0884679ece77
+    task_thread_id: 01a05ed6-653f-71d3-ac72-1d6a0db3a85c
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\18a8\PB-W00-control'
+    dispatch_base: a05e94fd8d7f58bce12a968aa1d5b09de78f4a14
     source_candidate: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
     source_candidate_parent: 96b8b5004a89a0dec6522753f64d03fd1d732c5b
     source_candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
