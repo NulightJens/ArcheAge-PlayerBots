@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: lifecycle-natural-recovery-source-correction
+phase: lifecycle-natural-recovery-integration-qualification
 verdict: active
 
 source:
@@ -54,8 +54,7 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-071 must add only a bounded, targetless, noncombat natural recovery wait between completed combat and the existing completion snapshot/logout path.
-  - Integrate/build T-071 before assigning another fresh immutable one-bot proof version.
+  - T-072 must independently replay, install, build, and run the full AAEmu 1.2 suite once under an exact build-only lease before another runtime proof.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
@@ -158,12 +157,23 @@ prepared_workstreams:
     head: 2f0cedd6d2400c3f435f2d01415df27b357a13eb
     handoff: ops/tasks/T-070/HANDOFF.md
   - task: T-071
-    state: active
+    state: source-ready-review
     client_thread_id: client-new-thread:8bc5f5e0-9730-430b-bb46-730a70a56d08
     task_thread_id: 01a05c8a-96fb-70c3-aec9-6884445f0e35
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\b798\PB-W00-control'
     base: 2f0cedd6d2400c3f435f2d01415df27b357a13eb
     blocker_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+    head: 16e8c2fe707f7bd96e4b6977dd6b7c441124c63f
+    handoff: ops/tasks/T-071/HANDOFF.md
+    proof: 100-passed-0-failed-build-0-errors-40-retained-warnings
+    retained_scope_event: one-pre-clarification-registered-host-output-only-build-no-source-config-module-change
+  - task: T-072
+    state: ready-awaiting-exact-thread-build-lease-assignment
+    client_thread_id: pending-thread-creation
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: d71a52b10e78be9ca6a91a3b1d5822a5ef199740
+    candidate: 16e8c2fe707f7bd96e4b6977dd6b7c441124c63f
     head: pending
     handoff: pending
   - task: T-038

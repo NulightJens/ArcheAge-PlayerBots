@@ -447,7 +447,7 @@ tasks:
   - id: T-071
     title: Wait for natural debt-free lifecycle completion
     track: AAEmu12
-    status: active
+    status: review
     integration: pending
     depends_on: [T-069, T-070]
     runtime_lease: none
@@ -455,6 +455,16 @@ tasks:
     owner_client_thread_id: client-new-thread:8bc5f5e0-9730-430b-bb46-730a70a56d08
     owner_thread_id: 01a05c8a-96fb-70c3-aec9-6884445f0e35
     worktree: 'C:\Users\jensh\.codex\worktrees\b798\PB-W00-control'
+    source_head: 16e8c2fe707f7bd96e4b6977dd6b7c441124c63f
+
+  - id: T-072
+    title: Integrate natural recovery lifecycle correction
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-071]
+    runtime_lease: aaemu12-build-only
+    gate: full-aaemu12-suite
 
   - id: T-041
     title: One-zone Autonomous Activity Director

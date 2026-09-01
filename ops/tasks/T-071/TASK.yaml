@@ -2,7 +2,7 @@ schema_version: 1
 id: T-071
 title: Wait for natural debt-free lifecycle completion
 track: AAEmu12
-status: active
+status: review
 integration: pending
 outcome: After the bounded one-kill activity is complete, keep the bot targetless and noncombat while natural world recovery clears HP/MP debt, then capture the completion snapshot and invoke the existing normal logout path exactly once.
 depends_on: [T-069, T-070]
@@ -27,3 +27,5 @@ write_scope:
 gates: [focused-aaemu12-tests]
 validation_boundary: Source-only bounded lifecycle recovery. Do not start/control AAEmu, MySQL, or clients; edit deployed hosts, databases, global ledgers/leases, target/combat/loot/progression behavior, retained evidence, AAEmu 3.0, or unrelated PlayerBots systems.
 handoff: ops/tasks/T-071/HANDOFF.md
+source_head: 16e8c2fe707f7bd96e4b6977dd6b7c441124c63f
+verdict: PASS-source-focused
