@@ -2,7 +2,7 @@ schema_version: 1
 id: T-086
 title: Add per-bot anchors to passive runtime fixtures
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Extend the inert passive-NPC operator fixture with an optional, fail-closed active-bot anchor so simultaneous one-zone opportunities can be spatially isolated without selecting or directing bot gameplay, while preserving all legacy syntax and behavior.
 depends_on: [T-041, T-085]
@@ -10,11 +10,11 @@ runtime:
   required: false
   lease: null
 branch: codex-managed-worktree
-worktree: pending-thread-creation
-owner_client_thread_id: pending-thread-creation
-owner_thread_id: pending-thread-creation
+worktree: 'C:\Users\jensh\.codex\worktrees\e2ee\PB-W00-control'
+owner_client_thread_id: client-new-thread:9fc5ce6e-5bb2-43d6-bef3-65ad26d3df50
+owner_thread_id: 01a05db6-0a37-72c3-85e3-71599af8359c
 inputs:
-  dispatch_base: pending-control-commit
+  dispatch_base: 0da7166627f53118184687736132a88cdb668e1e
   integration_head: c216c751e6a2f2d59adf444d907131ea72171048
   installed_module_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
   blocker_receipt: ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml

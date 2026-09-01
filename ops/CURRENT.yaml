@@ -349,10 +349,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t041-fail-integration-v1.yaml
     proof: 6271-of-6271-payloads-and-67-of-67-semantic-assertions-green
   - task: T-086
-    state: prepared-awaiting-thread-binding
-    task_thread_id: pending-thread-creation
-    codex_worktree: pending-thread-creation
-    base: pending-control-commit
+    state: active-exact-thread-bound
+    client_thread_id: client-new-thread:9fc5ce6e-5bb2-43d6-bef3-65ad26d3df50
+    task_thread_id: 01a05db6-0a37-72c3-85e3-71599af8359c
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\e2ee\PB-W00-control'
+    base: 0da7166627f53118184687736132a88cdb668e1e
     blocker_receipt: ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
     contract: ops/tasks/T-086/CONTRACT.md
   - task: T-038

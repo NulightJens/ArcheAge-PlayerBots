@@ -693,12 +693,16 @@ tasks:
   - id: T-086
     title: Add per-bot anchors to passive runtime fixtures
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-041, T-085]
     runtime_lease: none
     gate: focused-aaemu12-passive-fixture-anchor-tests
     contract: ops/tasks/T-086/CONTRACT.md
+    owner_client_thread_id: client-new-thread:9fc5ce6e-5bb2-43d6-bef3-65ad26d3df50
+    owner_thread_id: 01a05db6-0a37-72c3-85e3-71599af8359c
+    worktree: 'C:\Users\jensh\.codex\worktrees\e2ee\PB-W00-control'
+    dispatch_base: 0da7166627f53118184687736132a88cdb668e1e
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
