@@ -1,0 +1,125 @@
+schema_version: 1
+id: aaemu12-t036-combat-stealth-v1
+recorded_at: 2026-08-31
+verdict: INCOMPLETE
+
+fingerprint:
+  module_source_commit: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  task_lease_commit: fa3804120cbe988319f25856b4485573e8098121
+  task_thread_id: 01a05a64-9193-7c02-8f34-10219e4043a4
+  database_identity: aaemu12_database_public_alpha_v1
+  database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+  game_executable_sha256: c10fcd802124406f349253cfafd9413e1768605b90f36110d40c248a85fbc79e
+  login_executable_sha256: 96ef53555b53e532608eb0352ab993e30968eaae55d6d3e2ae9c83ba7c8c389e
+  game_config_sha256: d87acc71056021abe64aaeca29d37fa6cb60015109cbd81df92c9fef4b98ca1c
+  login_config_sha256: 2b18234b5306f7cd3a44138e94520ec27b3462aa8553f2fcdadad176d3fd58e1
+  gate_definition_version: 1
+
+preflight:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean: true
+  installed_module_head: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+  installed_module_clean: true
+  donor_head: 72fd2cc70bba3887e093e8a3800f13fed9b3e111
+  donor_clean: true
+  game_login_process_count: 0
+  occupied_required_port_count: 0
+  required_ports: [1234, 1237, 1239, 1250, 1280]
+  retained_bot_ids_sha256: 4990553caca2e0843b3a063e3ebd804f34eac75da58b97901982141e756b6203
+  retained_bot_ids_exact_range: [20001, 20100]
+
+runtime_provisioning:
+  external_receipt: 'D:\Codex-Labs\evidence\T-036\public-alpha-v1\runtime-provisioning.json'
+  external_receipt_sha256: 6236a1674468b6067ef3d383e40893b6b00f56582ae1f7069220a17ab4a2c027
+  target_data_root_preexisting: true
+  procedural_observation: >-
+    The target Data root predated dispatch. Exact comparison after lease
+    synchronization found only compact.sqlite3 and the three-file Chronicle
+    subtree absent; the task copied only those four literal paths.
+  data_overwrite_count: 0
+  copied_data:
+    - path: compact.sqlite3
+      bytes: 119054336
+      sha256: ed2921ff434af5279ada601bc95ddc132121eb40edf623ee77b9b1c72fe32025
+    - path: Chronicle/cast.json
+      bytes: 9188
+      sha256: a48e6f4d9dbe10a1ecc31119125304538d822ce0b081bb305475a273ffe2250b
+    - path: Chronicle/world.json
+      bytes: 15787
+      sha256: 27bfe23ac7378be4105516b11f34206d6ab23fcb9ea48b89dbf4b9be909a83c8
+    - path: Chronicle/world.schematic.json
+      bytes: 7893
+      sha256: 0740cc14984373796774662aca722807bff66d56e0b3659560d40a4619d4ed7f
+  game_database_in_config: aaemu_playerbots_game_public_alpha_v1
+  login_database_in_config: aaemu_playerbots_login_public_alpha_v1
+  all_listeners_loopback: true
+  credentials_in_git: false
+
+startup_attempt:
+  command: Start-ScaleGateRuntime.ps1 -SafetyAcknowledged
+  startup_timeout_seconds: 180
+  login_process_id: 118304
+  login_process_start_utc: '2026-09-01T00:43:53.1994406Z'
+  login_listeners:
+    - '127.0.0.1:1234'
+    - '127.0.0.1:1237'
+  game_started: false
+  startup_receipt_written: false
+  blocker: >-
+    The integrated startup guard requires a Login log match for the exact
+    isolated schema. This AAEmu 1.2 build emits a connection line without a
+    database name and an updater line with the hard-coded module prefix
+    aaemu_login, so the guard timed out before Game startup. The task did not
+    bypass the guard or modify source.
+  login_shutdown: graceful-ctrl-c-from-authorized-start-script
+  login_shutdown_utc: '2026-09-01T00:46:54Z'
+  login_shutdown_log_sha256: 2e758a6d5aba39f1114ae81e87349a6eaed6da601dc775e46c3efe3f2d3d7bbd
+  login_shutdown_log_bytes: 1991
+
+qualification:
+  retained_ids_used: false
+  mortal_targets_spawned: 0
+  stealth_targets_spawned: 0
+  cohorts_executed: []
+  zero_bot_start_observed: not-reached-command-api
+  exact_population_cleanup: not-applicable-no-bots-spawned
+  restart_executed: false
+  physical_proof: not-run-after-fail-closed-startup
+  analyzer:
+    script: scripts/combat/Test-CombatQualificationEvidence.ps1
+    result: INCOMPLETE
+    native_exit_code: 2
+    result_sha256: d95e21249816e7bcdc80161589e653386abc822487d382669c797a90b8a2bd3d
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-036\public-alpha-v1'
+  provisioning_script_sha256: 08d022404733e26bfd0ec8b473e339a911b26021c8cca342e8360a55b7924be9
+  login_log: login-attempt-1-startup-timeout.log
+  blocked_plan_sha256: 75cfad7351346503281282349a326ae1ed34f0744d84f6194098a38a29f2ce35
+  blocked_evidence_sha256: c06f0524da19be739e03e5a79bee19b7aef42515349a3ae0fa33b7428dac6f16
+  blocked_result_sha256: d95e21249816e7bcdc80161589e653386abc822487d382669c797a90b8a2bd3d
+  raw_logs_committed: false
+  configs_committed: false
+  credentials_recorded: false
+
+final_runtime_state:
+  aaemu_game_process_count: 0
+  aaemu_login_process_count: 0
+  occupied_required_port_count: 0
+  required_ports_free: [1234, 1237, 1239, 1250, 1280]
+  server_logs_remaining_in_runtime_paths: 0
+  isolated_databases_retained: true
+  runtime_configs_retained_external: true
+  copied_data_retained_external: true
+
+retained_failures:
+  - Exact isolated-schema startup evidence was not emitted by the pinned Login build, so the authorized startup guard failed closed before Game startup.
+  - Required mortal-combat, matched Idle, stealth, cleanup, and restart material is absent; the analyzer returned INCOMPLETE/2 and is not reinterpreted.
+
+retained_boundaries:
+  - No Game process, command API stimulus, bot, passive NPC, buff, combat cohort, stealth phase, or clean restart was started.
+  - No client, AAEmu 3.0 runtime, global ledger, integration branch, or deployed source file was controlled or modified.
+  - No direct database query or mutation was issued. Login reported no database update required, but its selected schema is not claimed because the server log did not identify it.
+  - Runtime configs, copied Data files, isolated schemas, and external evidence are retained; no destructive cleanup was performed.
+
