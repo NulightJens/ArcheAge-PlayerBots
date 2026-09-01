@@ -974,7 +974,7 @@ tasks:
   - id: T-100
     title: Accept valid default-world bot anchors
     track: AAEmu12
-    status: active
+    status: done
     integration: pending
     depends_on: [T-099]
     runtime_lease: null
@@ -984,13 +984,33 @@ tasks:
     owner_thread_id: 01a05ec5-b802-7013-bfc5-8a126484eb60
     worktree: 'C:\Users\jensh\.codex\worktrees\c413\PB-W00-control'
     dispatch_base: c0d08ddd3c2db5e542f17ec8b25751814ae344f9
+    candidate_commit: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
+    candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
+    evidence_receipt: ops/evidence/aaemu12-passive-anchor-default-world-zero-v1.yaml
+    result: PASS-40-focused-build-0-errors-72-retained-warnings-patch-unchanged
+
+  - id: T-101
+    title: Integrate and install default-world anchor correction
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-100]
+    runtime_lease: aaemu12-build-only
+    gate: source-install-focused-build-full-suite-integration
+    source_candidate: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
+    source_candidate_parent: 96b8b5004a89a0dec6522753f64d03fd1d732c5b
+    source_candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
+    contract: ops/tasks/T-101/CONTRACT.md
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [fresh-post-T-100-runtime-pass]
+    depends_on: [fresh-post-T-101-runtime-pass]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
     blocker: T-098-is-retained-FAIL-at-fixture-anchor-boundary-and-successor-source-correction-runtime-pass-is-not-yet-proven-and-integrated

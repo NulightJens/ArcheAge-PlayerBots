@@ -1,0 +1,39 @@
+schema_version: 1
+id: T-101
+title: Integrate and install default-world anchor correction
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Independently replay T-100 onto the saved lineage, install the exact replay into the registered AAEmu 1.2 integration module, reprove the focused guard, clean build, and exactly one full-suite wave gate, then fast-forward the saved branch with a durable receipt.
+depends_on: [T-100]
+runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
+branch: integration/aaemu12-world
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-commit
+  saved_head: pending-control-commit
+  source_candidate: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
+  source_candidate_parent: 96b8b5004a89a0dec6522753f64d03fd1d732c5b
+  source_candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/evidence/aaemu12-passive-anchor-default-world-zero-v1.yaml
+  - ops/tasks/T-100/HANDOFF.md
+  - ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
+  - ops/tasks/T-101/HANDOFF.md
+external_write_scope:
+  - aaemu12_integration host/module install and build/test outputs under exact build-only lease
+gates:
+  - exact-candidate-parent-tree-scope-and-byte-identical-replay
+  - exact-installed-replay-source-tree-and-unchanged-patch
+  - focused-40-green
+  - clean-build-zero-errors
+  - exactly-one-full-suite-1863-pass-4-intentional-skips-zero-fail
+  - saved-branch-fast-forward-and-clean-installed-state
+validation_boundary: Source integration/install/build/test only. Never start Login/Game/runtime observers, edit deployed BotConfig.json, access/control MySQL/database or ArcheAge client, edit global ledgers/lease, external runtime evidence, reference checkout, AAEmu 3.0, scale, soak, or packaging.
+contract: ops/tasks/T-101/CONTRACT.md
+handoff: ops/tasks/T-101/HANDOFF.md

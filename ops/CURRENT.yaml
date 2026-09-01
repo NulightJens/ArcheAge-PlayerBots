@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: correct-default-world-active-bot-anchor
+phase: integrate-install-default-world-anchor-correction
 verdict: active
 
 source:
@@ -55,8 +55,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-100 to an exact isolated source worktree and distinguish a missing world template from valid default template ID 0 while preserving all other fail-closed anchor checks.
-  - Independently integrate/install the T-100 correction with focused tests, isolated build, and the next permitted full-suite wave gate.
+  - Bind T-101 to an exact Integrator worktree and build-only aaemu12 lease, then replay/install T-100 candidate 043bf7aff4619808a050538c6763f0c6ab2e2ee8.
+  - Rerun all 40 focused command tests, one clean build, and exactly one complete AAEmu 1.2 suite; do not start runtime.
   - Run a fresh versioned runtime successor whose pre-command geometry predicts every one-shot fixture pairwise separation at least 15 m, then prove both lifecycle/refill waves and distinct-PID restart/dwell before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
@@ -541,7 +541,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t098-fail-integration-v1.yaml
     result: PASS-receipt-integrity-subject-retained-FAIL
   - task: T-100
-    state: active-exact-thread-bound-source-worker
+    state: done-source-pass-awaiting-integration
     client_thread_id: client-new-thread:ab3a1f91-8c01-4547-9d8f-c2d4d86ea83b
     task_thread_id: 01a05ec5-b802-7013-bfc5-8a126484eb60
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\c413\PB-W00-control'
@@ -549,6 +549,18 @@ prepared_workstreams:
     base: 1ab6c2e80a4c7e209149a804cdff6ae209142501
     cause: SpawnPassiveNpcCommand-invalidly-rejects-valid-default-world-template-id-zero
     contract: ops/tasks/T-100/CONTRACT.md
+    candidate_commit: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
+    candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
+    proof: 40-focused-0-fail-build-0-errors-72-warnings-patch-sha-unchanged-clean-apply
+  - task: T-101
+    state: prepared-awaiting-exact-integrator-binding-and-build-lease
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    source_candidate: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
+    source_candidate_parent: 96b8b5004a89a0dec6522753f64d03fd1d732c5b
+    source_candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
+    contract: ops/tasks/T-101/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
