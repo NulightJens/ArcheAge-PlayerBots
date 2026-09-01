@@ -561,12 +561,15 @@ tasks:
   - id: T-079
     title: AAEmu 1.2 single-bot autonomy proof v6
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-073, T-078]
     runtime_lease: aaemu12
     gate: serialized-one-bot-autonomy-proof-v6
     archeage_client_allowed: false
+    owner_client_thread_id: client-new-thread:aaa2aa85-cbf0-4f6b-9dcc-5ac9bdd5eacb
+    owner_thread_id: 01a05cfc-1ebf-79a2-94d8-4d287c3990ab
+    worktree: 'C:\Users\jensh\.codex\worktrees\3058\PB-W00-control'
 
   - id: T-041
     title: One-zone Autonomous Activity Director

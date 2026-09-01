@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-v6-dispatch
+phase: single-bot-autonomy-v6-runtime-proof
 verdict: active
 
 source:
@@ -251,8 +251,11 @@ prepared_workstreams:
     head: a406a3598213745ac3bead7dc5ba7ce009cf50e3
     proof: 64-deterministic-assertions-green-zero-fixture-copies
   - task: T-079
-    state: ready
-    base: pending-control-dispatch-commit
+    state: active
+    client_thread_id: client-new-thread:aaa2aa85-cbf0-4f6b-9dcc-5ac9bdd5eacb
+    task_thread_id: 01a05cfc-1ebf-79a2-94d8-4d287c3990ab
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\3058\PB-W00-control'
+    base: f12d8b16c14c4eab4ac7afe2e1422e04e1953ec6
     tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
     installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
     observer_integration: a406a3598213745ac3bead7dc5ba7ce009cf50e3
@@ -503,6 +506,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: released-after-T-075-incomplete-cleanup
+  runtime_lease: claimed-by-T-079-one-bot-autonomy-v6
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-exact-new-runtime-task-is-bound-and-committed-to-lease
+  runtime_start: authorized-only-for-exact-T-079-thread-after-committed-lease-verification
