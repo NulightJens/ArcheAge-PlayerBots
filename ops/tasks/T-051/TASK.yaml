@@ -6,9 +6,10 @@ status: active
 integration: pending
 outcome: Make live growing-log startup evidence scalar-safe and require exact emitted selected Game and Login schemas before runtime readiness.
 depends_on: [T-050]
-branch: assigned-by-codex
-worktree: assigned-by-codex
+branch: codex-managed-detached-worktree
+worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\ee21\\PB-W00-control'
 owner_client_thread_id: client-new-thread:d7e98349-adf1-4f47-8f52-b8c21b6cc68a
+owner_thread_id: 01a05a9f-d70b-7c70-b913-199fae63a0cd
 
 inputs:
   incomplete_receipt: ops/evidence/aaemu12-t050-combat-stealth-v2.yaml

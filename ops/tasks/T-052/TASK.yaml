@@ -6,9 +6,10 @@ status: active
 integration: analysis-pending
 outcome: Classify the retained BaseBaiLoader collection-modification and WorldManager missing-instance errors and define any required pre-v3 action.
 depends_on: [T-050]
-branch: assigned-by-codex
-worktree: assigned-by-codex
+branch: codex-managed-detached-worktree
+worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\0e7a\\PB-W00-control'
 owner_client_thread_id: client-new-thread:a7e7080c-7676-4ede-bda9-9c38ba919892
+owner_thread_id: 01a05a9f-d70c-7dd0-9bdb-7e9dd45b4c1f
 
 inputs:
   incomplete_receipt: ops/evidence/aaemu12-t050-combat-stealth-v2.yaml

@@ -167,6 +167,7 @@ tasks:
     depends_on: [T-050]
     gate: deterministic-harness-tests
     owner_client_thread_id: client-new-thread:d7e98349-adf1-4f47-8f52-b8c21b6cc68a
+    owner_thread_id: 01a05a9f-d70b-7c70-b913-199fae63a0cd
 
   - id: T-052
     title: Diagnose retained AAEmu 1.2 Game startup errors
@@ -176,6 +177,7 @@ tasks:
     depends_on: [T-050]
     gate: read-only-retained-evidence-analysis
     owner_client_thread_id: client-new-thread:a7e7080c-7676-4ede-bda9-9c38ba919892
+    owner_thread_id: 01a05a9f-d70c-7dd0-9bdb-7e9dd45b4c1f
 
   - id: T-053
     title: Integrate stable exact-schema startup correction
