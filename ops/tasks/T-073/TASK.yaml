@@ -2,8 +2,8 @@ schema_version: 1
 id: T-073
 title: AAEmu 1.2 single-bot autonomy proof v4
 track: AAEmu12
-status: review
-integration: runtime-incomplete-receipt-pending
+status: blocked
+integration: runtime-incomplete-retained
 outcome: Produce a new immutable runtime receipt proving or falsifying three complete autonomous gameplay iterations by one persistent bot with natural post-activity recovery, exact progression/resource snapshots, normal self-logout, and restart persistence without per-action operator control.
 depends_on: [T-069, T-072]
 runtime:

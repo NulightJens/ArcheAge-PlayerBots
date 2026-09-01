@@ -87,6 +87,13 @@ workspaces:
     path: 'D:\Codex-Labs\evidence\T-073\one-bot-autonomy-v4'
     access: task-evidence-write
     lease: aaemu12
+    expected_state: immutable-retained-incomplete
+
+  aaemu12_t075_evidence_v5:
+    role: single-bot-autonomy-runtime-evidence-v5
+    path: 'D:\Codex-Labs\evidence\T-075\one-bot-autonomy-v5'
+    access: task-evidence-write
+    lease: aaemu12
     expected_state: absent-before-first-run-then-immutable
 
   aaemu12_client:

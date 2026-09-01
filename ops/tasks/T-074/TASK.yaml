@@ -2,8 +2,8 @@ schema_version: 1
 id: T-074
 title: Integrate T-073 runtime receipt
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently verify and branch-integrate the exact two-file T-073 INCOMPLETE runtime receipt without changing its verdict, evidence, or cleanup boundary.
 depends_on: [T-073]
 branch: codex-managed-worktree
@@ -25,3 +25,4 @@ runtime:
 gates: [receipt-integrity-review]
 validation_boundary: Receipt review/integration only. Do not control runtime, MySQL, client, databases; edit global ledgers/lease; change source/host; reinterpret T-073; modify external evidence; or touch AAEmu 3.0.
 handoff: ops/tasks/T-074/HANDOFF.md
+integrated_commit: d629f405618b0b0b83ca3c7ff1b2c2e2bbb54b9d
