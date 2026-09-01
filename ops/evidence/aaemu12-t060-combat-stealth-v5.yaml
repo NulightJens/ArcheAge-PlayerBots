@@ -1,0 +1,173 @@
+schema_version: 1
+id: aaemu12-t060-combat-stealth-v5
+recorded_at: 2026-09-01
+verdict: INCOMPLETE
+
+fingerprint:
+  task_lease_commit: fadd161adf7ec7a5be97491a06eff4672542f98d
+  task_thread_id: 01a05b47-b0b7-71b3-90df-be5f07c6e81f
+  pre_preparation_integration_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a
+  module_source_commit: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+  installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  database_identity: aaemu12_database_public_alpha_v1
+  database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+  game_executable_sha256: c10fcd802124406f349253cfafd9413e1768605b90f36110d40c248a85fbc79e
+  game_assembly_sha256: 8326bc9502752491cdcbd53417237659e7277a5c94fc0ad85bcdf9501241c521
+  login_executable_sha256: 96ef53555b53e532608eb0352ab993e30968eaae55d6d3e2ae9c83ba7c8c389e
+  game_config_sha256: d87acc71056021abe64aaeca29d37fa6cb60015109cbd81df92c9fef4b98ca1c
+  login_config_sha256: 2b18234b5306f7cd3a44138e94520ec27b3462aa8553f2fcdadad176d3fd58e1
+  retained_bot_ids_exact_range: [20001, 20100]
+
+preflight:
+  captured_at_utc: '2026-09-01T07:17:55.1671449Z'
+  external_receipt_sha256: 13de33ff9d97c75fefcd19c5b6cd916ff1c20eebb1afdb3bf838017a25f7ac08
+  lease_proved: true
+  task_worktree_head: fadd161adf7ec7a5be97491a06eff4672542f98d
+  task_worktree_clean: true
+  reference_clean: true
+  installed_module_clean: true
+  aaemu_game_login_process_count: 0
+  archeage_client_process_count: 0
+  occupied_required_port_count: 0
+  runtime_log_entry_count: 0
+  mysql_observed_process_ids: [6308, 8076]
+  database_direct_access: false
+
+retained_attempts:
+  live_attempt_1_manifest_sha256: d704e096758649dc9db531db4b6435dacd2bfc2bf7ca0715e1eb2b70ec2173aa
+  attempt_2_manifest_sha256: d24d3e2e2f8178d4de4db04b03a1976a830a1e2993aa1f38e7c2567bf8bc5419
+  attempt_3_manifest_sha256: 77e11f48db68287c9cdc3683da2482f4a832c42cae740febbefc703473e96a4d
+  attempt_4_manifest_sha256: 2ffd1d75c144d6d6781de0804e078a0ccdfc425b79724045b6cdb3c6c0794a70
+  attempt_4_diagnosis_correction_sha256: 5f5a4b19c381928f880b40134c19e382e767851079d6aee6f8d89a33a318a39e
+  attempt_5_manifest_sha256: abaa538c5744dbe0c15fa52046cbceb9e0e2d4c50871cf84221041690a179399
+  attempt_6_manifest_sha256: fc00476c542c69128da780a28d2ccca2a48b1182f08a1ab2cf6d53006eab6698
+  attempt_7_manifest_sha256: 4045a9ce94fa4da444ea8cd648ce1020b49d0f1fa015953aae53bac9a66eb831
+  terminal_attempt_8_manifest_sha256: 31f12fe8a27737b0eb962408776f1a84a6010e6fe258ddca92cbbb48712f445c
+  predecessor_artifacts_overwritten: false
+
+terminal_attempt:
+  runner_resolved_sha256: 7fbc537dc840f192637b1c8df297a2631959fdbfc36c9eedbf35b2f0956ba501
+  startup_receipt_sha256: 0c0dc9f5ce057547595b595a8ba36ac9044c70f0842e00a23e0b86f871a115f0
+  login_process_id: 84136
+  login_process_start_utc: '2026-09-01T07:19:55.9478928Z'
+  game_process_id: 97748
+  game_process_start_utc: '2026-09-01T07:19:56.5074263Z'
+  exact_schemas_emitted: true
+  exact_five_loopback_listeners_present: true
+  initial_runtime_count: 0
+  initial_bot_count: 0
+  qualified_anchor_sha256: 09751748b1327503a1603a0129e7d97a7f7f9c5063818ede652ffd7d098067e4
+  qualified_nonzero_zone_anchor: true
+  fixture_verification_sha256: 9818b8485140eec4d29cea22af6319a3637058ce9c665b304b3775cc3c03791f
+  passive_npc_template_id: 10004
+  passive_npc_max_hp: 148
+  distinct_combat_target_count: 6
+  distinct_stealth_target_count: 2
+  typed_grade_label: Weak
+  stealth_buff_id: 896
+  stealth_true_response_proved: true
+  qualification_input_sha256: 412ff5942af4a221f7297ef74ce457fbff7d9dc3a7e1a1d8fa4a9c1157f2ca84
+  plan_sha256: 6fa7f8cd9687e39cc0acd0e30a4f4ec52d8430db03433d80c15620ae5ce58795
+  partial_evidence_sha256: 00db96d2152856a512d9b85f75d55c830f9d517815bed1ca5d44f72272d561cf
+  completed_idle_controls: [1, 5, 10, 25]
+  completed_mortal_combat_cohorts: [1, 5, 10]
+  incomplete_combat_cohort: 25
+  unexecuted_combat_cohorts: [50, 100]
+  stealth_reacquire_executed: false
+  stealth_release_executed: false
+  distinct_pid_restart_executed: false
+
+verified_blocker:
+  category: shared-low-hp-fixture-fanout-and-dead-object-observability
+  target_object_id: 44425
+  target_template_id: 10004
+  target_max_hp: 148
+  accepted_attack_bot_ids: [20001, 20002, 20003]
+  first_absent_target_attack_bot_id: 20004
+  final_absent_target_attack_bot_id: 20025
+  exact_kill_credit_bot_id: 20002
+  exact_kill_credit_server_line: 219200
+  exact_dead_transition_server_line: 219202
+  metrics_start_response: api-response-00480-botmetrics.json
+  metrics_end_response: api-response-00572-botmetrics.json
+  cast_attempts_delta: 1
+  cast_successes_delta: 1
+  credited_kills_delta: 1
+  runner_failure_sha256: b6be57254f0c68d60be72c4e682f8913def53618ca3b76cca633377314f11f7d
+  finding: >-
+    The 148-HP shared target died after only the first three of 25 sequential
+    attack commands were submitted. Commands for bots 20004-20025 therefore
+    could not resolve a living target, and the status observer could not prove
+    the already-despawned corpse as dead. The cohort is not complete even
+    though the server log and metrics independently prove one exact kill.
+  smallest_follow_up_boundary: >-
+    Qualify a mortal fixture durable enough to receive the complete 100-command
+    fan-out, or retain an exact target-death tombstone addressable after corpse
+    despawn. T-060 did not authorize a source or deployment correction.
+
+qualification:
+  analyzer_script: scripts/combat/Test-CombatQualificationEvidence.ps1
+  analyzer_invoked: false
+  analyzer_exit_code: null
+  analyzer_verdict_claimed: false
+  reason: >-
+    Cohort 25 was incomplete, and cohorts 50/100, both stealth phases, final
+    fixture cleanup, and clean restart were not executed. No complete truthful
+    evidence document existed for analyzer acceptance.
+
+runtime_error_classification:
+  pre_shutdown_missing_world_occurrences: 0
+  pre_shutdown_material_base_bai_occurrences: 0
+  shutdown_only_disposed_physics_occurrences: 1
+  game_server_log_sha256: fe965739218ad38c42e435cb53f6b75019ce984e8ba495c3a9d3a71518a7a89e
+  game_error_log_sha256: ff18ceb656b672e99fd99b479056a3e14b03e3242c10d2bf90c4b3f226db455e
+  login_server_log_sha256: 77af8a239d317132a7c52ecae9a363ae4ae5591569cc261a44e0639f5496c172
+
+cleanup:
+  final_metrics_response: api-response-00724-botmetrics.json
+  final_runtime_count: 0
+  final_bot_count: 0
+  game_stopped_before_login: true
+  game_stop: graceful-ctrl-c-exited
+  login_stop: graceful-ctrl-c-exited
+  forced_termination: false
+  final_aaemu_game_login_process_count: 0
+  final_archeage_client_process_count: 0
+  final_occupied_required_port_count: 0
+  runtime_game_log_entry_count: 0
+  runtime_login_log_entry_count: 0
+  continuous_client_observation_sha256: c4ed79fc9e722466dff53ad918fe7cd06e36ed7ffa998fb07afa761a61f0c0b8
+  continuous_client_samples: 740
+  continuous_client_violations: 0
+  mysql_process_ids_unchanged: [6308, 8076]
+  isolated_databases_retained: true
+  direct_database_queries_or_mutations: 0
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-036\public-alpha-v5'
+  final_manifest_file_count: 3995
+  final_manifest_sha256: 464582cc9168566d4ee27dcc7470c3c23e8122ff28cfa807ab8c0339cd36bc5d
+  raw_logs_committed: false
+  configs_committed: false
+  credentials_recorded: false
+
+retained_boundaries:
+  - T-036 v1, T-050 v2, T-054 v3, and T-057 v4 remain immutable and INCOMPLETE.
+  - No cohort-25 completion, cohorts 50/100, stealth, restart, analyzer PASS, or T-037 activation is claimed.
+  - No source, deployment, global-ledger, lease, retained-input, client-fixture, schema, or AAEmu 3.0 file was edited.
+  - No direct database command, ArcheAge client control, destructive cleanup, or force termination occurred.
+
+control_actions:
+  integrator: Integrate this commit as an INCOMPLETE T-060 runtime receipt only; do not mark the physical gate passed.
+  pb_000_release: >-
+    After accepting this committed zero-bot, graceful Game-then-Login stop,
+    zero-process, free-listener, empty-live-log, and zero-client proof, commit
+    release of the aaemu12 runtime lease from T-060. Until that commit, retain
+    the current lease record unchanged.
+  t_037: Keep T-037 blocked; do not activate it from this receipt.
+  next_boundary: >-
+    Dispatch a new bounded fixture/harness follow-up for durable fan-out target
+    qualification or post-despawn exact death observability. Do not widen or
+    reinterpret T-060.
