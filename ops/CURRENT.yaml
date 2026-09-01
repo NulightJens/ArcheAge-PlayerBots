@@ -524,10 +524,11 @@ prepared_workstreams:
     manifest_sha256: 1ab0074aad22af52abcef062982a10ad7c48146facabdde092e691c341127e42
     result: FAIL-first-anchored-fixture-inconsistent-world-or-instance-boundary-after-delay-pass-180055.392ms
   - task: T-099
-    state: prepared-awaiting-exact-integrator-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
+    state: active-exact-thread-bound-evidence-integrator
+    client_thread_id: client-new-thread:f98964db-737c-4e57-81d2-22c6fb4b9bc0
+    task_thread_id: 01a05eae-177d-7161-a57e-4ed8719fd920
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\4c45\PB-W00-control'
+    dispatch_base: 5bc8e004b8df2bddf46bbac0e209768a7161644c
     source_candidate: e7361e10c8c1d722c3f18481af07e6173030fb30
     source_candidate_parent: 5d5919e56cd980d0db2ad1907178ba2a59868eb7
     source_candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903

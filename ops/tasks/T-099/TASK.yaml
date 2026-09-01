@@ -2,17 +2,17 @@ schema_version: 1
 id: T-099
 title: Integrate retained T-098 fixture-anchor failure evidence
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Independently validate the complete sealed T-098 evidence root and exact two-file candidate, replay it onto the saved lineage only as a retained FAIL, and commit a durable integration receipt without runtime, source, build, or test activity.
 depends_on: [T-098]
 runtime: {required: false, lease: null}
 branch: integration/aaemu12-world
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\4c45\PB-W00-control'
+owner_client_thread_id: client-new-thread:f98964db-737c-4e57-81d2-22c6fb4b9bc0
+owner_thread_id: 01a05eae-177d-7161-a57e-4ed8719fd920
 inputs:
-  dispatch_base: pending-control-commit
+  dispatch_base: 5bc8e004b8df2bddf46bbac0e209768a7161644c
   source_candidate: e7361e10c8c1d722c3f18481af07e6173030fb30
   source_candidate_parent: 5d5919e56cd980d0db2ad1907178ba2a59868eb7
   source_candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903

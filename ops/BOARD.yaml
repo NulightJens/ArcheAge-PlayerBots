@@ -950,7 +950,7 @@ tasks:
   - id: T-099
     title: Integrate retained T-098 fixture-anchor failure evidence
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-098]
     runtime_lease: null
@@ -959,9 +959,10 @@ tasks:
     source_candidate_parent: 5d5919e56cd980d0db2ad1907178ba2a59868eb7
     source_candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903
     contract: ops/tasks/T-099/CONTRACT.md
-    owner_client_thread_id: pending
-    owner_thread_id: pending
-    worktree: pending
+    owner_client_thread_id: client-new-thread:f98964db-737c-4e57-81d2-22c6fb4b9bc0
+    owner_thread_id: 01a05eae-177d-7161-a57e-4ed8719fd920
+    worktree: 'C:\Users\jensh\.codex\worktrees\4c45\PB-W00-control'
+    dispatch_base: 5bc8e004b8df2bddf46bbac0e209768a7161644c
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
