@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-runtime-evidence-by-T-098
-    owner_task: T-098
-    owner_thread_id: 01a05e8c-e6b0-7902-81b1-8dd7a6456dd3
+    status: released-after-T-098-clean-retained-fail-awaiting-evidence-integration
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
-    cleanup_receipt: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
+    released_at: 2026-09-01
+    cleanup_receipt: e7361e10c8c1d722c3f18481af07e6173030fb30:ops/evidence/aaemu12-t098-one-zone-autonomy-v5.yaml
     baseline_evidence: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: T-098 in worktree C:\Users\jensh\.codex\worktrees\4e59\PB-W00-control may use only the installed AAEmu 1.2 source/tree 761ffa1e0bd76d06532688f34b45e192a493b239 / c36b1255cccb3a782e44e87a56bc9e867a946048 to perform the committed one-zone-autonomy-v5 runtime contract. It may preserve and exactly restore deployed BotConfig.json bytes, start the integrated zero-client observer, gracefully start and stop Login/Game twice, start six bot observers, create the fresh T-098 evidence root once, and issue exactly the six contracted spawnpassive fixtures. Source/build/test/patch edits, predecessor evidence writes, MySQL/database query or control, ArcheAge client start/control, directed bot gameplay commands, reference checkout writes, AAEmu 3.0, force-stop, and every other lease use are prohibited. No other task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 records release.
+    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact task/thread/worktree claim. T-098 stopped Game then Login gracefully, stopped all observers cooperatively, restored exact BotConfig.json bytes, left zero relevant processes/listeners/live logs and zero bots/runtimes, and sealed its retained FAIL root. T-099 is evidence-only and receives no runtime authority.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

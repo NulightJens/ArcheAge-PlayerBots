@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: execute-fresh-one-zone-runtime-proof-v5
+phase: integrate-t098-retained-fixture-anchor-fail
 verdict: active
 
 source:
@@ -30,11 +30,11 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-build-qualified-claimed-by-t098-before-runtime
+    state: stopped-clean-config-restored-t098-fail-awaiting-independent-integration
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-t092-one-zone-autonomy-v3
+    evidence_receipt: aaemu12-t098-one-zone-autonomy-v5-candidate-e7361e10c8c1d722c3f18481af07e6173030fb30
     integration_receipt: aaemu12-activity-director-delay-range-integration-v1
     installed_module_source: 761ffa1e0bd76d06532688f34b45e192a493b239
     installed_module_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
@@ -44,7 +44,7 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 40-passed-0-skipped-0-failed
     unit_tests: 1851-passed-4-intentional-skips-0-failed-exactly-one-invocation
-    runtime_boundary: T-097 installed and qualified the shared 300000 ms delay ceiling; 180000 now survives validation and runtime conversion. T-094 remains retained FAIL against predecessor source. T-098 must physically prove no admission before 180000 ms, both three-bot lifecycle waves/refills, and distinct-PID restart/dwell.
+    runtime_boundary: T-098 physically passed the 180000 ms delay and ordered three-bot bootstrap at 180055.392 ms, then retained FAIL because the exact first anchored passive fixture was rejected as an inconsistent world or instance boundary. No fixture spawned, later fixtures/waves/restart were not attempted, cleanup was graceful, and config bytes were restored. T-099 must independently integrate this FAIL before source correction.
 
 control_tower:
   permanent_task:
@@ -55,9 +55,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Execute T-098 under its exact committed thread/worktree and aaemu12 lease from integrated head 71d13ca70b7c6f530a48ece85ced7041adaa7e1b.
-  - Require all three pre-arms and no first admission before 180000 ms, then both separated three-bot lifecycle/refill waves.
-  - Prove distinct-PID restart/rebootstrap/two-minute dwell and independently integrate the sealed result before activating T-037.
+  - Bind T-099 to an exact evidence Integrator thread/worktree and independently validate/replay candidate e7361e10c8c1d722c3f18481af07e6173030fb30.
+  - After T-099, isolate and correct the active-bot anchor world/instance inconsistency with focused source tests; account for the retained 12.163 m anchor separation before any one-shot runtime successor.
+  - Run a fresh versioned successor proving fixtures, both three-bot lifecycle/refill waves, and distinct-PID restart/dwell before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
@@ -509,7 +509,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
     proof: 40-focused-build-0-errors-79-warnings-full-1851-pass-4-intentional-skips-once
   - task: T-098
-    state: active-exact-thread-bound-runtime-evidence-worker
+    state: done-retained-fail-awaiting-independent-integration
     client_thread_id: client-new-thread:1bb59774-6513-4413-ab92-af3e3d8253cb
     task_thread_id: 01a05e8c-e6b0-7902-81b1-8dd7a6456dd3
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\4e59\PB-W00-control'
@@ -519,6 +519,20 @@ prepared_workstreams:
     evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
     initial_delay_ms: 180000
     contract: ops/tasks/T-098/CONTRACT.md
+    candidate_commit: e7361e10c8c1d722c3f18481af07e6173030fb30
+    candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903
+    manifest_sha256: 1ab0074aad22af52abcef062982a10ad7c48146facabdde092e691c341127e42
+    result: FAIL-first-anchored-fixture-inconsistent-world-or-instance-boundary-after-delay-pass-180055.392ms
+  - task: T-099
+    state: prepared-awaiting-exact-integrator-binding
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    source_candidate: e7361e10c8c1d722c3f18481af07e6173030fb30
+    source_candidate_parent: 5d5919e56cd980d0db2ad1907178ba2a59868eb7
+    source_candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903
+    external_evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
+    contract: ops/tasks/T-099/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
