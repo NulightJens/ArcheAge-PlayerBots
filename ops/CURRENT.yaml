@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: passive-fixture-anchor-integration
+phase: fresh-one-zone-anchor-runtime-proof
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: c216c751e6a2f2d59adf444d907131ea72171048
-  tested_module_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
-  integration_evidence: ops/evidence/aaemu12-activity-director-integration-v1.yaml
+  integrated_head: d2b3c80eaad6c75cfec8f35658b54e5a12f4e6c0
+  tested_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  integration_evidence: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,20 +30,20 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-after-t041-retained-fail
+    state: stopped-clean-build-qualified-awaiting-t088-runtime
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
     evidence_receipt: aaemu12-t041-one-zone-autonomy-v1
-    integration_receipt: aaemu12-t041-fail-integration-v1
-    installed_module_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
-    installed_module_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+    integration_receipt: aaemu12-passive-fixture-anchor-integration-v1
+    installed_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
     database_identity: aaemu12_database_public_alpha_v1
-    compatibility_patch_sha256: 395a83ab5bf6a4f4f1c0d56289590d6a36ad36b3ab5f87e1701d6aa17ffbefcd
+    compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
     build: 0-errors-79-warnings
-    focused_tests: 154-unique-passed-0-skipped-0-failed
-    unit_tests: 1830-passed-4-intentional-skips-0-failed
-    runtime_boundary: T-041 proved exact observer-prearmed Director zero-to-three bootstrap in zone 221, then retained FAIL when one native skill by bot 20001 killed all three passive NPCs stacked at identical fixture coordinates. T-085 independently accepted all 6271 payloads and 67 semantic assertions. Cleanup/config restoration are exact; wave 2, restart, scale, and soak remain unclaimed.
+    focused_tests: 28-passed-0-skipped-0-failed
+    unit_tests: 1847-passed-4-intentional-skips-0-failed
+    runtime_boundary: T-087 independently qualified and installed the per-bot passive fixture anchor. Physical anchor separation, two three-bot activity waves, refills, restart, scale, and soak remain unclaimed; retained T-041 stays FAIL.
 
 control_tower:
   permanent_task:
@@ -54,12 +54,12 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-087 to an independent Integrator and grant only a committed AAEmu 1.2 build/install/test lease.
-  - Independently replay, install, focused-test, clean-build, and full-suite qualify exact T-086 candidate 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439.
-  - After a green T-087 receipt and lease release, run a fresh versioned three-bot Director proof with one spatially isolated inert opportunity anchored near each bot.
+  - Bind T-088 to an exact runtime thread and commit a fresh AAEmu 1.2 runtime-only lease.
+  - Run a fresh versioned three-bot Director proof with audited spatially separated passive opportunities anchored to the exact configured bot IDs, continuous client-process sampling, two waves/refills, and a distinct-PID restart.
+  - If and only if T-088 passes and an independent Integrator accepts its immutable evidence, activate T-037 functional scale qualification.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
-  - Keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
+  - Keep retained T-041 as FAIL and T-037 blocked until successor proof T-088 passes and its evidence is independently integrated.
 
 prepared_workstreams:
   - task: T-062
@@ -361,7 +361,7 @@ prepared_workstreams:
     blocker_receipt: ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
     contract: ops/tasks/T-086/CONTRACT.md
   - task: T-087
-    state: active-exact-thread-bound-build-only
+    state: done-integrated
     client_thread_id: client-new-thread:b707adcd-da74-4fef-9e66-b615a1ff6cf6
     task_thread_id: 01a05ddf-2e99-72b2-8e54-76681b976592
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\3ace\PB-W00-control'
@@ -369,6 +369,17 @@ prepared_workstreams:
     candidate: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
     candidate_parent: 0da7166627f53118184687736132a88cdb668e1e
     contract: ops/tasks/T-087/CONTRACT.md
+    head: d2b3c80eaad6c75cfec8f35658b54e5a12f4e6c0
+    replay_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+    evidence_receipt: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
+    proof: 28-focused-1847-full-unit-4-intentional-skips-build-0-errors
+  - task: T-088
+    state: prepared-awaiting-thread-binding
+    source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+    evidence_root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
+    contract: ops/tasks/T-088/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

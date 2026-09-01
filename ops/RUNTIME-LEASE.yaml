@@ -3,21 +3,21 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-build-install-test-only
-    owner_task: T-087
-    owner_thread_id: 01a05ddf-2e99-72b2-8e54-76681b976592
+    status: released-after-T-087-green-build-gate
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
     client_path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
-    claimed_at: 2026-09-01
-    released_at: null
+    claimed_at: null
+    released_at: 2026-09-01
     cleanup_receipt: ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
-    baseline_evidence: ops/evidence/aaemu12-activity-director-integration-v1.yaml
+    baseline_evidence: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: T-087 may write only the registered AAEmu 1.2 module/install/build/test outputs required by its contract. Login, GameServer, MySQL, database, ArcheAge client, live runtime control, runtime configuration, and retained runtime evidence are prohibited. No other task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 records release.
+    authority_limit: No task may start, stop, or control AAEmu 1.2 or edit its deployed runtime configuration until PB-000 commits a fresh exact T-088 task/thread/worktree binding and runtime authority limit.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

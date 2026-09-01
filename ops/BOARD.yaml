@@ -709,8 +709,8 @@ tasks:
   - id: T-087
     title: Integrate per-bot passive fixture anchors
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-086]
     runtime_lease: aaemu12-build-only
     gate: focused-build-and-full-aaemu12-suite
@@ -721,13 +721,31 @@ tasks:
     dispatch_base: f5df7623d33587a8b0bc4737733e8cec8b00b2cf
     candidate: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
     candidate_parent: 0da7166627f53118184687736132a88cdb668e1e
+    integrated_commit: d2b3c80eaad6c75cfec8f35658b54e5a12f4e6c0
+    tested_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    installed_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+    result: PASS-28-focused-1847-unit-4-intentional-skips-build-0-errors
+
+  - id: T-088
+    title: Reprove one-zone autonomy with isolated anchored fixtures
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-087]
+    runtime_lease: aaemu12-pending-thread-binding
+    gate: serialized-one-zone-autonomy-proof-v2
+    zone_id: 221
+    configured_bot_ids: [20001, 20002, 20003]
+    configured_population: {minimum: 2, target: 3, maximum: 3}
+    contract: ops/tasks/T-088/CONTRACT.md
+    evidence_root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-041]
+    depends_on: [T-088]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-041-retained-fail-awaiting-isolated-fixture-correction-integration-and-fresh-runtime-proof
+    blocker: T-088-fresh-isolated-fixture-runtime-proof-not-yet-passed-and-integrated

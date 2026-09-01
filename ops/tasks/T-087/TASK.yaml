@@ -2,8 +2,8 @@ schema_version: 1
 id: T-087
 title: Integrate per-bot passive fixture anchors
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently review, replay, install, build, focused-test, full-suite qualify, and saved-branch integrate the exact T-086 passive-fixture anchor candidate without starting any runtime.
 depends_on: [T-086]
 runtime:
@@ -39,3 +39,7 @@ gates:
 validation_boundary: Integration/install/build/test only under the exact committed build-only lease. Do not start or control Login, GameServer, MySQL, database, or client; edit global ledgers/lease, repair product source, reinterpret T-041, touch retained runtime evidence, scale, soak, packaging, or AAEmu 3.0.
 contract: ops/tasks/T-087/CONTRACT.md
 handoff: ops/tasks/T-087/HANDOFF.md
+integrated_commit: d2b3c80eaad6c75cfec8f35658b54e5a12f4e6c0
+tested_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+installed_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+result: PASS-28-focused-1847-unit-4-intentional-skips-build-0-errors
