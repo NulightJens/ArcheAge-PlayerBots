@@ -1,0 +1,169 @@
+schema_version: 1
+id: aaemu12-t054-combat-stealth-v3
+recorded_at: 2026-08-31
+verdict: INCOMPLETE
+
+fingerprint:
+  task_lease_commit: 3d923e661dbf9ead1cdb0ccd6565cf2173d95336
+  task_thread_id: 01a05abe-7ea9-70c1-94c4-236f31392392
+  integration_commit: a177607645cded9b318a6298ec5c44b0df2cc429
+  module_source_commit: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+  installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
+  database_identity: aaemu12_database_public_alpha_v1
+  database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+  game_executable_sha256: c10fcd802124406f349253cfafd9413e1768605b90f36110d40c248a85fbc79e
+  login_executable_sha256: 96ef53555b53e532608eb0352ab993e30968eaae55d6d3e2ae9c83ba7c8c389e
+  game_config_sha256: d87acc71056021abe64aaeca29d37fa6cb60015109cbd81df92c9fef4b98ca1c
+  login_config_sha256: 2b18234b5306f7cd3a44138e94520ec27b3462aa8553f2fcdadad176d3fd58e1
+  retained_bot_ids_sha256: 4990553caca2e0843b3a063e3ebd804f34eac75da58b97901982141e756b6203
+  gate_definition_version: 1
+
+preflight:
+  captured_at_utc: '2026-09-01T02:19:51.9556513Z'
+  lease_proved: true
+  task_worktree_head: 3d923e661dbf9ead1cdb0ccd6565cf2173d95336
+  task_worktree_clean: true
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean: true
+  installed_module_clean: true
+  required_ports: [1234, 1237, 1239, 1250, 1280]
+  aaemu_game_login_process_count: 0
+  occupied_required_port_count: 0
+  runtime_log_file_count: 0
+  v3_evidence_path_absent_before_creation: true
+  retained_bot_ids_exact_range: [20001, 20100]
+  retained_bot_id_count: 100
+  game_database_in_config: aaemu_playerbots_game_public_alpha_v1
+  login_database_in_config: aaemu_playerbots_login_public_alpha_v1
+  all_task_listeners_loopback: true
+  retained_data_hashes_match_predecessor: true
+  predecessor_v1_receipt_sha256: 9d4a3def6ce85ffd112a7cf694a4c159adefcff7b1f36d0511504ad478945246
+  predecessor_v2_receipt_sha256: 903756f2d50336fa74627f415de7167936f48d39dbbc7237f3753d78f4459b0d
+  preflight_external_sha256: 6bfe51eeac9f9acb4e96fcfe243b766aa72f45647e0b08012de2013eeb99372a
+
+startup_attempt_4:
+  command: Start-ScaleGateRuntime.ps1 -SafetyAcknowledged
+  startup_receipt_written: true
+  startup_receipt_sha256: 1017cc9e68ee0401ae9d8455f8da2d6bfb0f9c67a80603f288cf248a7782e6cb
+  core_startup_receipt_sha256: bd5480e9161e95563e26cac2a075f40d653db350f2699a6d5f528bed59eaa01b
+  login_process_id: 114720
+  login_process_start_utc: '2026-09-01T02:50:40.9441700Z'
+  game_process_id: 117764
+  game_process_start_utc: '2026-09-01T02:50:41.4809893Z'
+  exact_login_schema_emitted: true
+  exact_game_schema_emitted: true
+  login_internal_network_started: true
+  game_server_started: true
+  game_network_started: true
+  game_stream_network_started: true
+  game_web_api_started: '127.0.0.1:1280'
+  loopback_listeners:
+    - '127.0.0.1:1234 login=114720'
+    - '127.0.0.1:1237 login=114720'
+    - '127.0.0.1:1239 game=117764'
+    - '127.0.0.1:1250 game=117764'
+    - '127.0.0.1:1280 game=117764'
+  initial_runtime_count: 0
+  initial_bot_count: 0
+  initial_active_bot_count: 0
+  credentials_recorded: false
+
+fixture_boundary:
+  loopback_api_accessed: true
+  command_actor: '@system'
+  temporary_bot_id: 20001
+  temporary_bot_spawned: true
+  temporary_bot_despawned: true
+  passive_npc_command: spawnpassive
+  exact_response: '|cFFFFFFFF[spawnpassive]|r |cFFFF0000The command character is not in a world instance.|r'
+  mortal_template_verified: false
+  passive_npcs_spawned: 0
+  stealth_buff_verified: false
+  combat_targets_spawned: 0
+  stealth_targets_spawned: 0
+  source_boundary:
+    system_actor_path: src/AAEmu.Game/Bots/Ops/SystemActor.cs
+    system_actor_sha256: 2e74e7a287f4ae9be34baaa788ce3c46f6487f3669a9ecb569a9ec44a04ead0f
+    spawn_passive_path: src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+    spawn_passive_sha256: 2f7fc6afdf5eab84462bd1f6b151e98c37aa4b6102f42649193d6a45bc46f6fa
+    finding: >-
+      SystemActor.Create applies the MainWorld spawn position but never assigns
+      ParentWorld. SpawnPassiveNpcCommand rejects a command character whose
+      ParentWorld is null, and CommandController creates a fresh SystemActor for
+      every @system request. The installed source therefore has no compliant
+      @system path to create the mandatory passive-NPC fixture.
+
+qualification:
+  qualification_input_created: false
+  plan_created: false
+  evidence_created: false
+  cohorts_executed: []
+  stealth_reacquire_executed: false
+  stealth_release_executed: false
+  distinct_pid_restart_executed: false
+  analyzer:
+    script: scripts/combat/Test-CombatQualificationEvidence.ps1
+    invoked: false
+    native_exit_code: null
+    analyzer_verdict_claimed: false
+    reason: >-
+      Mandatory mortal-target fixture verification failed before a truthful
+      qualification input, plan, or evidence document could be created. Missing
+      material makes the task INCOMPLETE; no analyzer result was fabricated or
+      reinterpreted.
+
+runtime_error_classification:
+  base_bai_loader_collection_error_observed: false
+  missing_world_instance_observed: true
+  missing_world_instance_text: 'WorldManager - GetWorld: No such World Instance 0'
+  missing_world_instance_boundary: >-
+    It was caused by the @system fixture request before the runner initiated
+    graceful shutdown and is the material qualification blocker.
+  physics_disposed_error_observed: true
+  physics_disposed_boundary: post-stop-shutdown-no-cleanup-impact
+  shutdown_cleanup_marker: 'BOT ev=shutdown_cleanup remaining_bots=0 remaining_runtimes=0'
+
+cleanup:
+  game_stopped_before_login: true
+  game_stop: graceful-ctrl-c-exited
+  login_stop: graceful-ctrl-c-exited
+  forced_termination: false
+  final_runtime_count: 0
+  final_bot_count: 0
+  final_aaemu_game_login_process_count: 0
+  final_occupied_required_port_count: 0
+  runtime_game_log_file_count: 0
+  runtime_login_log_file_count: 0
+  isolated_databases_retained: true
+  direct_database_queries_or_mutations: 0
+  database_access_boundary: normal-aaemu-runtime-writes-only
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-036\public-alpha-v3'
+  final_runner_sha256: 7bc9a338227de15f6bd8e37bb2866d8c3c373a6ec76bab10af060b76ec0f7876
+  operator_probe_1_sha256: 9aaf506845bac8b2ae585460a2437b75a3419922608840ae2a56a53bee2b5940
+  operator_probe_2_sha256: bcb95f3154ec2c89254d7aee544e177260dbf9ab8fef53b75c23e875e8d5a72e
+  operator_probe_3_sha256: 866c4a7ad258d5d8580855049a3c58de1440c4a2036027416eb2fcc06d971a57
+  operator_probe_4_sha256: 2f5406cb3a06ef7b4dc954de4b2a79bb53518cdaf567c9c02e04597fc34215ce
+  runner_failure_attempt_4_sha256: 61411de526f495db9cd521f699658e2845b1dae8de94cd15f304707a028719a5
+  game_server_log_sha256: c71660d496241cbdc34fab3a9416ae141b285c4b5dc321594183f5ad97b56ec0
+  game_error_log_sha256: 051cafb4250ee42959cef976cac2cd7707271ebbad6a9c3adced1bb542b88051
+  login_server_log_sha256: 8c8efa9a93bf76363ebf78bd9df4cb690d5634ee652f885a8c7172b7ce60b6fa
+  raw_logs_committed: false
+  configs_committed: false
+  credentials_recorded: false
+
+retained_operator_probes:
+  - Attempt 1 proved its nested startup call did not return while child output handles remained open; no fixture work began and cleanup was graceful.
+  - Attempt 2 confirmed the same native output-pipe ownership boundary with a corrected reader; no fixture work began and cleanup was graceful.
+  - Attempt 3 completed the in-process startup receipt, then exposed success-stream contamination before fixture work; cleanup was graceful.
+  - Attempt 4 completed startup and initial zero metrics, then the mandatory @system passive-NPC fixture was rejected by the installed source boundary.
+
+retained_boundaries:
+  - No passive NPC, buff, combat target, stealth target, cohort, stealth phase, or restart was executed.
+  - No bot-name actor or client workaround was used after the @system rejection.
+  - No source, integration, global ledger, retained config, retained Data file, client fixture, schema, or predecessor receipt was edited or overwritten.
+  - No direct database command, client control, AAEmu 3.0 control, destructive cleanup, or force termination occurred.
+  - Control Tower directed closure as INCOMPLETE without another runtime attempt; the aaemu12 lease remains pending PB-000 integration and release.
