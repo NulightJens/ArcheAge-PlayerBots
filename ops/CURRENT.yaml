@@ -209,7 +209,9 @@ wave_2:
     external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v3'
   recovery_integration_task:
     task: T-053
-    state: ready
+    state: setup-in-progress
+    client_thread_id: client-new-thread:1d47aee2-eca1-4548-aae1-50ae4f89ef08
+    task_thread_id: pending-task-list-resolution
   runtime_lease: released-after-T-050-incomplete-cleanup
   runtime_database_identity: aaemu12_database_public_alpha_v1
   runtime_start: prohibited-until-fresh-versioned-task-and-lease-claim

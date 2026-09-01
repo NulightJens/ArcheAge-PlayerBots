@@ -2,12 +2,13 @@ schema_version: 1
 id: T-053
 title: Integrate stable exact-schema startup correction
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Independently replay, deploy, build, and fully verify the accepted T-051 startup correction on the registered AAEmu 1.2 integration boundary.
 depends_on: [T-051]
 branch: assigned-by-codex
 worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:1d47aee2-eca1-4548-aae1-50ae4f89ef08
 
 inputs:
   integration_head: e3b440d6ad9dc49012090639450d5f423fddfb85
