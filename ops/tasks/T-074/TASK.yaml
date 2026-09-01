@@ -1,0 +1,27 @@
+schema_version: 1
+id: T-074
+title: Integrate T-073 runtime receipt
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Independently verify and branch-integrate the exact two-file T-073 INCOMPLETE runtime receipt without changing its verdict, evidence, or cleanup boundary.
+depends_on: [T-073]
+branch: codex-managed-worktree
+worktree: pending-thread-creation
+owner_client_thread_id: pending-thread-creation
+owner_thread_id: pending-thread-creation
+inputs:
+  integration_head: 7261daa3a715213781c2c6a4e163ece69abddda8
+  source_candidate: 3000b8b92fdb7e88a6196dd966c4420891c81953
+  source_parent: 7261daa3a715213781c2c6a4e163ece69abddda8
+  evidence_manifest_sha256: 9f3b32de05e43ed64dff7dfd2b32219d3114aba7364f59674926a8c1a2278a14
+write_scope:
+  - ops/evidence/aaemu12-t073-one-bot-autonomy-v4.yaml
+  - ops/tasks/T-073/HANDOFF.md
+  - ops/tasks/T-074/HANDOFF.md
+runtime:
+  required: false
+  lease: null
+gates: [receipt-integrity-review]
+validation_boundary: Receipt review/integration only. Do not control runtime, MySQL, client, databases; edit global ledgers/lease; change source/host; reinterpret T-073; modify external evidence; or touch AAEmu 3.0.
+handoff: ops/tasks/T-074/HANDOFF.md

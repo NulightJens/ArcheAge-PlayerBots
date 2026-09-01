@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: single-bot-autonomy-runtime-proof-v4
+phase: single-bot-autonomy-v4-incomplete-receipt-integration
 verdict: active
 
 source:
@@ -54,7 +54,8 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-073 must prove or falsify three complete single-bot iterations including recovery pending/completed ordering, debt-free completion, self-logout, and restart persistence in a new immutable evidence root.
+  - T-074 must integrate T-073 as a truthful INCOMPLETE receipt, then PB-000 must release the clean aaemu12 lease.
+  - Dispatch a fresh proof only; pre-arm read-only brain/mover counters before fixture staging and use a new immutable evidence root.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep T-041 blocked until T-061 passes; keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
 
@@ -181,7 +182,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
     handoff: ops/tasks/T-072/HANDOFF.md
   - task: T-073
-    state: active-runtime-authorized
+    state: incomplete-receipt-review-missing-recovery-counter-window
     client_thread_id: client-new-thread:7c499b5e-a3e5-4d9d-8f74-b4a4560850e1
     task_thread_id: 01a05ca9-8270-7ed1-aa9a-652dce47db8c
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\a03c\PB-W00-control'
@@ -189,6 +190,18 @@ prepared_workstreams:
     tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
     installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
     evidence_root: 'D:\Codex-Labs\evidence\T-073\one-bot-autonomy-v4'
+    head: 3000b8b92fdb7e88a6196dd966c4420891c81953
+    verdict: INCOMPLETE-missing-recovery-window-brain-mover-counter-snapshots
+    evidence_receipt: ops/evidence/aaemu12-t073-one-bot-autonomy-v4.yaml
+    handoff: ops/tasks/T-073/HANDOFF.md
+    cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
+  - task: T-074
+    state: ready
+    client_thread_id: pending-thread-creation
+    task_thread_id: pending-thread-creation
+    codex_worktree: pending-thread-creation
+    base: 7261daa3a715213781c2c6a4e163ece69abddda8
+    source_commit: 3000b8b92fdb7e88a6196dd966c4420891c81953
     head: pending
     handoff: pending
   - task: T-038
