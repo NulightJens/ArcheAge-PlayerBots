@@ -2,14 +2,14 @@ schema_version: 1
 id: T-076
 title: Integrate T-075 runtime receipt
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Independently verify and branch-integrate the exact two-file T-075 INCOMPLETE runtime receipt without changing its verdict, evidence, or cleanup boundary.
 depends_on: [T-075]
-branch: pending-codex-managed-worktree
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\5dee\PB-W00-control'
+owner_client_thread_id: client-new-thread:0ffedae2-c299-4adc-b868-3768ade91679
+owner_thread_id: 01a05cde-3eaf-7801-a6b4-9836f880dd72
 inputs:
   integration_head: 4bf760b9f7d70ffc7941758c29abad2298a5ccb6
   source_candidate: f24f0f246adfdcf6ce2c692fc43eccd5b0c1d834

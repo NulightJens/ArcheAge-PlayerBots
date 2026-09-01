@@ -220,8 +220,11 @@ prepared_workstreams:
     verdict: INCOMPLETE-observer-parser-absent-optional-obj-capture
     cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
   - task: T-076
-    state: ready
-    base: pending-control-dispatch-commit
+    state: active
+    client_thread_id: client-new-thread:0ffedae2-c299-4adc-b868-3768ade91679
+    task_thread_id: 01a05cde-3eaf-7801-a6b4-9836f880dd72
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\5dee\PB-W00-control'
+    base: 91d4c5d2376771a8c3a170b1176d6d47396fc324
     source_commit: f24f0f246adfdcf6ce2c692fc43eccd5b0c1d834
     handoff: ops/tasks/T-076/HANDOFF.md
   - task: T-038

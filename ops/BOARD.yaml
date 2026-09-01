@@ -521,11 +521,14 @@ tasks:
   - id: T-076
     title: Integrate T-075 runtime receipt
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-075]
     runtime_lease: none
     gate: receipt-integrity-review
+    owner_client_thread_id: client-new-thread:0ffedae2-c299-4adc-b868-3768ade91679
+    owner_thread_id: 01a05cde-3eaf-7801-a6b4-9836f880dd72
+    worktree: 'C:\Users\jensh\.codex\worktrees\5dee\PB-W00-control'
 
   - id: T-041
     title: One-zone Autonomous Activity Director
