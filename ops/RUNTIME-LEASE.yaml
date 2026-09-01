@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-runtime-evidence-by-T-094
-    owner_task: T-094
-    owner_thread_id: 01a05e46-6402-7da0-b59e-7c757b6d0c68
+    status: released-after-T-094-fail-cleanup-awaiting-correction
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
-    cleanup_receipt: ops/evidence/aaemu12-t092-fail-integration-v1.yaml
+    released_at: 2026-09-01
+    cleanup_receipt: candidate-453d0bd60cf1e72117b10579d40e549b0a24729f:ops/evidence/aaemu12-t094-one-zone-autonomy-v4.yaml
     baseline_evidence: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: T-094 in worktree C:\Users\jensh\.codex\worktrees\2ba4\PB-W00-control may start loopback Login then Game and stop Game then Login gracefully, perform only the contracted deployed BotConfig.json edit with 180000 ms Director initial delay and exact byte restoration, run the integrated client-process observer plus read-only autonomy/metrics/roster observers, write only the fresh aaemu12_t094_evidence_v4 root, and issue exactly the six contracted spawnpassive fixture commands. MySQL/database query or control, ArcheAge client start/control, directed bot gameplay, source/install/build changes, force-stop, and every other lease use are prohibited. No other task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 records release.
+    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact task/thread/worktree claim. T-094 cleanup was accepted from candidate 453d0bd60cf1e72117b10579d40e549b0a24729f: graceful Game-then-Login stop, zero bots/runtimes/processes/client/listeners/live logs, exact config restoration, and unchanged observed MySQL PIDs.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

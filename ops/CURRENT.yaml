@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: fresh-one-zone-runtime-proof-v4
+phase: integrate-t094-fail-and-correct-director-delay-range
 verdict: active
 
 source:
@@ -54,9 +54,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - T-094 must validate the exact committed lease and integrated head before creating the fresh v4 evidence root or touching runtime.
-  - Use the 180000 ms initial delay and require all three autonomy observers to publish two offline samples before Director admission.
-  - Run the corrected two-wave three-bot Director proof, distinct-PID restart and dwell, then independently integrate its sealed evidence before activating T-037.
+  - T-095 independently verifies and integrates only the retained T-094 FAIL receipt.
+  - T-096 raises the supported ActivityDirectorInitialDelayMs ceiling above 180000 with focused tests and a regenerated AAEmu 1.2 compatibility patch, without deploying it.
+  - Independently integrate/install T-096, run the full suite once for that integration wave, then dispatch a fresh runtime successor before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
@@ -453,7 +453,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t092-fail-integration-v1.yaml
     proof: 1523-of-1523-payloads-866-of-866-client-chain-92-of-92-semantics-green
   - task: T-094
-    state: active-exact-thread-bound-runtime
+    state: blocked-retained-fail-runtime-clamped-180000-to-60000
     client_thread_id: client-new-thread:339575d7-83e5-488c-abfb-7fe729feba00
     task_thread_id: 01a05e46-6402-7da0-b59e-7c757b6d0c68
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\2ba4\PB-W00-control'
@@ -463,6 +463,27 @@ prepared_workstreams:
     evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
     initial_delay_ms: 180000
     contract: ops/tasks/T-094/CONTRACT.md
+    candidate_commit: 453d0bd60cf1e72117b10579d40e549b0a24729f
+    verdict: FAIL-runtime-observed-60020.997ms-despite-deployed-180000ms
+    manifest_sha256: 46ce346de698964231a522b2e3646af7a7fc0b0fbd5a080959c9e78da7d57293
+    cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login-config-restored
+  - task: T-095
+    state: prepared-awaiting-exact-thread-binding
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    source_candidate: 453d0bd60cf1e72117b10579d40e549b0a24729f
+    source_candidate_parent: cc4f9fc6889abc17a149e6dad9d4ff92491a8dc0
+    evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
+    contract: ops/tasks/T-095/CONTRACT.md
+  - task: T-096
+    state: prepared-awaiting-exact-thread-binding
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    source_base: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    blocker_candidate: 453d0bd60cf1e72117b10579d40e549b0a24729f
+    contract: ops/tasks/T-096/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

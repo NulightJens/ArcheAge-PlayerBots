@@ -845,7 +845,7 @@ tasks:
   - id: T-094
     title: Reprove one-zone autonomy with widened observer pre-arm window
     track: AAEmu12
-    status: active
+    status: blocked
     integration: pending
     depends_on: [T-087, T-091, T-093]
     runtime_lease: aaemu12
@@ -860,13 +860,46 @@ tasks:
     owner_thread_id: 01a05e46-6402-7da0-b59e-7c757b6d0c68
     worktree: 'C:\Users\jensh\.codex\worktrees\2ba4\PB-W00-control'
     dispatch_base: e70eb8d195a209ccef1c753ac48c6cc01fa89b86
+    candidate_commit: 453d0bd60cf1e72117b10579d40e549b0a24729f
+    result: FAIL-runtime-observed-60020.997ms-despite-deployed-180000ms
+    blocker: BotConfig-validation-clamps-ActivityDirectorInitialDelayMs-to-60000
+
+  - id: T-095
+    title: Independently integrate the T-094 retained FAIL evidence
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-094]
+    runtime_lease: null
+    gate: immutable-t094-fail-evidence-verification
+    contract: ops/tasks/T-095/CONTRACT.md
+    candidate_commit: 453d0bd60cf1e72117b10579d40e549b0a24729f
+    candidate_parent: cc4f9fc6889abc17a149e6dad9d4ff92491a8dc0
+    evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
+
+  - id: T-096
+    title: Support the widened Activity Director initial delay
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-094]
+    runtime_lease: null
+    gate: focused-director-delay-range-source-correction
+    contract: ops/tasks/T-096/CONTRACT.md
+    source_base: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [T-094]
+    depends_on: [fresh-post-T-096-runtime-proof]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-094-fresh-successor-runtime-proof-not-yet-passed-and-integrated
+    blocker: T-094-is-retained-FAIL-and-post-T-096-runtime-proof-not-yet-passed-and-integrated

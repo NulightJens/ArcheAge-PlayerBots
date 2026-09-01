@@ -1,0 +1,33 @@
+schema_version: 1
+id: T-096
+title: Support the widened Activity Director initial delay
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Raise the supported ActivityDirectorInitialDelayMs ceiling so a deployed value of 180000 is preserved by validation and used by the Director, with focused regression tests and a regenerated AAEmu 1.2 compatibility patch.
+depends_on: [T-094]
+runtime: {required: false, lease: null}
+branch: codex-managed-worktree
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-commit
+  accepted_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  installed_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  blocker_candidate: 453d0bd60cf1e72117b10579d40e549b0a24729f
+write_scope:
+  - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - ops/evidence/aaemu12-activity-director-delay-range-v1.yaml
+  - ops/tasks/T-096/HANDOFF.md
+gates:
+  - preserve-180000-through-validation-and-runtime-configuration
+  - bounded-upper-range-and-negative-clamp-regression-tests
+  - focused-tests-green
+  - clean-aaemu12-patch-apply-and-sha
+  - clean-build-zero-errors
+validation_boundary: Module source correction only. Do not mutate global ledgers/lease, deployed/reference host, installed module, external evidence, runtime, client, database, AAEmu 3.0, packaging, scale, soak, or full suite.
+contract: ops/tasks/T-096/CONTRACT.md
+handoff: ops/tasks/T-096/HANDOFF.md
