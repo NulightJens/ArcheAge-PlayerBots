@@ -1,0 +1,44 @@
+schema_version: 1
+id: T-104
+title: Prove safe two-wave one-zone autonomy with live transform preflight
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Run a fresh sealed physical proof that uses exact live transform telemetry to authorize safe uniquely owned passive fixtures before mutation, then proves two independent three-bot lifecycle/refill waves and a clean distinct-PID restart with sustained target population.
+depends_on: [T-103]
+runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-commit
+  installed_module_source: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+  installed_module_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: 5a2b9e9a32163b6003c0d4feb05fb68a06086bc23b6a7a6d2bfdc455d07942f2
+  client_observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+  autonomy_observer_blob: 94b82fb18a39e2356d43796b54e3eeea5ad7ee12
+  database_identity: aaemu12_database_public_alpha_v1
+  evidence_root: 'D:\Codex-Labs\evidence\T-104\one-zone-autonomy-v6'
+write_scope:
+  - ops/evidence/aaemu12-t104-one-zone-autonomy-v6.yaml
+  - ops/tasks/T-104/HANDOFF.md
+external_write_scope:
+  - aaemu12_t104_evidence_v6 fresh root only
+  - deployed AAEmu 1.2 BotConfig.json exact contracted assignments with byte-exact restoration
+  - aaemu12_integration Login/Game runtime and accepted graceful control path under exact lease
+gates:
+  - exact-source-host-patch-assembly-config-observer-and-fresh-root-preflight
+  - continuous-zero-client-process-observer-with-raw-chain-validation
+  - prearmed-three-bot-observers-and-180-second-ordered-director-bootstrap
+  - invariant-live-transform-parser-and-deterministic-single-precision-placement-plan
+  - predicted-pairwise-at-least-20m-and-unique-nearest-ownership-before-mutation
+  - exact-six-one-shot-fixtures-and-two-distinct-native-credits-per-identity
+  - two-complete-lifecycle-recovery-logout-refill-waves
+  - graceful-distinct-pid-restart-ordered-rebootstrap-and-two-minute-dwell
+  - exact-config-restoration-zero-runtime-cleanup-and-sealed-manifest
+validation_boundary: Physical AAEmu 1.2 one-zone runtime proof only. Do not edit module source, tests, global ledgers/lease/workspace registry, registered reference, database, client, AAEmu 3.0, scale, soak, packaging, or predecessor evidence. No directed gameplay commands, fixture retries, runtime force-stop, or destructive cleanup.
+contract: ops/tasks/T-104/CONTRACT.md
+handoff: ops/tasks/T-104/HANDOFF.md

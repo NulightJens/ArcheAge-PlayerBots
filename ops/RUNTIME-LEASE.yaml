@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: claimed-build-install-by-T-103
-    owner_task: T-103
-    owner_thread_id: 01a05f03-6e3a-75a3-9235-bb44950b3dde
+    status: released-after-T-103-green-install-awaiting-exact-T-104-binding
+    owner_task: null
+    owner_thread_id: null
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
-    cleanup_receipt: ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
-    baseline_evidence: ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
+    released_at: 2026-09-01
+    cleanup_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
+    baseline_evidence: ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: T-103 in worktree C:\Users\jensh\.codex\worktrees\b1da\PB-W00-control may replay candidate 70b577861a5f8fef8df4be40c61af3ba66298ed3, install its exact replay into the registered AAEmu 1.2 integration module, verify the unchanged compatibility patch, run all 46 focused BotCommandsTests, one clean build, and exactly one full AAEmu 1.2 suite, then write only its contracted integration receipt/handoff and fast-forward the saved branch. Login/Game/runtime observer start or control, deployed BotConfig.json edits, MySQL/database query or control, ArcheAge client start/control, reference checkout writes, external runtime evidence, force-stop, and every other lease use are prohibited. No other task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 records release.
+    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits the exact T-104 runtime claim. T-103 installed and qualified replay source/tree bf0ae36fc65eea4f341b936c9f7a961e9d474580 / 7f33545311c972d7a0ed31fa7f75a016df3571f7 with focused 46, zero-error build, and exactly one green full suite; runtime remained stopped.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

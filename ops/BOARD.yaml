@@ -1017,7 +1017,7 @@ tasks:
     title: Expose exact bot transform telemetry for fixture preflight
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated-by-T-103
     depends_on: [T-101]
     runtime_lease: null
     gate: focused-invariant-botdebug-transform-telemetry
@@ -1031,12 +1031,13 @@ tasks:
     candidate_tree: 2476ff1be7040f028882d54ef44b5371e4ed9f14
     evidence_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-v1.yaml
     result: PASS-46-focused-build-0-errors-72-warnings-patch-unchanged
+    integrated_commit: f63f3cd56586f968b92462e87948abc1a0d47596
 
   - id: T-103
     title: Integrate and install exact bot transform telemetry
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-102]
     runtime_lease: aaemu12-build-only
     gate: exact-replay-install-focused-build-full-suite-integration
@@ -1045,13 +1046,33 @@ tasks:
     owner_thread_id: 01a05f03-6e3a-75a3-9235-bb44950b3dde
     worktree: 'C:\Users\jensh\.codex\worktrees\b1da\PB-W00-control'
     dispatch_base: 14e6951f6e9c97243d7cc84502a2a25e9cedebec
+    replay_commit: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+    replay_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
+    integrated_commit: f63f3cd56586f968b92462e87948abc1a0d47596
+    integrated_tree: 4e98c9fbbb93aa5e21b8be474a185048f04cf976
+    evidence_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
+    result: PASS-46-focused-build-0-errors-79-warnings-full-1864-pass-4-intentional-skips-once
+
+  - id: T-104
+    title: Prove safe two-wave one-zone autonomy with live transform preflight
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-103]
+    runtime_lease: aaemu12
+    gate: physical-transform-preflight-two-wave-restart-dwell
+    contract: ops/tasks/T-104/CONTRACT.md
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
+    evidence_root: 'D:\Codex-Labs\evidence\T-104\one-zone-autonomy-v6'
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
     track: AAEmu12
     status: blocked
     integration: pending
-    depends_on: [fresh-post-transform-telemetry-integration-runtime-pass]
+    depends_on: [T-104-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-098-is-retained-FAIL-at-fixture-anchor-boundary-T-101-correction-is-integrated-but-exact-transform-preflight-and-a-fresh-successor-runtime-pass-are-not-yet-proven-and-integrated
+    blocker: T-103-telemetry-is-integrated-and-installed-but-T-104-safe-physical-two-wave-restart-proof-has-not-yet-passed-and-been-independently-integrated

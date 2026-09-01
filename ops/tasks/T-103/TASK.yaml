@@ -2,8 +2,8 @@ schema_version: 1
 id: T-103
 title: Integrate and install exact bot transform telemetry
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently replay T-102 byte-identically onto the saved lineage, install that exact replay into the registered AAEmu 1.2 module, qualify all focused bot-command tests, one clean build, and exactly one full-suite wave, then fast-forward the saved branch with a durable receipt.
 depends_on: [T-102]
 runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
@@ -40,3 +40,9 @@ gates:
 validation_boundary: Source integration/install/build/test only. Never start Login/Game/runtime observers, edit deployed BotConfig.json, access/control MySQL/database or ArcheAge client, edit global ledgers/lease, external runtime evidence, reference checkout, AAEmu 3.0, scale, soak, or packaging.
 contract: ops/tasks/T-103/CONTRACT.md
 handoff: ops/tasks/T-103/HANDOFF.md
+replay_commit: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+replay_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
+integrated_commit: f63f3cd56586f968b92462e87948abc1a0d47596
+integrated_tree: 4e98c9fbbb93aa5e21b8be474a185048f04cf976
+installed_game_assembly_sha256: 5a2b9e9a32163b6003c0d4feb05fb68a06086bc23b6a7a6d2bfdc455d07942f2
+result: PASS-46-focused-build-0-errors-79-warnings-full-1864-pass-4-intentional-skips-once
