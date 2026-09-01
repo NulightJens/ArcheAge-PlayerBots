@@ -2,7 +2,7 @@ schema_version: 1
 id: T-086
 title: Add per-bot anchors to passive runtime fixtures
 track: AAEmu12
-status: active
+status: done
 integration: pending
 outcome: Extend the inert passive-NPC operator fixture with an optional, fail-closed active-bot anchor so simultaneous one-zone opportunities can be spatially isolated without selecting or directing bot gameplay, while preserving all legacy syntax and behavior.
 depends_on: [T-041, T-085]
@@ -36,3 +36,6 @@ gates:
 validation_boundary: Source and focused tests only in this task worktree and isolated build copy. Do not write the registered host/module, start/control runtime/MySQL/database/client, edit global ledgers/lease or retained evidence, alter autonomous selection/combat/lifecycle/Director behavior, run a full suite, perform scale/soak/packaging, or touch AAEmu 3.0.
 contract: ops/tasks/T-086/CONTRACT.md
 handoff: ops/tasks/T-086/HANDOFF.md
+source_head: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
+source_parent: 0da7166627f53118184687736132a88cdb668e1e
+result: PASS-28-focused-clean-build-0-errors-patch-sha-green

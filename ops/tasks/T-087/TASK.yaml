@@ -1,0 +1,41 @@
+schema_version: 1
+id: T-087
+title: Integrate per-bot passive fixture anchors
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Independently review, replay, install, build, focused-test, full-suite qualify, and saved-branch integrate the exact T-086 passive-fixture anchor candidate without starting any runtime.
+depends_on: [T-086]
+runtime:
+  required: false
+  lease: aaemu12-build-only-pending-thread-binding
+  archeage_client_allowed: false
+branch: codex-managed-worktree
+worktree: pending-thread-binding
+owner_client_thread_id: pending-thread-binding
+owner_thread_id: pending-thread-binding
+inputs:
+  dispatch_base: pending-preparation-commit
+  integration_head_before_dispatch: pending-preparation-commit
+  source_candidate: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
+  source_parent: 0da7166627f53118184687736132a88cdb668e1e
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  runtime_workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+write_scope:
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - playerbots.module.json
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/tasks/T-086/HANDOFF.md
+  - ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
+  - ops/tasks/T-087/HANDOFF.md
+gates:
+  - exact-candidate-scope-and-semantics-review
+  - registered-host-install-and-clean-build
+  - focused-aaemu12-passive-fixture-anchor-tests
+  - exactly-one-full-aaemu12-suite
+  - saved-integration-branch-fast-forward
+validation_boundary: Integration/install/build/test only under the exact committed build-only lease. Do not start or control Login, GameServer, MySQL, database, or client; edit global ledgers/lease, repair product source, reinterpret T-041, touch retained runtime evidence, scale, soak, packaging, or AAEmu 3.0.
+contract: ops/tasks/T-087/CONTRACT.md
+handoff: ops/tasks/T-087/HANDOFF.md

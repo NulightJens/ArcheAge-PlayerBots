@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: one-zone-passive-fixture-isolation-correction
+phase: passive-fixture-anchor-integration
 verdict: active
 
 source:
@@ -54,8 +54,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Dispatch T-086 to add a fail-closed optional active-bot anchor to the passive NPC fixture command while preserving legacy syntax and behavior.
-  - Integrate and install T-086 through a fresh focused/full-suite wave gate, then run a fresh versioned three-bot Director proof with one spatially isolated inert opportunity anchored near each bot.
+  - Bind T-087 to an independent Integrator and grant only a committed AAEmu 1.2 build/install/test lease.
+  - Independently replay, install, focused-test, clean-build, and full-suite qualify exact T-086 candidate 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439.
+  - After a green T-087 receipt and lease release, run a fresh versioned three-bot Director proof with one spatially isolated inert opportunity anchored near each bot.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep T-037 blocked until the one-zone Autonomous Activity Director passes T-041.
@@ -349,13 +350,21 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t041-fail-integration-v1.yaml
     proof: 6271-of-6271-payloads-and-67-of-67-semantic-assertions-green
   - task: T-086
-    state: active-exact-thread-bound
+    state: done-candidate-pending-integration
     client_thread_id: client-new-thread:9fc5ce6e-5bb2-43d6-bef3-65ad26d3df50
     task_thread_id: 01a05db6-0a37-72c3-85e3-71599af8359c
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\e2ee\PB-W00-control'
     base: 0da7166627f53118184687736132a88cdb668e1e
+    head: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
+    patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+    proof: 28-focused-passed-clean-build-0-errors-72-retained-warnings
     blocker_receipt: ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
     contract: ops/tasks/T-086/CONTRACT.md
+  - task: T-087
+    state: prepared-awaiting-thread-binding
+    candidate: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
+    candidate_parent: 0da7166627f53118184687736132a88cdb668e1e
+    contract: ops/tasks/T-087/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
