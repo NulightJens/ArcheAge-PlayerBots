@@ -803,16 +803,20 @@ tasks:
   - id: T-092
     title: Reprove one-zone autonomy with integrated client observer
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-087, T-091]
-    runtime_lease: aaemu12-pending-thread-binding
+    runtime_lease: aaemu12
     gate: serialized-one-zone-autonomy-proof-v3
     zone_id: 221
     configured_bot_ids: [20001, 20002, 20003]
     configured_population: {minimum: 2, target: 3, maximum: 3}
     contract: ops/tasks/T-092/CONTRACT.md
     evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
+    owner_client_thread_id: client-new-thread:50955241-43de-4c78-ad98-794e7fdc7e2b
+    owner_thread_id: 01a05e17-fb8b-7610-a0de-e8693dc0af91
+    worktree: 'C:\Users\jensh\.codex\worktrees\86b9\PB-W00-control'
+    dispatch_base: 38b6ca7518215521dc3bb34389de4c5a4d547368
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

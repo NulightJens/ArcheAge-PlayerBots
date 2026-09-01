@@ -2,20 +2,20 @@ schema_version: 1
 id: T-092
 title: Reprove one-zone autonomy with integrated client observer
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Produce a fresh immutable live AAEmu 1.2 proof that continuously observes zero client processes, bootstraps the exact Director cohort, gives all three bots two independently credited autonomous lifecycles with refills, and preserves target population across a distinct-PID restart.
 depends_on: [T-087, T-091]
 runtime:
   required: true
-  lease: aaemu12-pending-thread-binding
+  lease: aaemu12
   archeage_client_allowed: false
 branch: codex-managed-worktree
-worktree: pending-thread-binding
-owner_client_thread_id: pending-thread-binding
-owner_thread_id: pending-thread-binding
+worktree: 'C:\Users\jensh\.codex\worktrees\86b9\PB-W00-control'
+owner_client_thread_id: client-new-thread:50955241-43de-4c78-ad98-794e7fdc7e2b
+owner_thread_id: 01a05e17-fb8b-7610-a0de-e8693dc0af91
 inputs:
-  dispatch_base: pending-preparation-commit
+  dispatch_base: 38b6ca7518215521dc3bb34389de4c5a4d547368
   host_base: 62e3eb1d87da01194802ac886cd500134facad28
   installed_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
   installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2

@@ -425,7 +425,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-client-process-observer-integration-v1.yaml
     proof: powershell-105-and-pwsh-105-assertions-green
   - task: T-092
-    state: prepared-awaiting-thread-binding
+    state: active-exact-thread-bound-runtime
+    client_thread_id: client-new-thread:50955241-43de-4c78-ad98-794e7fdc7e2b
+    task_thread_id: 01a05e17-fb8b-7610-a0de-e8693dc0af91
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\86b9\PB-W00-control'
+    base: 38b6ca7518215521dc3bb34389de4c5a4d547368
     source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
     observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
     evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'

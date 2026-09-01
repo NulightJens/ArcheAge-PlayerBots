@@ -3,21 +3,21 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-088-incomplete-zero-runtime-cleanup
-    owner_task: null
-    owner_thread_id: null
+    status: claimed-runtime-evidence-by-T-092
+    owner_task: T-092
+    owner_thread_id: 01a05e17-fb8b-7610-a0de-e8693dc0af91
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
     client_path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
-    claimed_at: null
-    released_at: 2026-09-01
+    claimed_at: 2026-09-01
+    released_at: null
     cleanup_receipt: ops/evidence/aaemu12-t088-one-zone-autonomy-v2.yaml
     baseline_evidence: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: No task may start, stop, or control AAEmu 1.2 or edit its deployed runtime configuration. T-089 and T-090 have no runtime lease. A fresh successor proof requires a new exact task/thread/worktree binding and committed runtime authority.
+    authority_limit: T-092 may start loopback Login then Game and stop Game then Login gracefully, perform only the contracted deployed BotConfig.json edit and exact byte restoration, run the bound integrated client-process observer plus read-only bot/metrics/roster observers, write only the fresh aaemu12_t092_evidence_v3 root, and issue exactly the six contracted spawnpassive fixture commands. MySQL/database query or control, ArcheAge client start/control, directed bot gameplay, source/install/build changes, force-stop, and every other lease use are prohibited. No other task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 records release.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
