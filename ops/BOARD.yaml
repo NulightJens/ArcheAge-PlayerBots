@@ -84,11 +84,23 @@ tasks:
   - id: T-045
     title: Wave 2 source and database-runway integration
     track: AAEmu12
-    status: active
-    integration: pending
+    status: blocked
+    integration: retained-red
     depends_on: [T-007, T-043, T-044]
     gate: full-aaemu12-suite
     owner_client_thread_id: client-new-thread:9b37ca27-d9b9-4d74-b76e-005f813e7b76
+    retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+    handoff_commit: 4d1a472
+    result: 1788-passed-4-intentional-skips-1-failed-before-focused-green-correction
+
+  - id: T-046
+    title: Wave 2 recovery integration qualification
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-045]
+    gate: full-aaemu12-suite
+    retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
 
   - id: T-036
     title: AAEmu 1.2 mortal-combat and stealth closure

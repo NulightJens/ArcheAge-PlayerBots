@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-08-31
-phase: wave-2-runtime-runway-parallel-source
+phase: wave-2-integration-recovery
 verdict: active
 
 source:
@@ -50,7 +50,7 @@ control_tower:
 
 next_transition:
   - Resolve the retained T-038 and T-039 setup client IDs to final task IDs when they appear in the Codex task list.
-  - Run T-045 as the independent Wave 2 source and database-runway integration task.
+  - Run T-046 as the independent recovery qualification for retained T-045 candidate 225595ebe45d5b0c08bfa0a1059cb8ba97669f86.
   - Register the isolated database, claim the aaemu12 lease, and activate T-036 only after the integrated candidate is green.
   - Keep T-037 and T-041 blocked until their declared dependencies are accepted.
 
@@ -97,7 +97,7 @@ integration_wave:
     T-040: a99663059db71afaa227bdce8f680b5196e36226
 
 wave_2:
-  state: handoffs-ready-for-integration
+  state: recovery-integration-ready
   base: e0350b3ee24352a1d96d81a60f34475fd8e56a45
   lanes:
     - task: T-007
@@ -123,8 +123,15 @@ wave_2:
       handoff: ready
   integration_task:
     task: T-045
-    state: setup-in-progress
+    state: blocked-retained-red
     client_thread_id: client-new-thread:9b37ca27-d9b9-4d74-b76e-005f813e7b76
     task_thread_id: pending-task-list-resolution
+    retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+    retained_handoff_commit: 4d1a472
+    full_unit: 1788-passed-4-intentional-skips-1-failed-before-focused-green-correction
+  recovery_integration_task:
+    task: T-046
+    state: ready
+    retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
   runtime_lease: unclaimed
   runtime_start: prohibited-until-integration-and-registration

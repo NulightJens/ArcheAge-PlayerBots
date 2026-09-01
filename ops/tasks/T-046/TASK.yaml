@@ -1,0 +1,50 @@
+schema_version: 1
+id: T-046
+title: Wave 2 recovery integration qualification
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Reapply and independently qualify the retained T-045 candidate, then advance Wave 2 only if a fresh full AAEmu 1.2 suite is green.
+depends_on: [T-045]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+
+inputs:
+  integration_branch: integration/aaemu12-world
+  retained_failure_handoff: ops/tasks/T-045/HANDOFF.md
+  retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+  retained_candidate_commits:
+    - 0dd9e80a375d419d9cf724a30ad16f23af889803
+    - 1453c04138e076b4c22c9b9549ce16fbc53ec3b8
+    - 568af9c3adac6d667524df2c0176a60e37ae9274
+    - bc872d2614718dee177f5f7e219ee43866f9c5ee
+    - 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+  host_reference: aaemu12_reference
+  validation_host: aaemu12_integration
+  database_receipt: aaemu12-database-public-alpha-v1
+
+write_scope:
+  - scripts/evidence/**
+  - scripts/combat/**
+  - src/AAEmu.Game/Core/Managers/Bots/BotCombatManager.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotCombatState.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotDiagnostics.cs
+  - src/AAEmu.Game/Models/Tasks/Bots/BotCombatTask.cs
+  - src/AAEmu.Game/Scripts/Commands/BotAttackObjectCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/BotBuffCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/BotMetricsCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotCombatManagerTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotCombatStateTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotCombatTaskTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/evidence/aaemu12-wave2-integration-v1.yaml
+  - ops/tasks/T-046/HANDOFF.md
+
+runtime:
+  required: false
+  lease: null
+gates: [deterministic-evidence-tool-tests, deterministic-harness-tests, focused-aaemu12-tests, full-aaemu12-suite]
+validation_boundary: Install/build/test only. Do not query or mutate the isolated schemas, start a runtime, alter the runtime lease/global ledgers, or rewrite T-045 evidence.
+handoff: ops/tasks/T-046/HANDOFF.md
