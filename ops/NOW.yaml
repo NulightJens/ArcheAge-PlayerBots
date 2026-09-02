@@ -2,7 +2,9 @@ schema_version: 1
 updated_at: 2026-09-02
 goal: G-001
 task: T-127
-task_state: ready-awaiting-new-thread-binding
+task_state: active
+task_thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
+task_worktree: 'C:\Users\jensh\.codex\worktrees\7e13\PB-W00-control'
 product_source: 1a52e7b44fab76939d9409561bdfa4739f1425e6
 deployed_source: fb0a315c9579fb2e7e249e47b37efa07a9404c51
 deployment_match: false
@@ -11,11 +13,11 @@ runtime:
   database: aaemu12_database_public_alpha_v1
   client: aaemu12_client
   lease: aaemu12
-  current_owner: T-120
-  state: retained-running-awaiting-graceful-t127-transition
+  current_owner: T-127
+  state: retained-from-T-120-graceful-transition-owned-by-T-127
 first_action: >-
-  Bind the new task, transfer the lease, close the client normally, stop Game
-  then Login gracefully, and deploy the exact integrated candidate.
+  Close the retained client normally, stop Game then Login gracefully, and
+  deploy the exact integrated candidate.
 execution_brief: ops/EXECUTION-BRIEF.md
 contract: ops/tasks/T-127/CONTRACT.md
 report_fields: [State, Build, Server marker, Client marker, Blocker, Next action]

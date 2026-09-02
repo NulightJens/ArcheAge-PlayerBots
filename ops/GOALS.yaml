@@ -24,7 +24,7 @@ current_candidate:
   deployed_source: fb0a315c9579fb2e7e249e47b37efa07a9404c51
   deployment_match: false
   live_acceptance: false
-  runtime_lease_owner: T-120
+  runtime_lease_owner: T-127
   blocker: >-
     The corrected identity and signpost lifecycle are not installed. The
     retained runtime has no proven level-one Nuian autonomous quest loop.

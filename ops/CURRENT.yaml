@@ -8,7 +8,9 @@ delivery_audit: ops/AUDIT-2026-09-02.md
 active_goal: G-001
 active_task: T-127
 current_execution_state: ops/NOW.yaml
-new_thread_state: pending-binding
+new_thread_state: active-bound
+new_thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
+new_thread_worktree: 'C:\Users\jensh\.codex\worktrees\7e13\PB-W00-control'
 
 source:
   integration_branch: integration/aaemu12-world
@@ -53,8 +55,8 @@ runtime:
     build: 0-errors-30-warnings
     focused_tests: 98-controller-host-command-and-32-safe-config-passed-zero-failed
     unit_tests: 1871-passed-4-intentional-skips-0-failed-exactly-one-t115-invocation-independently-reused-by-t116
-    live_session_owner: T-120
-    previous_session_owner: T-118
+    live_session_owner: T-127
+    previous_session_owner: T-120
     login_pid: 111900
     game_pid: 38844
     launcher_pid: 92432
@@ -62,16 +64,20 @@ runtime:
     listeners: [1234, 1237, 1239, 1250, 1280]
     director: disabled-quest-intake-enabled-two-active-idle-bots-zero-runtime-overlaps-or-tick-errors
     preserved_config: 'D:\Codex-Labs\sessions\T-118\interactive-live-demo-v1\config\BotConfig.original.bin'
-    runtime_boundary: T-120 integrated and installed T-119 successfully but is BLOCKED because the retained dataset has no eligible level-one Nuian. Its healthy interactive runtime remains leased to T-120 with two active idle ScaleBots after exploratory native high-level side-quest intake. No source worker may deploy, query or write the database, place more bots, or mutate this runtime; later transition must close the client normally and stop Game then Login gracefully.
+    runtime_boundary: T-127 owns the retained T-120 session only to close the client normally, stop Game then Login gracefully, deploy the G-001 candidate, and run the contracted live slice. No other task may mutate this runtime.
 
 control_tower:
   permanent_task:
     thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
     title: PB-000 PlayerBots Control Tower — Autonomous Alpha
-    state: retiring-after-T-127-binding
+    state: retiring-archived-after-T-127-dispatch
   saved_project_id: 9cdd642a-c900-4027-8f7b-d369835cef26
   operating_mode: local-integration-worktree
   dashboard_policy: product-goal-and-deployment-state-only
+  execution_thread:
+    thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
+    title: G-001 Nuian Five-Quest Live Slice
+    worktree: 'C:\Users\jensh\.codex\worktrees\7e13\PB-W00-control'
 
 next_transition:
   - Preserve the retained T-120 runtime and lease until a separately authorized graceful transition begins.

@@ -2,7 +2,7 @@ schema_version: 1
 id: T-127
 title: Execute G-001 Nuian five-quest live slice
 track: AAEmu12
-status: ready
+status: active
 integration: vertical-slice-owner
 outcome: >-
   Create one level-one Nuian bot and prove five native starter-quest
@@ -12,10 +12,10 @@ depends_on: [T-126]
 runtime:
   required: true
   lease: aaemu12
-  transfer: pending-new-thread-binding
-branch: assigned-by-codex-task
-worktree: assigned-by-codex-task
-owner_thread_id: pending-new-thread-binding
+  transfer: bound-from-retained-T-120-session
+branch: detached-at-40baf88f53a44797e8fcf013da4d6e7681bb273a
+worktree: 'C:\Users\jensh\.codex\worktrees\7e13\PB-W00-control'
+owner_thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
 write_scope:
   - src/**
   - tests/**
