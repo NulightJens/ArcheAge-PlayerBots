@@ -66,7 +66,7 @@ public sealed class BotQuestLifecycleController
     private readonly Action<Character> _stopMovement;
     private readonly Action<string> _eventSink;
 
-    private BotQuestLifecycleState _state = BotQuestLifecycleState.Disabled;
+    private volatile BotQuestLifecycleState _state = BotQuestLifecycleState.Disabled;
     private uint? _questId;
     private uint? _objectiveTargetTemplateId;
     private byte? _objectiveIndex;
@@ -122,6 +122,9 @@ public sealed class BotQuestLifecycleController
     {
         ArgumentNullException.ThrowIfNull(runtime);
         ArgumentNullException.ThrowIfNull(config);
+
+        if (!config.QuestCompletionEnabled && _state == BotQuestLifecycleState.Disabled)
+            return false;
 
         lock (_syncRoot)
         {

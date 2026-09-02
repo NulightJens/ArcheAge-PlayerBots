@@ -103,6 +103,8 @@ namespace AAEmu.Game.Scripts.Commands
             CommandManager.SendNormalText(this, messageOutput, $"Movement task running: {BotManager.Instance.IsMovementTaskRunning(botId)}");
             CommandManager.SendNormalText(this, messageOutput, $"Combat task running: {BotCombatManager.Instance.IsTaskRunning(botId)}");
             var runtime = BotHost.Instance.GetRuntime(botId);
+            string questGiverDebug = null;
+            string questLifecycleDebug = null;
             if (runtime != null)
             {
                 var life = runtime.LifeController.Inspect();
@@ -141,15 +143,16 @@ namespace AAEmu.Game.Scripts.Commands
                 CommandManager.SendNormalText(this, messageOutput,
                     string.Create(System.Globalization.CultureInfo.InvariantCulture,
                         $"Quest intake: state={QuestIntakeState(questIntake.State)}, " +
-                        $"giver={questIntake.GiverKind?.ToString().ToLowerInvariant() ?? "none"}:" +
-                        $"{Optional(questIntake.GiverTemplateId)}:{Optional(questIntake.GiverObjectId)}, " +
+                        $"npc={Optional(questIntake.NpcTemplateId)}:{Optional(questIntake.NpcObjectId)}, " +
                         $"quest={Optional(questIntake.QuestId)}, main_story={Optional(questIntake.MainStory)}, " +
                         $"reason={questIntake.DecisionReason ?? "none"}, at={Timestamp(questIntake.DecisionAt)}, " +
                         $"last_accepted_at={Timestamp(questIntake.LastAcceptedAt)}, retry_at={Timestamp(questIntake.RetryAt)}, " +
                         $"accepted={questIntake.AcceptedCount}, rejected={questIntake.RejectedCount}"));
+                questGiverDebug = string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                    $"Quest intake giver: giver={questIntake.GiverKind?.ToString().ToLowerInvariant() ?? "none"}:" +
+                    $"{Optional(questIntake.GiverTemplateId)}:{Optional(questIntake.GiverObjectId)}");
                 var questLifecycle = runtime.QuestLifecycleController.Inspect();
-                CommandManager.SendNormalText(this, messageOutput,
-                    string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                questLifecycleDebug = string.Create(System.Globalization.CultureInfo.InvariantCulture,
                         $"Quest lifecycle: state={questLifecycle.State.ToString().ToLowerInvariant()}, " +
                         $"quest={Optional(questLifecycle.QuestId)}, " +
                         $"objective={Optional(questLifecycle.ObjectiveTargetTemplateId)}:" +
@@ -164,7 +167,7 @@ namespace AAEmu.Game.Scripts.Commands
                         $"report_at={Timestamp(questLifecycle.ReportAttemptedAt)}, " +
                         $"completed_at={Timestamp(questLifecycle.CompletedAt)}, retry_at={Timestamp(questLifecycle.RetryAt)}, " +
                         $"completed={questLifecycle.CompletedCount}, suspended={questLifecycle.SuspensionCount}, " +
-                        $"report_attempts={questLifecycle.ReportAttemptCount}"));
+                        $"report_attempts={questLifecycle.ReportAttemptCount}");
                 var runtimeMetrics = runtime.Metrics;
                 CommandManager.SendNormalText(this, messageOutput,
                     string.Create(System.Globalization.CultureInfo.InvariantCulture,
@@ -173,6 +176,10 @@ namespace AAEmu.Game.Scripts.Commands
             }
             var hostMetrics = BotHost.Instance.Metrics;
             CommandManager.SendNormalText(this, messageOutput, $"Host metrics: bots={hostMetrics.LastTickBots}, active={hostMetrics.ActiveBots}, tick_ms_ema={hostMetrics.TickMsEma:F2}, max={hostMetrics.MaxTickMs:F2}, skipped={hostMetrics.SkippedTicks}, brain_steps={hostMetrics.BrainStepsTotal}, mover_steps={hostMetrics.MoverStepsTotal}");
+            if (questGiverDebug != null)
+                CommandManager.SendNormalText(this, messageOutput, questGiverDebug);
+            if (questLifecycleDebug != null)
+                CommandManager.SendNormalText(this, messageOutput, questLifecycleDebug);
         }
 
         private static string Timestamp(DateTimeOffset? value) =>

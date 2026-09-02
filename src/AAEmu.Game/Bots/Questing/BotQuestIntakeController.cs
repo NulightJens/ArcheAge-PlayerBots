@@ -76,7 +76,7 @@ public sealed class BotQuestIntakeController
 
     private GiverPlan _plan;
     private Vector3? _ownedDestination;
-    private BotQuestIntakeState _state = BotQuestIntakeState.Disabled;
+    private volatile BotQuestIntakeState _state = BotQuestIntakeState.Disabled;
     private string _decisionReason = "not_started";
     private DateTimeOffset? _decisionAt;
     private DateTimeOffset? _lastAcceptedAt;
@@ -165,6 +165,9 @@ public sealed class BotQuestIntakeController
     {
         ArgumentNullException.ThrowIfNull(runtime);
         ArgumentNullException.ThrowIfNull(config);
+
+        if (!config.QuestIntakeEnabled && _state == BotQuestIntakeState.Disabled)
+            return false;
 
         lock (_syncRoot)
         {
