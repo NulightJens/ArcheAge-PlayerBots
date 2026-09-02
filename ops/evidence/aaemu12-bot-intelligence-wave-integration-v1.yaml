@@ -1,0 +1,44 @@
+schema_version: 1
+task: T-124
+track: AAEmu12
+verdict: INCOMPLETE-full-suite-caught-three-regressions-corrected-focused-green
+source:
+  integration_base: af840ab8a90640f3e1ff964490a3e241ef5b999b
+  corrected_commit: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+  corrected_tree: 3f473420369dc46bcf3884c90cfc140b58d30c34
+  replay_commits:
+    identity: c62e591
+    quest: c4b8085
+    navigation: bf2ca43
+    navigation_handoff: d771db2
+host:
+  base: 62e3eb1d87da01194802ac886cd500134facad28
+  checkout: 'D:\Codex-Labs\aaemu-1.2-r208022-t124-integration-v1'
+  patches:
+    base_v3_sha256: BAA0979A200EB7F4403985D7166092F937033C31650AA11336FBA31543D96606
+    identity_sha256: 2461B25F571FBC9F11FD8D401E4FF7C1F5E2C07D5900896E608BF2FF18FFCF95
+    quest_sha256: F2DB46554F97A48FC71B068960D8AD3F2F98B2A496D4DB0338B4EEF253EA890E
+    navigation_sha256: C81E3CE9F52EA04FE1692EF470863D1CF547AD34380A842CCB948831A1EF23B1
+focused:
+  initial_merged: {passed: 192, failed: 0}
+  corrected_merged: {passed: 251, failed: 0, skipped: 0}
+full_suite_once:
+  total: 1961
+  passed: 1954
+  skipped: 4
+  failed: 3
+  retained_failures:
+    - BotHostTests.UnchangedRuntimeSnapshot_DoesNotAllocateDuringIdleTick
+    - BotCommandsTests.BotDebug_AutonomousDecision_ExposesLifeTransitionReasonAndTimestamps
+    - BotCommandsTests.BotDebug_TransformTelemetry_IsInvariantRoundTripAndReadOnly
+corrected_build:
+  command: dotnet build AAEmu.slnx --configuration Debug --no-incremental --nologo
+  errors: 0
+  warnings: 91
+  duration_seconds: 10.50
+  game_assembly_sha256: 9A74BA78E03C40B54A4EFA8015D4117CA1B2650D5407ADF939532E6B803E6B86
+  unit_test_assembly_sha256: BCE05BB12E4F75600464D6800FAE748731D0445C08445B7C63C410F33B26127D
+runtime:
+  mutated: false
+  lease_changed: false
+next_gate: T-125

@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-02
-phase: bot-intelligence-wave-immediate-integration-tests
+phase: bot-intelligence-wave-corrected-full-verification
 verdict: active
 
 source:
@@ -65,8 +65,9 @@ control_tower:
 
 next_transition:
   - Retain T-120 as BLOCKED because no eligible level-one Nuian identity exists; preserve its healthy interactive runtime under the existing lease until a separately contracted graceful transition.
-  - Integrate exact T-121, T-122, and T-123 candidates once in T-124; run all 128 retained focused tests immediately on the merged build, then the once-per-wave full suite.
-  - After T-124 is green, create a versioned live-smoke task, gracefully transition the retained T-120 runtime, and prove level-one creation, Nuian signpost completion/chaining, and transfer-road route generation without per-action commands.
+  - Retain T-124 as INCOMPLETE: its only full-suite invocation exposed three regressions; the corrected integration passed 251 focused/regression tests and a zero-error clean build.
+  - Run exactly one corrected full suite in T-125 and retain its complete result; do not mutate the healthy T-120 runtime.
+  - After T-125 is green, create a versioned live-smoke task, gracefully transition the retained T-120 runtime, and prove level-one creation, Nuian signpost completion/chaining, and transfer-road route generation without per-action commands.
   - Resume physical v10 qualification only with a fresh versioned successor root; never reuse the retained T-117 root.
   - Independently integrate only a fresh successor runtime PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.

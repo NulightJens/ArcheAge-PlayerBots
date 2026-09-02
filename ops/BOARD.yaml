@@ -1467,8 +1467,8 @@ tasks:
   - id: T-124
     title: Integrate and immediately test bot intelligence wave
     track: AAEmu12
-    status: active
-    integration: in-progress
+    status: done
+    integration: corrected-awaiting-T-125-full-verification
     depends_on: [T-121, T-122, T-123]
     runtime_lease: null
     gate: one-merged-build-128-focused-tests-and-once-per-wave-full-suite
@@ -1477,7 +1477,24 @@ tasks:
     branch: integration/aaemu12-world
     worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
     integration_base: af840ab8a90640f3e1ff964490a3e241ef5b999b
-    result: ACTIVE-exact-candidate-integration-and-immediate-combined-tests
+    corrected_commit: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+    evidence_receipt: ops/evidence/aaemu12-bot-intelligence-wave-integration-v1.yaml
+    result: INCOMPLETE-full-suite-caught-3-regressions-corrected-251-focused-build-zero-errors
+
+  - id: T-125
+    title: Verify corrected intelligence wave and lock fast-feedback build loop
+    track: AAEmu12
+    status: active
+    integration: verification-in-progress
+    depends_on: [T-124]
+    runtime_lease: null
+    gate: exactly-one-corrected-full-suite-and-durable-fast-feedback-policy
+    contract: ops/tasks/T-125/CONTRACT.md
+    owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    branch: integration/aaemu12-world
+    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+    corrected_source: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+    result: ACTIVE-single-corrected-full-suite
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

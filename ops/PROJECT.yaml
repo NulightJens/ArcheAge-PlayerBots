@@ -16,6 +16,7 @@ canonical_source:
 environment_control:
   workspace_registry: ops/WORKSPACES.yaml
   contingency_runbook: ops/ENVIRONMENT-CONTINGENCY.md
+  build_test_loop: ops/BUILD-TEST-LOOP.md
   runtime_lease: ops/RUNTIME-LEASE.yaml
   rule: Resolve every external path by registry ID before reading or writing it.
 
