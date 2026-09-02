@@ -2,7 +2,7 @@ schema_version: 1
 id: T-106
 title: Add bounded relative-yaw passive fixture placement
 track: AAEmu12
-status: active
+status: done
 integration: pending
 outcome: Extend the anchored passive-fixture command with an optional finite invariant relative-yaw offset so deterministic preflight can place uniquely owned fixtures around clustered live bots, while keeping every existing argument form, zero-offset result, anchor guard, and no-mutation boundary intact.
 depends_on: [T-105]
@@ -34,3 +34,8 @@ gates:
 validation_boundary: Module source, focused SpawnPassiveNpcCommandTests, isolated AAEmu 1.2 build, receipt, and handoff only. Do not edit global ledgers/lease, installed/reference host, deployed config, external runtime evidence, database, client, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite.
 contract: ops/tasks/T-106/CONTRACT.md
 handoff: ops/tasks/T-106/HANDOFF.md
+candidate_commit: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
+candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+candidate_patch_id: 1658582af94e18e4376ec0e8ffde12926d32fa0b
+result: PASS-46-focused-build-0-errors-72-warnings-patch-unchanged

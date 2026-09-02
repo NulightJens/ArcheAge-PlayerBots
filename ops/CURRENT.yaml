@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: implement-angular-fixture-placement-source-correction
+phase: independently-integrate-install-angular-fixture-placement
 verdict: active
 
 source:
@@ -55,8 +55,7 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-106 to an exact isolated source writer and add a finite invariant relative-yaw fixture seam while preserving one/two/three-argument and zero-offset behavior exactly.
-  - Independently replay, install, focus-test, build, and run exactly one full suite for T-106 in T-107.
+  - Bind T-107 to an exact isolated Integrator plus committed build-only lease, then replay/install T-106 byte-identically and consume exactly one full-suite invocation.
   - Run fresh T-108 evidence in a new v7 root with the deterministic 11-distance by 8-angle search, then prove both lifecycle/refill waves plus distinct-PID restart/rebootstrap and two-minute dwell before activating T-037.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
@@ -629,7 +628,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
     proof: PASS-receipt-integrity-17528-of-17528-payloads-5357-autonomy-1345-client-1331-geometry-subject-retained-FAIL
   - task: T-106
-    state: active-exact-thread-bound-source-writer
+    state: done-source-pass-awaiting-t107-integration
     client_thread_id: client-new-thread:cf15f37f-a09b-419d-a8b8-dad7ec57734c
     task_thread_id: 01a05f65-58af-70f2-a138-1bcccdffaf03
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\4173\PB-W00-control'
@@ -638,6 +637,22 @@ prepared_workstreams:
     contract: ops/tasks/T-106/CONTRACT.md
     retained_fail_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
     deterministic_dry_run: 681472-tuples-2430-eligible-from-exact-t104-transform-bits
+    candidate_commit: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
+    candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+    candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+    candidate_patch_id: 1658582af94e18e4376ec0e8ffde12926d32fa0b
+    evidence_receipt: ops/evidence/aaemu12-passive-anchor-yaw-offset-v1.yaml
+    proof: PASS-46-focused-build-0-errors-72-warnings-patch-unchanged-clean-four-path-candidate
+  - task: T-107
+    state: prepared-awaiting-exact-thread-and-build-lease-binding
+    client_thread_id: pending
+    task_thread_id: pending
+    codex_worktree: pending
+    dispatch_base: pending-control-prep-commit
+    source_candidate: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
+    source_candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+    source_candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+    contract: ops/tasks/T-107/CONTRACT.md
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

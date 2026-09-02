@@ -1,0 +1,42 @@
+schema_version: 1
+id: T-107
+title: Integrate and install bounded relative-yaw fixture placement
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Independently replay the exact T-106 four-path candidate onto the saved lineage, install that replay into the registered AAEmu 1.2 module under a committed build-only lease, rerun focused proof, one clean build, and exactly one full-suite wave, then fast-forward the saved branch with a durable integration receipt.
+depends_on: [T-106]
+runtime: {required: false, lease: aaemu12-build-only-pending-exact-binding, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: pending
+owner_client_thread_id: pending
+owner_thread_id: pending
+inputs:
+  dispatch_base: pending-control-prep-commit
+  saved_head: pending-control-prep-commit
+  source_candidate: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
+  source_candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+  source_candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+  source_candidate_patch_id: 1658582af94e18e4376ec0e8ffde12926d32fa0b
+  prior_installed_source: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+  prior_installed_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/evidence/aaemu12-passive-anchor-yaw-offset-v1.yaml
+  - ops/tasks/T-106/HANDOFF.md
+  - ops/evidence/aaemu12-passive-anchor-yaw-offset-integration-v1.yaml
+  - ops/tasks/T-107/HANDOFF.md
+external_write_scope:
+  - aaemu12_integration host/module install and build/test outputs under exact build-only lease
+gates:
+  - exact-candidate-parent-tree-scope-patch-id-and-byte-identical-replay
+  - exact-installed-replay-source-tree-and-unchanged-patch
+  - focused-46-spawn-passive-command-tests-green
+  - clean-build-zero-errors
+  - exactly-one-full-suite-1870-pass-4-intentional-skips-zero-fail
+  - saved-branch-fast-forward-and-clean-installed-state
+validation_boundary: Source integration/install/build/test only. Never start Login/Game/runtime observers, edit deployed BotConfig.json, access/control MySQL/database or ArcheAge client, edit global ledgers/lease, external runtime evidence, reference checkout, AAEmu 3.0, scale, soak, or packaging.
+contract: ops/tasks/T-107/CONTRACT.md
+handoff: ops/tasks/T-107/HANDOFF.md
