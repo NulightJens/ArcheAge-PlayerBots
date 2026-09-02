@@ -1,0 +1,40 @@
+schema_version: 1
+task: T-125
+track: AAEmu12
+verdict: PASS
+tested:
+  module_source: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+  module_tree: 3f473420369dc46bcf3884c90cfc140b58d30c34
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  checkout: 'D:\Codex-Labs\aaemu-1.2-r208022-t124-integration-v1'
+  source_paths_changed_after_binding: 0
+assemblies:
+  game_sha256: 9A74BA78E03C40B54A4EFA8015D4117CA1B2650D5407ADF939532E6B803E6B86
+  unit_tests_sha256: BCE05BB12E4F75600464D6800FAE748731D0445C08445B7C63C410F33B26127D
+full_suite:
+  command: dotnet test AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-build --verbosity normal
+  invocation_count: 1
+  exit_code: 0
+  total: 1961
+  passed: 1957
+  failed: 0
+  skipped: 4
+  runner_duration_seconds: 26.163
+  wall_duration_seconds: 26.733
+  skipped_tests:
+    - Legacy_Darkrunner_Pve_MatchesGolden
+    - Legacy_Darkrunner_Pvp_MatchesGolden
+    - Legacy_Primeval_Pve_MatchesGolden
+    - Legacy_Primeval_Pvp_MatchesGolden
+  log: 'D:\Codex-Labs\evidence\T-125\bot-intelligence-wave-verification-v1\full-suite-once.log'
+  log_bytes: 1439
+  log_sha256: 977C520815C27E8F10B98B6B326B73D1A4C5634A2857325C7D6B1D4EC97E22B8
+build_test_loop:
+  path: ops/BUILD-TEST-LOOP.md
+  linked_from_project_manifest: true
+runtime:
+  mutated: false
+  database_mutated: false
+  client_mutated: false
+  lease_changed: false
+release_boundary: Eligible for a separately leased live smoke; physical behavior remains unproven.

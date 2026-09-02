@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-02
-phase: bot-intelligence-wave-corrected-full-verification
-verdict: active
+phase: bot-intelligence-wave-live-smoke-ready
+verdict: PASS-source-gates
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: 0bff81c350a216b7018099749fd64096fbffc098
-  tested_module_source: fb0a315c9579fb2e7e249e47b37efa07a9404c51
-  integration_evidence: ops/evidence/aaemu12-autonomous-quest-intake-integration-v1.yaml
+  integrated_head: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+  tested_module_source: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+  integration_evidence: ops/evidence/aaemu12-bot-intelligence-wave-verification-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -66,8 +66,8 @@ control_tower:
 next_transition:
   - Retain T-120 as BLOCKED because no eligible level-one Nuian identity exists; preserve its healthy interactive runtime under the existing lease until a separately contracted graceful transition.
   - Retain T-124 as INCOMPLETE: its only full-suite invocation exposed three regressions; the corrected integration passed 251 focused/regression tests and a zero-error clean build.
-  - Run exactly one corrected full suite in T-125 and retain its complete result; do not mutate the healthy T-120 runtime.
-  - After T-125 is green, create a versioned live-smoke task, gracefully transition the retained T-120 runtime, and prove level-one creation, Nuian signpost completion/chaining, and transfer-road route generation without per-action commands.
+  - Retain T-125 as PASS: exactly one corrected full suite produced 1957 passed, four intentional skips, zero failed, and 1961 total.
+  - Create a versioned live-smoke task, gracefully transition the retained T-120 runtime, and prove level-one creation, Nuian signpost completion/chaining, and transfer-road route generation without per-action commands.
   - Resume physical v10 qualification only with a fresh versioned successor root; never reuse the retained T-117 root.
   - Independently integrate only a fresh successor runtime PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.

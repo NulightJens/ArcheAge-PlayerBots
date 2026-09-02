@@ -2,8 +2,8 @@ schema_version: 1
 id: T-125
 title: Verify corrected intelligence wave and lock fast-feedback build loop
 track: AAEmu12
-status: active
-integration: verification-in-progress
+status: done
+integration: verified
 outcome: Run exactly one corrected full AAEmu 1.2 suite against the T-124 integrated source and codify the build/test sequence that gives every feature immediate focused proof before live deployment.
 depends_on: [T-124]
 runtime: {required: false, lease: null}

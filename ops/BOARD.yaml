@@ -1484,8 +1484,8 @@ tasks:
   - id: T-125
     title: Verify corrected intelligence wave and lock fast-feedback build loop
     track: AAEmu12
-    status: active
-    integration: verification-in-progress
+    status: done
+    integration: verified
     depends_on: [T-124]
     runtime_lease: null
     gate: exactly-one-corrected-full-suite-and-durable-fast-feedback-policy
@@ -1494,7 +1494,8 @@ tasks:
     branch: integration/aaemu12-world
     worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
     corrected_source: 1a52e7b44fab76939d9409561bdfa4739f1425e6
-    result: ACTIVE-single-corrected-full-suite
+    evidence_receipt: ops/evidence/aaemu12-bot-intelligence-wave-verification-v1.yaml
+    result: PASS-1957-passed-4-intentional-skips-0-failed-1961-total
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
