@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-110-clean-incomplete-independently-integrated
-    owner_task: null
-    owner_thread_id: null
+    status: claimed-runtime-by-T-112
+    owner_task: T-112
+    owner_thread_id: 01a05ff2-1c7b-7643-9e6a-764fe1594975
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: 2026-09-01
+    released_at: null
     cleanup_receipt: ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
-    baseline_evidence: ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
+    baseline_evidence: ops/evidence/aaemu12-t110-incomplete-integration-v1.yaml
     archeage_client_allowed: false
-    authority_limit: No task may mutate configuration, start Login/Game or observers, or touch runtime evidence until PB-000 commits the fresh exact T-112 task/thread/worktree lease. T-110 stopped after one no-retry fixture response, shut down Game then Login gracefully, restored exact config, retained zero processes/listeners/live logs, and its immutable INCOMPLETE v8 root was independently integrated by T-111.
+    authority_limit: T-112 thread 01a05ff2-1c7b-7643-9e6a-764fe1594975 in worktree C:\Users\jensh\.codex\worktrees\19b4\PB-W00-control alone may create the fresh v9 evidence root once, apply only the nine contracted BotConfig assignments with exact restoration, and start/control the registered AAEmu 1.2 Login/Game plus evidence observers through accepted graceful paths. It may not edit source/tests/global ledgers/reference, build or run tests, access/control MySQL/database or ArcheAge client, touch predecessor evidence, persist the full 18399744-row enumeration, force-stop, retry fixture mutation, or perform destructive cleanup.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

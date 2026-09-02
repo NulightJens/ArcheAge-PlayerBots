@@ -2,17 +2,17 @@ schema_version: 1
 id: T-112
 title: Prove parser- and scheduler-safe row-valid one-zone autonomy v9
 track: AAEmu12
-status: prepared-awaiting-exact-thread-binding
+status: active
 integration: pending
 outcome: Prove the existing installed AAEmu 1.2 PlayerBots module through two complete three-bot native fixture lifecycle/refill waves and a clean distinct-PID restart, using the proven literal-row angular plan with an authoritative named-grade parser and observer-safe exhaustive planning.
 depends_on: [T-111]
 runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
 branch: codex-managed-worktree
-worktree: pending-exact-thread-binding
-owner_client_thread_id: pending-exact-thread-binding
-owner_thread_id: pending-exact-thread-binding
+worktree: 'C:\Users\jensh\.codex\worktrees\19b4\PB-W00-control'
+owner_client_thread_id: client-new-thread:faa00f23-f232-468c-9914-bf62a81f03a9
+owner_thread_id: 01a05ff2-1c7b-7643-9e6a-764fe1594975
 inputs:
-  dispatch_base: pending-preparation-commit
+  dispatch_base: f3cb885141e7d91cfb05bdeca7bb9f0fc14406ec
   installed_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
   installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
   host_base: 62e3eb1d87da01194802ac886cd500134facad28

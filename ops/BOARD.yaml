@@ -1233,16 +1233,16 @@ tasks:
   - id: T-112
     title: Prove parser- and scheduler-safe row-valid one-zone autonomy v9
     track: AAEmu12
-    status: prepared-awaiting-exact-thread-binding
+    status: active
     integration: pending
     depends_on: [T-111]
-    runtime_lease: pending-exact-thread-binding
+    runtime_lease: aaemu12-claimed-exact-thread-binding
     gate: physical-parser-scheduler-row-valid-two-wave-restart-dwell
     contract: ops/tasks/T-112/CONTRACT.md
-    owner_client_thread_id: pending-exact-thread-binding
-    owner_thread_id: pending-exact-thread-binding
-    worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
+    owner_client_thread_id: client-new-thread:faa00f23-f232-468c-9914-bf62a81f03a9
+    owner_thread_id: 01a05ff2-1c7b-7643-9e6a-764fe1594975
+    worktree: 'C:\Users\jensh\.codex\worktrees\19b4\PB-W00-control'
+    dispatch_base: f3cb885141e7d91cfb05bdeca7bb9f0fc14406ec
     evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
     tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
