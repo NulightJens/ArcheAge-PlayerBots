@@ -1,0 +1,203 @@
+schema_version: 1
+id: aaemu12-t108-incomplete-integration-v1
+recorded_at: '2026-09-01T19:10:48.7354029-06:00'
+verdict: PASS-receipt-integrity
+subject_verdict: INCOMPLETE-row-oriented-planner-zero-eligible
+
+integration_identity:
+  task: T-109
+  task_thread_id: 01a05fa3-b4c5-73b1-b3cc-2d0db58dc2a7
+  owner_client_thread_id: client-new-thread:4290d23d-1419-4ff3-9566-34793b51b939
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\19cc\PB-W00-control'
+  dispatch_base: fe5341e8eeba37f20a57bd1fbec7899db78be9f8
+  preparation_commit: fe5341e8eeba37f20a57bd1fbec7899db78be9f8
+  binding_commit: d3745799a5c7460739eca3a1ee8a79c3227485c8
+  binding_tree: fe946c42bd96f0100b26c5b37bddb550f536d730
+  saved_branch: integration/aaemu12-world
+  saved_branch_head_before: d3745799a5c7460739eca3a1ee8a79c3227485c8
+
+candidate:
+  commit: 9a9a84532f321fbe6755bcf4957c41c8503086e5
+  parent: 3c1329cf6e95a46998f889aa71cdd2673aa7ea4c
+  tree: 01079a441274e1f999307d2b978768fe1c23bf72
+  stable_patch_id: 8268d979f201ad25ef2e531fff6e5a7d911d8af2
+  exact_path_count: 2
+  replay_commit: 4a8fb0be83cda70113b683d00cd04c2772257a5e
+  replay_parent: d3745799a5c7460739eca3a1ee8a79c3227485c8
+  replay_tree: 84cdb8bcc823dc59b721d7938464de0bf599f167
+  replay_stable_patch_id: 8268d979f201ad25ef2e531fff6e5a7d911d8af2
+  stable_patch_id_match: true
+  exact_paths:
+    - path: ops/evidence/aaemu12-t108-one-zone-autonomy-v7.yaml
+      candidate_blob: b27a7b46967848d10d957adc801fd2679e679196
+      replay_blob: b27a7b46967848d10d957adc801fd2679e679196
+      byte_identical: true
+    - path: ops/tasks/T-108/HANDOFF.md
+      candidate_blob: 7853550e9a950ea9f0b38304b039c47284b6c639
+      replay_blob: 7853550e9a950ea9f0b38304b039c47284b6c639
+      byte_identical: true
+  rejected_scope_changes: 0
+
+immutable_evidence:
+  root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
+  access: read-only-no-audit-output-written
+  manifest_path: manifest.json
+  manifest_schema: t108.manifest.v1
+  manifest_length: 4408
+  manifest_sha256: ba96e8171f58bf1c0c4b600d5ae5d1c981aadb865d8e05ccf260e02f2e8a3430
+  terminal_result_path: terminal-result.json
+  terminal_result_sha256: 3bba737efc1f047ec80e63e99f158cd823028c60170a20ee9b940173c2e6144c
+  declared_payload_file_count: 31
+  manifest_entry_count: 31
+  actual_payload_file_count: 31
+  verified_payload_file_count: 31
+  declared_payload_total_bytes: 86107
+  verified_payload_total_bytes: 86107
+  duplicate_paths: 0
+  unsafe_paths: 0
+  missing_paths: 0
+  length_mismatches: 0
+  sha256_mismatches: 0
+  unlisted_payloads: 0
+  reparse_points: 0
+  result: 31-of-31-length-and-sha256-green-zero-missing-mismatched-duplicate-unsafe-unlisted-or-reparse
+
+independent_planner_recomputation:
+  implementation: independent-single-precision-angular-placement-mirror
+  retained_transform_bits:
+    - {bot_id: 20001, x_bits: 1179957453, y_bits: 1179643699, yaw_bits: -1065611208}
+    - {bot_id: 20002, x_bits: 1179966362, y_bits: 1179652403, yaw_bits: -1065603658}
+    - {bot_id: 20003, x_bits: 1179971072, y_bits: 1179656704, yaw_bits: -1065577192}
+  decoded_transforms:
+    - {bot_id: 20001, x: 13614.2, y: 13307.8, yaw: -3.93849}
+    - {bot_id: 20002, x: 13622.9, y: 13316.3, yaw: -3.94029}
+    - {bot_id: 20003, x: 13627.5, y: 13320.5, yaw: -3.9466}
+  distances: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+  ordered_angles: [0, 45, 90, 135, 180, -135, -90, -45]
+  transform_operations:
+    deg_to_rad: 'float offset = MathF.PI / 180f * (float)angle'
+    rotation: 'for nonzero angle only, heading = sourceYaw + offset'
+    placement: 'fx = sourceX + (-(distance * MathF.Sin(heading))); fy = sourceY + (distance * MathF.Cos(heading))'
+  total_tuple_count: 681472
+  finite_tuple_count: 681472
+  within_60_tuple_count: 681472
+  pairwise_at_least_20_tuple_count: 427142
+  row_oriented_ownership_at_least_3_tuple_count: 142
+  row_oriented_pairwise_and_ownership_tuple_count: 0
+  column_oriented_ownership_at_least_3_tuple_count: 4386
+  column_oriented_pairwise_and_ownership_tuple_count: 2430
+  interpretation: >-
+    The 2430 count belongs only to the diagnostic column-oriented comparison.
+    The literal row-oriented gate remains failed with zero combined tuples.
+  retained_extrema:
+    best_row_ownership_overall:
+      choice_orders: [1, 7, 3]
+      distances: [5, 5, 5]
+      angles: [45, -45, 135]
+      minimum_pairwise: 14.077234576620343
+      minimum_row_ownership_margin: 4.331053860687011
+      rejection: pairwise-below-20
+    best_row_ownership_with_pairwise_gate:
+      choice_orders: [40, 57, 59]
+      distances: [30, 40, 40]
+      angles: [0, 45, 135]
+      minimum_pairwise: 31.4392794642013
+      minimum_row_ownership_margin: 2.1637271317828493
+      rejection: ownership-margin-below-3
+    maximum_minimum_pairwise:
+      choice_orders: [87, 74, 85]
+      distances: [55, 50, 55]
+      angles: [-45, 90, -135]
+      minimum_pairwise: 96.48496349078026
+      minimum_row_ownership_margin: -4.8120719752989345
+
+sealed_preflight_and_cleanup_evidence:
+  verdict: PASS-CLEAN-PRE-RUNTIME-BLOCKER
+  bot_config_length: 1772
+  bot_config_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  bot_config_exact_original_bytes: true
+  login_started: false
+  game_started: false
+  client_started_or_accessed: false
+  client_observer_started: false
+  autonomy_observer_started: false
+  fixture_command_count: 0
+  fixture_spawn_count: 0
+  directed_gameplay_command_count: 0
+  database_queries_or_mutations: 0
+  final_game_login_process_count: 0
+  final_observer_process_count: 0
+  final_archeage_client_process_count: 0
+  final_required_listener_count: 0
+  final_runtime_log_entry_count: 0
+  mysql_process_ids_unchanged: [6308, 8076]
+  reference_head_exact_clean_detached: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_module_head_exact_clean_detached: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  installed_module_tree_exact: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  host_overlay_entry_count: 30
+  host_overlay_reverse_patch_check: true
+  host_overlay_unchanged: true
+  forced_termination: false
+  build_or_test_invocation_count: 0
+
+retained_candidate_anomalies:
+  - category: mandatory-selftest-stop
+    finding: >-
+      The mandatory self-test stopped on eligible count zero before creating
+      selftest/result.json; immutable negative fixtures and failure.json retain
+      the attempt.
+  - category: read-only-diagnostic-argument
+    finding: >-
+      One follow-up diagnostic command passed its argument incorrectly and
+      produced no durable output or external state change.
+  - category: margin-comparison-source-v1
+    finding: >-
+      The first comparison source had a compile-time parenthesis error and
+      produced no comparison output. The retained create-new v2 source
+      independently produced the exact row and column counts.
+  - category: manifest-script-v1
+    finding: >-
+      The first manifest script failed before manifest creation while
+      aggregating ordered-dictionary lengths. The retained create-new v2 script
+      sealed and validated the root without overwriting any evidence payload.
+
+integrator_verifier_anomalies:
+  - category: initial-unbound-default-checkout
+    finding: >-
+      The task initially opened at project-default commit 92ec73ba11ad8de5c37d7b4d763998714c416392,
+      where no ops task files existed. The integrator made no changes and waited
+      for PB-000's exact committed binding before switching detached.
+  - category: startup-output-window
+    finding: >-
+      The first combined required-startup read exceeded the output window.
+      CURRENT.yaml and BOARD.yaml were then reread completely in contiguous
+      bounded chunks before replay or artifact creation.
+
+integration:
+  candidate_replayed_byte_identically: true
+  integrator_authored_paths:
+    - ops/evidence/aaemu12-t108-incomplete-integration-v1.yaml
+    - ops/tasks/T-109/HANDOFF.md
+  saved_branch_update: fast-forward-only-through-replay-and-artifact-commits
+  history_rewritten: false
+  runtime_started_or_controlled: false
+  external_evidence_mutated: false
+  runtime_host_module_config_reference_mutated: false
+  global_ledgers_lease_or_workspace_registry_mutated: false
+  database_or_client_accessed: false
+  source_tests_or_tooling_mutated: false
+  builds_or_tests_consumed: false
+
+retained_boundaries:
+  - T-108 remains INCOMPLETE because the literal row-oriented planner has zero pairwise-and-ownership-valid tuples.
+  - The diagnostic 2430 column-oriented count is not runtime acceptance and does not weaken or reopen the failed row gate.
+  - No live transform plan, selected tuple, fixture request, fixture response, fixture spawn, actual fixture geometry, or world mutation exists.
+  - No lifecycle wave, refill, second wave, distinct-PID restart, second delay, rebootstrap, or two-minute dwell was attempted or proven.
+  - Runtime behavior, scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+  - T-037 remains blocked behind a fresh row-valid successor runtime PASS and its independent integration.
+
+control_action: >-
+  PB-000 may accept this independently verified retained T-108 INCOMPLETE
+  receipt and bind a fresh row-valid successor with a new lease and v8 root.
+  Never reinterpret T-108 as runtime acceptance and never reuse or overwrite
+  the immutable v7 evidence root.
