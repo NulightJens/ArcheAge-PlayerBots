@@ -2,18 +2,19 @@ schema_version: 1
 id: T-115
 title: Integrate and install per-runtime recovery observability
 track: AAEmu12
-status: prepared-awaiting-exact-thread-binding
+status: active
 integration: pending
 outcome: Independently replay the exact T-114 seven-path candidate onto the saved lineage, install that replay into the registered AAEmu 1.2 module under a committed build-only lease, rerun observer and focused proof, one clean build, and exactly one full-suite integration wave, then fast-forward the saved branch with a durable receipt.
 depends_on: [T-114]
 runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
 branch: codex-managed-worktree
-worktree: pending-exact-thread-binding
-owner_client_thread_id: pending-exact-thread-binding
-owner_thread_id: pending-exact-thread-binding
+worktree: 'C:\Users\jensh\.codex\worktrees\e53c\PB-W00-control'
+owner_client_thread_id: client-new-thread:4d5d7429-1e31-4234-b650-40d3ffee5906
+owner_thread_id: 01a0604f-ad55-70f2-a138-001a1b6fd92f
 inputs:
-  dispatch_base: pending-preparation-commit
-  saved_head: d147bebce60ee79588e0e430f47969e9ba8662b9
+  dispatch_base: e47bcf03468bdeeee73877c95936a1a969e58eb5
+  accepted_head_before_preparation: d147bebce60ee79588e0e430f47969e9ba8662b9
+  saved_head: exact-binding-commit-reported-by-PB-000
   source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
   source_candidate_parent: d335ce053c58eaebbfda384412ef9be5c9d839da
   source_candidate_tree: e342e61030ae78ab411fa7cb6a109839199ca610

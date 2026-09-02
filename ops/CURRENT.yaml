@@ -776,15 +776,16 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-runtime-recovery-observability-v1.yaml
     proof: PASS-91-observer-46-command-34-host-build-0-errors-source-focused
   - task: T-115
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending-exact-thread-binding
-    task_thread_id: pending-exact-thread-binding
-    codex_worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
-    saved_head: d147bebce60ee79588e0e430f47969e9ba8662b9
+    state: active-exact-thread-bound-build-only-integration
+    client_thread_id: client-new-thread:4d5d7429-1e31-4234-b650-40d3ffee5906
+    task_thread_id: 01a0604f-ad55-70f2-a138-001a1b6fd92f
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\e53c\PB-W00-control'
+    dispatch_base: e47bcf03468bdeeee73877c95936a1a969e58eb5
+    accepted_head_before_preparation: d147bebce60ee79588e0e430f47969e9ba8662b9
+    saved_head: exact-binding-commit-reported-by-PB-000
     contract: ops/tasks/T-115/CONTRACT.md
     source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
-    runtime_lease: pending-exact-build-only-thread-binding
+    runtime_lease: aaemu12-build-only
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

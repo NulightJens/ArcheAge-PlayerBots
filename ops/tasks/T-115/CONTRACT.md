@@ -24,9 +24,14 @@ listed blobs:
 - `ops/tasks/T-114/HANDOFF.md`:
   `26ea78391a6ccc95cdd77e5c8f0dd4ea697af154`.
 
-Replay those blobs byte-identically onto committed saved head
-`d147bebce60ee79588e0e430f47969e9ba8662b9`. Do not merge the writer
-worktree, rewrite candidate content, or add source changes. Independently
+Replay those blobs byte-identically onto PB-000's exact committed T-115
+binding, whose sole parent must be preparation commit
+`e47bcf03468bdeeee73877c95936a1a969e58eb5`; PB-000 reports the binding's
+exact commit and tree after creating it. The accepted integration head before
+preparation was `d147bebce60ee79588e0e430f47969e9ba8662b9`; it is ancestry evidence,
+not the replay parent. Require the saved branch clean at the exact binding
+before replay. Do not merge the writer worktree, rewrite candidate content, or
+add source changes. Independently
 confirm the production diff is limited to the invariant per-runtime botdebug
 line and observation-only schema-v2 parser, with no lifecycle, scheduler,
 mover, brain, combat, recovery, logout, or host-metric semantic change.

@@ -1300,17 +1300,18 @@ tasks:
   - id: T-115
     title: Integrate and install per-runtime recovery observability
     track: AAEmu12
-    status: prepared-awaiting-exact-thread-binding
+    status: active
     integration: pending
     depends_on: [T-114]
-    runtime_lease: pending-exact-build-only-thread-binding
+    runtime_lease: aaemu12-build-only
     gate: exact-replay-install-focused-build-full-suite-integration
     contract: ops/tasks/T-115/CONTRACT.md
-    owner_client_thread_id: pending-exact-thread-binding
-    owner_thread_id: pending-exact-thread-binding
-    worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
-    saved_head: d147bebce60ee79588e0e430f47969e9ba8662b9
+    owner_client_thread_id: client-new-thread:4d5d7429-1e31-4234-b650-40d3ffee5906
+    owner_thread_id: 01a0604f-ad55-70f2-a138-001a1b6fd92f
+    worktree: 'C:\Users\jensh\.codex\worktrees\e53c\PB-W00-control'
+    dispatch_base: e47bcf03468bdeeee73877c95936a1a969e58eb5
+    accepted_head_before_preparation: d147bebce60ee79588e0e430f47969e9ba8662b9
+    saved_head: exact-binding-commit-reported-by-PB-000
     source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
 
   - id: T-037
