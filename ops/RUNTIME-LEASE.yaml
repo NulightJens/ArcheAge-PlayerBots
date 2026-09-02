@@ -17,7 +17,7 @@ runtimes:
     cleanup_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     baseline_evidence: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     archeage_client_allowed: false
-    authority_limit: No task may mutate configuration, start Login/Game or observers, or touch runtime evidence until PB-000 commits a fresh exact task/thread/worktree lease. T-112 shut down Game then Login gracefully, stopped all observers cooperatively, restored exact config, retained zero processes/listeners/live logs, and sealed its immutable FAIL v9 root. T-113 is evidence-only and has no runtime lease.
+    authority_limit: No task may mutate configuration, start Login/Game or observers, or touch runtime evidence until PB-000 commits a fresh exact task/thread/worktree lease. T-112 shut down Game then Login gracefully, stopped all observers cooperatively, restored exact config, retained zero processes/listeners/live logs, and sealed its immutable FAIL v9 root; T-113 independently integrated that retained FAIL. T-114 is source-and-test-only and has no runtime lease.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

@@ -1234,7 +1234,7 @@ tasks:
     title: Prove parser- and scheduler-safe row-valid one-zone autonomy v9
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated-by-T-113
     depends_on: [T-111]
     runtime_lease: released-clean-fail
     gate: physical-parser-scheduler-row-valid-two-wave-restart-dwell
@@ -1255,8 +1255,8 @@ tasks:
   - id: T-113
     title: Independently integrate retained T-112 runtime failure
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-112]
     runtime_lease: null
     gate: sealed-fail-evidence-replay-and-integration
@@ -1269,6 +1269,27 @@ tasks:
     source_candidate_parent: 4277111312b09d549b29b0e3af8c0e4ebcef2168
     source_candidate_tree: 6059e88d2f58c9c1632f2ff2194f47618ef6fb75
     evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
+    replay_commit: 94879030e015ab15bbfd5e896df6f9f6deb86476
+    replay_tree: b5f9383a8cd37c10415245ca65d83bc3c84f01fa
+    integrated_commit: 5108bcedb6782a24b0095fab88b021a628c01f8b
+    integrated_tree: 432dbdb84234899886e5a8e01c613ff798f70441
+    evidence_receipt: ops/evidence/aaemu12-t112-fail-integration-v1.yaml
+    result: PASS-receipt-integrity-subject-retained-FAIL
+
+  - id: T-114
+    title: Expose per-runtime recovery suspension metrics
+    track: AAEmu12
+    status: prepared-awaiting-exact-thread-binding
+    integration: pending
+    depends_on: [T-113]
+    runtime_lease: null
+    gate: per-runtime-recovery-observability-source-correction
+    contract: ops/tasks/T-114/CONTRACT.md
+    owner_client_thread_id: pending-exact-thread-binding
+    owner_thread_id: pending-exact-thread-binding
+    worktree: pending-exact-thread-binding
+    dispatch_base: pending-preparation-commit
+    source_base: 5108bcedb6782a24b0095fab88b021a628c01f8b
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -1278,4 +1299,4 @@ tasks:
     depends_on: [fresh-post-angular-placement-runtime-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-112-is-retained-FAIL-pending-independent-integration-and-source-correction-before-a-fresh-runtime-successor-PASS
+    blocker: T-112-retained-FAIL-is-independently-integrated-and-T-037-awaits-T-114-per-runtime-observability-integration-plus-a-fresh-runtime-successor-PASS

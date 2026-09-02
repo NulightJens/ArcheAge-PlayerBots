@@ -3,7 +3,7 @@ id: T-112
 title: Prove parser- and scheduler-safe row-valid one-zone autonomy v9
 track: AAEmu12
 status: done
-integration: pending
+integration: integrated-by-T-113
 outcome: Prove the existing installed AAEmu 1.2 PlayerBots module through two complete three-bot native fixture lifecycle/refill waves and a clean distinct-PID restart, using the proven literal-row angular plan with an authoritative named-grade parser and observer-safe exhaustive planning.
 depends_on: [T-111]
 runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}

@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: integrate-retained-t112-fail-and-correct-recovery
+phase: dispatch-per-runtime-recovery-observability-correction
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: bc7279be7a5d5fb0aff1d04474ddb1fc7480f66c
+  integrated_head: 5108bcedb6782a24b0095fab88b021a628c01f8b
   tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
-  integration_evidence: ops/evidence/aaemu12-t110-incomplete-integration-v1.yaml
+  integration_evidence: ops/evidence/aaemu12-t112-fail-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -35,7 +35,7 @@ runtime:
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
     evidence_receipt: aaemu12-t112-one-zone-autonomy-v9
-    integration_receipt: aaemu12-t110-incomplete-integration-v1
+    integration_receipt: aaemu12-t112-fail-integration-v1
     installed_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
     database_identity: aaemu12_database_public_alpha_v1
@@ -44,7 +44,7 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 46-passed-0-skipped-0-failed
     unit_tests: 1870-passed-4-intentional-skips-0-failed-exactly-one-invocation
-    runtime_boundary: T-112 proved named-grade parsing, observer-safe dual planning, delayed ordered bootstrap at 180068.861 ms, and a correct three-object wave-one batch. Native recovery then failed because bots 20001 and 20003 advanced brain/mover counters during the fixed-counter window; complete-ledger audit also retained 2569-2597 ms graceful-shutdown tail gaps. No retry, wave two, or restart occurred. Game then Login stopped gracefully, config was restored byte-exact, the 8602-payload root is sealed, and the lease is released.
+    runtime_boundary: T-112 proved named-grade parsing, observer-safe dual planning, delayed ordered bootstrap at 180068.861 ms, and a correct three-object wave-one batch. Its validator then failed because shared host brain/mover totals advanced while bots 20001 and 20003 were awaiting recovery; source inspection shows BotHostTask already suspends each pending runtime before mover/brain steps, but botdebug exposes only shared totals. Complete-ledger audit also retained 2569-2597 ms graceful-shutdown tail gaps. T-113 independently integrated the immutable 8602-payload FAIL. Game then Login stopped gracefully, config was restored byte-exact, and the lease remains released.
 
 control_tower:
   permanent_task:
@@ -55,9 +55,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Independently verify and integrate the exact two-path T-112 candidate as retained FAIL without runtime or evidence mutation.
-  - Diagnose and correct the authoritative recovery fixed-counter behavior for bots 20001 and 20003 in an isolated source task, with focused tests and no runtime mutation.
-  - Correct future shutdown-tail observer orchestration without weakening the 2000 ms live observer ceiling, then use a fresh versioned runtime root.
+  - Bind T-114 to expose invariant per-runtime brain/mover/error counters through botdebug and the observation-only parser, with deterministic multi-runtime suspension proof and no lifecycle behavior change.
+  - Independently integrate T-114, install it in the lease-controlled AAEmu 1.2 host, run focused verification and one full suite for the integration wave.
+  - In the fresh runtime successor, validate recovery against per-runtime counters and cooperatively stop autonomy observers after final valid samples but before each graceful Game shutdown, without weakening the 2000 ms live ceiling.
   - Preserve the proven parser, literal-row geometry, semantic hash, observer-safe planning, and exact 180-second bootstrap requirements.
   - Independently integrate only a fresh successor runtime PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
@@ -729,7 +729,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t110-incomplete-integration-v1.yaml
     proof: PASS-receipt-integrity-5918-of-5918-payloads-subject-retained-INCOMPLETE
   - task: T-112
-    state: done-retained-fail-awaiting-independent-integration
+    state: done-integrated-retained-fail-by-t113
     client_thread_id: client-new-thread:faa00f23-f232-468c-9914-bf62a81f03a9
     task_thread_id: 01a05ff2-1c7b-7643-9e6a-764fe1594975
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\19b4\PB-W00-control'
@@ -746,7 +746,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     proof: FAIL-wave-one-fixed-counter-recovery-and-shutdown-tail-observer-gaps-clean-sealed-8602-payload-root
   - task: T-113
-    state: active-exact-thread-bound-retained-fail-integration
+    state: done-integrated-retained-t112-fail
     client_thread_id: client-new-thread:1596f314-1e91-4d05-8074-0502d8fe85c9
     task_thread_id: 01a06020-e7f8-7bc2-8d1e-d1b281ef764c
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\18b5\PB-W00-control'
@@ -754,6 +754,21 @@ prepared_workstreams:
     contract: ops/tasks/T-113/CONTRACT.md
     source_candidate: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
     evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
+    runtime_lease: null
+    replay_commit: 94879030e015ab15bbfd5e896df6f9f6deb86476
+    replay_tree: b5f9383a8cd37c10415245ca65d83bc3c84f01fa
+    integrated_head: 5108bcedb6782a24b0095fab88b021a628c01f8b
+    integrated_tree: 432dbdb84234899886e5a8e01c613ff798f70441
+    evidence_receipt: ops/evidence/aaemu12-t112-fail-integration-v1.yaml
+    proof: PASS-receipt-integrity-8602-of-8602-payloads-subject-retained-FAIL
+  - task: T-114
+    state: prepared-awaiting-exact-thread-binding
+    client_thread_id: pending-exact-thread-binding
+    task_thread_id: pending-exact-thread-binding
+    codex_worktree: pending-exact-thread-binding
+    dispatch_base: pending-preparation-commit
+    source_base: 5108bcedb6782a24b0095fab88b021a628c01f8b
+    contract: ops/tasks/T-114/CONTRACT.md
     runtime_lease: null
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
@@ -999,6 +1014,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: aaemu12-released-after-T-112-clean-fail
+  runtime_lease: aaemu12-released-after-T-112-clean-fail-independently-integrated
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-PB-000-commits-a-fresh-exact-successor-lease
+  runtime_start: prohibited-during-T-114-source-work-and-until-PB-000-commits-a-fresh-exact-successor-lease

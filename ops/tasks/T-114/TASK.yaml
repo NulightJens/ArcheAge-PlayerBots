@@ -1,0 +1,40 @@
+schema_version: 1
+id: T-114
+title: Expose per-runtime recovery suspension metrics
+track: AAEmu12
+status: prepared-awaiting-exact-thread-binding
+integration: pending
+outcome: Expose each bot runtime's own brain, mover, and error counters through botdebug and the observation-only autonomy parser, and prove that a recovery-suspended runtime stays fixed while other runtimes legitimately advance shared host totals.
+depends_on: [T-113]
+runtime: {required: false, lease: null}
+branch: codex-managed-worktree
+worktree: pending-exact-thread-binding
+owner_client_thread_id: pending-exact-thread-binding
+owner_thread_id: pending-exact-thread-binding
+inputs:
+  dispatch_base: pending-preparation-commit
+  source_base: 5108bcedb6782a24b0095fab88b021a628c01f8b
+  retained_fail_receipt: ops/evidence/aaemu12-t112-fail-integration-v1.yaml
+  tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - scripts/autonomy/AutonomyObserver.psm1
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - scripts/autonomy/tests/Test-AutonomyObserver.ps1
+  - ops/evidence/aaemu12-runtime-recovery-observability-v1.yaml
+  - ops/tasks/T-114/HANDOFF.md
+gates:
+  - exact-invariant-per-runtime-brain-mover-error-metrics-line
+  - strict-online-parser-captures-exactly-one-runtime-metrics-record
+  - missing-duplicate-malformed-or-negative-runtime-metrics-fail-closed
+  - suspended-runtime-counters-fixed-while-second-runtime-and-host-totals-advance
+  - existing-lifecycle-step-order-and-recovery-suspension-behavior-unchanged
+  - complete-focused-command-host-behavior-and-observer-tests-green
+  - isolated-aaemu12-build-zero-errors-and-compatibility-patch-unchanged
+validation_boundary: Module source, observation-only parser, focused tests, isolated AAEmu 1.2 build, receipt, and handoff only. Do not edit global ledgers/lease/workspace registry, installed/reference host, deployed config, runtime evidence, database, client, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite or start Login, Game, clients, or observers against a live host.
+contract: ops/tasks/T-114/CONTRACT.md
+handoff: ops/tasks/T-114/HANDOFF.md
