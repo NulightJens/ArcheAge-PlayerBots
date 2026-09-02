@@ -1364,16 +1364,16 @@ tasks:
   - id: T-118
     title: Run interactive PlayerBots live demo
     track: AAEmu12
-    status: ready
+    status: active
     integration: not-requested
     depends_on: [T-116]
-    runtime_lease: aaemu12-pending-exact-thread-binding
+    runtime_lease: aaemu12
     gate: interactive-server-ready-three-bot-director-and-user-launcher-handoff
     contract: ops/tasks/T-118/CONTRACT.md
-    owner_client_thread_id: pending-create-thread
-    owner_thread_id: pending-create-thread
-    worktree: pending-create-thread
-    dispatch_base: pending-preparation-commit
+    owner_client_thread_id: client-new-thread:a9966d94-fda8-44b2-b01e-4c408b892742
+    owner_thread_id: 01a06077-2a1b-7733-be91-e4bae28f2d55
+    worktree: 'C:\Users\jensh\.codex\worktrees\1d32\PB-W00-control'
+    dispatch_base: 10f7dbafbb34876fb865c695b584ab3e1bf923a7
     tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
     installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
 

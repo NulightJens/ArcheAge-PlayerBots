@@ -820,15 +820,15 @@ prepared_workstreams:
     runtime_lease: released-to-interactive-T-118
     retained_root_state: exactly-config-original-bin-plus-empty-prepared-directories-no-runtime-evidence
   - task: T-118
-    state: ready-pending-exact-thread-binding
-    client_thread_id: pending-create-thread
-    task_thread_id: pending-create-thread
-    codex_worktree: pending-create-thread
-    dispatch_base: pending-preparation-commit
+    state: active-exact-thread-bound-interactive-session
+    client_thread_id: client-new-thread:a9966d94-fda8-44b2-b01e-4c408b892742
+    task_thread_id: 01a06077-2a1b-7733-be91-e4bae28f2d55
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\1d32\PB-W00-control'
+    dispatch_base: 10f7dbafbb34876fb865c695b584ab3e1bf923a7
     contract: ops/tasks/T-118/CONTRACT.md
     tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
     installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
-    runtime_lease: aaemu12-pending-exact-thread-binding
+    runtime_lease: aaemu12
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
@@ -1073,6 +1073,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: aaemu12-reserved-for-T-118-pending-exact-thread-binding
+  runtime_lease: aaemu12-leased-to-T-118-interactive-session
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-exact-T-118-thread-worktree-binding-is-committed
+  runtime_start: authorized-only-for-exact-T-118-thread-worktree-under-committed-lease

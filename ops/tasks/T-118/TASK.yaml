@@ -2,17 +2,17 @@ schema_version: 1
 id: T-118
 title: Run interactive PlayerBots live demo
 track: AAEmu12
-status: ready
+status: active
 integration: not-requested
 outcome: Leave the pinned AAEmu 1.2 Login and Game servers healthy with the three-bot activity Director running in zone 221, then open the matching AAEmu launcher for the user's authentication and in-game inspection.
 depends_on: [T-116]
 runtime: {required: true, lease: aaemu12, archeage_client_allowed: true}
 branch: codex-managed-worktree
-worktree: pending-create-thread
-owner_client_thread_id: pending-create-thread
-owner_thread_id: pending-create-thread
+worktree: 'C:\Users\jensh\.codex\worktrees\1d32\PB-W00-control'
+owner_client_thread_id: client-new-thread:a9966d94-fda8-44b2-b01e-4c408b892742
+owner_thread_id: 01a06077-2a1b-7733-be91-e4bae28f2d55
 inputs:
-  dispatch_base: pending-preparation-commit
+  dispatch_base: 10f7dbafbb34876fb865c695b584ab3e1bf923a7
   installed_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
   installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
   host_base: 62e3eb1d87da01194802ac886cd500134facad28
