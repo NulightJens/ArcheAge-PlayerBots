@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-02
-phase: bot-identity-quest-lifecycle-and-world-navigation-source-wave
+phase: bot-intelligence-wave-immediate-integration-tests
 verdict: active
 
 source:
@@ -65,8 +65,8 @@ control_tower:
 
 next_transition:
   - Retain T-120 as BLOCKED because no eligible level-one Nuian identity exists; preserve its healthy interactive runtime under the existing lease until a separately contracted graceful transition.
-  - Complete T-121 server-owned arbitrary-level identity creation, T-122 autonomous doodad kill-quest lifecycle, and T-123 transfer-road world navigation as independent source-only candidates.
-  - Independently integrate reviewed candidates, create a versioned successor test identity without destructive database reset, and run a fresh hands-off Nuian signpost acceptance, objective, report, chaining, and road-routing proof under a new runtime task and lease.
+  - Integrate exact T-121, T-122, and T-123 candidates once in T-124; run all 128 retained focused tests immediately on the merged build, then the once-per-wave full suite.
+  - After T-124 is green, create a versioned live-smoke task, gracefully transition the retained T-120 runtime, and prove level-one creation, Nuian signpost completion/chaining, and transfer-road route generation without per-action commands.
   - Resume physical v10 qualification only with a fresh versioned successor root; never reuse the retained T-117 root.
   - Independently integrate only a fresh successor runtime PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
@@ -870,32 +870,44 @@ prepared_workstreams:
     runtime_lease: aaemu12
     result: BLOCKED-source-integrated-exploratory-high-level-intake-partial-no-level-one-or-objective-proof
   - task: T-121
-    state: active-source-only
+    state: done-source-ready-for-T124
     owner_thread_id: 01a0635b-a425-7611-b165-d93d455f69e5
     branch: codex/T-121-bot-identities
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\8064\PB-W00-control'
     source_base: 0bff81c350a216b7018099749fd64096fbffc098
     contract: ops/tasks/T-121/CONTRACT.md
     runtime_lease: null
-    result: ACTIVE-server-owned-arbitrary-level-bot-identity-factory
+    candidate_commit: b48708522ebfc26a43124f6e43a9de7bed55af35
+    result: READY-server-owned-arbitrary-level-bot-identity-factory-50-focused-build-zero-errors
   - task: T-122
-    state: active-source-only
+    state: done-source-ready-for-T124
     owner_thread_id: 01a0635b-be45-7e41-95ec-571100c7d02d
     branch: codex/T-122-autonomous-signpost-kill-quest
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\fcc6\PB-W00-control'
     source_base: 0bff81c350a216b7018099749fd64096fbffc098
     contract: ops/tasks/T-122/CONTRACT.md
     runtime_lease: null
-    result: ACTIVE-doodad-kill-report-reward-and-nearby-quest-chaining
+    candidate_commit: 215dbbbd12464ec41eff87251eee2cd348a2c5f2
+    result: READY-doodad-kill-report-reward-and-nearby-quest-chaining-48-focused-build-zero-errors
   - task: T-123
-    state: active-source-only
+    state: done-source-ready-for-T124
     owner_thread_id: 01a0635b-d9b7-71c3-9b35-84cf9dd32dd7
     branch: codex/T-123-transfer-road-navigation
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\67c9\PB-W00-control'
     source_base: 0bff81c350a216b7018099749fd64096fbffc098
     contract: ops/tasks/T-123/CONTRACT.md
     runtime_lease: null
-    result: ACTIVE-transfer-road-world-navigation-graph
+    candidate_commit: 9340ceb8f58c0be8aa00e83e530bce442bfa5273
+    handoff_commit: 463924b7876585bd76763f533b8f63a929a76cc3
+    result: READY-transfer-road-world-navigation-graph-30-focused-build-zero-errors
+  - task: T-124
+    state: active-integration-tests
+    task_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    codex_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+    integration_base: af840ab8a90640f3e1ff964490a3e241ef5b999b
+    contract: ops/tasks/T-124/CONTRACT.md
+    runtime_lease: null
+    result: ACTIVE-one-merged-build-128-focused-tests-and-once-per-wave-full-suite
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
