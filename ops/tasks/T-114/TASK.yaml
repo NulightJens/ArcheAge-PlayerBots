@@ -2,7 +2,7 @@ schema_version: 1
 id: T-114
 title: Expose per-runtime recovery suspension metrics
 track: AAEmu12
-status: active
+status: done
 integration: pending
 outcome: Expose each bot runtime's own brain, mover, and error counters through botdebug and the observation-only autonomy parser, and prove that a recovery-suspended runtime stays fixed while other runtimes legitimately advance shared host totals.
 depends_on: [T-113]
@@ -38,3 +38,9 @@ gates:
 validation_boundary: Module source, observation-only parser, focused tests, isolated AAEmu 1.2 build, receipt, and handoff only. Do not edit global ledgers/lease/workspace registry, installed/reference host, deployed config, runtime evidence, database, client, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite or start Login, Game, clients, or observers against a live host.
 contract: ops/tasks/T-114/CONTRACT.md
 handoff: ops/tasks/T-114/HANDOFF.md
+candidate_commit: 3b9824e5250caf90a6347cb286e31deda993a0cf
+candidate_parent: d335ce053c58eaebbfda384412ef9be5c9d839da
+candidate_tree: e342e61030ae78ab411fa7cb6a109839199ca610
+candidate_patch_id: f2172268436a17d0642b837ed5e0696b81c316d6
+evidence_receipt: ops/evidence/aaemu12-runtime-recovery-observability-v1.yaml
+result: PASS-91-observer-46-command-34-host-build-0-errors-source-focused

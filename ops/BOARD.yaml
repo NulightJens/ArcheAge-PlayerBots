@@ -1279,7 +1279,7 @@ tasks:
   - id: T-114
     title: Expose per-runtime recovery suspension metrics
     track: AAEmu12
-    status: active
+    status: done
     integration: pending
     depends_on: [T-113]
     runtime_lease: null
@@ -1290,6 +1290,28 @@ tasks:
     worktree: 'C:\Users\jensh\.codex\worktrees\dd89\PB-W00-control'
     dispatch_base: d335ce053c58eaebbfda384412ef9be5c9d839da
     source_base: 5108bcedb6782a24b0095fab88b021a628c01f8b
+    candidate_commit: 3b9824e5250caf90a6347cb286e31deda993a0cf
+    candidate_parent: d335ce053c58eaebbfda384412ef9be5c9d839da
+    candidate_tree: e342e61030ae78ab411fa7cb6a109839199ca610
+    candidate_patch_id: f2172268436a17d0642b837ed5e0696b81c316d6
+    evidence_receipt: ops/evidence/aaemu12-runtime-recovery-observability-v1.yaml
+    result: PASS-91-observer-46-command-34-host-build-0-errors-source-focused
+
+  - id: T-115
+    title: Integrate and install per-runtime recovery observability
+    track: AAEmu12
+    status: prepared-awaiting-exact-thread-binding
+    integration: pending
+    depends_on: [T-114]
+    runtime_lease: pending-exact-build-only-thread-binding
+    gate: exact-replay-install-focused-build-full-suite-integration
+    contract: ops/tasks/T-115/CONTRACT.md
+    owner_client_thread_id: pending-exact-thread-binding
+    owner_thread_id: pending-exact-thread-binding
+    worktree: pending-exact-thread-binding
+    dispatch_base: pending-preparation-commit
+    saved_head: d147bebce60ee79588e0e430f47969e9ba8662b9
+    source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -1299,4 +1321,4 @@ tasks:
     depends_on: [fresh-post-angular-placement-runtime-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-112-retained-FAIL-is-independently-integrated-and-T-037-awaits-T-114-per-runtime-observability-integration-plus-a-fresh-runtime-successor-PASS
+    blocker: T-112-retained-FAIL-is-independently-integrated-and-T-037-awaits-T-115-observability-install-full-suite-PASS-plus-a-fresh-runtime-successor-PASS

@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: dispatch-per-runtime-recovery-observability-correction
+phase: integrate-and-install-per-runtime-recovery-observability
 verdict: active
 
 source:
@@ -55,8 +55,7 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-114 to expose invariant per-runtime brain/mover/error counters through botdebug and the observation-only parser, with deterministic multi-runtime suspension proof and no lifecycle behavior change.
-  - Independently integrate T-114, install it in the lease-controlled AAEmu 1.2 host, run focused verification and one full suite for the integration wave.
+  - Bind T-115 to replay the exact seven-path T-114 candidate, install it in the lease-controlled AAEmu 1.2 host, run focused verification and exactly one full suite for the integration wave.
   - In the fresh runtime successor, validate recovery against per-runtime counters and cooperatively stop autonomy observers after final valid samples but before each graceful Game shutdown, without weakening the 2000 ms live ceiling.
   - Preserve the proven parser, literal-row geometry, semantic hash, observer-safe planning, and exact 180-second bootstrap requirements.
   - Independently integrate only a fresh successor runtime PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
@@ -762,7 +761,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t112-fail-integration-v1.yaml
     proof: PASS-receipt-integrity-8602-of-8602-payloads-subject-retained-FAIL
   - task: T-114
-    state: active-exact-thread-bound-source-correction
+    state: done-source-focused-awaiting-t115-integration
     client_thread_id: client-new-thread:7145dd31-8b47-446e-a820-61dff9253848
     task_thread_id: 01a0603d-80a4-7bf3-b70f-6ba0f0d139f5
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\dd89\PB-W00-control'
@@ -770,6 +769,22 @@ prepared_workstreams:
     source_base: 5108bcedb6782a24b0095fab88b021a628c01f8b
     contract: ops/tasks/T-114/CONTRACT.md
     runtime_lease: null
+    candidate_commit: 3b9824e5250caf90a6347cb286e31deda993a0cf
+    candidate_parent: d335ce053c58eaebbfda384412ef9be5c9d839da
+    candidate_tree: e342e61030ae78ab411fa7cb6a109839199ca610
+    candidate_patch_id: f2172268436a17d0642b837ed5e0696b81c316d6
+    evidence_receipt: ops/evidence/aaemu12-runtime-recovery-observability-v1.yaml
+    proof: PASS-91-observer-46-command-34-host-build-0-errors-source-focused
+  - task: T-115
+    state: prepared-awaiting-exact-thread-binding
+    client_thread_id: pending-exact-thread-binding
+    task_thread_id: pending-exact-thread-binding
+    codex_worktree: pending-exact-thread-binding
+    dispatch_base: pending-preparation-commit
+    saved_head: d147bebce60ee79588e0e430f47969e9ba8662b9
+    contract: ops/tasks/T-115/CONTRACT.md
+    source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
+    runtime_lease: pending-exact-build-only-thread-binding
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
@@ -1016,4 +1031,4 @@ wave_2:
     evidence_receipt: aaemu12-startup-log-integration-v2
   runtime_lease: aaemu12-released-after-T-112-clean-fail-independently-integrated
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-during-T-114-source-work-and-until-PB-000-commits-a-fresh-exact-successor-lease
+  runtime_start: prohibited-during-T-115-build-only-integration-and-until-PB-000-commits-a-fresh-exact-successor-lease

@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-112-clean-fail
-    owner_task: null
-    owner_thread_id: null
+    status: pending-T-115-exact-build-only-thread-binding
+    owner_task: T-115
+    owner_thread_id: pending-exact-thread-binding
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -17,7 +17,7 @@ runtimes:
     cleanup_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     baseline_evidence: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     archeage_client_allowed: false
-    authority_limit: No task may mutate configuration, start Login/Game or observers, or touch runtime evidence until PB-000 commits a fresh exact task/thread/worktree lease. T-112 shut down Game then Login gracefully, stopped all observers cooperatively, restored exact config, retained zero processes/listeners/live logs, and sealed its immutable FAIL v9 root; T-113 independently integrated that retained FAIL. T-114 is source-and-test-only and has no runtime lease.
+    authority_limit: No task may write the registered integration host until PB-000 commits the exact T-115 thread/worktree build-only binding. Once bound, T-115 may install/build/test only; it may not mutate deployed BotConfig, start Login/Game or observers, touch runtime evidence, access database/client, or perform runtime control. T-112's immutable v9 FAIL remains independently integrated and the live runtime remains stopped.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
