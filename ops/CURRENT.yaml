@@ -762,11 +762,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t112-fail-integration-v1.yaml
     proof: PASS-receipt-integrity-8602-of-8602-payloads-subject-retained-FAIL
   - task: T-114
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending-exact-thread-binding
-    task_thread_id: pending-exact-thread-binding
-    codex_worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
+    state: active-exact-thread-bound-source-correction
+    client_thread_id: client-new-thread:7145dd31-8b47-446e-a820-61dff9253848
+    task_thread_id: 01a0603d-80a4-7bf3-b70f-6ba0f0d139f5
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\dd89\PB-W00-control'
+    dispatch_base: d335ce053c58eaebbfda384412ef9be5c9d839da
     source_base: 5108bcedb6782a24b0095fab88b021a628c01f8b
     contract: ops/tasks/T-114/CONTRACT.md
     runtime_lease: null
