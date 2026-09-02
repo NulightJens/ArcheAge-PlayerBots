@@ -4,7 +4,11 @@ Verdict: `BLOCKED-no-existing-eligible-level-one-nuian`. The exact T-119
 candidate is integrated, installed, built, enabled, and running successfully,
 but the contracted physical quest-intake demonstration cannot start because
 the leased public-alpha dataset contains no eligible level-one Nuian identity.
-No bot was admitted and no quest state was fabricated.
+Continued exploratory testing did admit the three requested level-51 ScaleBots:
+all three independently discovered a nearby side-quest giver, walked normally,
+and accepted through AAEmu's native quest lifecycle. This is a real partial
+pass for intake only, not a level-one, story-first, or five-quest pass. No quest
+state was forced or fabricated.
 
 ## Source, install, and build
 
@@ -41,9 +45,10 @@ No bot was admitted and no quest state was fabricated.
   listeners 1234/1237 belong to Login and 1239/1250/1280 belong to Game. The
   Game API is responsive, Game `Error.log` is absent, and no startup
   `ERROR`/`FATAL` marker was found.
-- Live metrics at `2026-09-02T08:43:40.9966162Z` reported runtime count 0,
-  active bots 0, spawn count 0, and spawn failures 0. The Director runtime
-  snapshot reports `enabled=false`, `reason=disabled`.
+- Final live metrics at `2026-09-02T13:15:35.6168649Z` report runtime count 2,
+  active bots 2, zero runtime overlaps, zero tick errors, and zero spawn
+  failures. The Director runtime snapshot still reports `enabled=false`,
+  `reason=disabled`.
 
 ## Exact physical blocker
 
@@ -62,28 +67,66 @@ identities. Therefore no existing level-one Nuian is available to admit.
 T-120 explicitly forbids character creation, database/quest-state edits, and
 GM quest acceptance/progress/report/completion. It also requires reporting
 this exact condition instead of substituting an ineligible character. I did
-not down-level a ScaleBot, create a character, query or write the database,
-admit a bot, teleport a bot, or issue any quest lifecycle command.
+not down-level a ScaleBot, create a character, query or write the database, or
+issue any quest mutation command. Read-only `/botdebug` and `/botquest`
+scan/status/inspect diagnostics were used. One explicit initial teleport staged
+ScaleBot000 beside the user, as allowed by the contract; no later controller
+movement was a teleport.
 
-Consequently, client-visible bot admission, story-first selection, ordinary
-walking, native story-plus-side acceptance, and botdebug/log/journal agreement
-remain unproven. This is an infrastructure/data-fixture blocker, not a passing
-gameplay result.
+Consequently, client-visible level-one admission, live story-first selection,
+native story-plus-side acceptance on one chosen giver, and level-one
+botdebug/log/journal agreement remain unproven. This is still an
+infrastructure/data-fixture blocker for the official verdict.
+
+## Continued exploratory live result
+
+The high-level diagnostic nevertheless proved a useful slice of the shipped
+behavior on all three requested ScaleBots:
+
+- `ScaleBot000` (ID 20001, level 51) selected Maude object 44869/template 3597
+  and side quest 330, `A Friendly Reminder`, from 33.58 m. `/botdebug`
+  coordinates advanced from `(15532.366,15349.34,131.92491)` to
+  `(15556.891,15353.397,129.07507)` under normal movement. The server emitted
+  `StartQuest, Quest:330` and `quest_intake_accepted`; read-only native status
+  then reported `Ready / QuestComplete`. With no other eligible nearby start,
+  the older one-kill lifecycle took over and the bot later logged out normally.
+- `ScaleBot001` (ID 20002, level 51) received no staging or teleport. It
+  selected Guard object 44953/template 8172 and side quest 6628, `Gladiator`,
+  from 29.13 m, walked normally, emitted native `StartQuest`, and reached
+  `Ready / QuestComplete` with intake counters `accepted=1, rejected=0`.
+- `ScaleBot002` (ID 20003, level 51) independently repeated the same native
+  result from 30.57 m with no staging or teleport and the same clean counters.
+
+The authoritative server markers are in the live Game log at lines
+450712/450714/450765/450770 for ScaleBot000,
+454957/454959/455419/455442 for ScaleBot001, and
+455827/455829/455938/455961 for ScaleBot002. The recent log slice has zero
+`ERROR`/`FATAL` markers and Game `Error.log` remains absent.
+
+This demonstrates nearby exact-NPC discovery, bounded normal travel, and
+native acceptance on three independent identities. It also exposes the exact
+product boundary: this controller is intake-only. It does not perform quest
+objectives, travel to reporters, choose rewards, report quests, or chain the
+first five Nuian quests. Every live candidate was `main_story=false`, so the
+story-priority rule remains unit-tested but not physically demonstrated.
 
 ## Runtime state and exact next action
 
 The healthy client, launcher, Login, and Game processes were intentionally
 left running for the user, as the contract requires. `Over` remains in-world;
-there are zero bots. Quest intake remains enabled and the original config bytes
-remain retained for later exact restoration. Later cleanup must close the
-client/launcher normally, stop Game then Login gracefully, restore the retained
-bytes, and prove zero processes/listeners.
+ScaleBot001 and ScaleBot002 remain active and idle after their native accepts;
+ScaleBot000 logged out normally. Quest intake remains enabled and the original
+config bytes remain retained for later exact restoration. Later cleanup must
+close the client/launcher normally, stop Game then Login gracefully, restore
+the retained bytes, and prove zero processes/listeners.
 
 The next action is a separately authorized data-provisioning task: create and
 retain a clean level-one Nuian bot identity in a versioned successor test
 dataset without deleting/resetting the current database. Then rerun only the
 blocked physical acceptance against that explicit identity under the AAEmu 1.2
-runtime lease. Do not reinterpret this T-120 result as a pass.
+runtime lease. A separate implementation task is required for autonomous
+objective execution, reporting, reward selection, and multi-quest chaining.
+Do not reinterpret this T-120 result as a full pass.
 
 Full machine-readable receipt:
 `ops/evidence/aaemu12-autonomous-quest-intake-integration-v1.yaml`.
