@@ -870,26 +870,32 @@ prepared_workstreams:
     runtime_lease: aaemu12
     result: BLOCKED-source-integrated-exploratory-high-level-intake-partial-no-level-one-or-objective-proof
   - task: T-121
-    state: ready-source-only
-    owner_thread_id: pending-control-tower-binding
+    state: active-source-only
+    owner_thread_id: 01a0635b-a425-7611-b165-d93d455f69e5
+    branch: codex/T-121-bot-identities
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\8064\PB-W00-control'
     source_base: 0bff81c350a216b7018099749fd64096fbffc098
     contract: ops/tasks/T-121/CONTRACT.md
     runtime_lease: null
-    result: READY-server-owned-arbitrary-level-bot-identity-factory
+    result: ACTIVE-server-owned-arbitrary-level-bot-identity-factory
   - task: T-122
-    state: ready-source-only
-    owner_thread_id: pending-control-tower-binding
+    state: active-source-only
+    owner_thread_id: 01a0635b-be45-7e41-95ec-571100c7d02d
+    branch: codex/T-122-autonomous-signpost-kill-quest
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\fcc6\PB-W00-control'
     source_base: 0bff81c350a216b7018099749fd64096fbffc098
     contract: ops/tasks/T-122/CONTRACT.md
     runtime_lease: null
-    result: READY-doodad-kill-report-reward-and-nearby-quest-chaining
+    result: ACTIVE-doodad-kill-report-reward-and-nearby-quest-chaining
   - task: T-123
-    state: ready-source-only
-    owner_thread_id: pending-control-tower-binding
+    state: active-source-only
+    owner_thread_id: 01a0635b-d9b7-71c3-9b35-84cf9dd32dd7
+    branch: codex/T-123-transfer-road-navigation
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\67c9\PB-W00-control'
     source_base: 0bff81c350a216b7018099749fd64096fbffc098
     contract: ops/tasks/T-123/CONTRACT.md
     runtime_lease: null
-    result: READY-transfer-road-world-navigation-graph
+    result: ACTIVE-transfer-road-world-navigation-graph
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

@@ -2,13 +2,15 @@ schema_version: 1
 id: T-122
 title: Implement autonomous signpost kill-quest completion
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: An idle bot can discover and natively accept an eligible NPC or signpost quest, understand a supported monster-kill objective, find and defeat valid targets, report through the authoritative quest endpoint, choose a deterministic valid reward, and continue scanning nearby quests without per-quest operator commands.
 depends_on: [T-119]
 runtime: {required: false, lease: null}
 source_base: 0bff81c350a216b7018099749fd64096fbffc098
-owner_thread_id: pending-control-tower-binding
+branch: codex/T-122-autonomous-signpost-kill-quest
+worktree: 'C:\Users\jensh\.codex\worktrees\fcc6\PB-W00-control'
+owner_thread_id: 01a0635b-be45-7e41-95ec-571100c7d02d
 write_scope:
   - src/AAEmu.Game/Bots/Questing/
   - src/AAEmu.Game/Bots/Host/BotRuntime.cs

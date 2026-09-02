@@ -1418,41 +1418,47 @@ tasks:
   - id: T-121
     title: Implement server-owned arbitrary-level bot identities
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-120]
     runtime_lease: null
     gate: dedicated-bot-account-arbitrary-level-native-creation-and-admission
     contract: ops/tasks/T-121/CONTRACT.md
-    owner_thread_id: pending-control-tower-binding
+    owner_thread_id: 01a0635b-a425-7611-b165-d93d455f69e5
+    branch: codex/T-121-bot-identities
+    worktree: 'C:\Users\jensh\.codex\worktrees\8064\PB-W00-control'
     source_base: 0bff81c350a216b7018099749fd64096fbffc098
-    result: READY-source-only
+    result: ACTIVE-source-only
 
   - id: T-122
     title: Implement autonomous signpost kill-quest completion
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-119]
     runtime_lease: null
     gate: doodad-intake-monster-hunt-report-reward-and-nearby-chaining
     contract: ops/tasks/T-122/CONTRACT.md
-    owner_thread_id: pending-control-tower-binding
+    owner_thread_id: 01a0635b-be45-7e41-95ec-571100c7d02d
+    branch: codex/T-122-autonomous-signpost-kill-quest
+    worktree: 'C:\Users\jensh\.codex\worktrees\fcc6\PB-W00-control'
     source_base: 0bff81c350a216b7018099749fd64096fbffc098
-    result: READY-source-only
+    result: ACTIVE-source-only
 
   - id: T-123
     title: Implement transfer-road world navigation graph
     track: AAEmu12
-    status: ready
+    status: active
     integration: pending
     depends_on: [T-116]
     runtime_lease: null
     gate: transfer-road-snapshot-normalized-graph-and-deterministic-routing
     contract: ops/tasks/T-123/CONTRACT.md
-    owner_thread_id: pending-control-tower-binding
+    owner_thread_id: 01a0635b-d9b7-71c3-9b35-84cf9dd32dd7
+    branch: codex/T-123-transfer-road-navigation
+    worktree: 'C:\Users\jensh\.codex\worktrees\67c9\PB-W00-control'
     source_base: 0bff81c350a216b7018099749fd64096fbffc098
-    result: READY-source-only
+    result: ACTIVE-source-only
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
