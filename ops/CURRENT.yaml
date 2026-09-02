@@ -712,7 +712,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
     proof: INCOMPLETE-planner-and-bootstrap-pass-grade-Weak-parser-rejection-autonomy-gap-clean-sealed-5918-payload-root
   - task: T-111
-    state: prepared-unbound-retained-incomplete-integration
+    state: active-exact-thread-bound-retained-incomplete-integration
+    client_thread_id: client-new-thread:76cfa252-f51d-44ea-ab5f-3646117da15d
+    task_thread_id: 01a05fdd-0f55-75f3-8f95-a596588c6520
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c1ab\PB-W00-control'
+    dispatch_base: 8e1659331eba986f4c6742c3e77d29173a7f8fbe
     contract: ops/tasks/T-111/CONTRACT.md
     source_candidate: 1b914085d64b3957b3c394d9b9f75600c91e2a96
     evidence_root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
