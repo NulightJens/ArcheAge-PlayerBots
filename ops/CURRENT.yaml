@@ -678,7 +678,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t108-one-zone-autonomy-v7.yaml
     proof: INCOMPLETE-row-oriented-0-eligible-column-oriented-2430-clean-pre-runtime-31-payload-root
   - task: T-109
-    state: prepared-unbound-retained-incomplete-integration
+    state: active-exact-thread-bound-retained-incomplete-integration
+    client_thread_id: client-new-thread:4290d23d-1419-4ff3-9566-34793b51b939
+    task_thread_id: 01a05fa3-b4c5-73b1-b3cc-2d0db58dc2a7
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\19cc\PB-W00-control'
+    dispatch_base: fe5341e8eeba37f20a57bd1fbec7899db78be9f8
     contract: ops/tasks/T-109/CONTRACT.md
     source_candidate: 9a9a84532f321fbe6755bcf4957c41c8503086e5
     evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
