@@ -150,7 +150,7 @@ workspaces:
     path: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
     access: lease-controlled
     lease: aaemu12
-    expected_state: fresh-absent-until-exact-T108-binding
+    expected_state: fresh-absent-claimed-by-exact-T108-until-first-create
 
   aaemu12_client:
     role: matching-client-fixture

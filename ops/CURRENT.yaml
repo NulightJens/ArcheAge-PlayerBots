@@ -30,7 +30,7 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-after-t107-angular-placement-install
+    state: stopped-clean-pre-t108-runtime-lease-held
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
@@ -661,11 +661,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-passive-anchor-yaw-offset-integration-v1.yaml
     proof: PASS-46-focused-build-0-errors-79-warnings-full-1870-pass-4-intentional-skips-once
   - task: T-108
-    state: prepared-awaiting-exact-thread-and-runtime-lease-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
-    dispatch_base: pending-control-prep-commit
+    state: active-exact-thread-bound-runtime-lease-held
+    client_thread_id: client-new-thread:fb735534-d444-4ee6-933c-fe69d503e388
+    task_thread_id: 01a05f89-2616-7f82-945d-a397a839f024
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\48c0\PB-W00-control'
+    dispatch_base: 6a4444cba7bb3e2e9452787afe4a85b24ee522f3
     tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
     evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
@@ -915,6 +915,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: released-after-T-107-integration-install-qualification
+  runtime_lease: aaemu12-held-by-T-108-thread-01a05f89-2616-7f82-945d-a397a839f024
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-T-108-exact-thread-and-runtime-lease-binding-is-committed
+  runtime_start: authorized-only-for-T-108-exact-v7-contract-and-graceful-control-paths

@@ -2,17 +2,17 @@ schema_version: 1
 id: T-108
 title: Prove angular two-wave one-zone autonomy and restart
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Run a fresh sealed physical proof that enumerates exact live distance/angle fixture geometry before one-shot mutation, then proves two independent three-bot lifecycle/refill waves and a clean distinct-PID restart with ordered rebootstrap and sustained target population.
 depends_on: [T-107]
-runtime: {required: true, lease: aaemu12-pending-exact-binding, archeage_client_allowed: false}
+runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
 branch: codex-managed-worktree
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\48c0\PB-W00-control'
+owner_client_thread_id: client-new-thread:fb735534-d444-4ee6-933c-fe69d503e388
+owner_thread_id: 01a05f89-2616-7f82-945d-a397a839f024
 inputs:
-  dispatch_base: pending-control-prep-commit
+  dispatch_base: 6a4444cba7bb3e2e9452787afe4a85b24ee522f3
   installed_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
   installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
   host_base: 62e3eb1d87da01194802ac886cd500134facad28
