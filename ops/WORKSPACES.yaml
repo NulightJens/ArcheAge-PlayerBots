@@ -162,9 +162,9 @@ workspaces:
   aaemu12_t112_evidence_v9:
     role: one-zone-parser-and-scheduler-safe-autonomous-director-runtime-evidence-v9
     path: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
-    access: task-evidence-write
+    access: evidence-only
     lease: aaemu12
-    expected_state: absent-before-first-run-then-immutable
+    expected_state: immutable-retained-fail-recovery-counters-and-shutdown-tail-gap
 
   aaemu12_client:
     role: matching-client-fixture

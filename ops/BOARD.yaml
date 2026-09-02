@@ -1233,10 +1233,10 @@ tasks:
   - id: T-112
     title: Prove parser- and scheduler-safe row-valid one-zone autonomy v9
     track: AAEmu12
-    status: active
+    status: done
     integration: pending
     depends_on: [T-111]
-    runtime_lease: aaemu12-claimed-exact-thread-binding
+    runtime_lease: released-clean-fail
     gate: physical-parser-scheduler-row-valid-two-wave-restart-dwell
     contract: ops/tasks/T-112/CONTRACT.md
     owner_client_thread_id: client-new-thread:faa00f23-f232-468c-9914-bf62a81f03a9
@@ -1246,6 +1246,29 @@ tasks:
     evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
     tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    candidate_commit: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
+    candidate_parent: 4277111312b09d549b29b0e3af8c0e4ebcef2168
+    candidate_tree: 6059e88d2f58c9c1632f2ff2194f47618ef6fb75
+    evidence_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
+    result: FAIL-wave-one-fixed-counter-recovery-and-shutdown-tail-observer-gaps-clean-sealed
+
+  - id: T-113
+    title: Independently integrate retained T-112 runtime failure
+    track: AAEmu12
+    status: prepared-awaiting-exact-thread-binding
+    integration: pending
+    depends_on: [T-112]
+    runtime_lease: null
+    gate: sealed-fail-evidence-replay-and-integration
+    contract: ops/tasks/T-113/CONTRACT.md
+    owner_client_thread_id: pending-exact-thread-binding
+    owner_thread_id: pending-exact-thread-binding
+    worktree: pending-exact-thread-binding
+    dispatch_base: pending-preparation-commit
+    source_candidate: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
+    source_candidate_parent: 4277111312b09d549b29b0e3af8c0e4ebcef2168
+    source_candidate_tree: 6059e88d2f58c9c1632f2ff2194f47618ef6fb75
+    evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -1255,4 +1278,4 @@ tasks:
     depends_on: [fresh-post-angular-placement-runtime-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-110-retained-INCOMPLETE-is-independently-integrated-and-T-037-awaits-a-fresh-T-112-parser-and-observer-safe-runtime-PASS-plus-independent-integration
+    blocker: T-112-is-retained-FAIL-pending-independent-integration-and-source-correction-before-a-fresh-runtime-successor-PASS

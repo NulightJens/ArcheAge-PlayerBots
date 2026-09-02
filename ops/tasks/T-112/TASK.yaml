@@ -2,7 +2,7 @@ schema_version: 1
 id: T-112
 title: Prove parser- and scheduler-safe row-valid one-zone autonomy v9
 track: AAEmu12
-status: active
+status: done
 integration: pending
 outcome: Prove the existing installed AAEmu 1.2 PlayerBots module through two complete three-bot native fixture lifecycle/refill waves and a clean distinct-PID restart, using the proven literal-row angular plan with an authoritative named-grade parser and observer-safe exhaustive planning.
 depends_on: [T-111]
@@ -47,3 +47,7 @@ gates:
 validation_boundary: Physical AAEmu 1.2 one-zone runtime proof only. Do not edit module source, tests, global ledgers/lease/workspace registry, registered reference, database, client, AAEmu 3.0, scale, soak, packaging, or predecessor evidence. No build/full suite, directed gameplay commands, fixture retries, runtime force-stop, destructive cleanup, or persistence of the full 18,399,744-row enumeration.
 contract: ops/tasks/T-112/CONTRACT.md
 handoff: ops/tasks/T-112/HANDOFF.md
+candidate_commit: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
+candidate_tree: 6059e88d2f58c9c1632f2ff2194f47618ef6fb75
+evidence_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
+result: FAIL-wave-one-fixed-counter-recovery-and-shutdown-tail-observer-gaps
