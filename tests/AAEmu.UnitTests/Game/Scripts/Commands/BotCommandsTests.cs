@@ -923,6 +923,10 @@ public class BotCommandsTests
             var transformLine = messages.Single(message =>
                 message.StartsWith("[botdebug] Transform: ", StringComparison.Ordinal));
             var lifeDeltaIndex = messages.IndexOf("[botdebug] Life delta: pending");
+            const string expectedQuestIntake =
+                "[botdebug] Quest intake: state=disabled, npc=none:none, quest=none, main_story=none, " +
+                "reason=not_started, at=none, last_accepted_at=none, retry_at=none, accepted=0, rejected=0";
+            var questIntakeIndex = messages.IndexOf(expectedQuestIntake);
             var runtimeMetricsIndex = messages.IndexOf(expectedRuntimeMetrics);
             var hostMetricsIndex = messages.IndexOf(expectedHostMetrics);
 
@@ -940,7 +944,8 @@ public class BotCommandsTests
             await Assert.That(messages).Contains("[botdebug] State: Combat, Previous: Idle, Forced: Grinding");
             await Assert.That(messages).Contains("[botdebug] Target: bot3, CurrentTarget: bot3");
             await Assert.That(messages.Count(message => message == expectedRuntimeMetrics)).IsEqualTo(1);
-            await Assert.That(runtimeMetricsIndex).IsEqualTo(lifeDeltaIndex + 1);
+            await Assert.That(questIntakeIndex).IsEqualTo(lifeDeltaIndex + 1);
+            await Assert.That(runtimeMetricsIndex).IsEqualTo(questIntakeIndex + 1);
             await Assert.That(hostMetricsIndex).IsEqualTo(runtimeMetricsIndex + 1);
             await Assert.That(messages.Count(message => message.StartsWith("[botdebug] Host metrics: ", StringComparison.Ordinal))).IsEqualTo(1);
 
@@ -1082,6 +1087,9 @@ public class BotCommandsTests
                 message.Contains("fingerprint=unavailable"));
             await Assert.That(output.Messages).Contains("[botdebug] Life completion: pending");
             await Assert.That(output.Messages).Contains("[botdebug] Life delta: pending");
+            await Assert.That(output.Messages).Contains(
+                "[botdebug] Quest intake: state=disabled, npc=none:none, quest=none, main_story=none, " +
+                "reason=not_started, at=none, last_accepted_at=none, retry_at=none, accepted=0, rejected=0");
 
             bot.Hp = 80;
             bot.Mp = 70;

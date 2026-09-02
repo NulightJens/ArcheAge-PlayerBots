@@ -83,6 +83,11 @@ namespace AAEmu.Game.Models.Game.Bots
         public int IterationsPerTick { get; set; } = 10;
         public int ExpireActionTimeMs { get; set; } = 5000;
         public int GlobalSkillDelayMs { get; set; } = 600;
+        /// <summary>Opt-in autonomous discovery, movement, and normal NPC acceptance of nearby quests.</summary>
+        public bool QuestIntakeEnabled { get; set; }
+        public double QuestIntakeScanRadius { get; set; } = 60.0;
+        public double QuestIntakeInteractionRadius { get; set; } = 6.0;
+        public int QuestIntakeRetryBackoffMs { get; set; } = 30000;
         public bool ActivityDirectorEnabled { get; set; }
         public uint ActivityDirectorZoneId { get; set; }
         public List<uint> ActivityDirectorCharacterIds { get; set; } = [];
@@ -193,6 +198,15 @@ namespace AAEmu.Game.Models.Game.Bots
             IterationsPerTick = Math.Max(1, IterationsPerTick);
             ExpireActionTimeMs = Math.Max(0, ExpireActionTimeMs);
             GlobalSkillDelayMs = Math.Max(0, GlobalSkillDelayMs);
+            QuestIntakeScanRadius = Math.Clamp(
+                double.IsFinite(QuestIntakeScanRadius) ? QuestIntakeScanRadius : 60.0,
+                1.0,
+                100.0);
+            QuestIntakeInteractionRadius = Math.Clamp(
+                double.IsFinite(QuestIntakeInteractionRadius) ? QuestIntakeInteractionRadius : 6.0,
+                1.0,
+                Math.Min(10.0, QuestIntakeScanRadius));
+            QuestIntakeRetryBackoffMs = Math.Clamp(QuestIntakeRetryBackoffMs, 1000, 600000);
             ActivityDirectorCharacterIds ??= [];
             ActivityDirectorInitialDelayMs = Math.Clamp(
                 ActivityDirectorInitialDelayMs,

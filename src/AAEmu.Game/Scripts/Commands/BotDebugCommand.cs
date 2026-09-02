@@ -137,6 +137,15 @@ namespace AAEmu.Game.Scripts.Commands
                     $"Life completion: {Snapshot(life.ProgressionCompletion)}");
                 CommandManager.SendNormalText(this, messageOutput,
                     $"Life delta: {Delta(life.ProgressionDelta)}");
+                var questIntake = runtime.QuestIntakeController.Inspect();
+                CommandManager.SendNormalText(this, messageOutput,
+                    string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                        $"Quest intake: state={QuestIntakeState(questIntake.State)}, " +
+                        $"npc={Optional(questIntake.NpcTemplateId)}:{Optional(questIntake.NpcObjectId)}, " +
+                        $"quest={Optional(questIntake.QuestId)}, main_story={Optional(questIntake.MainStory)}, " +
+                        $"reason={questIntake.DecisionReason ?? "none"}, at={Timestamp(questIntake.DecisionAt)}, " +
+                        $"last_accepted_at={Timestamp(questIntake.LastAcceptedAt)}, retry_at={Timestamp(questIntake.RetryAt)}, " +
+                        $"accepted={questIntake.AcceptedCount}, rejected={questIntake.RejectedCount}"));
                 var runtimeMetrics = runtime.Metrics;
                 CommandManager.SendNormalText(this, messageOutput,
                     string.Create(System.Globalization.CultureInfo.InvariantCulture,
@@ -196,5 +205,14 @@ namespace AAEmu.Game.Scripts.Commands
             BotLifeRecoveryState.Completed => "completed",
             _ => "unavailable"
         };
+
+        private static string QuestIntakeState(Bots.Questing.BotQuestIntakeState state) =>
+            state.ToString().ToLowerInvariant();
+
+        private static string Optional(uint? value) =>
+            value?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none";
+
+        private static string Optional(bool? value) =>
+            value.HasValue ? value.Value.ToString().ToLowerInvariant() : "none";
     }
 }

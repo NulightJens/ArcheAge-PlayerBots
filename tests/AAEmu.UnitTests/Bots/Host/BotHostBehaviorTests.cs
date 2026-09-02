@@ -1,12 +1,17 @@
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Host;
 using AAEmu.Game.Bots.Life;
+using AAEmu.Game.Bots.Questing;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Bots.Kernel;
 using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Models.Game.Bots;
+using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.Quests;
+using AAEmu.Game.Models.Game.Quests.Templates;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.NPChar;
@@ -635,6 +640,67 @@ public class BotHostBehaviorTests
     }
 
     [Test]
+    public async Task QuestIntake_ClaimsTheHostTickBeforeTheOneKillGrindSelector()
+    {
+        var config = BotConfig.Instance;
+        var previousEnabled = config.QuestIntakeEnabled;
+        var previousSearchRadius = config.SearchRadius;
+        var previousScanRadius = config.QuestIntakeScanRadius;
+        var previousInteractionRadius = config.QuestIntakeInteractionRadius;
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 2, 12, 0, 0, TimeSpan.Zero));
+        var quest = new QuestTemplate { Id = 7001, ChapterIdx = 1, QuestIdx = 1 };
+        var accepted = new List<uint>();
+        var controller = new BotQuestIntakeController(
+            npcTemplateId => npcTemplateId == 5500 ? [quest] : [],
+            (bot, questId, _) =>
+            {
+                accepted.Add(questId);
+                bot.Quests.ActiveQuests[questId] =
+                    (Quest)RuntimeHelpers.GetUninitializedObject(typeof(Quest));
+                return true;
+            },
+            (_, _, _) => throw new InvalidOperationException("nearby quest giver must not request movement"),
+            _ => { },
+            (_, position) => position.Z,
+            null);
+        var host = MakeLifecycleHost(time, _ => false);
+        var runtime = MakeLifecycleRuntime(6501, time, questIntakeController: controller);
+        var questNpc = runtime.Bot.ParentWorld.GetNpc(9901);
+        questNpc.TemplateId = 5500;
+        questNpc.Transform.Local.SetPosition(new Vector3(2, 0, 0));
+        BotTestFixture.SetPrivateField(questNpc, "_parentWorld", runtime.Bot.ParentWorld);
+        runtime.Blackboard.Register(BotValues.NearbyNpcIds, new ManualValue<List<uint>>([questNpc.ObjId]));
+        runtime.Brain = new NoopBrain(runtime.Bot, runtime.CombatState, runtime.Broadcaster);
+
+        try
+        {
+            config.QuestIntakeEnabled = true;
+            config.SearchRadius = 60;
+            config.QuestIntakeScanRadius = 60;
+            config.QuestIntakeInteractionRadius = 6;
+            host.Register(runtime);
+
+            host.HostTask.Execute();
+
+            var intake = runtime.QuestIntakeController.Inspect();
+            await Assert.That(accepted).IsEquivalentTo(new uint[] { 7001 });
+            await Assert.That(runtime.Bot.Quests.HasQuest(7001)).IsTrue();
+            await Assert.That(intake.AcceptedCount).IsEqualTo(1);
+            await Assert.That(runtime.LifeController.Inspect().Activity).IsNull();
+            await Assert.That(runtime.CombatState.KillGoal).IsNull();
+            await Assert.That(runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Idle);
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+            config.QuestIntakeEnabled = previousEnabled;
+            config.SearchRadius = previousSearchRadius;
+            config.QuestIntakeScanRadius = previousScanRadius;
+            config.QuestIntakeInteractionRadius = previousInteractionRadius;
+        }
+    }
+
+    [Test]
     public async Task NaturalRecoveryWait_SuspendsMoverAndBrainUntilWorldResourcesAreFull()
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 2, 0, TimeSpan.Zero));
@@ -1155,7 +1221,8 @@ public class BotHostBehaviorTests
         uint id,
         FakeTimeProvider time,
         BotLifeController controller = null,
-        uint? directorZone = null)
+        uint? directorZone = null,
+        BotQuestIntakeController questIntakeController = null)
     {
         var bot = new LifecycleCharacterMock
         {
@@ -1165,6 +1232,7 @@ public class BotHostBehaviorTests
             Hp = 100,
             Mp = 100
         };
+        bot.Quests = new CharacterQuests(bot);
         bot.Transform.Local.SetPosition(Vector3.Zero);
         var instanceId = directorZone.HasValue ? WorldManager.DefaultInstanceId : 1u;
         var templateId = directorZone.HasValue ? WorldManager.DefaultWorldTemplateId : 1u;
@@ -1202,7 +1270,8 @@ public class BotHostBehaviorTests
             brain,
             blackboard,
             new BotConfig { UseEngine = false },
-            controller);
+            controller,
+            questIntakeController);
     }
 
     private sealed class LifecycleCharacterMock : CharacterMock

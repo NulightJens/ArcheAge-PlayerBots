@@ -54,6 +54,23 @@ Each character is loaded independently. A character that is already online or ca
 
 Combat rotations use live skill-template ranges. `AttackRange` and `BowRange` are fallback values; changing them does not override the client data for a known skill.
 
+## Autonomous nearby quest intake
+
+Quest intake is deliberately disabled by default. To let an otherwise idle bot discover nearby quest-giver NPCs, walk to the best candidate, and accept every eligible quest offered by that NPC through AAEmu's normal quest authority, enable:
+
+```json
+{
+  "QuestIntakeEnabled": true,
+  "QuestIntakeScanRadius": 60,
+  "QuestIntakeInteractionRadius": 6,
+  "QuestIntakeRetryBackoffMs": 30000
+}
+```
+
+Main-story candidates are ranked ahead of side quests. Candidates must be in the bot's current world, within both `SearchRadius` and `QuestIntakeScanRadius`, and compatible with the current heightmap surface. Rejected quests are retried only after the configured backoff. `/botdebug <characterId>` reports the current NPC, quest, decision reason, counters, and retry time.
+
+This controller covers local discovery, normal movement, and quest acceptance. It does not create bot characters, reset quest state, execute arbitrary or mixed quest objectives, report completed quests, chain quest completion, or route between distant zones. Direct movement still has the terrain limitations described below.
+
 ## Activity and performance
 
 | Setting | Default | Purpose |

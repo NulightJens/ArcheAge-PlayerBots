@@ -104,7 +104,7 @@ PlayerBots uses a small, versioned AAEmu compatibility patch because AAEmu does 
 
 - PlayerBots controls existing characters you select; it does not generate random bot accounts or claim automated quest, raid, or battleground completion.
 - Bots use direct pursuit and native collision, not navmesh navigation, so obstructed terrain can cause poor paths.
-- A GM can run one bounded selected-quest hunt or one static sphere-travel objective. Autonomous quest selection, long-range routing, mixed objectives, and quest chaining are not implemented.
+- Opt-in nearby quest intake can rank main-story quests first, walk to a locally discovered quest giver, and accept all eligible quests on that NPC. Arbitrary objective execution, reporting, long-range routing, mixed objectives, and quest chaining are not implemented.
 - Jump presentation and stealth search behavior are still experimental.
 - No public server-capacity claim is made; measure your own server before increasing bot populations.
 - The 3.0 track is for isolated testing only until its remaining gameplay gates pass.

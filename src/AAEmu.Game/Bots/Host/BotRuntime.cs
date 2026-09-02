@@ -8,6 +8,7 @@ using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Kernel;
 using AAEmu.Game.Bots.Social;
 using AAEmu.Game.Bots.Life;
+using AAEmu.Game.Bots.Questing;
 
 namespace AAEmu.Game.Bots.Host;
 
@@ -22,7 +23,8 @@ public sealed class BotRuntime
         BotCombatTask brain = null,
         BotBlackboard blackboard = null,
         BotConfig config = null,
-        BotLifeController lifeController = null)
+        BotLifeController lifeController = null,
+        BotQuestIntakeController questIntakeController = null)
     {
         Bot = bot ?? throw new ArgumentNullException(nameof(bot));
         MovementState = movementState ?? throw new ArgumentNullException(nameof(movementState));
@@ -33,6 +35,7 @@ public sealed class BotRuntime
         Brain = brain;
         Blackboard = blackboard ?? new BotBlackboard();
         LifeController = lifeController ?? new BotLifeController();
+        QuestIntakeController = questIntakeController ?? new BotQuestIntakeController();
         CombatState.BotId = bot.Id;
         KillCreditSubscription = new BotKillCreditSubscription(Bot, CombatState);
         Social = new BotSocialState(this);
@@ -69,6 +72,7 @@ public sealed class BotRuntime
     public string AttachedRotationArchetype { get; set; }
     public BotBlackboard Blackboard { get; }
     public BotLifeController LifeController { get; }
+    public BotQuestIntakeController QuestIntakeController { get; }
     public BotSocialState Social { get; }
     public BotTeamHooks TeamHooks { get; }
     public BotStuckWatch StuckWatch { get; }
