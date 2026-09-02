@@ -2,8 +2,8 @@ schema_version: 1
 id: T-117
 title: Prove per-runtime two-wave one-zone autonomy v10
 track: AAEmu12
-status: active
-integration: pending
+status: paused
+integration: retained-pre-runtime-user-supersession
 outcome: Prove two complete three-bot native fixture lifecycle/refill waves and a clean distinct-PID restart using exact per-runtime recovery counters, the proven parser/planner/geometry gates, and cooperative autonomy-observer stop boundaries before each Game shutdown.
 depends_on: [T-116]
 runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}

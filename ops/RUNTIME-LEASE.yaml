@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: leased-to-T-117
-    owner_task: T-117
-    owner_thread_id: 01a0606e-751b-79b2-b8ce-38ea2c604f7a
+    status: reserved-for-T-118-pending-exact-thread-binding
+    owner_task: T-118
+    owner_thread_id: pending-exact-thread-binding
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -16,8 +16,8 @@ runtimes:
     released_at: null
     cleanup_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     baseline_evidence: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
-    archeage_client_allowed: false
-    authority_limit: Only T-117 task 01a0606e-751b-79b2-b8ce-38ea2c604f7a in C:\Users\jensh\.codex\worktrees\fbcd\PB-W00-control may create the fresh v10 root, apply the exact nine BotConfig assignments with byte-exact restoration, and start/control Login, Game, client-process observer, and autonomy observers through accepted graceful paths. ArcheAge client, database access/control, source/reference/global-ledger writes, predecessor evidence, force-stop, build, and full suite remain prohibited.
+    archeage_client_allowed: true
+    authority_limit: No runtime action is allowed until PB-000 commits T-118's exact owner thread and worktree. After exact binding, only T-118 may preserve the original BotConfig bytes, apply the contracted interactive Director assignments, start/control Login and Game through accepted graceful paths, and open the registered AAEmu 1.2 launcher for the user. The user owns authentication and in-game interaction. Database access/control, source/reference/client-fixture/global-ledger writes, evidence-root reuse, forced process control, build, and tests remain prohibited.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
