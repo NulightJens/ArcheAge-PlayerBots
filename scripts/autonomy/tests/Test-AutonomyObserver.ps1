@@ -235,10 +235,12 @@ Assert-True -Condition ($retainedHashBefore -ceq $expectedFixtureSha256) -Messag
 $retainedBytes = [System.IO.File]::ReadAllBytes($RetainedFixturePath)
 $retainedSample = ConvertFrom-AutonomyBotDebugResponse -BotId 20001 -ResponseBytes $retainedBytes
 Assert-True -Condition ($retainedSample.PSObject.TypeNames[0] -ceq 'PlayerBots.Autonomy.BotDebugSample') -Message 'parser results must retain their PowerShell type name'
+Assert-True -Condition ($retainedSample.schema_version -ceq 'playerbots.autonomy-botdebug-sample.v2') -Message 'parser results must use the runtime-metrics sample schema'
 Assert-True -Condition ($retainedSample.classification -ceq 'offline') -Message 'retained T-075 response must classify as valid offline evidence'
 Assert-True -Condition ($retainedSample.online -eq $false) -Message 'retained T-075 response must report online=false'
 Assert-True -Condition ($retainedSample.bot_id -eq 20001 -and $retainedSample.reported_bot_id -eq 20001) -Message 'retained bot identity must be preserved'
 Assert-True -Condition ($null -eq $retainedSample.object_id) -Message 'offline object ID must be nullable'
+Assert-True -Condition ($null -eq $retainedSample.runtime_metrics) -Message 'offline runtime metrics must remain null'
 Assert-True -Condition ($null -eq $retainedSample.diagnostic) -Message 'valid offline evidence must not retain a parse diagnostic'
 
 # Synthetic offline variants keep every optional field strict-mode safe.
@@ -247,6 +249,7 @@ $offlineWithoutIdentitySample = ConvertFrom-AutonomyBotDebugResponse -BotId 2000
 Assert-True -Condition ($offlineWithoutIdentitySample.classification -ceq 'offline') -Message 'offline response without reported identity must classify'
 Assert-True -Condition ($null -eq $offlineWithoutIdentitySample.reported_bot_id) -Message 'absent offline identity must remain null'
 Assert-True -Condition ($null -eq $offlineWithoutIdentitySample.command_line) -Message 'absent commandLine must remain null'
+Assert-True -Condition ($null -eq $offlineWithoutIdentitySample.runtime_metrics) -Message 'synthetic offline runtime metrics must remain null'
 
 $plainOffline = '{"commandLine":"botdebug 20001","Messages":["No active bot found with id 20001."],"ErrorMessages":[]}'
 $plainOfflineSample = ConvertFrom-AutonomyBotDebugResponse -BotId 20001 -ResponseBytes (ConvertTo-TestBytes $plainOffline)
@@ -259,6 +262,7 @@ $onlineFull = @{
     commandCharacter = '@system'
     Messages = @(
         "|cFFFFFFFF[botdebug]|r === Bot 'ObserverOne' (Id: 20001, ObjId: 88001) ===",
+        '|cFFFFFFFF[botdebug]|r Runtime metrics: brain_steps=17, mover_steps=19, errors=3',
         '|cFFFFFFFF[botdebug]|r Host metrics: bots=1, active=1, tick_ms_ema=0.25, max=1.50, skipped=2, brain_steps=11, mover_steps=13'
     )
     ErrorMessages = @()
@@ -269,12 +273,61 @@ Assert-True -Condition ($onlineFullSample.bot_name -ceq 'ObserverOne') -Message 
 Assert-True -Condition ($onlineFullSample.object_id -eq 88001) -Message 'online object ID must be parsed when present'
 Assert-True -Condition ($onlineFullSample.host_metrics.brain_steps -eq 11 -and $onlineFullSample.host_metrics.mover_steps -eq 13) -Message 'online brain and mover counters must be parsed'
 Assert-True -Condition ($onlineFullSample.host_metrics.skipped_ticks -eq 2) -Message 'online skipped counter must be parsed'
+Assert-True -Condition ($onlineFullSample.runtime_metrics.brain_steps -eq 17 -and $onlineFullSample.runtime_metrics.mover_steps -eq 19) -Message 'online per-runtime brain and mover counters must be parsed'
+Assert-True -Condition ($onlineFullSample.runtime_metrics.errors -eq 3) -Message 'online per-runtime error counter must be parsed'
+Assert-True -Condition (
+    $onlineFullSample.runtime_metrics.brain_steps -is [long] -and
+    $onlineFullSample.runtime_metrics.mover_steps -is [long] -and
+    $onlineFullSample.runtime_metrics.errors -is [long]) -Message 'all online runtime counters must be typed as Int64'
 
-$onlineMinimal = '{"Messages":["[botdebug] === Bot ''ObserverTwo'' (Id: 20001) ==="]}'
+$onlineMinimal = '{"Messages":["[botdebug] === Bot ''ObserverTwo'' (Id: 20001) ===","[botdebug] Runtime metrics: brain_steps=0, mover_steps=0, errors=0"]}'
 $onlineMinimalSample = ConvertFrom-AutonomyBotDebugResponse -BotId 20001 -ResponseBytes (ConvertTo-TestBytes $onlineMinimal)
 Assert-True -Condition ($onlineMinimalSample.classification -ceq 'online') -Message 'minimal online response must classify'
 Assert-True -Condition ($null -eq $onlineMinimalSample.object_id) -Message 'absent online object ID must remain null'
 Assert-True -Condition ($null -eq $onlineMinimalSample.host_metrics) -Message 'absent host metrics must remain null'
+Assert-True -Condition ($onlineMinimalSample.runtime_metrics.brain_steps -eq 0) -Message 'zero-valued runtime metrics must parse'
+
+$onlineMissingRuntime = '{"Messages":["[botdebug] === Bot ''ObserverMissing'' (Id: 20001) ==="]}'
+$onlineMissingRuntimeSample = ConvertFrom-AutonomyBotDebugResponse -BotId 20001 -ResponseBytes (ConvertTo-TestBytes $onlineMissingRuntime)
+Assert-True -Condition ($onlineMissingRuntimeSample.classification -ceq 'malformed') -Message 'online response missing runtime metrics must fail closed'
+Assert-True -Condition ($onlineMissingRuntimeSample.diagnostic -ceq 'missing-runtime-metrics') -Message 'missing runtime metrics diagnostic must be stable'
+
+$onlineDuplicateRuntime = @{
+    Messages = @(
+        "[botdebug] === Bot 'ObserverDuplicate' (Id: 20001) ===",
+        '[botdebug] Runtime metrics: brain_steps=1, mover_steps=2, errors=3',
+        '[botdebug] Runtime metrics: brain_steps=4, mover_steps=5, errors=6'
+    )
+} | ConvertTo-Json -Compress
+$onlineDuplicateRuntimeSample = ConvertFrom-AutonomyBotDebugResponse -BotId 20001 -ResponseBytes (ConvertTo-TestBytes $onlineDuplicateRuntime)
+Assert-True -Condition ($onlineDuplicateRuntimeSample.classification -ceq 'malformed') -Message 'duplicate runtime metrics must fail closed'
+Assert-True -Condition ($onlineDuplicateRuntimeSample.diagnostic -ceq 'duplicate-runtime-metrics') -Message 'duplicate runtime metrics diagnostic must be stable'
+
+$invalidRuntimeCases = @(
+    [pscustomobject]@{ Name = 'partial'; Line = 'Runtime metrics: brain_steps=1, mover_steps=2' },
+    [pscustomobject]@{ Name = 'signed'; Line = 'Runtime metrics: brain_steps=+1, mover_steps=2, errors=3' },
+    [pscustomobject]@{ Name = 'negative'; Line = 'Runtime metrics: brain_steps=-1, mover_steps=2, errors=3' },
+    [pscustomobject]@{ Name = 'localized'; Line = 'Runtime metrics: brain_steps=١, mover_steps=2, errors=3' },
+    [pscustomobject]@{ Name = 'decimal'; Line = 'Runtime metrics: brain_steps=1.0, mover_steps=2, errors=3' },
+    [pscustomobject]@{ Name = 'exponent'; Line = 'Runtime metrics: brain_steps=1e1, mover_steps=2, errors=3' },
+    [pscustomobject]@{ Name = 'trailing'; Line = 'Runtime metrics: brain_steps=1, mover_steps=2, errors=3 extra' }
+)
+foreach ($invalidRuntimeCase in $invalidRuntimeCases) {
+    $invalidRuntimeBody = @{
+        Messages = @(
+            "[botdebug] === Bot 'ObserverInvalid' (Id: 20001) ===",
+            "[botdebug] $($invalidRuntimeCase.Line)"
+        )
+    } | ConvertTo-Json -Compress
+    $invalidRuntimeSample = ConvertFrom-AutonomyBotDebugResponse -BotId 20001 -ResponseBytes (ConvertTo-TestBytes $invalidRuntimeBody)
+    Assert-True -Condition ($invalidRuntimeSample.classification -ceq 'malformed') -Message "$($invalidRuntimeCase.Name) runtime metrics must fail closed"
+    Assert-True -Condition ($invalidRuntimeSample.diagnostic -ceq 'malformed-runtime-metrics') -Message "$($invalidRuntimeCase.Name) runtime metrics diagnostic must be stable"
+}
+
+$onlineOverflowRuntime = '{"Messages":["[botdebug] === Bot ''ObserverOverflow'' (Id: 20001) ===","[botdebug] Runtime metrics: brain_steps=9223372036854775808, mover_steps=2, errors=3"]}'
+$onlineOverflowRuntimeSample = ConvertFrom-AutonomyBotDebugResponse -BotId 20001 -ResponseBytes (ConvertTo-TestBytes $onlineOverflowRuntime)
+Assert-True -Condition ($onlineOverflowRuntimeSample.classification -ceq 'malformed') -Message 'overflow runtime metrics must fail closed'
+Assert-True -Condition ($onlineOverflowRuntimeSample.diagnostic -ceq 'malformed-runtime-metrics') -Message 'overflow runtime metrics diagnostic must be stable'
 
 # Malformed bytes and mismatched fixed-command identities classify without a strict-mode exception.
 $invalidJsonSample = ConvertFrom-AutonomyBotDebugResponse -BotId 20001 -ResponseBytes (ConvertTo-TestBytes '{')

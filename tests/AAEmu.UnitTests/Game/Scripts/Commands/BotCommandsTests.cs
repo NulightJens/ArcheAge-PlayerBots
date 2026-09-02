@@ -846,6 +846,7 @@ public class BotCommandsTests
     {
         var previousCulture = CultureInfo.CurrentCulture;
         var previousUiCulture = CultureInfo.CurrentUICulture;
+        BotRuntime runtime = null;
         try
         {
             CultureInfo.CurrentCulture = new CultureInfo("de-DE");
@@ -885,6 +886,21 @@ public class BotCommandsTests
             movement.IsFalling = true;
             movement.FallVelocity = -4.25f;
             movement.FollowTarget = target;
+            runtime = new BotRuntime(
+                bot,
+                movement,
+                combat,
+                config: new BotConfig { UseEngine = false });
+            runtime.Metrics.BrainSteps = 9876543210L;
+            runtime.Metrics.MoverSteps = 12345678901L;
+            runtime.Metrics.Errors = 23;
+            var hostMetrics = BotHost.Instance.Metrics;
+            hostMetrics.RecordBrainStep(BotCadence.Idle, true);
+            hostMetrics.RecordBrainStep(BotCadence.Idle, true);
+            hostMetrics.RecordMoverStep();
+            hostMetrics.RecordMoverStep();
+            hostMetrics.RecordMoverStep();
+            BotHost.Instance.Register(runtime);
 
             var originalPosition = bot.Transform.World.Position;
             var originalRotation = bot.Transform.World.Rotation;
@@ -892,6 +908,13 @@ public class BotCommandsTests
             var expectedTransform = string.Create(CultureInfo.InvariantCulture,
                 $"[botdebug] Transform: world=0, instance=43, zone={zoneId}, " +
                 $"x={position.X:R}, y={position.Y:R}, z={position.Z:R}, yaw_rad={yaw:R}");
+            const string expectedRuntimeMetrics =
+                "[botdebug] Runtime metrics: brain_steps=9876543210, mover_steps=12345678901, errors=23";
+            var expectedHostMetrics =
+                $"[botdebug] Host metrics: bots={hostMetrics.LastTickBots}, active={hostMetrics.ActiveBots}, " +
+                $"tick_ms_ema={hostMetrics.TickMsEma:F2}, max={hostMetrics.MaxTickMs:F2}, " +
+                $"skipped={hostMetrics.SkippedTicks}, brain_steps={hostMetrics.BrainStepsTotal}, " +
+                $"mover_steps={hostMetrics.MoverStepsTotal}";
 
             var output = Execute(new BotDebugCommand(), bot.Id.ToString(CultureInfo.InvariantCulture));
             var messages = output.Messages.ToList();
@@ -899,6 +922,9 @@ public class BotCommandsTests
             var transformIndex = messages.IndexOf(expectedTransform);
             var transformLine = messages.Single(message =>
                 message.StartsWith("[botdebug] Transform: ", StringComparison.Ordinal));
+            var lifeDeltaIndex = messages.IndexOf("[botdebug] Life delta: pending");
+            var runtimeMetricsIndex = messages.IndexOf(expectedRuntimeMetrics);
+            var hostMetricsIndex = messages.IndexOf(expectedHostMetrics);
 
             await Assert.That(positionIndex).IsGreaterThanOrEqualTo(0);
             await Assert.That(transformIndex).IsEqualTo(positionIndex + 1);
@@ -913,7 +939,10 @@ public class BotCommandsTests
             await Assert.That(messages).Contains("[botdebug] --- Combat State ---");
             await Assert.That(messages).Contains("[botdebug] State: Combat, Previous: Idle, Forced: Grinding");
             await Assert.That(messages).Contains("[botdebug] Target: bot3, CurrentTarget: bot3");
-            await Assert.That(messages).Contains(message => message.StartsWith("[botdebug] Host metrics: ", StringComparison.Ordinal));
+            await Assert.That(messages.Count(message => message == expectedRuntimeMetrics)).IsEqualTo(1);
+            await Assert.That(runtimeMetricsIndex).IsEqualTo(lifeDeltaIndex + 1);
+            await Assert.That(hostMetricsIndex).IsEqualTo(runtimeMetricsIndex + 1);
+            await Assert.That(messages.Count(message => message.StartsWith("[botdebug] Host metrics: ", StringComparison.Ordinal))).IsEqualTo(1);
 
             var parsedYaw = float.Parse(
                 transformLine[(transformLine.LastIndexOf('=') + 1)..],
@@ -941,9 +970,16 @@ public class BotCommandsTests
             await Assert.That(movement.IsFalling).IsTrue();
             await Assert.That(movement.FallVelocity).IsEqualTo(-4.25f);
             await Assert.That(movement.FollowTarget).IsSameReferenceAs(target);
+            await Assert.That(runtime.Metrics.BrainSteps).IsEqualTo(9876543210L);
+            await Assert.That(runtime.Metrics.MoverSteps).IsEqualTo(12345678901L);
+            await Assert.That(runtime.Metrics.Errors).IsEqualTo(23);
+            await Assert.That(hostMetrics.BrainStepsTotal).IsEqualTo(2L);
+            await Assert.That(hostMetrics.MoverStepsTotal).IsEqualTo(3L);
         }
         finally
         {
+            if (runtime != null)
+                BotHost.Instance.Unregister(runtime.Bot.Id);
             CultureInfo.CurrentCulture = previousCulture;
             CultureInfo.CurrentUICulture = previousUiCulture;
         }

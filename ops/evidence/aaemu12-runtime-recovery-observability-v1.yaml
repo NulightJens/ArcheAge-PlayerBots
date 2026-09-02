@@ -1,0 +1,178 @@
+schema_version: 1
+id: aaemu12-runtime-recovery-observability-v1
+task: T-114
+track: AAEmu12
+recorded_at: '2026-09-01T22:04:43-06:00'
+verdict: PASS
+
+source:
+  control_binding_commit: d147bebce60ee79588e0e430f47969e9ba8662b9
+  control_binding_tree: 63d0e3ebcebbe9ee5e7156cefbeac38a11fb19ac
+  dispatch_base: d335ce053c58eaebbfda384412ef9be5c9d839da
+  accepted_integration_source: 5108bcedb6782a24b0095fab88b021a628c01f8b
+  candidate_parent: d335ce053c58eaebbfda384412ef9be5c9d839da
+  candidate_commit: exact-hash-reported-to-control-tower-after-commit
+  candidate_tree: exact-hash-reported-to-control-tower-after-commit
+  candidate_patch_id: exact-hash-reported-to-control-tower-after-commit
+  writer_git_state: detached
+  writer_worktree: 'C:\Users\jensh\.codex\worktrees\dd89\PB-W00-control'
+
+botdebug:
+  command: BotDebugCommand
+  exact_runtime_line: 'Runtime metrics: brain_steps=<nonnegative long>, mover_steps=<nonnegative long>, errors=<nonnegative int>'
+  fixture_line: 'Runtime metrics: brain_steps=9876543210, mover_steps=12345678901, errors=23'
+  source: selected-runtime.BotRuntimeMetrics
+  field_order: [brain_steps, mover_steps, errors]
+  formatting: System.Globalization.CultureInfo.InvariantCulture
+  placement: after-Life-delta-inside-present-runtime-block-before-Host-metrics
+  emitted_lines_per_present_runtime: 1
+  aggregate_host_metrics_line_changed: false
+  command_grammar_or_mutation_boundary_changed: false
+  non_english_test_culture: de-DE
+  runtime_and_host_fixture_values_distinct: true
+
+observer_parser:
+  sample_type: PlayerBots.Autonomy.BotDebugSample
+  sample_schema: playerbots.autonomy-botdebug-sample.v2
+  runtime_metrics:
+    required_for_online: exactly-one
+    offline_value: null
+    fields:
+      brain_steps: Int64
+      mover_steps: Int64
+      errors: Int64
+    exact_ascii_grammar: '^Runtime metrics: brain_steps=(?<brain>[0-9]+), mover_steps=(?<mover>[0-9]+), errors=(?<errors>[0-9]+)$'
+    invariant_overflow_checked_conversion: true
+  stable_diagnostics:
+    missing: missing-runtime-metrics
+    duplicate: duplicate-runtime-metrics
+    malformed_signed_negative_localized_decimal_exponent_overflow_or_trailing: malformed-runtime-metrics
+  retained_host_metrics_object_changed: false
+  route_allowlist: ['/commands/botdebug']
+  exported_functions: [ConvertFrom-AutonomyBotDebugResponse, Start-AutonomyObserver]
+  command_parameter_filesystem_or_dependency_surface_expanded: false
+
+focused_tests:
+  framework: TUnit-1.54.0.0
+  runtime: net10.0-x64
+  bot_commands:
+    filter: '/*/AAEmu.UnitTests.Game.Scripts.Commands/BotCommandsTests/*'
+    total: 46
+    passed: 46
+    failed: 0
+    skipped: 0
+    final_duration_ms: 747
+  bot_host_behavior:
+    filter: '/*/AAEmu.UnitTests.Bots.Host/BotHostBehaviorTests/*'
+    total: 34
+    passed: 34
+    failed: 0
+    skipped: 0
+    final_duration_ms: 717
+  multi_runtime_recovery:
+    sampled_host_ticks: 3
+    pending_should_suspend_runtime: true
+    pending_brain_steps_delta: 0
+    pending_mover_steps_delta: 0
+    advancing_brain_steps_delta: 3
+    advancing_mover_steps_delta: 3
+    aggregate_host_brain_steps_delta: 3
+    aggregate_host_mover_steps_delta: 3
+    aggregate_deltas_equal_advancing_runtime_deltas: true
+    pending_full_resource_restore_mp: 100
+    pending_normal_logout_callbacks: 1
+    advancing_runtime_logout_callbacks: 0
+    existing_single_runtime_recovery_regression: PASS
+  observer:
+    command: >-
+      pwsh -NoLogo -NoProfile -File
+      scripts/autonomy/tests/Test-AutonomyObserver.ps1
+      -ArtifactsDirectory D:\Codex-Labs\t114-observer-tests-v1
+    assertions: 91
+    verdict: PASS
+    positive_missing_duplicate_malformed_signed_negative_localized_decimal_exponent_overflow_trailing_offline_null: PASS
+    ast_route_command_parameter_and_type_allowlists: PASS
+    retained_fixture_copies: 0
+  retained_fixture_only_failure:
+    first_host_run_passed: 33
+    first_host_run_failed: 1
+    source_diagnosis_disproved: false
+    cause: >-
+      The advancing peer used the real combat brain, entered Combat, and reached
+      a deliberately absent SkillManager in the isolated unit fixture before
+      its own brain counter could increment.
+    correction: deterministic-noop-peer-brain-with-real-host-scheduling-and-mover
+    lifecycle_production_source_changed: false
+
+isolated_build:
+  proof_workspace: 'D:\Codex-Labs\t114-aaemu12-source-build-v1'
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  host_state: detached-pinned-with-28-file-compatibility-patch
+  module_delivery: proof-only-junction-and-PlayerBotsModuleRoot-to-exact-writer-tree
+  restore: PASS
+  complete_no_incremental:
+    command: >-
+      dotnet build AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-incremental
+      --no-restore -p:PlayerBotsModuleRoot=C:\Users\jensh\.codex\worktrees\dd89\PB-W00-control\
+    invocation: single-complete-build
+    result: PASS
+    warnings: 40
+    errors: 0
+    elapsed: '00:00:53.36'
+  final_test_only_recompile_after_fixture_correction:
+    command: >-
+      dotnet build AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-restore
+      -p:PlayerBotsModuleRoot=C:\Users\jensh\.codex\worktrees\dd89\PB-W00-control\
+    result: PASS
+    warnings: 33
+    errors: 0
+    elapsed: '00:00:09.45'
+    production_source_changed_after_complete_build: false
+  warning_boundary: pinned package advisory plus existing host, module, analyzer, and TUnit warnings
+
+compatibility_patch:
+  path: compatibility/aaemu-1.2-r208022-v3.patch
+  expected_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  observed_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  byte_identical: true
+  registered_reference:
+    workspace_id: aaemu12_reference
+    head: 62e3eb1d87da01194802ac886cd500134facad28
+    clean_detached_before: true
+    strict_forward_apply_check_whitespace_error_all: PASS
+    clean_detached_after: true
+  isolated_proof_reverse_check_whitespace_error_all: PASS
+  isolated_proof_host_diff_file_count: 28
+
+integrity:
+  precommit_blobs:
+    botdebug_command: 3dcb8c803fad04657132c16ee37c0fec64911c9f
+    autonomy_observer: 173a2de8f8844f16be463ab0779670f0fe264198
+    bot_commands_tests: 38f199f79d9e8f5116678625b2f912bd752407fe
+    bot_host_behavior_tests: e2158cd316bf1e809653f722de7764719c70911a
+    autonomy_observer_tests: 587be6192a9138cb9c3c94ec9c612e16db56bcec
+  artifacts:
+    game_assembly_sha256: b2a804e467c5780638fb8289d0985c5ce5e12538dc710e198c22b8991952cf9b
+    test_assembly_sha256: cb4ba1ffe18e6e5fe33a56eaf63c40e679496ea42578a633b7007ab1266115c7
+    test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+    final_test_report_sha256: 1c163393df6512372021156db8d4000387d3b5a40f2112d735c25374e69e1974
+    observer_summary_sha256: be11143ba37cdf72260f226cf24acd6a77494836b1ca11191f999b92afdd447e
+  git_diff_check: PASS
+  raw_logs_committed: false
+
+scope:
+  production_behavior_changes: [botdebug-observation-line, observation-only-parser]
+  lifecycle_scheduling_movement_combat_recovery_logout_or_host_metrics_semantics_changed: false
+  full_suite_invocations: 0
+  deployment_performed: false
+  live_runtime_started_stopped_inspected_or_controlled: false
+  registered_integration_host_or_module_written: false
+  registered_reference_written: false
+  external_runtime_evidence_written: false
+  database_or_client_accessed: false
+  global_ledgers_lease_or_workspace_registry_written: false
+  aaemu30_scale_soak_or_packaging_touched: false
+
+retained_boundaries:
+  - T-112 remains an immutable independently integrated runtime FAIL and is not reinterpreted by this source PASS.
+  - Installation, the once-per-wave full suite, live botdebug sampling, physical recovery, shutdown-tail closure, and a fresh runtime successor remain pending for independent T-115 integration and later runtime evidence.

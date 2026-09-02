@@ -137,6 +137,11 @@ namespace AAEmu.Game.Scripts.Commands
                     $"Life completion: {Snapshot(life.ProgressionCompletion)}");
                 CommandManager.SendNormalText(this, messageOutput,
                     $"Life delta: {Delta(life.ProgressionDelta)}");
+                var runtimeMetrics = runtime.Metrics;
+                CommandManager.SendNormalText(this, messageOutput,
+                    string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                        $"Runtime metrics: brain_steps={runtimeMetrics.BrainSteps}, " +
+                        $"mover_steps={runtimeMetrics.MoverSteps}, errors={runtimeMetrics.Errors}"));
             }
             var hostMetrics = BotHost.Instance.Metrics;
             CommandManager.SendNormalText(this, messageOutput, $"Host metrics: bots={hostMetrics.LastTickBots}, active={hostMetrics.ActiveBots}, tick_ms_ema={hostMetrics.TickMsEma:F2}, max={hostMetrics.MaxTickMs:F2}, skipped={hostMetrics.SkippedTicks}, brain_steps={hostMetrics.BrainStepsTotal}, mover_steps={hostMetrics.MoverStepsTotal}");

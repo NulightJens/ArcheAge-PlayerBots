@@ -687,6 +687,106 @@ public class BotHostBehaviorTests
     }
 
     [Test]
+    public async Task MultipleRuntimes_PendingRecoveryCountersStayFixedWhilePeerAndHostAdvance()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 4, 0, TimeSpan.Zero));
+        var logoutIds = new List<uint>();
+        var host = MakeLifecycleHost(time, id =>
+        {
+            logoutIds.Add(id);
+            return true;
+        });
+        var pending = MakeLifecycleRuntime(6305, time, directorZone: 137);
+        var advancing = MakeLifecycleRuntime(6306, time, directorZone: 137);
+        var director = new BotActivityDirectorTask(
+            new BotConfig
+            {
+                ActivityDirectorEnabled = true,
+                ActivityDirectorZoneId = 137,
+                ActivityDirectorCharacterIds = [pending.Bot.Id, advancing.Bot.Id],
+                ActivityDirectorMinimumPopulation = 1,
+                ActivityDirectorTargetPopulation = 2,
+                ActivityDirectorMaximumPopulation = 2
+            },
+            Mock.Of<IBotManager>().Object,
+            time);
+
+        try
+        {
+            await Assert.That(director.TryStart()).IsTrue();
+            host.Register(pending);
+            host.Register(advancing);
+            host.HostTask.Execute();
+
+            await Assert.That(pending.LifeController.Inspect().Activity).IsEqualTo("grind");
+            await Assert.That(advancing.LifeController.Inspect().Activity).IsEqualTo("grind");
+
+            advancing.Brain = new NoopBrain(
+                advancing.Bot,
+                advancing.CombatState,
+                advancing.Broadcaster);
+            pending.CombatState.KillCount = 1;
+            pending.CombatState.KillGoal = null;
+            pending.CombatState.TransitionTo(BotCombatStateType.Idle);
+            pending.Bot.Mp = 60;
+            advancing.MovementState.Destination = Vector3.One;
+            time.Advance(TimeSpan.FromSeconds(1));
+            advancing.Schedule.NextBrainAt = time.GetUtcNow().UtcDateTime;
+            host.HostTask.Execute();
+
+            var recovery = pending.LifeController.Inspect();
+            await Assert.That(recovery.Recovery.State).IsEqualTo(BotLifeRecoveryState.Pending);
+            await Assert.That(pending.LifeController.ShouldSuspendRuntime).IsTrue();
+            await Assert.That(logoutIds).IsEmpty();
+
+            var pendingBrainBefore = pending.Metrics.BrainSteps;
+            var pendingMoverBefore = pending.Metrics.MoverSteps;
+            var advancingBrainBefore = advancing.Metrics.BrainSteps;
+            var advancingMoverBefore = advancing.Metrics.MoverSteps;
+            var hostBrainBefore = host.Metrics.BrainStepsTotal;
+            var hostMoverBefore = host.Metrics.MoverStepsTotal;
+
+            for (var tick = 0; tick < 3; tick++)
+            {
+                time.Advance(TimeSpan.FromSeconds(1));
+                advancing.Schedule.NextBrainAt = time.GetUtcNow().UtcDateTime;
+                host.HostTask.Execute();
+            }
+
+            var advancingBrainDelta = advancing.Metrics.BrainSteps - advancingBrainBefore;
+            var advancingMoverDelta = advancing.Metrics.MoverSteps - advancingMoverBefore;
+            var hostBrainDelta = host.Metrics.BrainStepsTotal - hostBrainBefore;
+            var hostMoverDelta = host.Metrics.MoverStepsTotal - hostMoverBefore;
+            await Assert.That(pending.LifeController.ShouldSuspendRuntime).IsTrue();
+            await Assert.That(pending.Metrics.BrainSteps).IsEqualTo(pendingBrainBefore);
+            await Assert.That(pending.Metrics.MoverSteps).IsEqualTo(pendingMoverBefore);
+            await Assert.That(advancingBrainDelta).IsGreaterThan(0L);
+            await Assert.That(advancingMoverDelta).IsGreaterThan(0L);
+            await Assert.That(hostBrainDelta).IsEqualTo(advancingBrainDelta);
+            await Assert.That(hostMoverDelta).IsEqualTo(advancingMoverDelta);
+            await Assert.That(logoutIds).IsEmpty();
+
+            pending.Bot.Mp = 100;
+            time.Advance(TimeSpan.FromSeconds(1));
+            host.HostTask.Execute();
+            host.HostTask.Execute();
+
+            var completed = pending.LifeController.Inspect();
+            await Assert.That(logoutIds.Count(id => id == pending.Bot.Id)).IsEqualTo(1);
+            await Assert.That(logoutIds).DoesNotContain(advancing.Bot.Id);
+            await Assert.That(completed.Recovery.State).IsEqualTo(BotLifeRecoveryState.Completed);
+            await Assert.That(completed.ProgressionCompletion?.Mp).IsEqualTo(100L);
+            await Assert.That(completed.Life.State).IsEqualTo(BotLifeState.Offline);
+        }
+        finally
+        {
+            director.Stop();
+            host.Unregister(pending.Bot.Id);
+            host.Unregister(advancing.Bot.Id);
+        }
+    }
+
+    [Test]
     public async Task LogoutCallbackFailure_IsRecordedAndNeverRetried()
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 5, 0, TimeSpan.Zero));
@@ -1121,6 +1221,18 @@ public class BotHostBehaviorTests
         {
             Entered.Set();
             Release.Wait();
+        }
+    }
+
+    private sealed class NoopBrain(AAEmu.Game.Models.Game.Char.Character bot, BotCombatState state, BotMovementBroadcaster broadcaster)
+        : BotCombatTask(bot, state, broadcaster)
+    {
+        internal override void Step()
+        {
+        }
+
+        internal override void StepMinimal()
+        {
         }
     }
 }

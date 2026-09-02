@@ -2,7 +2,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $script:SampleTypeName = 'PlayerBots.Autonomy.BotDebugSample'
-$script:SampleSchema = 'playerbots.autonomy-botdebug-sample.v1'
+$script:SampleSchema = 'playerbots.autonomy-botdebug-sample.v2'
 $script:TransportSchema = 'playerbots.autonomy-botdebug-transport.v1'
 $script:BoundarySchema = 'playerbots.autonomy-observer-boundary.v1'
 
@@ -143,6 +143,7 @@ function New-BotDebugSample {
         [int]$MessageCount,
         [int]$ErrorCount,
         [AllowNull()][object]$HostMetrics,
+        [AllowNull()][object]$RuntimeMetrics,
         [AllowNull()][object]$Diagnostic,
         [AllowNull()][object]$StatusCode
     )
@@ -160,6 +161,7 @@ function New-BotDebugSample {
         message_count = $MessageCount
         error_count = $ErrorCount
         host_metrics = $HostMetrics
+        runtime_metrics = $RuntimeMetrics
         diagnostic = $Diagnostic
         status_code = $StatusCode
     }
@@ -192,6 +194,7 @@ function New-MalformedBotDebugSample {
         -MessageCount $MessageCount `
         -ErrorCount $ErrorCount `
         -HostMetrics $null `
+        -RuntimeMetrics $null `
         -Diagnostic $Diagnostic `
         -StatusCode $null
 }
@@ -268,6 +271,9 @@ function ConvertFrom-AutonomyBotDebugResponse {
     $onlineMatch = $null
     $offlineMatch = $null
     $hostMetrics = $null
+    $runtimeMetrics = $null
+    $runtimeMetricsLineCount = 0
+    $runtimeMetricsMalformed = $false
     foreach ($message in $messages) {
         $clean = ConvertTo-CleanBotDebugMessage -Message $message
         if ($null -eq $onlineMatch) {
@@ -302,6 +308,30 @@ function ConvertFrom-AutonomyBotDebugResponse {
                 }
             }
         }
+        if ($clean -cmatch '^Runtime metrics:') {
+            $runtimeMetricsLineCount++
+            $candidate = [regex]::Match(
+                $clean,
+                '^Runtime metrics: brain_steps=(?<brain>[0-9]+), mover_steps=(?<mover>[0-9]+), errors=(?<errors>[0-9]+)$')
+            if (-not $candidate.Success) {
+                $runtimeMetricsMalformed = $true
+                continue
+            }
+
+            $brainSteps = ConvertTo-NullableInt64 (Get-MatchGroupValue -Match $candidate -Name 'brain')
+            $moverSteps = ConvertTo-NullableInt64 (Get-MatchGroupValue -Match $candidate -Name 'mover')
+            $runtimeErrors = ConvertTo-NullableInt64 (Get-MatchGroupValue -Match $candidate -Name 'errors')
+            if ($null -eq $brainSteps -or $null -eq $moverSteps -or $null -eq $runtimeErrors) {
+                $runtimeMetricsMalformed = $true
+                continue
+            }
+
+            $runtimeMetrics = [pscustomobject][ordered]@{
+                brain_steps = $brainSteps
+                mover_steps = $moverSteps
+                errors = $runtimeErrors
+            }
+        }
     }
 
     if ($null -ne $onlineMatch -and $null -ne $offlineMatch) {
@@ -320,10 +350,29 @@ function ConvertFrom-AutonomyBotDebugResponse {
                 -CommandLine $commandLine -CommandCharacter $commandCharacter `
                 -MessageCount $messages.Count -ErrorCount $errors.Count
         }
+        if ($runtimeMetricsLineCount -eq 0) {
+            return New-MalformedBotDebugSample -BotId $BotId -Diagnostic 'missing-runtime-metrics' `
+                -ReportedBotId $onlineBotId -BotName $botName -ObjectId $objectId `
+                -CommandLine $commandLine -CommandCharacter $commandCharacter `
+                -MessageCount $messages.Count -ErrorCount $errors.Count
+        }
+        if ($runtimeMetricsLineCount -ne 1) {
+            return New-MalformedBotDebugSample -BotId $BotId -Diagnostic 'duplicate-runtime-metrics' `
+                -ReportedBotId $onlineBotId -BotName $botName -ObjectId $objectId `
+                -CommandLine $commandLine -CommandCharacter $commandCharacter `
+                -MessageCount $messages.Count -ErrorCount $errors.Count
+        }
+        if ($runtimeMetricsMalformed -or $null -eq $runtimeMetrics) {
+            return New-MalformedBotDebugSample -BotId $BotId -Diagnostic 'malformed-runtime-metrics' `
+                -ReportedBotId $onlineBotId -BotName $botName -ObjectId $objectId `
+                -CommandLine $commandLine -CommandCharacter $commandCharacter `
+                -MessageCount $messages.Count -ErrorCount $errors.Count
+        }
         return New-BotDebugSample -BotId $BotId -Classification 'online' -Online $true `
             -ReportedBotId $onlineBotId -BotName $botName -ObjectId $objectId `
             -CommandLine $commandLine -CommandCharacter $commandCharacter `
             -MessageCount $messages.Count -ErrorCount $errors.Count -HostMetrics $hostMetrics `
+            -RuntimeMetrics $runtimeMetrics `
             -Diagnostic $null -StatusCode $null
     }
 
@@ -342,6 +391,7 @@ function ConvertFrom-AutonomyBotDebugResponse {
             -ReportedBotId $offlineBotId -BotName $null -ObjectId $null `
             -CommandLine $commandLine -CommandCharacter $commandCharacter `
             -MessageCount $messages.Count -ErrorCount $errors.Count -HostMetrics $null `
+            -RuntimeMetrics $null `
             -Diagnostic $null -StatusCode $null
     }
 
@@ -444,6 +494,7 @@ function New-TransportErrorSample {
     return New-BotDebugSample -BotId $BotId -Classification 'transport-error' -Online $null `
         -ReportedBotId $null -BotName $null -ObjectId $null -CommandLine $null `
         -CommandCharacter $null -MessageCount 0 -ErrorCount 0 -HostMetrics $null `
+        -RuntimeMetrics $null `
         -Diagnostic $Diagnostic -StatusCode $StatusCode
 }
 
