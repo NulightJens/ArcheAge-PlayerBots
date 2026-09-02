@@ -1522,3 +1522,16 @@ tasks:
     owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
     worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
     result: PASS-audit-goals-delivery-contract-and-root-operating-rules-installed-runtime-untouched
+
+  - id: T-127
+    title: Execute G-001 Nuian five-quest live slice
+    track: AAEmu12
+    status: ready
+    integration: vertical-slice-owner
+    depends_on: [T-126]
+    runtime_lease: pending-new-thread-binding
+    gate: five-native-quests-same-build-server-and-client-proof
+    contract: ops/tasks/T-127/CONTRACT.md
+    owner_thread_id: pending-new-thread-binding
+    worktree: assigned-by-codex-task
+    result: READY-single-live-slice-no-task-fanout

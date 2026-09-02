@@ -4,16 +4,17 @@ This repository is the durable source of truth. Chats perform bounded work; chat
 
 ## Required startup
 
-Before changing files, read only:
+Before changing files, read:
 
 1. `ops/PROJECT.yaml`
-2. `ops/CURRENT.yaml`
+2. `ops/NOW.yaml`
 3. `ops/GOALS.yaml`
-4. `ops/DELIVERY-MODEL-V2.md`
-5. `ops/BOARD.yaml`
-6. `ops/WORKSPACES.yaml`
-7. `ops/ENVIRONMENT-CONTINGENCY.md`
-8. The assigned `ops/tasks/T-NNN/TASK.yaml` and `CONTRACT.md`
+4. The assigned `ops/tasks/T-NNN/TASK.yaml` and `CONTRACT.md`
+
+For runtime work, also read `ops/RUNTIME-LEASE.yaml` and only the workspace
+records named by `ops/NOW.yaml`. Do not load `ops/BOARD.yaml`,
+`ops/CURRENT.yaml`, old handoffs, or raw evidence unless the task is a
+historical audit.
 
 Do not reconstruct current state from old chats, chronological status diaries, raw logs, or `C:\aaemu-playerbots\.planning`. Those are retained evidence, not dispatch authority.
 
@@ -34,6 +35,12 @@ Do not reconstruct current state from old chats, chronological status diaries, r
 - Only an Integrator changes an integration branch or `main`.
 - Writer tasks must not modify deployed AAEmu hosts as source trees.
 - Subagents may perform bounded research, test design, log analysis, or review. Independent writers require independent worktrees.
+
+## Communication
+
+Progress updates use no more than these six lines: State, Build, Server marker,
+Client marker, Blocker, Next action. No planning essays, repeated context, or
+raw logs. Final handoffs state outcome, proof, retained failure, and next action.
 
 ## Workspace routing
 

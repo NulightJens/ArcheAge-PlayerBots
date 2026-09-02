@@ -6,6 +6,9 @@ delivery_model: ops/DELIVERY-MODEL-V2.md
 product_goals: ops/GOALS.yaml
 delivery_audit: ops/AUDIT-2026-09-02.md
 active_goal: G-001
+active_task: T-127
+current_execution_state: ops/NOW.yaml
+new_thread_state: pending-binding
 
 source:
   integration_branch: integration/aaemu12-world
@@ -65,7 +68,7 @@ control_tower:
   permanent_task:
     thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
     title: PB-000 PlayerBots Control Tower — Autonomous Alpha
-    state: active-pinned-successor
+    state: retiring-after-T-127-binding
   saved_project_id: 9cdd642a-c900-4027-8f7b-d369835cef26
   operating_mode: local-integration-worktree
   dashboard_policy: product-goal-and-deployment-state-only

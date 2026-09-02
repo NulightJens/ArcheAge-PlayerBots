@@ -6,6 +6,7 @@ audit_basis: ops/AUDIT-2026-09-02.md
 updated_at: 2026-09-02
 active_track: AAEmu12
 active_goal: G-001
+active_task: T-127
 allowed_states:
   - specified
   - source-green
@@ -63,7 +64,7 @@ goals:
       - identity-quest-and-position-state-survive-a-distinct-pid-graceful-restart
       - zero-unexplained-tick-errors-runtime-overlaps-or-synthetic-progress
     next_action: >-
-      Gracefully transition the retained T-120 runtime, deploy the exact
+      T-127 gracefully transitions the retained T-120 runtime, deploys the exact
       corrected candidate and bot-account configuration, then run the first
       client-witnessed one-bot attempt and fix its first behavioral blocker.
 

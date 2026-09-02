@@ -21,6 +21,8 @@ environment_control:
   delivery_model: ops/DELIVERY-MODEL-V2.md
   product_goals: ops/GOALS.yaml
   latest_delivery_audit: ops/AUDIT-2026-09-02.md
+  current_execution_state: ops/NOW.yaml
+  execution_brief: ops/EXECUTION-BRIEF.md
   rule: Resolve every external path by registry ID before reading or writing it.
 
 active_track:

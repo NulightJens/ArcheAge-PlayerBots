@@ -1,0 +1,53 @@
+schema_version: 1
+id: T-127
+title: Execute G-001 Nuian five-quest live slice
+track: AAEmu12
+status: ready
+integration: vertical-slice-owner
+outcome: >-
+  Create one level-one Nuian bot and prove five native starter-quest
+  completions through autonomous decisions, real movement, server authority,
+  and an active client on one fingerprinted build.
+depends_on: [T-126]
+runtime:
+  required: true
+  lease: aaemu12
+  transfer: pending-new-thread-binding
+branch: assigned-by-codex-task
+worktree: assigned-by-codex-task
+owner_thread_id: pending-new-thread-binding
+write_scope:
+  - src/**
+  - tests/**
+  - compatibility/aaemu-1.2-*.patch
+  - docs/BOT-IDENTITIES.md
+  - docs/QUEST-AUTONOMY.md
+  - docs/WORLD-NAVIGATION.md
+  - ops/NOW.yaml
+  - ops/GOALS.yaml
+  - ops/CURRENT.yaml
+  - ops/BOARD.yaml
+  - ops/WORKSPACES.yaml
+  - ops/RUNTIME-LEASE.yaml
+  - ops/tasks/T-127/**
+  - ops/evidence/aaemu12-g001-nuian-five-quest-v1.yaml
+external_write_scope:
+  - D:\Codex-Labs\aaemu-1.2-r208022-integration-v1
+  - D:\Codex-Labs\evidence\T-127\g001-nuian-five-quest-v1
+runtime_controls:
+  - normal-client-close
+  - graceful-game-then-login-shutdown
+  - exact-candidate-install-build-config-start
+  - registered-client-launch-and-computer-use
+  - versioned-test-data-creation-without-destructive-reset
+gates:
+  - deployed-source-and-integrated-source-match
+  - active-server-and-client
+  - one-level-one-nuian-created-at-observed-location
+  - five-native-starter-quest-completions
+  - client-visible-movement-interaction-combat-and-reporting
+  - no-per-action-command-or-synthetic-progress
+  - graceful-distinct-pid-restart-persistence
+  - zero-unexplained-tick-errors-or-runtime-overlaps
+contract: ops/tasks/T-127/CONTRACT.md
+handoff: ops/tasks/T-127/HANDOFF.md
