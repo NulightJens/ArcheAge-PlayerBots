@@ -5,8 +5,10 @@ using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.DoodadObj;
 using AAEmu.Game.Models.Game.NPChar;
 using AAEmu.Game.Models.Game.Quests.Templates;
+using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Tasks.Bots;
 using NLog;
 
@@ -24,8 +26,9 @@ public enum BotQuestIntakeState
 
 public readonly record struct BotQuestIntakeView(
     BotQuestIntakeState State,
-    uint? NpcObjectId,
-    uint? NpcTemplateId,
+    BotQuestGiverKind? GiverKind,
+    uint? GiverObjectId,
+    uint? GiverTemplateId,
     uint? QuestId,
     bool? MainStory,
     string DecisionReason,
@@ -33,12 +36,25 @@ public readonly record struct BotQuestIntakeView(
     DateTimeOffset? LastAcceptedAt,
     DateTimeOffset? RetryAt,
     long AcceptedCount,
-    long RejectedCount);
+    long RejectedCount)
+{
+    public uint? NpcObjectId =>
+        GiverKind == BotQuestGiverKind.Npc ? GiverObjectId : null;
+
+    public uint? NpcTemplateId =>
+        GiverKind == BotQuestGiverKind.Npc ? GiverTemplateId : null;
+
+    public uint? DoodadObjectId =>
+        GiverKind == BotQuestGiverKind.Doodad ? GiverObjectId : null;
+
+    public uint? DoodadTemplateId =>
+        GiverKind == BotQuestGiverKind.Doodad ? GiverTemplateId : null;
+}
 
 /// <summary>
 /// Owns the bounded, opt-in path from nearby quest discovery to normal AAEmu
-/// NPC acceptance. Objective execution and quest reporting deliberately remain
-/// outside this controller.
+/// NPC or doodad acceptance. Objective execution and quest reporting are owned
+/// by <see cref="BotQuestLifecycleController"/>.
 /// </summary>
 public sealed class BotQuestIntakeController
 {
@@ -49,14 +65,16 @@ public sealed class BotQuestIntakeController
 
     private readonly object _syncRoot = new();
     private readonly Func<uint, IReadOnlyList<QuestTemplate>> _questStarts;
-    private readonly Func<Character, uint, uint, bool> _acceptQuest;
+    private readonly Func<BotRuntime, float, DateTimeOffset, IReadOnlyList<BotQuestStartCandidate>> _doodadStarts;
+    private readonly Func<Character, BotQuestGiverKind, uint, uint, bool> _acceptQuest;
+    private readonly Func<Character, BotQuestGiverKind, uint, uint, bool> _validateGiverQuest;
     private readonly Action<Character, Vector3, bool> _setDestination;
     private readonly Action<Character> _stopMovement;
     private readonly Func<Character, Vector3, float> _heightProvider;
     private readonly Action<string> _eventSink;
     private readonly Dictionary<QuestCandidateKey, DateTimeOffset> _retryAfter = [];
 
-    private NpcPlan _plan;
+    private GiverPlan _plan;
     private Vector3? _ownedDestination;
     private BotQuestIntakeState _state = BotQuestIntakeState.Disabled;
     private string _decisionReason = "not_started";
@@ -67,7 +85,25 @@ public sealed class BotQuestIntakeController
     private long _rejectedCount;
 
     public BotQuestIntakeController()
-        : this(null, null, null, null, null, null)
+        : this(new BotQuestAuthority(), null, null, null, null)
+    {
+    }
+
+    private BotQuestIntakeController(
+        IBotQuestAuthority authority,
+        Action<Character, Vector3, bool> setDestination,
+        Action<Character> stopMovement,
+        Func<Character, Vector3, float> heightProvider,
+        Action<string> eventSink)
+        : this(
+            npcTemplateId => QuestManager.Instance.GetPlayerBotNpcQuestStarts(npcTemplateId),
+            (runtime, radius, now) => authority.FindDoodadQuestStarts(runtime, radius, now),
+            authority.AcceptQuest,
+            ValidateProductionGiverQuest,
+            setDestination,
+            stopMovement,
+            heightProvider,
+            eventSink)
     {
     }
 
@@ -78,11 +114,40 @@ public sealed class BotQuestIntakeController
         Action<Character> stopMovement,
         Func<Character, Vector3, float> heightProvider,
         Action<string> eventSink)
+        : this(
+            questStarts,
+            (_, _, _) => [],
+            (bot, kind, questId, objectId) =>
+                kind == BotQuestGiverKind.Npc && acceptQuest(bot, questId, objectId),
+            (_, kind, _, _) => kind == BotQuestGiverKind.Npc,
+            setDestination,
+            stopMovement,
+            heightProvider,
+            eventSink)
+    {
+    }
+
+    internal BotQuestIntakeController(
+        Func<uint, IReadOnlyList<QuestTemplate>> questStarts,
+        Func<BotRuntime, float, DateTimeOffset, IReadOnlyList<BotQuestStartCandidate>> doodadStarts,
+        Func<Character, BotQuestGiverKind, uint, uint, bool> acceptQuest,
+        Func<Character, BotQuestGiverKind, uint, uint, bool> validateGiverQuest,
+        Action<Character, Vector3, bool> setDestination,
+        Action<Character> stopMovement,
+        Func<Character, Vector3, float> heightProvider,
+        Action<string> eventSink)
     {
         _questStarts = questStarts ??
             (npcTemplateId => QuestManager.Instance.GetPlayerBotNpcQuestStarts(npcTemplateId));
         _acceptQuest = acceptQuest ??
-            ((bot, questId, npcObjectId) => bot.Quests.AddQuestFromNpc(questId, npcObjectId));
+            ((bot, kind, questId, objectId) => kind switch
+            {
+                BotQuestGiverKind.Npc => bot.Quests.AddQuestFromNpc(questId, objectId),
+                BotQuestGiverKind.Doodad => bot.Quests.AddQuestFromDoodad(questId, objectId),
+                _ => false
+            });
+        _doodadStarts = doodadStarts ?? ((_, _, _) => []);
+        _validateGiverQuest = validateGiverQuest ?? ((_, _, _, _) => false);
         _setDestination = setDestination ??
             ((bot, destination, run) => BotManager.Instance.SetBotDestination(
                 bot, destination.X, destination.Y, destination.Z, run));
@@ -138,19 +203,22 @@ public sealed class BotQuestIntakeController
 
             var selected = candidates[0];
             var quests = candidates
-                .Where(candidate => candidate.Npc.ObjId == selected.Npc.ObjId)
+                .Where(candidate => candidate.Kind == selected.Kind &&
+                                    candidate.Giver.ObjId == selected.Giver.ObjId)
                 .OrderBy(candidate => candidate.MainStory ? 0 : 1)
                 .ThenBy(candidate => candidate.Quest.Id)
                 .Select(candidate => candidate.Quest)
                 .ToArray();
-            _plan = new NpcPlan(
-                selected.Npc.ObjId,
-                selected.Npc.TemplateId,
+            _plan = new GiverPlan(
+                selected.Kind,
+                selected.Giver.ObjId,
+                selected.Giver.TemplateId,
                 quests);
             _retryAt = null;
             SetState(BotQuestIntakeState.Interacting, "candidate_selected", now);
             Log(runtime.Bot.Id, "selected",
-                $"npc_obj={selected.Npc.ObjId} npc_template={selected.Npc.TemplateId} " +
+                $"giver={GiverName(selected.Kind)} giver_obj={selected.Giver.ObjId} " +
+                $"giver_template={selected.Giver.TemplateId} " +
                 $"quest={selected.Quest.Id} main_story={selected.MainStory.ToString().ToLowerInvariant()} " +
                 $"distance={selected.Distance:F2} planned={quests.Length}");
             return StepPlan(runtime, config, now);
@@ -164,8 +232,9 @@ public sealed class BotQuestIntakeController
             var quest = _plan?.Quests.FirstOrDefault();
             return new BotQuestIntakeView(
                 _state,
-                _plan?.NpcObjectId,
-                _plan?.NpcTemplateId,
+                _plan?.Kind,
+                _plan?.ObjectId,
+                _plan?.TemplateId,
                 quest?.Id,
                 quest == null ? null : IsMainStory(quest),
                 _decisionReason,
@@ -183,14 +252,14 @@ public sealed class BotQuestIntakeController
     private bool StepPlan(BotRuntime runtime, BotConfig config, DateTimeOffset now)
     {
         var bot = runtime.Bot;
-        var npc = bot.ParentWorld?.GetNpc(_plan.NpcObjectId);
-        if (!TryValidateNpc(bot, npc, EffectiveScanRadius(config), out var distance, out var reason))
+        var giver = ResolveGiver(bot, _plan.Kind, _plan.ObjectId);
+        if (!TryValidateGiver(bot, _plan.Kind, giver, EffectiveScanRadius(config), out var distance, out var reason))
         {
             InvalidatePlan(runtime, reason, now, stopOwnedMovement: true);
             return true;
         }
 
-        var targetPosition = npc.Transform.World.Position;
+        var targetPosition = giver.Transform.World.Position;
         if (distance > config.QuestIntakeInteractionRadius)
         {
             if (runtime.MovementState.Destination is { } currentDestination &&
@@ -209,7 +278,8 @@ public sealed class BotQuestIntakeController
                 _ownedDestination = targetPosition;
                 SetState(BotQuestIntakeState.Moving, "moving_to_quest_giver", now);
                 Log(bot.Id, "move_requested",
-                    $"npc_obj={npc.ObjId} npc_template={npc.TemplateId} distance={distance:F2} " +
+                    $"giver={GiverName(_plan.Kind)} giver_obj={giver.ObjId} " +
+                    $"giver_template={giver.TemplateId} distance={distance:F2} " +
                     $"destination=({targetPosition.X:R},{targetPosition.Y:R},{targetPosition.Z:R})");
             }
 
@@ -219,26 +289,41 @@ public sealed class BotQuestIntakeController
         StopOwnedMovement(runtime);
         SetState(BotQuestIntakeState.Interacting, "within_interaction_radius", now);
         var plannedQuests = _plan.Quests;
+        var giverKind = _plan.Kind;
         _plan = null;
         foreach (var quest in plannedQuests)
         {
-            var key = new QuestCandidateKey(npc.ObjId, quest.Id);
+            var key = new QuestCandidateKey(giverKind, giver.ObjId, quest.Id);
             if (!IsEligible(bot, quest) || IsInBackoff(key, now))
                 continue;
+
+            if (!_validateGiverQuest(bot, giverKind, giver.ObjId, quest.Id))
+            {
+                _rejectedCount++;
+                var validationRetryAt =
+                    now + TimeSpan.FromMilliseconds(config.QuestIntakeRetryBackoffMs);
+                _retryAfter[key] = validationRetryAt;
+                Log(bot.Id, "validation_rejected",
+                    $"giver={GiverName(giverKind)} giver_obj={giver.ObjId} " +
+                    $"giver_template={giver.TemplateId} quest={quest.Id} " +
+                    $"retry_at={Timestamp(validationRetryAt)}");
+                continue;
+            }
 
             var accepted = false;
             try
             {
-                accepted = _acceptQuest(bot, quest.Id, npc.ObjId);
+                accepted = _acceptQuest(bot, giverKind, quest.Id, giver.ObjId);
             }
             catch (Exception exception)
             {
                 Log(bot.Id, "accept_error",
-                    $"npc_obj={npc.ObjId} quest={quest.Id} error={exception.GetType().Name}");
+                    $"giver={GiverName(giverKind)} giver_obj={giver.ObjId} " +
+                    $"quest={quest.Id} error={exception.GetType().Name}");
             }
             finally
             {
-                if (ReferenceEquals(bot.CurrentTarget, npc))
+                if (ReferenceEquals(bot.CurrentTarget, giver))
                     bot.CurrentTarget = null;
             }
 
@@ -248,7 +333,8 @@ public sealed class BotQuestIntakeController
                 _lastAcceptedAt = now;
                 _retryAfter.Remove(key);
                 Log(bot.Id, "accepted",
-                    $"npc_obj={npc.ObjId} npc_template={npc.TemplateId} quest={quest.Id} " +
+                    $"giver={GiverName(giverKind)} giver_obj={giver.ObjId} " +
+                    $"giver_template={giver.TemplateId} quest={quest.Id} " +
                     $"main_story={IsMainStory(quest).ToString().ToLowerInvariant()}");
                 continue;
             }
@@ -257,32 +343,33 @@ public sealed class BotQuestIntakeController
             var retryAt = now + TimeSpan.FromMilliseconds(config.QuestIntakeRetryBackoffMs);
             _retryAfter[key] = retryAt;
             Log(bot.Id, "rejected",
-                $"npc_obj={npc.ObjId} npc_template={npc.TemplateId} quest={quest.Id} retry_at={Timestamp(retryAt)}");
+                $"giver={GiverName(giverKind)} giver_obj={giver.ObjId} giver_template={giver.TemplateId} " +
+                $"quest={quest.Id} retry_at={Timestamp(retryAt)}");
         }
 
         _retryAt = EarliestRetry();
-        SetState(BotQuestIntakeState.Idle, "npc_intake_complete", now);
+        SetState(BotQuestIntakeState.Idle, "giver_intake_complete", now);
         return true;
     }
 
     private List<QuestCandidate> FindCandidates(BotRuntime runtime, BotConfig config, DateTimeOffset now)
     {
-        List<uint> nearbyNpcObjectIds;
+        List<uint> nearbyNpcObjectIds = [];
         try
         {
             if (!runtime.Blackboard.TryGet(
                     BotValues.NearbyNpcIds,
                     now.UtcDateTime,
                     out nearbyNpcObjectIds) ||
-                nearbyNpcObjectIds == null || nearbyNpcObjectIds.Count == 0)
+                nearbyNpcObjectIds == null)
             {
-                return [];
+                nearbyNpcObjectIds = [];
             }
         }
         catch (Exception exception)
         {
             Log(runtime.Bot.Id, "scan_error", $"error={exception.GetType().Name}");
-            return [];
+            nearbyNpcObjectIds = [];
         }
 
         var bot = runtime.Bot;
@@ -291,7 +378,7 @@ public sealed class BotQuestIntakeController
         foreach (var npcObjectId in nearbyNpcObjectIds.Distinct())
         {
             var npc = bot.ParentWorld?.GetNpc(npcObjectId);
-            if (!TryValidateNpc(bot, npc, radius, out var distance, out _))
+            if (!TryValidateGiver(bot, BotQuestGiverKind.Npc, npc, radius, out var distance, out _))
                 continue;
 
             IReadOnlyList<QuestTemplate> starts;
@@ -306,12 +393,52 @@ public sealed class BotQuestIntakeController
 
             foreach (var quest in starts)
             {
-                var key = new QuestCandidateKey(npc.ObjId, quest?.Id ?? 0);
+                var key = new QuestCandidateKey(BotQuestGiverKind.Npc, npc.ObjId, quest?.Id ?? 0);
                 if (!IsEligible(bot, quest) || IsInBackoff(key, now))
                     continue;
 
-                candidates.Add(new QuestCandidate(npc, quest, IsMainStory(quest), distance));
+                candidates.Add(new QuestCandidate(
+                    BotQuestGiverKind.Npc,
+                    npc,
+                    quest,
+                    IsMainStory(quest),
+                    distance));
             }
+        }
+
+        try
+        {
+            foreach (var candidate in _doodadStarts(runtime, radius, now) ?? [])
+            {
+                var key = new QuestCandidateKey(
+                    BotQuestGiverKind.Doodad,
+                    candidate.Giver?.ObjId ?? 0,
+                    candidate.Quest?.Id ?? 0);
+                if (candidate.Kind != BotQuestGiverKind.Doodad ||
+                    !TryValidateGiver(
+                        bot,
+                        BotQuestGiverKind.Doodad,
+                        candidate.Giver,
+                        radius,
+                        out var distance,
+                        out _) ||
+                    !IsEligible(bot, candidate.Quest) ||
+                    IsInBackoff(key, now))
+                {
+                    continue;
+                }
+
+                candidates.Add(new QuestCandidate(
+                    BotQuestGiverKind.Doodad,
+                    candidate.Giver,
+                    candidate.Quest,
+                    IsMainStory(candidate.Quest),
+                    distance));
+            }
+        }
+        catch (Exception exception)
+        {
+            Log(runtime.Bot.Id, "doodad_scan_error", $"error={exception.GetType().Name}");
         }
 
         candidates.Sort(static (left, right) =>
@@ -322,31 +449,38 @@ public sealed class BotQuestIntakeController
             var distance = left.Distance.CompareTo(right.Distance);
             if (distance != 0)
                 return distance;
-            var npc = left.Npc.ObjId.CompareTo(right.Npc.ObjId);
-            return npc != 0 ? npc : left.Quest.Id.CompareTo(right.Quest.Id);
+            var kind = left.Kind.CompareTo(right.Kind);
+            if (kind != 0)
+                return kind;
+            var giver = left.Giver.ObjId.CompareTo(right.Giver.ObjId);
+            return giver != 0 ? giver : left.Quest.Id.CompareTo(right.Quest.Id);
         });
         return candidates;
     }
 
-    private bool TryValidateNpc(
+    private bool TryValidateGiver(
         Character bot,
-        Npc npc,
+        BotQuestGiverKind kind,
+        BaseUnit giver,
         float scanRadius,
         out float distance,
         out string reason)
     {
         distance = float.MaxValue;
-        reason = "npc_invalid";
-        if (npc == null || npc.IsDead || npc.Hp <= 0 || npc.TemplateId == 0 ||
-            bot?.ParentWorld == null || !ReferenceEquals(npc.ParentWorld, bot.ParentWorld) ||
-            bot.Transform?.World == null || npc.Transform?.World == null)
+        reason = kind == BotQuestGiverKind.Npc ? "npc_invalid" : "doodad_invalid";
+        if (giver == null || giver.TemplateId == 0 ||
+            (kind == BotQuestGiverKind.Npc && (giver is not Npc npc || npc.IsDead || npc.Hp <= 0)) ||
+            (kind == BotQuestGiverKind.Doodad &&
+             (giver is not Doodad || giver.Despawn > DateTime.MinValue)) ||
+            bot?.ParentWorld == null || !ReferenceEquals(giver.ParentWorld, bot.ParentWorld) ||
+            bot.Transform?.World == null || giver.Transform?.World == null)
         {
             return false;
         }
 
         var botPosition = bot.Transform.World.Position;
-        var npcPosition = npc.Transform.World.Position;
-        if (!IsFinite(botPosition) || !IsFinite(npcPosition))
+        var giverPosition = giver.Transform.World.Position;
+        if (!IsFinite(botPosition) || !IsFinite(giverPosition))
         {
             reason = "nonfinite_transform";
             return false;
@@ -355,7 +489,7 @@ public sealed class BotQuestIntakeController
         float surfaceZ;
         try
         {
-            surfaceZ = _heightProvider(bot, npcPosition);
+            surfaceZ = _heightProvider(bot, giverPosition);
         }
         catch
         {
@@ -368,9 +502,9 @@ public sealed class BotQuestIntakeController
             return false;
         }
 
-        distance = Vector3.Distance(botPosition, npcPosition);
+        distance = Vector3.Distance(botPosition, giverPosition);
         if (!BotCombatTask.IsWithinNavigableQuestTargetVolume(
-                botPosition, npcPosition, surfaceZ, scanRadius))
+                botPosition, giverPosition, surfaceZ, scanRadius))
         {
             reason = "outside_navigable_scan_volume";
             return false;
@@ -436,6 +570,40 @@ public sealed class BotQuestIntakeController
         return !bot.Quests.HasQuestCompleted(quest.Id) || quest.Repeatable;
     }
 
+    private static BaseUnit ResolveGiver(
+        Character bot,
+        BotQuestGiverKind kind,
+        uint objectId) =>
+        kind switch
+        {
+            BotQuestGiverKind.Npc => bot?.ParentWorld?.GetNpc(objectId),
+            BotQuestGiverKind.Doodad => bot?.ParentWorld?.GetDoodad(objectId),
+            _ => null
+        };
+
+    private static bool ValidateProductionGiverQuest(
+        Character bot,
+        BotQuestGiverKind kind,
+        uint objectId,
+        uint questId)
+    {
+        if (bot?.ParentWorld == null || objectId == 0 || questId == 0)
+            return false;
+
+        return kind switch
+        {
+            BotQuestGiverKind.Npc =>
+                bot.ParentWorld.GetNpc(objectId) is { } npc &&
+                QuestManager.Instance.GetPlayerBotNpcQuestStarts(npc.TemplateId)
+                    .Any(quest => quest.Id == questId),
+            BotQuestGiverKind.Doodad =>
+                bot.ParentWorld.GetDoodad(objectId) is { } doodad &&
+                doodad.TryGetPlayerBotCurrentQuest(out var currentQuestId) &&
+                currentQuestId == questId,
+            _ => false
+        };
+    }
+
     private static bool IsFinite(Vector3 value) =>
         float.IsFinite(value.X) && float.IsFinite(value.Y) && float.IsFinite(value.Z);
 
@@ -486,13 +654,16 @@ public sealed class BotQuestIntakeController
         if (_plan == null && !_ownedDestination.HasValue)
             return;
 
-        var npcObjectId = _plan?.NpcObjectId;
+        var kind = _plan?.Kind;
+        var objectId = _plan?.ObjectId;
         if (stopOwnedMovement)
             StopOwnedMovement(runtime);
         _plan = null;
         _ownedDestination = null;
         SetState(BotQuestIntakeState.Blocked, reason, now);
-        Log(runtime.Bot.Id, "invalidated", $"npc_obj={npcObjectId?.ToString() ?? "none"} reason={reason}");
+        Log(runtime.Bot.Id, "invalidated",
+            $"giver={(kind.HasValue ? GiverName(kind.Value) : "none")} " +
+            $"giver_obj={objectId?.ToString() ?? "none"} reason={reason}");
     }
 
     private void StopOwnedMovement(BotRuntime runtime)
@@ -527,13 +698,21 @@ public sealed class BotQuestIntakeController
     private static string Timestamp(DateTimeOffset value) =>
         value.ToUniversalTime().ToString("O");
 
-    private readonly record struct QuestCandidateKey(uint NpcObjectId, uint QuestId);
-    private sealed record NpcPlan(
-        uint NpcObjectId,
-        uint NpcTemplateId,
+    private static string GiverName(BotQuestGiverKind kind) =>
+        kind.ToString().ToLowerInvariant();
+
+    private readonly record struct QuestCandidateKey(
+        BotQuestGiverKind Kind,
+        uint ObjectId,
+        uint QuestId);
+    private sealed record GiverPlan(
+        BotQuestGiverKind Kind,
+        uint ObjectId,
+        uint TemplateId,
         QuestTemplate[] Quests);
     private readonly record struct QuestCandidate(
-        Npc Npc,
+        BotQuestGiverKind Kind,
+        BaseUnit Giver,
         QuestTemplate Quest,
         bool MainStory,
         float Distance);

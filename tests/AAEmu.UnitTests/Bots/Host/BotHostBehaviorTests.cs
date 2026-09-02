@@ -701,6 +701,76 @@ public class BotHostBehaviorTests
     }
 
     [Test]
+    public async Task QuestLifecycle_ClaimsTheHostTickBeforeIntakeAndOneKillGrind()
+    {
+        var config = BotConfig.Instance;
+        var previousCompletionEnabled = config.QuestCompletionEnabled;
+        var previousIntakeEnabled = config.QuestIntakeEnabled;
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 2, 12, 0, 0, TimeSpan.Zero));
+        var quest = new QuestTemplate { Id = 7002, ChapterIdx = 1, QuestIdx = 2 };
+        var accepted = new List<uint>();
+        var intake = new BotQuestIntakeController(
+            npcTemplateId => npcTemplateId == 5500 ? [quest] : [],
+            (bot, questId, _) =>
+            {
+                accepted.Add(questId);
+                return true;
+            },
+            (_, _, _) => { },
+            _ => { },
+            (_, position) => position.Z,
+            null);
+        var authority = new HostQuestAuthority
+        {
+            Snapshots =
+            [
+                new BotQuestSnapshot(
+                    7001,
+                    true,
+                    false,
+                    BotQuestObjectiveShape.Unsupported,
+                    null,
+                    [],
+                    [],
+                    "unsupported_fixture")
+            ]
+        };
+        var lifecycle = new BotQuestLifecycleController(authority);
+        var host = MakeLifecycleHost(time, _ => false);
+        var runtime = MakeLifecycleRuntime(
+            6502,
+            time,
+            questIntakeController: intake,
+            questLifecycleController: lifecycle);
+        var questNpc = runtime.Bot.ParentWorld.GetNpc(9901);
+        questNpc.TemplateId = 5500;
+        questNpc.Transform.Local.SetPosition(new Vector3(2, 0, 0));
+        BotTestFixture.SetPrivateField(questNpc, "_parentWorld", runtime.Bot.ParentWorld);
+        runtime.Blackboard.Register(BotValues.NearbyNpcIds, new ManualValue<List<uint>>([questNpc.ObjId]));
+        runtime.Brain = new NoopBrain(runtime.Bot, runtime.CombatState, runtime.Broadcaster);
+
+        try
+        {
+            config.QuestCompletionEnabled = true;
+            config.QuestIntakeEnabled = true;
+            host.Register(runtime);
+
+            host.HostTask.Execute();
+
+            await Assert.That(lifecycle.Inspect().State).IsEqualTo(BotQuestLifecycleState.Suspended);
+            await Assert.That(accepted).IsEmpty();
+            await Assert.That(runtime.LifeController.Inspect().Activity).IsNull();
+            await Assert.That(runtime.CombatState.KillGoal).IsNull();
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+            config.QuestCompletionEnabled = previousCompletionEnabled;
+            config.QuestIntakeEnabled = previousIntakeEnabled;
+        }
+    }
+
+    [Test]
     public async Task NaturalRecoveryWait_SuspendsMoverAndBrainUntilWorldResourcesAreFull()
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 2, 0, TimeSpan.Zero));
@@ -1222,7 +1292,8 @@ public class BotHostBehaviorTests
         FakeTimeProvider time,
         BotLifeController controller = null,
         uint? directorZone = null,
-        BotQuestIntakeController questIntakeController = null)
+        BotQuestIntakeController questIntakeController = null,
+        BotQuestLifecycleController questLifecycleController = null)
     {
         var bot = new LifecycleCharacterMock
         {
@@ -1271,7 +1342,45 @@ public class BotHostBehaviorTests
             blackboard,
             new BotConfig { UseEngine = false },
             controller,
-            questIntakeController);
+            questIntakeController,
+            questLifecycleController);
+    }
+
+    private sealed class HostQuestAuthority : IBotQuestAuthority
+    {
+        public IReadOnlyList<BotQuestSnapshot> Snapshots { get; set; } = [];
+
+        public IReadOnlyList<BotQuestStartCandidate> FindDoodadQuestStarts(
+            BotRuntime runtime,
+            float radius,
+            DateTimeOffset now) => [];
+
+        public bool AcceptQuest(
+            Character bot,
+            BotQuestGiverKind kind,
+            uint questId,
+            uint giverObjectId) => false;
+
+        public IReadOnlyList<BotQuestSnapshot> ReadActiveQuests(Character bot) => Snapshots;
+
+        public IReadOnlyList<Npc> FindMonsterTargets(
+            BotRuntime runtime,
+            uint npcTemplateId,
+            float radius,
+            DateTimeOffset now) => [];
+
+        public IReadOnlyList<BotQuestWorldObject> FindReportObjects(
+            BotRuntime runtime,
+            BotQuestReportEndpoint endpoint,
+            float radius,
+            DateTimeOffset now) => [];
+
+        public bool ReportQuest(
+            Character bot,
+            uint questId,
+            BotQuestReportKind kind,
+            uint worldObjectId,
+            int rewardIndex) => false;
     }
 
     private sealed class LifecycleCharacterMock : CharacterMock

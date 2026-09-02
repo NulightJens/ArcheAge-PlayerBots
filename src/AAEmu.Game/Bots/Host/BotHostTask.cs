@@ -97,7 +97,7 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
             }
 
             BotCombatTask brain;
-            var questIntakeClaimed = false;
+            var questActivityClaimed = false;
             try
             {
                 lock (runtime.SyncRoot)
@@ -108,8 +108,10 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                         continue;
                     }
 
-                    questIntakeClaimed = runtime.QuestIntakeController.Step(runtime, config, nowOffset);
-                    var logoutRequested = !questIntakeClaimed && runtime.LifeController.Step(
+                    questActivityClaimed = runtime.QuestLifecycleController.Step(runtime, config, nowOffset);
+                    if (!questActivityClaimed)
+                        questActivityClaimed = runtime.QuestIntakeController.Step(runtime, config, nowOffset);
+                    var logoutRequested = !questActivityClaimed && runtime.LifeController.Step(
                         runtime,
                         lifecycleEligible,
                         nowOffset);
@@ -131,7 +133,7 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
 
                 lock (runtime.SyncRoot)
                 {
-                    if (!questIntakeClaimed && !runtime.Retired &&
+                    if (!questActivityClaimed && !runtime.Retired &&
                         runtime.LifeController.Step(runtime, lifecycleEligible, nowOffset))
                     {
                         _logoutRequests.Add(runtime);

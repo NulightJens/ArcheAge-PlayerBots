@@ -24,7 +24,8 @@ public sealed class BotRuntime
         BotBlackboard blackboard = null,
         BotConfig config = null,
         BotLifeController lifeController = null,
-        BotQuestIntakeController questIntakeController = null)
+        BotQuestIntakeController questIntakeController = null,
+        BotQuestLifecycleController questLifecycleController = null)
     {
         Bot = bot ?? throw new ArgumentNullException(nameof(bot));
         MovementState = movementState ?? throw new ArgumentNullException(nameof(movementState));
@@ -36,6 +37,7 @@ public sealed class BotRuntime
         Blackboard = blackboard ?? new BotBlackboard();
         LifeController = lifeController ?? new BotLifeController();
         QuestIntakeController = questIntakeController ?? new BotQuestIntakeController();
+        QuestLifecycleController = questLifecycleController ?? new BotQuestLifecycleController();
         CombatState.BotId = bot.Id;
         KillCreditSubscription = new BotKillCreditSubscription(Bot, CombatState);
         Social = new BotSocialState(this);
@@ -73,6 +75,7 @@ public sealed class BotRuntime
     public BotBlackboard Blackboard { get; }
     public BotLifeController LifeController { get; }
     public BotQuestIntakeController QuestIntakeController { get; }
+    public BotQuestLifecycleController QuestLifecycleController { get; }
     public BotSocialState Social { get; }
     public BotTeamHooks TeamHooks { get; }
     public BotStuckWatch StuckWatch { get; }

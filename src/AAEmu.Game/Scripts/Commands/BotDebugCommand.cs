@@ -141,11 +141,30 @@ namespace AAEmu.Game.Scripts.Commands
                 CommandManager.SendNormalText(this, messageOutput,
                     string.Create(System.Globalization.CultureInfo.InvariantCulture,
                         $"Quest intake: state={QuestIntakeState(questIntake.State)}, " +
-                        $"npc={Optional(questIntake.NpcTemplateId)}:{Optional(questIntake.NpcObjectId)}, " +
+                        $"giver={questIntake.GiverKind?.ToString().ToLowerInvariant() ?? "none"}:" +
+                        $"{Optional(questIntake.GiverTemplateId)}:{Optional(questIntake.GiverObjectId)}, " +
                         $"quest={Optional(questIntake.QuestId)}, main_story={Optional(questIntake.MainStory)}, " +
                         $"reason={questIntake.DecisionReason ?? "none"}, at={Timestamp(questIntake.DecisionAt)}, " +
                         $"last_accepted_at={Timestamp(questIntake.LastAcceptedAt)}, retry_at={Timestamp(questIntake.RetryAt)}, " +
                         $"accepted={questIntake.AcceptedCount}, rejected={questIntake.RejectedCount}"));
+                var questLifecycle = runtime.QuestLifecycleController.Inspect();
+                CommandManager.SendNormalText(this, messageOutput,
+                    string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                        $"Quest lifecycle: state={questLifecycle.State.ToString().ToLowerInvariant()}, " +
+                        $"quest={Optional(questLifecycle.QuestId)}, " +
+                        $"objective={Optional(questLifecycle.ObjectiveTargetTemplateId)}:" +
+                        $"{Optional(questLifecycle.ObjectiveTargetObjectId)} " +
+                        $"progress={Optional(questLifecycle.ObjectiveCurrent)}/" +
+                        $"{Optional(questLifecycle.ObjectiveRequired)}, " +
+                        $"report={questLifecycle.ReportKind?.ToString().ToLowerInvariant() ?? "none"}:" +
+                        $"{Optional(questLifecycle.ReportTemplateId)}:{Optional(questLifecycle.ReportObjectId)}, " +
+                        $"reward={Optional(questLifecycle.RewardIndex)}, " +
+                        $"reason={questLifecycle.DecisionReason ?? "none"}, at={Timestamp(questLifecycle.DecisionAt)}, " +
+                        $"progress_at={Timestamp(questLifecycle.ProgressObservedAt)}, " +
+                        $"report_at={Timestamp(questLifecycle.ReportAttemptedAt)}, " +
+                        $"completed_at={Timestamp(questLifecycle.CompletedAt)}, retry_at={Timestamp(questLifecycle.RetryAt)}, " +
+                        $"completed={questLifecycle.CompletedCount}, suspended={questLifecycle.SuspensionCount}, " +
+                        $"report_attempts={questLifecycle.ReportAttemptCount}"));
                 var runtimeMetrics = runtime.Metrics;
                 CommandManager.SendNormalText(this, messageOutput,
                     string.Create(System.Globalization.CultureInfo.InvariantCulture,
@@ -210,6 +229,9 @@ namespace AAEmu.Game.Scripts.Commands
             state.ToString().ToLowerInvariant();
 
         private static string Optional(uint? value) =>
+            value?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none";
+
+        private static string Optional(int? value) =>
             value?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none";
 
         private static string Optional(bool? value) =>

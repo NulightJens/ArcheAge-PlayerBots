@@ -48,6 +48,14 @@ public class BotConfigTests
         await Assert.That(config.QuestIntakeScanRadius).IsEqualTo(60d);
         await Assert.That(config.QuestIntakeInteractionRadius).IsEqualTo(6d);
         await Assert.That(config.QuestIntakeRetryBackoffMs).IsEqualTo(30000);
+        await Assert.That(config.QuestCompletionEnabled).IsFalse();
+        await Assert.That(config.QuestObjectiveScanRadius).IsEqualTo(60d);
+        await Assert.That(config.QuestReportScanRadius).IsEqualTo(60d);
+        await Assert.That(config.QuestReportInteractionRadius).IsEqualTo(6d);
+        await Assert.That(config.QuestTargetSelectionTimeoutMs).IsEqualTo(30000);
+        await Assert.That(config.QuestProgressObservationMs).IsEqualTo(3000);
+        await Assert.That(config.QuestCompletionObservationMs).IsEqualTo(5000);
+        await Assert.That(config.QuestCompletionRetryBackoffMs).IsEqualTo(30000);
         await Assert.That(config.ActivityDirectorEnabled).IsFalse();
         await Assert.That(config.ActivityDirectorZoneId).IsEqualTo(0u);
         await Assert.That(config.ActivityDirectorCharacterIds).IsEmpty();
@@ -139,6 +147,14 @@ public class BotConfigTests
               "QuestIntakeScanRadius": 56.6,
               "QuestIntakeInteractionRadius": 5.5,
               "QuestIntakeRetryBackoffMs": 4567,
+              "QuestCompletionEnabled": true,
+              "QuestObjectiveScanRadius": 55.5,
+              "QuestReportScanRadius": 54.4,
+              "QuestReportInteractionRadius": 4.4,
+              "QuestTargetSelectionTimeoutMs": 6543,
+              "QuestProgressObservationMs": 7654,
+              "QuestCompletionObservationMs": 8765,
+              "QuestCompletionRetryBackoffMs": 9876,
               "ActivityDirectorEnabled": true,
               "ActivityDirectorZoneId": 137,
               "ActivityDirectorCharacterIds": [2, 3, 4],
@@ -180,6 +196,14 @@ public class BotConfigTests
         await Assert.That(config.QuestIntakeScanRadius).IsEqualTo(56.6);
         await Assert.That(config.QuestIntakeInteractionRadius).IsEqualTo(5.5);
         await Assert.That(config.QuestIntakeRetryBackoffMs).IsEqualTo(4567);
+        await Assert.That(config.QuestCompletionEnabled).IsTrue();
+        await Assert.That(config.QuestObjectiveScanRadius).IsEqualTo(55.5);
+        await Assert.That(config.QuestReportScanRadius).IsEqualTo(54.4);
+        await Assert.That(config.QuestReportInteractionRadius).IsEqualTo(4.4);
+        await Assert.That(config.QuestTargetSelectionTimeoutMs).IsEqualTo(6543);
+        await Assert.That(config.QuestProgressObservationMs).IsEqualTo(7654);
+        await Assert.That(config.QuestCompletionObservationMs).IsEqualTo(8765);
+        await Assert.That(config.QuestCompletionRetryBackoffMs).IsEqualTo(9876);
         await Assert.That(config.ActivityDirectorEnabled).IsTrue();
         await Assert.That(config.ActivityDirectorZoneId).IsEqualTo(137u);
         await Assert.That(config.ActivityDirectorCharacterIds).IsEquivalentTo([2u, 3u, 4u]);
@@ -298,6 +322,14 @@ public class BotConfigTests
         await Assert.That(config.QuestIntakeScanRadius).IsEqualTo(60d);
         await Assert.That(config.QuestIntakeInteractionRadius).IsEqualTo(6d);
         await Assert.That(config.QuestIntakeRetryBackoffMs).IsEqualTo(30000);
+        await Assert.That(config.QuestCompletionEnabled).IsFalse();
+        await Assert.That(config.QuestObjectiveScanRadius).IsEqualTo(60d);
+        await Assert.That(config.QuestReportScanRadius).IsEqualTo(60d);
+        await Assert.That(config.QuestReportInteractionRadius).IsEqualTo(6d);
+        await Assert.That(config.QuestTargetSelectionTimeoutMs).IsEqualTo(30000);
+        await Assert.That(config.QuestProgressObservationMs).IsEqualTo(3000);
+        await Assert.That(config.QuestCompletionObservationMs).IsEqualTo(5000);
+        await Assert.That(config.QuestCompletionRetryBackoffMs).IsEqualTo(30000);
         await Assert.That(config.ActivityDirectorEnabled).IsFalse();
         await Assert.That(config.ActivityDirectorZoneId).IsEqualTo(0u);
         await Assert.That(config.ActivityDirectorCharacterIds).IsEmpty();
@@ -373,6 +405,14 @@ public class BotConfigTests
         await Assert.That((double)json["QuestIntakeScanRadius"]).IsEqualTo(60d);
         await Assert.That((double)json["QuestIntakeInteractionRadius"]).IsEqualTo(6d);
         await Assert.That((int)json["QuestIntakeRetryBackoffMs"]).IsEqualTo(30000);
+        await Assert.That((bool)json["QuestCompletionEnabled"]).IsFalse();
+        await Assert.That((double)json["QuestObjectiveScanRadius"]).IsEqualTo(60d);
+        await Assert.That((double)json["QuestReportScanRadius"]).IsEqualTo(60d);
+        await Assert.That((double)json["QuestReportInteractionRadius"]).IsEqualTo(6d);
+        await Assert.That((int)json["QuestTargetSelectionTimeoutMs"]).IsEqualTo(30000);
+        await Assert.That((int)json["QuestProgressObservationMs"]).IsEqualTo(3000);
+        await Assert.That((int)json["QuestCompletionObservationMs"]).IsEqualTo(5000);
+        await Assert.That((int)json["QuestCompletionRetryBackoffMs"]).IsEqualTo(30000);
     }
 
     [Test]
@@ -399,6 +439,40 @@ public class BotConfigTests
         await Assert.That(config.QuestIntakeScanRadius).IsEqualTo(2d);
         await Assert.That(config.QuestIntakeInteractionRadius).IsEqualTo(2d);
         await Assert.That(config.QuestIntakeRetryBackoffMs).IsEqualTo(600000);
+    }
+
+    [Test]
+    public async Task Validate_QuestCompletionBoundsAndNonfiniteValues_FailClosedToSafeDefaults()
+    {
+        var config = new BotConfig
+        {
+            QuestObjectiveScanRadius = double.NaN,
+            QuestReportScanRadius = double.PositiveInfinity,
+            QuestReportInteractionRadius = double.NaN,
+            QuestTargetSelectionTimeoutMs = -1,
+            QuestProgressObservationMs = -1,
+            QuestCompletionObservationMs = 70000,
+            QuestCompletionRetryBackoffMs = 700000
+        };
+
+        config.Validate();
+
+        await Assert.That(config.QuestObjectiveScanRadius).IsEqualTo(60d);
+        await Assert.That(config.QuestReportScanRadius).IsEqualTo(60d);
+        await Assert.That(config.QuestReportInteractionRadius).IsEqualTo(6d);
+        await Assert.That(config.QuestTargetSelectionTimeoutMs).IsEqualTo(1000);
+        await Assert.That(config.QuestProgressObservationMs).IsEqualTo(100);
+        await Assert.That(config.QuestCompletionObservationMs).IsEqualTo(60000);
+        await Assert.That(config.QuestCompletionRetryBackoffMs).IsEqualTo(600000);
+
+        config.QuestObjectiveScanRadius = 500;
+        config.QuestReportScanRadius = 2;
+        config.QuestReportInteractionRadius = 9;
+        config.Validate();
+
+        await Assert.That(config.QuestObjectiveScanRadius).IsEqualTo(100d);
+        await Assert.That(config.QuestReportScanRadius).IsEqualTo(2d);
+        await Assert.That(config.QuestReportInteractionRadius).IsEqualTo(2d);
     }
 
     [Test]

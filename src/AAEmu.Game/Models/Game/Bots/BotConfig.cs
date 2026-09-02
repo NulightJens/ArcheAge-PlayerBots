@@ -83,11 +83,20 @@ namespace AAEmu.Game.Models.Game.Bots
         public int IterationsPerTick { get; set; } = 10;
         public int ExpireActionTimeMs { get; set; } = 5000;
         public int GlobalSkillDelayMs { get; set; } = 600;
-        /// <summary>Opt-in autonomous discovery, movement, and normal NPC acceptance of nearby quests.</summary>
+        /// <summary>Opt-in autonomous discovery, movement, and normal NPC/doodad acceptance of nearby quests.</summary>
         public bool QuestIntakeEnabled { get; set; }
         public double QuestIntakeScanRadius { get; set; } = 60.0;
         public double QuestIntakeInteractionRadius { get; set; } = 6.0;
         public int QuestIntakeRetryBackoffMs { get; set; } = 30000;
+        /// <summary>Opt-in autonomous execution and reporting of supported active quests.</summary>
+        public bool QuestCompletionEnabled { get; set; }
+        public double QuestObjectiveScanRadius { get; set; } = 60.0;
+        public double QuestReportScanRadius { get; set; } = 60.0;
+        public double QuestReportInteractionRadius { get; set; } = 6.0;
+        public int QuestTargetSelectionTimeoutMs { get; set; } = 30000;
+        public int QuestProgressObservationMs { get; set; } = 3000;
+        public int QuestCompletionObservationMs { get; set; } = 5000;
+        public int QuestCompletionRetryBackoffMs { get; set; } = 30000;
         public bool ActivityDirectorEnabled { get; set; }
         public uint ActivityDirectorZoneId { get; set; }
         public List<uint> ActivityDirectorCharacterIds { get; set; } = [];
@@ -207,6 +216,31 @@ namespace AAEmu.Game.Models.Game.Bots
                 1.0,
                 Math.Min(10.0, QuestIntakeScanRadius));
             QuestIntakeRetryBackoffMs = Math.Clamp(QuestIntakeRetryBackoffMs, 1000, 600000);
+            QuestObjectiveScanRadius = Math.Clamp(
+                double.IsFinite(QuestObjectiveScanRadius) ? QuestObjectiveScanRadius : 60.0,
+                1.0,
+                100.0);
+            QuestReportScanRadius = Math.Clamp(
+                double.IsFinite(QuestReportScanRadius) ? QuestReportScanRadius : 60.0,
+                1.0,
+                100.0);
+            QuestReportInteractionRadius = Math.Clamp(
+                double.IsFinite(QuestReportInteractionRadius) ? QuestReportInteractionRadius : 6.0,
+                1.0,
+                Math.Min(10.0, QuestReportScanRadius));
+            QuestTargetSelectionTimeoutMs = Math.Clamp(
+                QuestTargetSelectionTimeoutMs,
+                1000,
+                600000);
+            QuestProgressObservationMs = Math.Clamp(QuestProgressObservationMs, 100, 60000);
+            QuestCompletionObservationMs = Math.Clamp(
+                QuestCompletionObservationMs,
+                100,
+                60000);
+            QuestCompletionRetryBackoffMs = Math.Clamp(
+                QuestCompletionRetryBackoffMs,
+                1000,
+                600000);
             ActivityDirectorCharacterIds ??= [];
             ActivityDirectorInitialDelayMs = Math.Clamp(
                 ActivityDirectorInitialDelayMs,
