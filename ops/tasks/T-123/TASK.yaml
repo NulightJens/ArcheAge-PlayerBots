@@ -27,4 +27,3 @@ gates:
 validation_boundary: Navigation module source, a separate reviewed AAEmu 1.2 compatibility patch, synthetic focused tests, isolated build, documentation, and handoff only. Do not edit or unpack the client/game_pak, deploy or control the retained T-120 runtime/client, query or write a database, edit global ledgers or the lease, run the full suite, force a process, or touch AAEmu 3.0.
 contract: ops/tasks/T-123/CONTRACT.md
 handoff: ops/tasks/T-123/HANDOFF.md
-

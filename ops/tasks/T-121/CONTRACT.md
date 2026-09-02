@@ -36,4 +36,3 @@ Nuian race spawn, caller placement, clean quest state, level-appropriate skills
 and inventory, roster registration, admission, rollback/fail-closed behavior,
 and unchanged loading of existing persisted bots. Run an isolated AAEmu 1.2
 build with zero errors and record exact proof in `HANDOFF.md`.
-

@@ -34,4 +34,3 @@ gates:
 validation_boundary: Module source, a separate reviewed AAEmu 1.2 compatibility patch, focused deterministic tests, isolated build, documentation, and handoff only. Do not deploy or control the retained T-120 runtime/client, query or write a database, force quest state, edit global ledgers or the lease, run the full suite, edit client data, force a process, or touch AAEmu 3.0.
 contract: ops/tasks/T-122/CONTRACT.md
 handoff: ops/tasks/T-122/HANDOFF.md
-

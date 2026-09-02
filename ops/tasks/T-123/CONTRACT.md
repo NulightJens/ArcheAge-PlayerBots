@@ -30,4 +30,3 @@ preservation, length weights, deterministic snapping/ties, cross-zone routing,
 disconnected graphs, invalid inputs, slope/gap rejection, projection, replans,
 and final-approach handoff. Run an isolated AAEmu 1.2 build with zero errors and
 record exact proof in `HANDOFF.md`.
-

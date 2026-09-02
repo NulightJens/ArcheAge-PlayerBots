@@ -41,4 +41,3 @@ targets, no fabricated credit, normal travel/combat handoff, ready-state
 reporting for every supported endpoint, reward validation, chaining, duplicate
 prevention, unsupported objectives, and all fail-closed guards. Run an isolated
 AAEmu 1.2 build with zero errors and record exact proof in `HANDOFF.md`.
-
