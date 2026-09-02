@@ -20,6 +20,7 @@ using AAEmu.Game.Models.Game.World;
 using AAEmu.Game.Models.Game.World.Transform;
 using AAEmu.Game.Models.Game.World.Zones;
 using AAEmu.Game.Scripts.Commands;
+using AAEmu.Game.Utils;
 using AAEmu.Game.Utils.Scripts;
 using AAEmu.UnitTests.Utils.Mocks;
 using Microsoft.Extensions.DependencyInjection;
@@ -85,14 +86,14 @@ public class SpawnPassiveNpcCommandTests
     }
 
     [Test]
-    public async Task CommandSurface_PreservesAliasesAndLegacyHelpBytes()
+    public async Task CommandSurface_PreservesAliasesAndShowsCompleteGrammar()
     {
         var command = new SpawnPassiveNpcCommand();
 
         await Assert.That(string.Join(',', command.CommandNames))
             .IsEqualTo("spawnpassive,passivenpc,passiveboss");
         await Assert.That(command.GetCommandLineHelp())
-            .IsEqualTo("<npcTemplateId> [distance]");
+            .IsEqualTo("<npcTemplateId> [distance] [anchorBotId] [yawOffsetDegrees]");
         await Assert.That(command.GetCommandHelpText()).IsEqualTo(
             "Spawns a killable, non-retaliating NPC on the terrain in front of you. " +
             "The passive AI applies only to that spawned instance and its respawn is disabled.");
@@ -116,6 +117,84 @@ public class SpawnPassiveNpcCommandTests
         await Assert.That(error).IsNull();
         await Assert.That(SpawnPassiveNpcCommand.TryParse(
             ["11180", "14.5", "20001"], out _, out _)).IsFalse();
+    }
+
+    [Test]
+    public async Task TryParse_FourthYawOffsetUnderGermanCulture_UsesInvariantFiniteInclusiveDegrees()
+    {
+        var previousCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            foreach (var (text, expected) in new[]
+                     {
+                         ("0", 0f),
+                         ("45", 45f),
+                         ("-45", -45f),
+                         ("180", 180f),
+                         ("-180", -180f)
+                     })
+            {
+                var parsed = SpawnPassiveNpcCommand.TryParse(
+                    ["11180", "14.5", "20001", text],
+                    out var templateId,
+                    out var distance,
+                    out var anchorBotId,
+                    out var yawOffsetDegrees,
+                    out var error);
+
+                await Assert.That(parsed).IsTrue();
+                await Assert.That(templateId).IsEqualTo(11180u);
+                await Assert.That(distance).IsEqualTo(14.5f);
+                await Assert.That(anchorBotId).IsEqualTo(20001u);
+                await Assert.That(yawOffsetDegrees).IsEqualTo(expected);
+                await Assert.That(error).IsNull();
+            }
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previousCulture;
+        }
+    }
+
+    [Test]
+    public async Task TryParse_InvalidYawOffset_ReturnsPreciseError()
+    {
+        var previousCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            foreach (var value in new[]
+                     {
+                         null,
+                         string.Empty,
+                         "NaN",
+                         "Infinity",
+                         "-Infinity",
+                         "malformed",
+                         "45,5",
+                         "-180.1",
+                         "180.1"
+                     })
+            {
+                var parsed = SpawnPassiveNpcCommand.TryParse(
+                    ["11180", "12", "20001", value],
+                    out _,
+                    out _,
+                    out _,
+                    out _,
+                    out var error);
+
+                await Assert.That(parsed).IsFalse();
+                await Assert.That(error).IsEqualTo(SpawnPassiveNpcCommand.InvalidYawOffsetError);
+            }
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previousCulture;
+        }
     }
 
     [Test]
@@ -145,13 +224,22 @@ public class SpawnPassiveNpcCommandTests
             ["invalid", "12", "20001"], out _, out _, out _, out var templateError);
         var invalidDistance = SpawnPassiveNpcCommand.TryParse(
             ["11180", "4.9", "20001"], out _, out _, out _, out var distanceError);
+        var invalidNewArity = SpawnPassiveNpcCommand.TryParse(
+            ["11180", "12", "20001", "45", "extra"],
+            out _,
+            out _,
+            out _,
+            out _,
+            out var newArityError);
 
         await Assert.That(invalidArity).IsFalse();
         await Assert.That(invalidTemplate).IsFalse();
         await Assert.That(invalidDistance).IsFalse();
+        await Assert.That(invalidNewArity).IsFalse();
         await Assert.That(arityError).IsNull();
         await Assert.That(templateError).IsNull();
         await Assert.That(distanceError).IsNull();
+        await Assert.That(newArityError).IsNull();
     }
 
     [Test]
@@ -219,6 +307,45 @@ public class SpawnPassiveNpcCommandTests
         await Assert.That(resolverCalls).IsEqualTo(0);
         await Assert.That(messages).Contains(
             "|cFFFFFFFF[spawnpassive]|r |cFFFF0000Anchor bot ID must be a nonzero unsigned integer.|r");
+    }
+
+    [Test]
+    public async Task Execute_InvalidYawOffsetFailsBeforeResolutionWithoutStateMutation()
+    {
+        var (world, bot) = CreateQualifiedAnchor();
+        var previousTarget = new Npc { ObjId = 99001 };
+        bot.CurrentTarget = previousTarget;
+        bot.IsInBattle = true;
+        var originalPosition = bot.Transform.World.Position;
+        var originalRotation = bot.Transform.World.Rotation;
+        var resolverCalls = 0;
+        var groundCalls = 0;
+        SpawnPassiveNpcCommand.ActiveBotResolver = _ =>
+        {
+            resolverCalls++;
+            return bot;
+        };
+        SpawnPassiveNpcCommand.GroundHeightResolver = (_, _, _, _) =>
+        {
+            groundCalls++;
+            return 0f;
+        };
+        var messages = CaptureMessages(out var output);
+
+        new SpawnPassiveNpcCommand().Execute(
+            new Character(new AAEmu.Game.Models.Game.Units.UnitCustomModelParams()),
+            ["11180", "12", "20001", "45,5"],
+            output);
+
+        await Assert.That(resolverCalls).IsEqualTo(0);
+        await Assert.That(groundCalls).IsEqualTo(0);
+        await Assert.That(messages).Contains(
+            "|cFFFFFFFF[spawnpassive]|r |cFFFF0000Yaw offset degrees must be a finite invariant number from -180 through 180.|r");
+        await Assert.That(bot.ParentWorld).IsSameReferenceAs(world);
+        await Assert.That(bot.CurrentTarget).IsSameReferenceAs(previousTarget);
+        await Assert.That(bot.IsInBattle).IsTrue();
+        await Assert.That(bot.Transform.World.Position).IsEqualTo(originalPosition);
+        await Assert.That(bot.Transform.World.Rotation).IsEqualTo(originalRotation);
     }
 
     [Test]
@@ -517,6 +644,112 @@ public class SpawnPassiveNpcCommandTests
         await Assert.That(float.IsFinite(spawnPosition.Y)).IsTrue();
         await Assert.That(float.IsFinite(spawnPosition.Z)).IsTrue();
         await Assert.That(heightRequest.Value.zoneId).IsEqualTo(anchor.ZoneId);
+        await Assert.That(anchor.Transform.World.Position).IsEqualTo(sourcePosition);
+        await Assert.That(anchor.Transform.World.Rotation).IsEqualTo(sourceRotation);
+        await Assert.That(SpawnPassiveNpcCommand.AnchorAudit(anchor))
+            .IsEqualTo("anchorBotId=20001, anchorZone=601, anchorInstance=43, ");
+    }
+
+    [Test]
+    public async Task CreateSpawnPosition_OmittedAndExplicitZeroYawOffsetAreBitExact()
+    {
+        var (_, bot) = CreateQualifiedAnchor();
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        var sourcePosition = anchor.Transform.World.Position;
+        var sourceRotation = anchor.Transform.World.Rotation;
+
+        var omitted = SpawnPassiveNpcCommand.CreateSpawnPosition(
+            anchor.Transform,
+            12f,
+            anchor.WorldId,
+            static (_, _, _, _) => 0f);
+        var explicitZero = SpawnPassiveNpcCommand.CreateSpawnPosition(
+            anchor.Transform,
+            12f,
+            0f,
+            anchor.WorldId,
+            static (_, _, _, _) => 0f);
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(BitConverter.SingleToInt32Bits(explicitZero.X))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(omitted.X));
+        await Assert.That(BitConverter.SingleToInt32Bits(explicitZero.Y))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(omitted.Y));
+        await Assert.That(BitConverter.SingleToInt32Bits(explicitZero.Z))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(omitted.Z));
+        await Assert.That(BitConverter.SingleToInt32Bits(explicitZero.Roll))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(omitted.Roll));
+        await Assert.That(BitConverter.SingleToInt32Bits(explicitZero.Pitch))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(omitted.Pitch));
+        await Assert.That(BitConverter.SingleToInt32Bits(explicitZero.Yaw))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(omitted.Yaw));
+        await Assert.That(explicitZero.WorldId).IsEqualTo(omitted.WorldId);
+        await Assert.That(explicitZero.ZoneId).IsEqualTo(omitted.ZoneId);
+        await Assert.That(anchor.Transform.World.Position).IsEqualTo(sourcePosition);
+        await Assert.That(anchor.Transform.World.Rotation).IsEqualTo(sourceRotation);
+    }
+
+    [Arguments(45f)]
+    [Arguments(-45f)]
+    [Test]
+    public async Task CreateSpawnPosition_SignedYawOffsetMatchesPinnedSinglePrecisionDetachedGeometry(
+        float yawOffsetDegrees)
+    {
+        var (world, bot) = CreateQualifiedAnchor();
+        var previousTarget = new Npc { ObjId = 99001 };
+        bot.CurrentTarget = previousTarget;
+        bot.IsInBattle = true;
+        var resolved = SpawnPassiveNpcCommand.TryResolveActiveBotAnchor(
+            bot.Id, _ => bot, out var anchor, out _);
+        using var anchorScope = anchor;
+        var sourcePosition = anchor.Transform.World.Position;
+        var sourceRotation = anchor.Transform.World.Rotation;
+        (uint zoneId, float x, float y, float z)? heightRequest = null;
+        var placementYaw = sourceRotation.Z + yawOffsetDegrees.DegToRad();
+        var expectedX = sourcePosition.X - 12f * MathF.Sin(placementYaw);
+        var expectedY = sourcePosition.Y + 12f * MathF.Cos(placementYaw);
+        var expectedFacing = ((float)MathUtil.CalculateAngleFrom(
+            expectedX,
+            expectedY,
+            sourcePosition.X,
+            sourcePosition.Y)).DegToRad();
+
+        var spawnPosition = SpawnPassiveNpcCommand.CreateSpawnPosition(
+            anchor.Transform,
+            12f,
+            yawOffsetDegrees,
+            anchor.WorldId,
+            (zoneId, x, y, z) =>
+            {
+                heightRequest = (zoneId, x, y, z);
+                return 333.25f;
+            });
+
+        await Assert.That(resolved).IsTrue();
+        await Assert.That(BitConverter.SingleToInt32Bits(spawnPosition.X))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(expectedX));
+        await Assert.That(BitConverter.SingleToInt32Bits(spawnPosition.Y))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(expectedY));
+        await Assert.That(BitConverter.SingleToInt32Bits(spawnPosition.Yaw))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(expectedFacing));
+        await Assert.That(spawnPosition.Z).IsEqualTo(333.25f);
+        await Assert.That(spawnPosition.WorldId).IsEqualTo(world.Template.Id);
+        await Assert.That(spawnPosition.ZoneId).IsEqualTo(anchor.ZoneId);
+        await Assert.That(anchor.InstanceId).IsEqualTo(world.Id);
+        await Assert.That(heightRequest.Value.zoneId).IsEqualTo(anchor.ZoneId);
+        await Assert.That(BitConverter.SingleToInt32Bits(heightRequest.Value.x))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(expectedX));
+        await Assert.That(BitConverter.SingleToInt32Bits(heightRequest.Value.y))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(expectedY));
+        await Assert.That(BitConverter.SingleToInt32Bits(heightRequest.Value.z))
+            .IsEqualTo(BitConverter.SingleToInt32Bits(sourcePosition.Z));
+        await Assert.That(bot.ParentWorld).IsSameReferenceAs(world);
+        await Assert.That(bot.CurrentTarget).IsSameReferenceAs(previousTarget);
+        await Assert.That(bot.IsInBattle).IsTrue();
+        await Assert.That(bot.Transform.World.Position).IsEqualTo(sourcePosition);
+        await Assert.That(bot.Transform.World.Rotation).IsEqualTo(sourceRotation);
         await Assert.That(anchor.Transform.World.Position).IsEqualTo(sourcePosition);
         await Assert.That(anchor.Transform.World.Rotation).IsEqualTo(sourceRotation);
         await Assert.That(SpawnPassiveNpcCommand.AnchorAudit(anchor))

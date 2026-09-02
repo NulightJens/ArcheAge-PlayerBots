@@ -23,6 +23,8 @@ public sealed class SpawnPassiveNpcCommand : ICommand
 {
     internal const float DefaultDistance = 12f;
     internal const string InvalidAnchorIdError = "Anchor bot ID must be a nonzero unsigned integer.";
+    internal const string InvalidYawOffsetError =
+        "Yaw offset degrees must be a finite invariant number from -180 through 180.";
 
     internal static Func<uint, Character> ActiveBotResolver { get; set; } =
         static botId => BotManager.Instance.GetBot(botId);
@@ -45,7 +47,7 @@ public sealed class SpawnPassiveNpcCommand : ICommand
 
     public string GetCommandLineHelp()
     {
-        return "<npcTemplateId> [distance]";
+        return "<npcTemplateId> [distance] [anchorBotId] [yawOffsetDegrees]";
     }
 
     public string GetCommandHelpText()
@@ -56,7 +58,13 @@ public sealed class SpawnPassiveNpcCommand : ICommand
 
     public void Execute(Character character, string[] args, IMessageOutput messageOutput)
     {
-        if (!TryParse(args, out var templateId, out var distance, out var anchorBotId, out var parseError))
+        if (!TryParse(
+                args,
+                out var templateId,
+                out var distance,
+                out var anchorBotId,
+                out var yawOffsetDegrees,
+                out var parseError))
         {
             if (parseError == null)
                 CommandManager.SendDefaultHelpText(this, messageOutput);
@@ -92,6 +100,7 @@ public sealed class SpawnPassiveNpcCommand : ICommand
             var spawnPosition = CreateSpawnPosition(
                 sourceTransform,
                 distance,
+                yawOffsetDegrees,
                 anchor?.WorldId,
                 GroundHeightResolver);
 
@@ -175,11 +184,32 @@ public sealed class SpawnPassiveNpcCommand : ICommand
         out uint? anchorBotId,
         out string error)
     {
+        if (args?.Length > 3)
+        {
+            templateId = 0;
+            distance = DefaultDistance;
+            anchorBotId = null;
+            error = null;
+            return false;
+        }
+
+        return TryParse(args, out templateId, out distance, out anchorBotId, out _, out error);
+    }
+
+    internal static bool TryParse(
+        string[] args,
+        out uint templateId,
+        out float distance,
+        out uint? anchorBotId,
+        out float yawOffsetDegrees,
+        out string error)
+    {
         templateId = 0;
         distance = DefaultDistance;
         anchorBotId = null;
+        yawOffsetDegrees = 0f;
         error = null;
-        if (args == null || args.Length is < 1 or > 3 ||
+        if (args == null || args.Length is < 1 or > 4 ||
             !uint.TryParse(args[0], NumberStyles.None, CultureInfo.InvariantCulture, out templateId) ||
             templateId == 0)
             return false;
@@ -189,7 +219,7 @@ public sealed class SpawnPassiveNpcCommand : ICommand
              !float.IsFinite(distance) || distance < 5f || distance > 100f))
             return false;
 
-        if (args.Length == 3)
+        if (args.Length >= 3)
         {
             if (!uint.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out var parsedAnchorBotId) ||
                 parsedAnchorBotId == 0)
@@ -199,6 +229,19 @@ public sealed class SpawnPassiveNpcCommand : ICommand
             }
 
             anchorBotId = parsedAnchorBotId;
+        }
+
+        if (args.Length == 4 &&
+            (!float.TryParse(
+                 args[3],
+                 NumberStyles.Float,
+                 CultureInfo.InvariantCulture,
+                 out yawOffsetDegrees) ||
+             !float.IsFinite(yawOffsetDegrees) ||
+             yawOffsetDegrees < -180f || yawOffsetDegrees > 180f))
+        {
+            error = InvalidYawOffsetError;
+            return false;
         }
 
         return true;
@@ -388,10 +431,27 @@ public sealed class SpawnPassiveNpcCommand : ICommand
         uint? worldIdOverride,
         Func<uint, float, float, float, float> groundHeightResolver)
     {
+        return CreateSpawnPosition(
+            sourceTransform,
+            distance,
+            0f,
+            worldIdOverride,
+            groundHeightResolver);
+    }
+
+    internal static WorldSpawnPosition CreateSpawnPosition(
+        Transform sourceTransform,
+        float distance,
+        float yawOffsetDegrees,
+        uint? worldIdOverride,
+        Func<uint, float, float, float, float> groundHeightResolver)
+    {
         ArgumentNullException.ThrowIfNull(sourceTransform);
         ArgumentNullException.ThrowIfNull(groundHeightResolver);
 
         using var spawnTransform = sourceTransform.CloneDetached();
+        if (yawOffsetDegrees != 0f)
+            spawnTransform.Local.Rotate(0f, 0f, yawOffsetDegrees.DegToRad());
         spawnTransform.Local.AddDistanceToFront(distance);
         var spawnPosition = spawnTransform.CloneAsSpawnPosition();
         if (worldIdOverride.HasValue)
