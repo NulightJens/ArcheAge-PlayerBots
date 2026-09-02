@@ -1097,7 +1097,7 @@ tasks:
     title: Add bounded relative-yaw passive fixture placement
     track: AAEmu12
     status: done
-    integration: pending
+    integration: integrated-by-T-107
     depends_on: [T-105]
     runtime_lease: null
     gate: focused-invariant-angular-placement-source-correction
@@ -1117,8 +1117,8 @@ tasks:
   - id: T-107
     title: Integrate and install bounded relative-yaw fixture placement
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-106]
     runtime_lease: aaemu12-build-only
     gate: exact-replay-install-focused-build-full-suite-integration
@@ -1130,6 +1130,29 @@ tasks:
     source_candidate: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
     source_candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
     source_candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+    replay_commit: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+    replay_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    integrated_commit: fc26a8e9347880efa155bd4fd8ddc94913112b79
+    integrated_tree: aeed65ca98ae10f9bd461602f2fe32a998735e24
+    evidence_receipt: ops/evidence/aaemu12-passive-anchor-yaw-offset-integration-v1.yaml
+    result: PASS-46-focused-build-0-errors-79-warnings-full-1870-pass-4-intentional-skips-once
+
+  - id: T-108
+    title: Prove angular two-wave one-zone autonomy and restart
+    track: AAEmu12
+    status: ready
+    integration: pending
+    depends_on: [T-107]
+    runtime_lease: aaemu12-pending-exact-binding
+    gate: physical-angular-preflight-two-wave-restart-dwell
+    contract: ops/tasks/T-108/CONTRACT.md
+    owner_client_thread_id: pending
+    owner_thread_id: pending
+    worktree: pending
+    dispatch_base: pending-control-prep-commit
+    evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
+    tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+    installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -1139,4 +1162,4 @@ tasks:
     depends_on: [fresh-post-angular-placement-runtime-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-104-retained-fail-independently-integrated-by-T-105-proves-forward-distance-only-placement-cannot-meet-unique-ownership-for-live-collinear-geometry-T-106-angular-placement-and-fresh-runtime-pass-remain-required
+    blocker: T-104-retained-fail-is-integrated-and-T-107-angular-placement-is-qualified-but-fresh-T-108-runtime-pass-and-independent-evidence-integration-remain-required

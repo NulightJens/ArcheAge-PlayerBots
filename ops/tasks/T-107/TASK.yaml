@@ -2,8 +2,8 @@ schema_version: 1
 id: T-107
 title: Integrate and install bounded relative-yaw fixture placement
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently replay the exact T-106 four-path candidate onto the saved lineage, install that replay into the registered AAEmu 1.2 module under a committed build-only lease, rerun focused proof, one clean build, and exactly one full-suite wave, then fast-forward the saved branch with a durable integration receipt.
 depends_on: [T-106]
 runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
@@ -40,3 +40,9 @@ gates:
 validation_boundary: Source integration/install/build/test only. Never start Login/Game/runtime observers, edit deployed BotConfig.json, access/control MySQL/database or ArcheAge client, edit global ledgers/lease, external runtime evidence, reference checkout, AAEmu 3.0, scale, soak, or packaging.
 contract: ops/tasks/T-107/CONTRACT.md
 handoff: ops/tasks/T-107/HANDOFF.md
+replay_commit: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+replay_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+integrated_commit: fc26a8e9347880efa155bd4fd8ddc94913112b79
+integrated_tree: aeed65ca98ae10f9bd461602f2fe32a998735e24
+installed_game_assembly_sha256: 2385d16554b1fc9df1c77d45612b39c8fdac20721f20eac31ec9d0c32cc71696
+result: PASS-46-focused-build-0-errors-79-warnings-full-1870-pass-4-intentional-skips-once
