@@ -746,11 +746,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     proof: FAIL-wave-one-fixed-counter-recovery-and-shutdown-tail-observer-gaps-clean-sealed-8602-payload-root
   - task: T-113
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending-exact-thread-binding
-    task_thread_id: pending-exact-thread-binding
-    codex_worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
+    state: active-exact-thread-bound-retained-fail-integration
+    client_thread_id: client-new-thread:1596f314-1e91-4d05-8074-0502d8fe85c9
+    task_thread_id: 01a06020-e7f8-7bc2-8d1e-d1b281ef764c
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\18b5\PB-W00-control'
+    dispatch_base: 03b2b84a3b047a86323ac722ca3718dfbf91c54c
     contract: ops/tasks/T-113/CONTRACT.md
     source_candidate: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
     evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'

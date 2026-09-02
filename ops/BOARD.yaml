@@ -1255,16 +1255,16 @@ tasks:
   - id: T-113
     title: Independently integrate retained T-112 runtime failure
     track: AAEmu12
-    status: prepared-awaiting-exact-thread-binding
+    status: active
     integration: pending
     depends_on: [T-112]
     runtime_lease: null
     gate: sealed-fail-evidence-replay-and-integration
     contract: ops/tasks/T-113/CONTRACT.md
-    owner_client_thread_id: pending-exact-thread-binding
-    owner_thread_id: pending-exact-thread-binding
-    worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
+    owner_client_thread_id: client-new-thread:1596f314-1e91-4d05-8074-0502d8fe85c9
+    owner_thread_id: 01a06020-e7f8-7bc2-8d1e-d1b281ef764c
+    worktree: 'C:\Users\jensh\.codex\worktrees\18b5\PB-W00-control'
+    dispatch_base: 03b2b84a3b047a86323ac722ca3718dfbf91c54c
     source_candidate: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
     source_candidate_parent: 4277111312b09d549b29b0e3af8c0e4ebcef2168
     source_candidate_tree: 6059e88d2f58c9c1632f2ff2194f47618ef6fb75
