@@ -2,8 +2,8 @@ schema_version: 1
 id: T-119
 title: Implement autonomous nearby quest intake
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: ready-for-T-120
 outcome: An opt-in production controller makes an eligible idle bot discover exact-NPC quest starters around its current position, prioritize main-story quests, walk to the selected NPC, accept through AAEmu's normal quest lifecycle, and continue collecting eligible nearby side quests without a per-quest GM command.
 depends_on: [T-116]
 runtime: {required: false, lease: null}
@@ -42,3 +42,7 @@ gates:
 validation_boundary: Module source, focused deterministic tests, isolated AAEmu 1.2 build, documentation, and handoff only. Do not write or control the registered integration host, deployed module/config, T-118 runtime/client/launcher, database, reference/client fixture, global ledgers, runtime lease, evidence roots, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite. Physical Nuian-spawn acceptance remains pending a separate integration/install/runtime task after the current interactive session is gracefully transitioned.
 contract: ops/tasks/T-119/CONTRACT.md
 handoff: ops/tasks/T-119/HANDOFF.md
+candidate_commit: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
+candidate_tree: 1276326b17cabfb3dbe10010ddbcf65dea729417
+candidate_patch_id: d525d7bc14e72ac0c5042bc6443044762e253084
+result: READY-source-only-17-controller-35-host-46-command-28-safe-config-build-zero-errors

@@ -1381,8 +1381,8 @@ tasks:
   - id: T-119
     title: Implement autonomous nearby quest intake
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: ready-for-T-120
     depends_on: [T-116]
     runtime_lease: null
     gate: autonomous-nearby-quest-intake-source-and-focused-tests
@@ -1392,7 +1392,25 @@ tasks:
     worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-119-autonomous-quest-intake'
     source_base: cb9232d23312f719a90dc2ca51e6f5a561402fde
     dispatch_base: aa9d2957fa348b545615faa167f9c2f15d888e6d
-    result: active-source-only-live-t118-untouched
+    candidate_commit: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
+    candidate_tree: 1276326b17cabfb3dbe10010ddbcf65dea729417
+    candidate_patch_id: d525d7bc14e72ac0c5042bc6443044762e253084
+    result: READY-source-only-17-controller-35-host-46-command-28-safe-config-build-zero-errors
+
+  - id: T-120
+    title: Integrate and launch autonomous quest intake
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-118, T-119]
+    runtime_lease: pending-aaemu12-after-T118-cleanup
+    gate: exact-replay-install-build-and-level-one-nuian-physical-quest-intake
+    contract: ops/tasks/T-120/CONTRACT.md
+    owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+    dispatch_base: d42236e77cfc8030b78eb9750db9f78a3df8d35d
+    source_candidate: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
+    result: PREPARED-awaiting-T118-graceful-cleanup-and-runtime-lease-transfer
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

@@ -1,0 +1,58 @@
+schema_version: 1
+id: T-120
+title: Integrate and launch autonomous quest intake
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Integrate the exact T-119 quest-intake candidate, install and rebuild the registered AAEmu 1.2 host, enable only quest intake, launch a clean interactive session, and physically demonstrate a level-one Nuian bot selecting, walking to, and accepting local quests without per-quest commands.
+depends_on: [T-118, T-119]
+runtime: {required: true, lease: aaemu12, archeage_client_allowed: true}
+branch: integration/aaemu12-world
+worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+inputs:
+  dispatch_base: d42236e77cfc8030b78eb9750db9f78a3df8d35d
+  source_candidate: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
+  source_candidate_parent: d42236e77cfc8030b78eb9750db9f78a3df8d35d
+  source_candidate_tree: 1276326b17cabfb3dbe10010ddbcf65dea729417
+  source_candidate_patch_id: d525d7bc14e72ac0c5042bc6443044762e253084
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  previous_installed_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
+  previous_installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+  database_identity: aaemu12_database_public_alpha_v1
+write_scope:
+  - src/AAEmu.Game/Bots/Questing/BotQuestIntakeController.cs
+  - src/AAEmu.Game/Bots/Host/BotRuntime.cs
+  - src/AAEmu.Game/Bots/Host/BotHostTask.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Questing/BotQuestIntakeControllerTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - docs/CONFIGURATION.md
+  - README.md
+  - ops/tasks/T-119/HANDOFF.md
+  - ops/evidence/aaemu12-autonomous-quest-intake-integration-v1.yaml
+  - ops/tasks/T-120/HANDOFF.md
+external_write_scope:
+  - clean installed module pointer in aaemu12_integration at the exact T-120 replay
+  - registered AAEmu 1.2 build outputs after T-118 cleanup and before runtime start
+  - deployed BotConfig quest-intake assignments with exact prior bytes retained for later restoration
+  - aaemu12_integration Login/Game runtime and new T-120 session logs under the exact lease
+  - AAEmu launcher and registered read-only AAEmu 1.2 client process state for user takeover
+gates:
+  - t118-graceful-cleanup-and-exact-config-restoration
+  - exact-t119-candidate-identity-and-replay
+  - focused-controller-host-command-and-safe-config-tests-green
+  - registered-aaemu12-no-incremental-build-zero-errors
+  - quest-intake-enabled-director-disabled-and-prior-config-retained
+  - ordered-login-then-game-startup-and-five-required-listeners
+  - existing-eligible-level-one-nuian-placed-beside-user-without-quest-state-forcing
+  - story-first-walk-and-normal-main-plus-side-quest-acceptance
+  - botdebug-server-log-and-client-journal-state-agree
+validation_boundary: Exact source integration, installed-module update, focused verification, registered build, reversible quest-intake configuration, interactive Login/Game/client launch, and one level-one Nuian local quest-intake acceptance only. Do not automate authentication, fabricate or reset quest state, issue per-quest acceptance/progress/report commands, edit the database/reference/client fixture, reuse retained evidence roots, run the full suite, claim objective execution or first-five completion, force-stop processes, or touch AAEmu 3.0, scale, soak, packaging, or release readiness.
+contract: ops/tasks/T-120/CONTRACT.md
+handoff: ops/tasks/T-120/HANDOFF.md
+result: PREPARED-awaiting-T118-graceful-cleanup-and-runtime-lease-transfer

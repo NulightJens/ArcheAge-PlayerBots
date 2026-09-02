@@ -1,6 +1,6 @@
 schema_version: 1
-updated_at: 2026-09-01
-phase: interactive-demo-and-autonomous-quest-intake-source
+updated_at: 2026-09-02
+phase: autonomous-quest-intake-integration-and-live-acceptance
 verdict: active
 
 source:
@@ -62,9 +62,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Complete T-119 as an isolated source-only autonomous quest-intake candidate while T-118 remains live and untouched; require independent integration, install, and a fresh Nuian-spawn physical acceptance before claiming the feature works in game.
-  - Bind T-118 to one exact task/thread/worktree, apply the reversible interactive Director config, start Login then Game, verify three zone-221 bots, and open the registered launcher for user takeover.
-  - Keep the live session leased to T-118 until the user requests cleanup; restore exact config bytes and stop Game then Login gracefully at session end.
+  - Finish T-118 cleanup through its owning task, transfer the clean AAEmu 1.2 lease to T-120, and do not mutate the registered host before that committed transfer.
+  - Integrate exact T-119 candidate 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15, install, run focused proof, rebuild the registered host, enable quest intake with the Director disabled, and restart gracefully.
+  - Launch the registered client for user authentication, then physically verify one existing eligible level-one Nuian bot beside the user discovers, walks to, and normally accepts local story and side quests without per-quest commands.
   - Resume physical v10 qualification only with a fresh versioned successor root; never reuse the retained T-117 root.
   - Independently integrate only a fresh successor runtime PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
@@ -844,7 +844,7 @@ prepared_workstreams:
     director_state: zone-221-live-3-of-3-successes-3-failures-0
     preserved_config: 'D:\Codex-Labs\sessions\T-118\interactive-live-demo-v1\config\BotConfig.original.bin'
   - task: T-119
-    state: active-source-only-live-t118-untouched
+    state: done-source-ready-for-T120
     owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
     branch: codex/T-119-autonomous-quest-intake
     worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-119-autonomous-quest-intake'
@@ -853,6 +853,18 @@ prepared_workstreams:
     contract: ops/tasks/T-119/CONTRACT.md
     runtime_lease: null
     validation_boundary: source-focused-only-no-live-runtime-or-deployed-host-writes
+    candidate_commit: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
+    candidate_tree: 1276326b17cabfb3dbe10010ddbcf65dea729417
+    candidate_patch_id: d525d7bc14e72ac0c5042bc6443044762e253084
+  - task: T-120
+    state: prepared-awaiting-t118-cleanup
+    task_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    codex_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+    dispatch_base: d42236e77cfc8030b78eb9750db9f78a3df8d35d
+    contract: ops/tasks/T-120/CONTRACT.md
+    source_candidate: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
+    runtime_lease: pending-aaemu12-after-T118-cleanup
+    result: PREPARED-exact-integration-install-build-and-level-one-nuian-live-acceptance
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
