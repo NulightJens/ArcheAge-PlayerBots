@@ -1,5 +1,11 @@
 # Roadmap
 
+> **Superseded operational view (2026-09-02):** The executable roadmap now
+> lives in [`ops/GOALS.yaml`](../ops/GOALS.yaml) and the acceptance rules live
+> in [`ops/DELIVERY-MODEL-V2.md`](../ops/DELIVERY-MODEL-V2.md). The detailed
+> milestone history below is retained as evidence; its “completed” labels do
+> not accept the current source/runtime/client combination.
+
 The goal is believable, useful, lightweight party members and autonomous world
 population. The upstream
 [`mod-playerbots`](https://github.com/mod-playerbots/mod-playerbots) capability

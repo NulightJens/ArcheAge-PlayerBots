@@ -2,6 +2,9 @@ schema_version: 1
 owner: PB-000 Control Tower
 active_track: AAEmu12
 statuses: [proposed, ready, active, review, blocked, paused, done]
+delivery_model: superseded-by-ops-GOALS-for-product-status
+active_product_goal: G-001
+ledger_role: retained-task-history-and-implementation-index
 
 tasks:
   - id: T-035
@@ -1506,3 +1509,16 @@ tasks:
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
     blocker: T-116-integrated-per-runtime-observability-and-T-037-awaits-a-fresh-T-117-runtime-PASS-plus-independent-evidence-integration
+
+  - id: T-126
+    title: Audit delivery failure and install outcome-driven operating model
+    track: program-governance
+    status: done
+    integration: control-model-installed
+    depends_on: [T-125]
+    runtime_lease: null
+    gate: evidence-backed-audit-and-client-witnessed-delivery-model
+    contract: ops/tasks/T-126/CONTRACT.md
+    owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+    result: PASS-audit-goals-delivery-contract-and-root-operating-rules-installed-runtime-untouched

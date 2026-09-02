@@ -1,5 +1,9 @@
 # PlayerBots capability roadmap
 
+> **Legacy dependency view (2026-09-02):** `ops/GOALS.yaml` now owns executable
+> product order and state. This T-number dependency graph is retained for
+> history only. A task marked done is not a product acceptance claim.
+
 This file records capability dependencies. `BOARD.yaml` owns current dispatch;
 historical evidence does not. The upstream
 [`mod-playerbots`](https://github.com/mod-playerbots/mod-playerbots) project is

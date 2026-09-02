@@ -18,6 +18,9 @@ environment_control:
   contingency_runbook: ops/ENVIRONMENT-CONTINGENCY.md
   build_test_loop: ops/BUILD-TEST-LOOP.md
   runtime_lease: ops/RUNTIME-LEASE.yaml
+  delivery_model: ops/DELIVERY-MODEL-V2.md
+  product_goals: ops/GOALS.yaml
+  latest_delivery_audit: ops/AUDIT-2026-09-02.md
   rule: Resolve every external path by registry ID before reading or writing it.
 
 active_track:
@@ -37,19 +40,23 @@ compatibility_track:
   policy: frozen-release-boundary-regression-only
 
 current_milestone:
-  id: M-005
-  name: One-zone autonomous population director
+  id: G-001
+  name: Level-one Nuian five-quest vertical slice
   acceptance: >-
-    Three configured persistent bots are admitted by the Activity Director in
-    one qualified zone, independently complete repeated safe activity cycles,
-    self-logout, refill to the configured target without per-action operator
-    control, and survive a clean distinct-PID restart.
+    One newly created level-one Nuian bot finds, accepts, travels to, executes,
+    reports, and chains five eligible starter-area quests under native AAEmu
+    authority without per-action operator control, while an active client
+    witnesses the behavior and a graceful distinct-PID restart preserves it.
 
 program_rules:
-  one_outcome_per_task: true
-  one_writer_per_worktree: true
+  authoritative_product_ledger: ops/GOALS.yaml
+  one_active_vertical_slice: true
+  maximum_concurrent_durable_workspaces: 3
+  source_green_is_product_done: false
+  active_client_required_for_feature_acceptance: true
+  native_server_marker_required_for_feature_acceptance: true
   runtime_proofs_serialized: true
-  full_suite_cadence: integration-wave
+  full_suite_cadence: accepted-slice-or-shared-infrastructure-change
   raw_evidence_in_git: false
-  integration_owner: PB-WXX Integrator
   global_ledger_owner: PB-000 Control Tower
+  historical_task_ledger: retained-not-roadmap-authority

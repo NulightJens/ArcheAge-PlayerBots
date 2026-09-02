@@ -1,12 +1,18 @@
-schema_version: 1
+schema_version: 2
 updated_at: 2026-09-02
-phase: bot-intelligence-wave-live-smoke-ready
-verdict: PASS-source-gates
+phase: g001-level-one-nuian-five-quest-slice
+verdict: RED-integrated-candidate-not-deployed-or-live-accepted
+delivery_model: ops/DELIVERY-MODEL-V2.md
+product_goals: ops/GOALS.yaml
+delivery_audit: ops/AUDIT-2026-09-02.md
+active_goal: G-001
 
 source:
   integration_branch: integration/aaemu12-world
   integrated_head: 1a52e7b44fab76939d9409561bdfa4739f1425e6
   tested_module_source: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+  source_gate: PASS-1957-passed-4-skipped-0-failed
+  product_acceptance: false
   integration_evidence: ops/evidence/aaemu12-bot-intelligence-wave-verification-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
@@ -62,19 +68,17 @@ control_tower:
     state: active-pinned-successor
   saved_project_id: 9cdd642a-c900-4027-8f7b-d369835cef26
   operating_mode: local-integration-worktree
+  dashboard_policy: product-goal-and-deployment-state-only
 
 next_transition:
-  - Retain T-120 as BLOCKED because no eligible level-one Nuian identity exists; preserve its healthy interactive runtime under the existing lease until a separately contracted graceful transition.
-  - Retain T-124 as INCOMPLETE: its only full-suite invocation exposed three regressions; the corrected integration passed 251 focused/regression tests and a zero-error clean build.
-  - Retain T-125 as PASS: exactly one corrected full suite produced 1957 passed, four intentional skips, zero failed, and 1961 total.
-  - Create a versioned live-smoke task, gracefully transition the retained T-120 runtime, and prove level-one creation, Nuian signpost completion/chaining, and transfer-road route generation without per-action commands.
-  - Resume physical v10 qualification only with a fresh versioned successor root; never reuse the retained T-117 root.
-  - Independently integrate only a fresh successor runtime PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
-  - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
-  - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
-  - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
+  - Preserve the retained T-120 runtime and lease until a separately authorized graceful transition begins.
+  - Close the client normally and stop Game then Login gracefully; never force a process.
+  - Install exact source 1a52e7b44fab76939d9409561bdfa4739f1425e6 plus its reviewed AAEmu 1.2 adapters and dedicated bot-account configuration.
+  - Start the server and an active sentinel client, create one level-one Nuian bot at the observed location, and run G-001 without per-action commands.
+  - Fix and redeploy the first behavioral blocker inside the same vertical slice; do not create receipt/replay/integration task chains.
+  - Keep population scale blocked until G-001 and then G-002 are accepted.
 
-prepared_workstreams:
+legacy_pre_v2_workstreams:
   - task: T-062
     state: done-integrated
     client_thread_id: client-new-thread:94a6b91f-5fa0-4de9-aa6a-cafa679bec2e

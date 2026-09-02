@@ -1,0 +1,41 @@
+schema_version: 1
+id: T-126
+title: Audit delivery failure and install outcome-driven operating model
+track: program-governance
+status: done
+integration: control-model-installed
+outcome: >-
+  Establish an evidence-backed inventory of the last 24 hours and replace the
+  task-volume delivery model with a small set of executable product goals whose
+  completion requires the same source to be deployed and witnessed in a live
+  AAEmu server and ArcheAge client.
+depends_on: [T-125]
+runtime: {required: false, lease: null}
+branch: integration/aaemu12-world
+worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+write_scope:
+  - AGENTS.md
+  - ops/tasks/T-126/TASK.yaml
+  - ops/tasks/T-126/CONTRACT.md
+  - ops/tasks/T-126/HANDOFF.md
+  - ops/AUDIT-2026-09-02.md
+  - ops/DELIVERY-MODEL-V2.md
+  - ops/GOALS.yaml
+  - ops/PROJECT.yaml
+  - ops/CURRENT.yaml
+  - ops/BOARD.yaml
+  - ops/ROADMAP.md
+  - docs/ROADMAP.md
+gates:
+  - git-and-ledger-inventory-is-reproducible
+  - source-integrated-deployed-and-live-witnessed-states-are-not-conflated
+  - current-roadmap-is-rebased-on-player-visible-capability
+  - new-definition-of-done-requires-server-authority-and-client-visible-proof
+  - old-ledgers-and-runtime-state-are-preserved
+validation_boundary: >-
+  Governance and roadmap redesign only. Do not edit product source, deploy or
+  stop the retained runtime, query or write a database, control the client,
+  change the runtime lease, delete historical material, or touch AAEmu 3.0.
+contract: ops/tasks/T-126/CONTRACT.md
+handoff: ops/tasks/T-126/HANDOFF.md
