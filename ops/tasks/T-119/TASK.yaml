@@ -1,0 +1,44 @@
+schema_version: 1
+id: T-119
+title: Implement autonomous nearby quest intake
+track: AAEmu12
+status: active
+integration: pending
+outcome: An opt-in production controller makes an eligible idle bot discover exact-NPC quest starters around its current position, prioritize main-story quests, walk to the selected NPC, accept through AAEmu's normal quest lifecycle, and continue collecting eligible nearby side quests without a per-quest GM command.
+depends_on: [T-116]
+runtime: {required: false, lease: null}
+branch: codex/T-119-autonomous-quest-intake
+worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-119-autonomous-quest-intake'
+owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+inputs:
+  source_base: cb9232d23312f719a90dc2ca51e6f5a561402fde
+  dispatch_base: binding-commit-reported-by-PB-000
+  installed_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Bots/Questing/BotQuestIntakeController.cs
+  - src/AAEmu.Game/Bots/Host/BotRuntime.cs
+  - src/AAEmu.Game/Bots/Host/BotHostTask.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Questing/BotQuestIntakeControllerTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - docs/CONFIGURATION.md
+  - README.md
+  - ops/tasks/T-119/HANDOFF.md
+gates:
+  - opt-in-default-off-and-validated-bounded-configuration
+  - nearby-exact-npc-discovery-with-main-story-first-deterministic-order
+  - same-world-finite-heightmap-reachable-target-selection
+  - normal-movement-to-interaction-radius-without-teleport
+  - normal-aaemu-add-quest-from-npc-acceptance-and-no-fabricated-state
+  - continued-eligible-side-quest-intake-with-duplicate-and-rejection-backoff
+  - quest-intake-precedes-one-kill-grind-lifecycle-activation
+  - deterministic-controller-host-config-and-debug-tests-green
+  - isolated-aaemu12-build-zero-errors-and-compatibility-patch-unchanged
+validation_boundary: Module source, focused deterministic tests, isolated AAEmu 1.2 build, documentation, and handoff only. Do not write or control the registered integration host, deployed module/config, T-118 runtime/client/launcher, database, reference/client fixture, global ledgers, runtime lease, evidence roots, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite. Physical Nuian-spawn acceptance remains pending a separate integration/install/runtime task after the current interactive session is gracefully transitioned.
+contract: ops/tasks/T-119/CONTRACT.md
+handoff: ops/tasks/T-119/HANDOFF.md

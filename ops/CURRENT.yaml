@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: interactive-playerbots-live-demo
+phase: interactive-demo-and-autonomous-quest-intake-source
 verdict: active
 
 source:
@@ -62,6 +62,7 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
+  - Complete T-119 as an isolated source-only autonomous quest-intake candidate while T-118 remains live and untouched; require independent integration, install, and a fresh Nuian-spawn physical acceptance before claiming the feature works in game.
   - Bind T-118 to one exact task/thread/worktree, apply the reversible interactive Director config, start Login then Game, verify three zone-221 bots, and open the registered launcher for user takeover.
   - Keep the live session leased to T-118 until the user requests cleanup; restore exact config bytes and stop Game then Login gracefully at session end.
   - Resume physical v10 qualification only with a fresh versioned successor root; never reuse the retained T-117 root.
@@ -842,6 +843,16 @@ prepared_workstreams:
     launcher_state: window-present-user-escape-interrupted-only-skill-visibility-check
     director_state: zone-221-live-3-of-3-successes-3-failures-0
     preserved_config: 'D:\Codex-Labs\sessions\T-118\interactive-live-demo-v1\config\BotConfig.original.bin'
+  - task: T-119
+    state: active-source-only-live-t118-untouched
+    owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    branch: codex/T-119-autonomous-quest-intake
+    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-119-autonomous-quest-intake'
+    source_base: cb9232d23312f719a90dc2ca51e6f5a561402fde
+    dispatch_base: binding-commit-reported-by-PB-000
+    contract: ops/tasks/T-119/CONTRACT.md
+    runtime_lease: null
+    validation_boundary: source-focused-only-no-live-runtime-or-deployed-host-writes
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
