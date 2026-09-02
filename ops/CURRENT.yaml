@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: dispatch-per-runtime-one-zone-autonomy-v10
+phase: execute-per-runtime-one-zone-autonomy-v10
 verdict: active
 
 source:
@@ -807,16 +807,16 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-runtime-recovery-observability-integration-v1.yaml
     proof: PASS-corrected-count-reused-1871-plus-4-observer-91-command-46-host-34-no-build-or-full-suite-rerun
   - task: T-117
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending-exact-thread-binding
-    task_thread_id: pending-exact-thread-binding
-    codex_worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
+    state: active-exact-thread-bound-runtime-v10
+    client_thread_id: client-new-thread:72ca3f2d-8109-4df8-a49a-a270b6b56265
+    task_thread_id: 01a0606e-751b-79b2-b8ce-38ea2c604f7a
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\fbcd\PB-W00-control'
+    dispatch_base: a56217b27e3f51ad96099847ee6cb2d989c6677c
     contract: ops/tasks/T-117/CONTRACT.md
     tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
     installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
     evidence_root: 'D:\Codex-Labs\evidence\T-117\one-zone-autonomy-v10'
-    runtime_lease: pending-exact-thread-binding
+    runtime_lease: aaemu12
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
@@ -1061,6 +1061,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: aaemu12-pending-T-117-exact-thread-binding
+  runtime_lease: aaemu12-leased-to-T-117
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-PB-000-commits-the-exact-T-117-thread-worktree-lease
+  runtime_start: authorized-only-for-exact-T-117-thread-worktree-under-committed-lease

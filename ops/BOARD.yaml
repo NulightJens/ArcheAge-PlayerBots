@@ -1346,16 +1346,16 @@ tasks:
   - id: T-117
     title: Prove per-runtime two-wave one-zone autonomy v10
     track: AAEmu12
-    status: prepared-awaiting-exact-thread-binding
+    status: active
     integration: pending
     depends_on: [T-116]
-    runtime_lease: pending-exact-thread-binding
+    runtime_lease: aaemu12
     gate: physical-per-runtime-recovery-two-wave-restart-dwell
     contract: ops/tasks/T-117/CONTRACT.md
-    owner_client_thread_id: pending-exact-thread-binding
-    owner_thread_id: pending-exact-thread-binding
-    worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
+    owner_client_thread_id: client-new-thread:72ca3f2d-8109-4df8-a49a-a270b6b56265
+    owner_thread_id: 01a0606e-751b-79b2-b8ce-38ea2c604f7a
+    worktree: 'C:\Users\jensh\.codex\worktrees\fbcd\PB-W00-control'
+    dispatch_base: a56217b27e3f51ad96099847ee6cb2d989c6677c
     evidence_root: 'D:\Codex-Labs\evidence\T-117\one-zone-autonomy-v10'
     tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
     installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d

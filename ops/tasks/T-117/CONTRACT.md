@@ -1,7 +1,9 @@
 # T-117 contract: per-runtime two-wave one-zone autonomy proof v10
 
 Use only PB-000's exact committed T-117 thread/worktree binding and AAEmu 1.2
-runtime lease. Require host `62e3eb1d87da01194802ac886cd500134facad28`,
+runtime lease. Require the binding's sole parent to be preparation commit
+`a56217b27e3f51ad96099847ee6cb2d989c6677c`; PB-000 reports the binding's
+exact commit and tree after creating it. Require host `62e3eb1d87da01194802ac886cd500134facad28`,
 installed module source/tree
 `39f748fb3904584b50e1dabc0cfb0b3045793165` /
 `7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d`, compatibility patch SHA-256
