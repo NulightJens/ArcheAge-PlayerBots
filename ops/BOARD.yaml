@@ -1364,7 +1364,7 @@ tasks:
   - id: T-118
     title: Run interactive PlayerBots live demo
     track: AAEmu12
-    status: active
+    status: done
     integration: not-requested
     depends_on: [T-116]
     runtime_lease: aaemu12
@@ -1376,7 +1376,8 @@ tasks:
     dispatch_base: 10f7dbafbb34876fb865c695b584ab3e1bf923a7
     tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
     installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
-    result: LIVE-login-103064-game-23160-launcher-62516-five-listeners-zone221-director-3of3-zero-failures-user-takeover
+    cleanup_commit: abe55bc4395ffe733e00628d0986f24bf4d98cc2
+    result: CLEANUP-COMPLETE-normal-client-close-graceful-game-then-login-zero-processes-listeners-live-logs-config-exactly-restored
 
   - id: T-119
     title: Implement autonomous nearby quest intake
@@ -1400,17 +1401,19 @@ tasks:
   - id: T-120
     title: Integrate and launch autonomous quest intake
     track: AAEmu12
-    status: prepared
-    integration: pending
+    status: active
+    integration: in-progress
     depends_on: [T-118, T-119]
-    runtime_lease: pending-aaemu12-after-T118-cleanup
+    runtime_lease: aaemu12
     gate: exact-replay-install-build-and-level-one-nuian-physical-quest-intake
     contract: ops/tasks/T-120/CONTRACT.md
     owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
     worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
     dispatch_base: d42236e77cfc8030b78eb9750db9f78a3df8d35d
+    preparation_commit: ca6acb96b11daaa862b609fcce19d0641406d869
+    cleanup_receipt_commit: a004780cf791bf614342bbe8a41c2b8d207252df
     source_candidate: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
-    result: PREPARED-awaiting-T118-graceful-cleanup-and-runtime-lease-transfer
+    result: ACTIVE-clean-lease-transferred-exact-replay-next
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification

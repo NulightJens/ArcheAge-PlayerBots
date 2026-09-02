@@ -2,7 +2,7 @@ schema_version: 1
 id: T-118
 title: Run interactive PlayerBots live demo
 track: AAEmu12
-status: active
+status: done
 integration: not-requested
 outcome: Leave the pinned AAEmu 1.2 Login and Game servers healthy with the three-bot activity Director running in zone 221, then open the matching AAEmu launcher for the user's authentication and in-game inspection.
 depends_on: [T-116]
@@ -36,3 +36,5 @@ gates:
 validation_boundary: Interactive local demo only. Do not automate authentication or gameplay, edit source/tests/global ledgers/workspace registry/reference/client fixture, access/control the database, run build/tests, reuse evidence roots, or force-stop any process. Leave the leased runtime running for the user; later cleanup must close the client normally, stop Game then Login gracefully, and restore exact original config bytes.
 contract: ops/tasks/T-118/CONTRACT.md
 handoff: ops/tasks/T-118/HANDOFF.md
+cleanup_commit: abe55bc4395ffe733e00628d0986f24bf4d98cc2
+result: CLEANUP-COMPLETE-normal-client-close-graceful-game-then-login-zero-processes-listeners-live-logs-config-exactly-restored

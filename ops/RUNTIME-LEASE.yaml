@@ -3,21 +3,21 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: leased-to-T-118-interactive-session
-    owner_task: T-118
-    owner_thread_id: 01a06077-2a1b-7733-be91-e4bae28f2d55
+    status: leased-to-T-120-quest-intake-integration-and-live-acceptance
+    owner_task: T-120
+    owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
     client_path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
-    claimed_at: 2026-09-01
+    claimed_at: 2026-09-02
     released_at: null
-    cleanup_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
+    cleanup_receipt: ops/tasks/T-118/HANDOFF.md
     baseline_evidence: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     archeage_client_allowed: true
-    authority_limit: Only T-118 task 01a06077-2a1b-7733-be91-e4bae28f2d55 in C:\Users\jensh\.codex\worktrees\1d32\PB-W00-control may preserve the original BotConfig bytes, apply the contracted interactive Director assignments, start/control Login and Game through accepted graceful paths, and open the registered AAEmu 1.2 launcher for the user. The user owns authentication and in-game interaction. Database access/control, source/reference/client-fixture/global-ledger writes, evidence-root reuse, forced process control, build, and tests remain prohibited.
+    authority_limit: Only T-120 task 01a05bb6-9d9c-7502-9e2d-534073c0501b in C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control may integrate the exact T-119 candidate, move the clean installed module pointer, run contracted focused tests and one registered no-incremental Game build, retain and edit deployed BotConfig only for quest intake with the Director disabled, start/control Login and Game through accepted graceful paths, and open the registered AAEmu 1.2 launcher for user takeover. One explicit initial bot placement and normal admission are allowed after the user reaches Nuian spawn; authentication and gameplay remain user-owned. Database writes/queries, quest-state forcing/reset, reference/client-fixture writes, evidence-root reuse, full suite, forced process control, and AAEmu 3.0 remain prohibited.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
