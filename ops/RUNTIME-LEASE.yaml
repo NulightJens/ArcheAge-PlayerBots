@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: leased-build-only-to-T-116
-    owner_task: T-116
-    owner_thread_id: 01a0605e-2939-75e0-b6cc-1fbb1b617f40
+    status: pending-T-117-exact-thread-binding
+    owner_task: T-117
+    owner_thread_id: pending-exact-thread-binding
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
+    released_at: 2026-09-01
     cleanup_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     baseline_evidence: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     archeage_client_allowed: false
-    authority_limit: Only T-116 task 01a0605e-2939-75e0-b6cc-1fbb1b617f40 in C:\Users\jensh\.codex\worktrees\c9da\PB-W00-control may move the clean installed module to its byte-equivalent replay and run contracted focused verification. It must not build or rerun the full suite, mutate deployed BotConfig, start Login/Game/live observers, touch runtime evidence, access database/client, or perform runtime control.
+    authority_limit: T-116 is integrated and its build-only lease is released. No task may mutate configuration, start Login/Game or observers, or create T-117 evidence until PB-000 commits the exact T-117 thread/worktree runtime lease. The v10 evidence root must remain absent before that binding.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

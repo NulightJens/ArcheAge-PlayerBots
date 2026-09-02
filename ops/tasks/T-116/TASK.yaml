@@ -2,8 +2,8 @@ schema_version: 1
 id: T-116
 title: Reconcile T-115 count and integrate recovery observability
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently prove T-115's sole full suite is a reusable green receipt for the exact one-test T-114 discovery delta, replay the same seven T-114 blobs onto the saved lineage, retain T-115's exact handoff, and integrate without rebuilding or rerunning the full suite.
 depends_on: [T-115]
 runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
@@ -50,3 +50,10 @@ gates:
 validation_boundary: Evidence reconciliation, byte-identical replay, installed-module pointer update, focused verification, receipt, and integration only. Do not build, rerun the full suite, start Login/Game/live observers, edit deployed BotConfig, access/control database or client, mutate external runtime evidence or reference source, or touch AAEmu 3.0, scale, soak, or packaging. Do not edit global ledgers/lease/workspace registry.
 contract: ops/tasks/T-116/CONTRACT.md
 handoff: ops/tasks/T-116/HANDOFF.md
+replay_commit: 39f748fb3904584b50e1dabc0cfb0b3045793165
+replay_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+integrated_commit: fc6a5b9044d7e7aef1c2b6a6d93590256f3f89a3
+integrated_tree: 1e94a28810827c2666e1713a596644a8c0c925ce
+installed_game_assembly_sha256: 0b770b543b167f7ae57fcb8eb9ad18357e75a5241b0b170a9b1fa4ac05f564f6
+evidence_receipt: ops/evidence/aaemu12-runtime-recovery-observability-integration-v1.yaml
+result: PASS-corrected-count-reused-1871-plus-4-observer-91-command-46-host-34-no-build-or-full-suite-rerun

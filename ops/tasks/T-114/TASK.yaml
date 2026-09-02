@@ -3,7 +3,7 @@ id: T-114
 title: Expose per-runtime recovery suspension metrics
 track: AAEmu12
 status: done
-integration: pending
+integration: integrated-by-T-116
 outcome: Expose each bot runtime's own brain, mover, and error counters through botdebug and the observation-only autonomy parser, and prove that a recovery-suspended runtime stays fixed while other runtimes legitimately advance shared host totals.
 depends_on: [T-113]
 runtime: {required: false, lease: null}
