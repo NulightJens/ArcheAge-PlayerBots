@@ -30,7 +30,7 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-after-t108-pre-runtime-incomplete-lease-released
+    state: stopped-clean-pre-t110-runtime-lease-held
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
@@ -44,7 +44,7 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 46-passed-0-skipped-0-failed
     unit_tests: 1870-passed-4-intentional-skips-0-failed-exactly-one-invocation
-    runtime_boundary: T-109 independently verified and integrated T-108 as retained INCOMPLETE: 31 payloads and 86107 bytes green, row counts 142/0 versus diagnostic column 4386/2430, zero runtime/config/client/database mutation. Runtime remains stopped and the lease remains released. An independent 15-degree search found 125 literal-row-valid retained-transform tuples and deterministic choice orders 28/68/56 at 10/+60,15/-60,15/+120 with 23.728951 m separation and 3.820467 m row margin; T-110 is prepared for a fresh v8 root.
+    runtime_boundary: T-109 independently verified and integrated T-108 as retained INCOMPLETE: 31 payloads and 86107 bytes green, row counts 142/0 versus diagnostic column 4386/2430, zero runtime/config/client/database mutation. An independent 15-degree search found 125 literal-row-valid retained-transform tuples and deterministic choice orders 28/68/56 at 10/+60,15/-60,15/+120 with 23.728951 m separation and 3.820467 m row margin. Runtime remains stopped; the exact committed T-110 thread/worktree now exclusively holds the v8 lease.
 
 control_tower:
   permanent_task:
@@ -695,7 +695,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t108-incomplete-integration-v1.yaml
     proof: PASS-receipt-integrity-31-of-31-payloads-row-142-0-column-4386-2430-subject-retained-INCOMPLETE
   - task: T-110
-    state: prepared-unbound-row-valid-runtime-v8
+    state: active-exact-thread-bound-runtime-lease-held-row-valid-v8
+    client_thread_id: client-new-thread:27b390c6-7b31-4d2e-b471-c63e85600ab4
+    task_thread_id: 01a05fb0-5d05-72b0-970f-cdd231a2fbe5
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\9aaa\PB-W00-control'
+    dispatch_base: 73129640a7b90a275dadbb6c63403f10aaa4b96e
     contract: ops/tasks/T-110/CONTRACT.md
     tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
@@ -945,6 +949,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: aaemu12-released-after-T-108-clean-pre-runtime-incomplete
+  runtime_lease: aaemu12-held-by-T-110-thread-01a05fb0-5d05-72b0-970f-cdd231a2fbe5
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-PB-000-commits-a-fresh-exact-successor-lease
+  runtime_start: authorized-only-for-T-110-exact-v8-contract-and-graceful-control-paths

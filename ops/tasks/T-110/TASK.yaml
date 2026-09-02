@@ -2,16 +2,17 @@ schema_version: 1
 id: T-110
 title: Prove row-valid angular two-wave one-zone autonomy and restart
 track: AAEmu12
-status: prepared
+status: active
 integration: pending
 outcome: Run a fresh sealed physical proof whose mandatory self-test and both live planners use the literal bot-row own-versus-foreign-fixture criterion over a verified 15-degree angular grid, then prove two independent three-bot lifecycle/refill waves and a clean distinct-PID restart with ordered rebootstrap and sustained target population.
 depends_on: [T-109]
 runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
 branch: codex-managed-worktree
-worktree: null
-owner_client_thread_id: null
-owner_thread_id: null
+worktree: 'C:\Users\jensh\.codex\worktrees\9aaa\PB-W00-control'
+owner_client_thread_id: client-new-thread:27b390c6-7b31-4d2e-b471-c63e85600ab4
+owner_thread_id: 01a05fb0-5d05-72b0-970f-cdd231a2fbe5
 inputs:
+  dispatch_base: 73129640a7b90a275dadbb6c63403f10aaa4b96e
   installed_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
   installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
   host_base: 62e3eb1d87da01194802ac886cd500134facad28

@@ -1186,12 +1186,16 @@ tasks:
   - id: T-110
     title: Prove row-valid angular two-wave one-zone autonomy and restart
     track: AAEmu12
-    status: prepared
+    status: active
     integration: pending
     depends_on: [T-109]
-    runtime_lease: pending-exact-binding
+    runtime_lease: aaemu12
     gate: physical-row-valid-angular-preflight-two-wave-restart-dwell
     contract: ops/tasks/T-110/CONTRACT.md
+    owner_client_thread_id: client-new-thread:27b390c6-7b31-4d2e-b471-c63e85600ab4
+    owner_thread_id: 01a05fb0-5d05-72b0-970f-cdd231a2fbe5
+    worktree: 'C:\Users\jensh\.codex\worktrees\9aaa\PB-W00-control'
+    dispatch_base: 73129640a7b90a275dadbb6c63403f10aaa4b96e
     evidence_root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
     tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
