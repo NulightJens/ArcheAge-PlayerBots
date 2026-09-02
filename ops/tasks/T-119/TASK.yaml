@@ -12,7 +12,7 @@ worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-119-autonomous-
 owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
 inputs:
   source_base: cb9232d23312f719a90dc2ca51e6f5a561402fde
-  dispatch_base: binding-commit-reported-by-PB-000
+  dispatch_base: aa9d2957fa348b545615faa167f9c2f15d888e6d
   installed_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
   host_base: 62e3eb1d87da01194802ac886cd500134facad28
   compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606

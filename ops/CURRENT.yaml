@@ -849,7 +849,7 @@ prepared_workstreams:
     branch: codex/T-119-autonomous-quest-intake
     worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-119-autonomous-quest-intake'
     source_base: cb9232d23312f719a90dc2ca51e6f5a561402fde
-    dispatch_base: binding-commit-reported-by-PB-000
+    dispatch_base: aa9d2957fa348b545615faa167f9c2f15d888e6d
     contract: ops/tasks/T-119/CONTRACT.md
     runtime_lease: null
     validation_boundary: source-focused-only-no-live-runtime-or-deployed-host-writes
