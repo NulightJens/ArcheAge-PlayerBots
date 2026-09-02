@@ -644,11 +644,11 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-passive-anchor-yaw-offset-v1.yaml
     proof: PASS-46-focused-build-0-errors-72-warnings-patch-unchanged-clean-four-path-candidate
   - task: T-107
-    state: prepared-awaiting-exact-thread-and-build-lease-binding
-    client_thread_id: pending
-    task_thread_id: pending
-    codex_worktree: pending
-    dispatch_base: pending-control-prep-commit
+    state: active-exact-thread-bound-integrator-build-lease-held
+    client_thread_id: client-new-thread:aa21dc2d-c74b-4201-9e60-39eda2d6b709
+    task_thread_id: 01a05f74-3d1b-7e03-9418-60148911d9a2
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\7da5\PB-W00-control'
+    dispatch_base: 0ebac76ed88a80b3a75c1f13478da269821b4e96
     source_candidate: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
     source_candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
     source_candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
@@ -897,6 +897,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: released-after-T-041-fail-cleanup-and-T-085-independent-acceptance
+  runtime_lease: aaemu12-build-only-held-by-T-107-thread-01a05f74-3d1b-7e03-9418-60148911d9a2
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: prohibited-until-fresh-post-correction-runtime-task-is-bound-and-committed-to-lease
+  runtime_start: prohibited-T-107-build-only-lease-authorizes-no-Login-Game-observer-database-or-client-action

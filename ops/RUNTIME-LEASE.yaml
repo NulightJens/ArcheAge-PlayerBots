@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-104-clean-retained-fail
-    owner_task: null
-    owner_thread_id: null
+    status: claimed-build-only-by-T-107
+    owner_task: T-107
+    owner_thread_id: 01a05f74-3d1b-7e03-9418-60148911d9a2
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: 2026-09-01
+    released_at: null
     cleanup_receipt: ops/evidence/aaemu12-t104-one-zone-autonomy-v6.yaml
     baseline_evidence: ops/evidence/aaemu12-t104-one-zone-autonomy-v6.yaml
     archeage_client_allowed: false
-    authority_limit: No task may touch the AAEmu 1.2 lease-controlled workspace until PB-000 commits a new exact claim. T-104 stopped Game then Login gracefully, restored exact config bytes, ended observers cooperatively, proved zero required processes/listeners/live logs, and sealed its retained FAIL. T-105 is evidence-only and has no runtime-host authority.
+    authority_limit: T-107 alone may install its exact replay and create ordinary build/test outputs in aaemu12_integration. It may not start Login or Game, run observers, edit deployed BotConfig.json, access or control MySQL/database or ArcheAge client, touch external runtime evidence, force-stop a process, or perform destructive cleanup. T-104 cleanup remains the runtime baseline.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed

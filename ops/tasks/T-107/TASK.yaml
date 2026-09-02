@@ -2,18 +2,18 @@ schema_version: 1
 id: T-107
 title: Integrate and install bounded relative-yaw fixture placement
 track: AAEmu12
-status: ready
+status: active
 integration: pending
 outcome: Independently replay the exact T-106 four-path candidate onto the saved lineage, install that replay into the registered AAEmu 1.2 module under a committed build-only lease, rerun focused proof, one clean build, and exactly one full-suite wave, then fast-forward the saved branch with a durable integration receipt.
 depends_on: [T-106]
-runtime: {required: false, lease: aaemu12-build-only-pending-exact-binding, archeage_client_allowed: false}
+runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
 branch: codex-managed-worktree
-worktree: pending
-owner_client_thread_id: pending
-owner_thread_id: pending
+worktree: 'C:\Users\jensh\.codex\worktrees\7da5\PB-W00-control'
+owner_client_thread_id: client-new-thread:aa21dc2d-c74b-4201-9e60-39eda2d6b709
+owner_thread_id: 01a05f74-3d1b-7e03-9418-60148911d9a2
 inputs:
-  dispatch_base: pending-control-prep-commit
-  saved_head: pending-control-prep-commit
+  dispatch_base: 0ebac76ed88a80b3a75c1f13478da269821b4e96
+  saved_head: 0ebac76ed88a80b3a75c1f13478da269821b4e96
   source_candidate: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
   source_candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
   source_candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
