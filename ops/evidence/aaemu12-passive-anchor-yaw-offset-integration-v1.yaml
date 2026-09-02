@@ -1,0 +1,208 @@
+schema_version: 1
+id: aaemu12-passive-anchor-yaw-offset-integration-v1
+recorded_at: '2026-09-01T18:25:00-06:00'
+verdict: PASS-integration-install-build-focused-full-unit
+
+fingerprint:
+  task: T-107
+  dispatch_base: 0ebac76ed88a80b3a75c1f13478da269821b4e96
+  binding_commit: 85435f215db854960d460127d9f1b2e7bad57036
+  binding_tree: 02be073ab84453e15e3318ce76bd68d16f9d7fb1
+  lease_commit: 85435f215db854960d460127d9f1b2e7bad57036
+  lease: aaemu12-build-only
+  lease_owner_thread: 01a05f74-3d1b-7e03-9418-60148911d9a2
+  lease_owner_client_thread: client-new-thread:aa21dc2d-c74b-4201-9e60-39eda2d6b709
+  candidate: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
+  candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+  candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+  candidate_parent_tree: 5960ffe01a1ca9f38df9f4b67a1f67df71483021
+  replay_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  replay_parent: 85435f215db854960d460127d9f1b2e7bad57036
+  replay_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  candidate_patch_id: 1658582af94e18e4376ec0e8ffde12926d32fa0b
+  replay_patch_id: 1658582af94e18e4376ec0e8ffde12926d32fa0b
+  prior_installed_source: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+  prior_installed_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
+  installed_module_commit: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  artifact_commit: exact-hash-reported-to-control-tower-after-commit
+  gate_definition_version: 1
+
+accepted_input:
+  exact_sole_parent: true
+  candidate_declared_path_count: 4
+  unexpected_candidate_path_count: 0
+  replayed_blob_count: 4
+  replayed_blob_mismatch_count: 0
+  stable_patch_id_equal: true
+  saved_lineage_matches_candidate_parent_on_replay_paths: true
+  binding_is_sole_child_of_saved_head: true
+  writer_branch_merged: false
+  candidate_paths:
+    - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+    - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+    - ops/evidence/aaemu12-passive-anchor-yaw-offset-v1.yaml
+    - ops/tasks/T-106/HANDOFF.md
+  exact_blob_identity:
+    command_source: 893f7d639477bd8cbc4fc9911f63cb642733a8cf
+    command_tests: 664e1b595e00d9659f3cc13c40e1c8ba5350ac40
+    source_receipt: a08fd0c7c643e5cb4baabe30c506befc9c9305a2
+    source_handoff: cddda2f69d70c01869d50c4a2146ea804326872b
+
+independent_review:
+  verdict: passed
+  grammar: 'spawnpassive <npcTemplateId> [distance] [anchorBotId] [yawOffsetDegrees]'
+  invalid_angle_error: 'Yaw offset degrees must be a finite invariant number from -180 through 180.'
+  invariant_finite_inclusive_range: [-180, 180]
+  omitted_and_explicit_zero_bit_exact: true
+  signed_positive_and_negative_angle_geometry_pinned: true
+  default_world_zero_preserved: true
+  source_transform_target_and_battle_state_unchanged: true
+  existing_anchor_guards_preserved: true
+  product_defects_found: none
+
+environment:
+  os: Microsoft Windows 10.0.26200
+  architecture: X64
+  powershell: 7.6.4
+  dotnet_sdk: 10.0.302
+  workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+
+host_preflight:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean_detached: true
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  host_status_entry_count: 30
+  host_tracked_patch_path_count: 28
+  host_untracked_entries:
+    - SQL/updates/2026-08-25_aaemu_game_bot_archetype_plans.sql
+    - modules/
+  module_root_only_child: modules/archeage-playerbots/
+  prior_installed_module_commit: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+  prior_installed_module_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
+  prior_installed_module_clean_detached: true
+  strict_reference_apply_check_whitespace_error_all: passed
+  complete_integration_host_reverse_check_whitespace_error_all: passed
+  runtime_process_count: 0
+  occupied_required_port_count: 0
+
+installation:
+  method: clean-installed-module-detached-fast-forward-to-exact-replay-object
+  tracked_path_deletions: 0
+  installed_module_transition:
+    from: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+    to: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  installed_module_clean_detached: true
+  exact_four_blob_identity: true
+  host_overlay_transition: unchanged
+  installer_check_only_after: passed-installed-supported
+  installer_normal_invocations: 0
+  final_host_status_entry_count: 30
+  final_host_tracked_patch_path_count: 28
+  final_host_patch_reverse_check: passed
+
+results:
+  preparatory_test_project_build:
+    purpose: refresh-focused-test-binary-before-authoritative-solution-build
+    command: dotnet build AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-restore -m:1 -nodeReuse:false --nologo --verbosity minimal
+    invocations: 1
+    elapsed: '00:00:49.72'
+    warnings: 72
+    errors: 0
+  focused:
+    framework: TUnit-1.54.0.0
+    runtime: net10.0-x64
+    command: >-
+      AAEmu.UnitTests.exe --treenode-filter
+      /*/AAEmu.UnitTests.Game.Scripts.Commands/SpawnPassiveNpcCommandTests/*
+      --minimum-expected-tests 46 --no-progress --no-ansi --output Detailed
+    total: 46
+    succeeded: 46
+    skipped: 0
+    failed: 0
+    duration_ms: 2019
+    invariant_and_range_parsing: passed
+    bit_exact_zero_and_signed_angle_geometry: passed
+    default_world_zero: passed
+    retained_anchor_guards: passed
+    source_state_unchanged: passed
+  build:
+    command: dotnet build AAEmu.slnx --no-incremental -m:1 -nodeReuse:false --nologo --verbosity minimal
+    invocations: 1
+    elapsed: '00:00:35.89'
+    errors: 0
+    warnings: 79
+  full_unit:
+    command: dotnet test AAEmu.UnitTests/AAEmu.UnitTests.csproj --no-build --verbosity normal
+    invocations: 1
+    total: 1874
+    succeeded: 1870
+    skipped: 4
+    failed: 0
+    duration: '00:00:27.437'
+    intentional_skips:
+      - Legacy_Darkrunner_Pve_MatchesGolden
+      - Legacy_Darkrunner_Pvp_MatchesGolden
+      - Legacy_Primeval_Pve_MatchesGolden
+      - Legacy_Primeval_Pvp_MatchesGolden
+  final_reference_clean: true
+  final_installed_module_clean: true
+  final_source_and_installed_tree_equal: true
+
+artifact_hashes:
+  game_assembly_sha256: 2385d16554b1fc9df1c77d45612b39c8fdac20721f20eac31ec9d0c32cc71696
+  test_assembly_sha256: ccbb0a715dadfbdcd7ec54e0dd32939d973722fd2350b72b242ae70e80d58ef3
+  test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+  focused_test_report_sha256: 83b19f3f4e053edbc82e700236ecffdd779b0f37fd6edc695ea16936da403423
+  full_test_report_sha256: 77f3ae1ea5b4cdc7bf2c78339971337c2004a9f68e088f009c4a70d917d1235d
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_failures:
+  product_or_gate_failures: none
+  warnings:
+    - The no-incremental solution build retained 79 pinned package, compiler, analyzer, and test-analyzer warnings, including existing SQLitePCLRaw.lib.e_sqlite3 and SSH.NET high-severity advisories.
+  operator_probes:
+    - A source-only literal grammar probe initially looked for the combined command name and help suffix in one string; the exact command name, exact help suffix, and literal combined grammar in the source receipt and handoff were then verified without mutation.
+    - Two generated apply_patch envelopes were rejected before mutation; the accepted replay was subsequently proven by all four blob IDs and the stable patch ID before commit.
+    - An unstaged diff patch-ID probe omitted the two new untracked evidence paths; after staging all four exact paths, both staged and committed patch IDs matched the candidate exactly.
+
+runtime_state:
+  runtime_started_stopped_or_controlled: false
+  runtime_observer_started_or_controlled: false
+  database_or_client_accessed: false
+  mysql_queried_started_stopped_or_controlled: false
+  deployed_runtime_configuration_edited: false
+  aaemu_game_login_process_count_after: 0
+  occupied_required_port_count_after: 0
+  required_ports_observed_free: [1234, 1237, 1239, 1250, 1280]
+
+scope:
+  full_suite_invocations: 1
+  registered_reference_written: false
+  external_runtime_evidence_written: false
+  global_ledgers_or_runtime_lease_written: false
+  aaemu30_scale_soak_or_packaging_touched: false
+
+retained_boundaries:
+  - T-104 remains an immutable retained runtime FAIL; this source/install/unit PASS does not reinterpret its evidence.
+  - Physical angular placement, both lifecycle/refill waves, distinct-PID restart and rebootstrap, and two-minute dwell remain unproven until fresh T-108 v7 runtime evidence passes and is independently integrated.
+  - No database, client, scale, soak, packaging, release-readiness, or AAEmu 3.0 behavior is proven.
+  - T-037 remains blocked.
+
+authorization:
+  saved_branch_fast_forward_after_scoped_artifact_commit: true
+  fresh_t108_v7_runtime_successor_may_be_bound_after_build_lease_release: true
+  exact_runtime_proof_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  exact_runtime_proof_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  control_tower_action: >-
+    After the saved integration branch contains the scoped T-107 artifact
+    commit, PB-000 may release the build-only lease and bind fresh T-108 v7
+    runtime evidence against this exact replay source and tree. T-108 must
+    prove deterministic angular placement, both lifecycle/refill waves,
+    distinct-PID restart and rebootstrap, and the two-minute dwell before
+    T-037 can advance.
