@@ -41,13 +41,13 @@ workspaces:
     access: lease-controlled
     repository: AAEmu/AAEmu
     base_head: 62e3eb1d87da01194802ac886cd500134facad28
-    expected_state: receipted-module-install-changes
+    expected_state: clean-detached-t115-replay-retained-pending-count-reconciliation
     lease: aaemu12
     installed_module_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\modules\archeage-playerbots'
-    installed_module_head: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
-    installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    installed_module_head: 5f544acffdbef48b83278978b68c3f62b1441808
+    installed_module_tree: 6bf7927fc28ca163ffa67da6a280fce4f22d4460
     compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
-    evidence_receipt: ops/evidence/aaemu12-passive-anchor-yaw-offset-integration-v1.yaml
+    evidence_receipt: pending-T116-integration-of-ops/tasks/T-115/HANDOFF.md
 
   aaemu12_database_public_alpha_v1:
     role: isolated-public-alpha-runtime-database

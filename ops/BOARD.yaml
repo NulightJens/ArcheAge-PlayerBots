@@ -1300,10 +1300,10 @@ tasks:
   - id: T-115
     title: Integrate and install per-runtime recovery observability
     track: AAEmu12
-    status: active
-    integration: pending
+    status: blocked
+    integration: retained-count-contract-mismatch
     depends_on: [T-114]
-    runtime_lease: aaemu12-build-only
+    runtime_lease: released-clean-count-mismatch
     gate: exact-replay-install-focused-build-full-suite-integration
     contract: ops/tasks/T-115/CONTRACT.md
     owner_client_thread_id: client-new-thread:4d5d7429-1e31-4234-b650-40d3ffee5906
@@ -1313,6 +1313,28 @@ tasks:
     accepted_head_before_preparation: d147bebce60ee79588e0e430f47969e9ba8662b9
     saved_head: exact-binding-commit-reported-by-PB-000
     source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
+    replay_commit: 5f544acffdbef48b83278978b68c3f62b1441808
+    replay_tree: 6bf7927fc28ca163ffa67da6a280fce4f22d4460
+    retained_handoff_blob: 01af6882c7143960bfa2b2fefb3a0ab05fff52c2
+    full_suite_log_sha256: bb8b3ed89578c304e3114b7885528b09c5bd6811ccd4a4208aaf91f6facccf08
+    result: BLOCKED-contract-expected-1872-but-exact-one-test-delta-produced-green-1871-plus-4-skips
+    blocker: T-114-added-one-new-host-test-and-strengthened-one-existing-command-test-so-contract-overcounted-discovery-delta-by-one
+
+  - id: T-116
+    title: Reconcile T-115 count and integrate recovery observability
+    track: AAEmu12
+    status: prepared-awaiting-exact-thread-binding
+    integration: pending
+    depends_on: [T-115]
+    runtime_lease: pending-exact-build-only-thread-binding
+    gate: exact-replay-green-receipt-reuse-and-count-correction-integration
+    contract: ops/tasks/T-116/CONTRACT.md
+    owner_client_thread_id: pending-exact-thread-binding
+    owner_thread_id: pending-exact-thread-binding
+    worktree: pending-exact-thread-binding
+    dispatch_base: pending-preparation-commit
+    source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
+    retained_t115_replay: 5f544acffdbef48b83278978b68c3f62b1441808
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -1322,4 +1344,4 @@ tasks:
     depends_on: [fresh-post-angular-placement-runtime-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-112-retained-FAIL-is-independently-integrated-and-T-037-awaits-T-115-observability-install-full-suite-PASS-plus-a-fresh-runtime-successor-PASS
+    blocker: T-112-retained-FAIL-is-independently-integrated-and-T-037-awaits-T-116-corrected-count-integration-plus-a-fresh-runtime-successor-PASS

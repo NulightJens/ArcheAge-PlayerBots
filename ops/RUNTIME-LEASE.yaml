@@ -3,9 +3,9 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: leased-build-only-to-T-115
-    owner_task: T-115
-    owner_thread_id: 01a0604f-ad55-70f2-a138-001a1b6fd92f
+    status: pending-T-116-exact-build-only-thread-binding
+    owner_task: T-116
+    owner_thread_id: pending-exact-thread-binding
     workspace_id: aaemu12_integration
     host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
     reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
@@ -13,11 +13,11 @@ runtimes:
     pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
     database_identity: aaemu12_database_public_alpha_v1
     claimed_at: 2026-09-01
-    released_at: null
+    released_at: 2026-09-01
     cleanup_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     baseline_evidence: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
     archeage_client_allowed: false
-    authority_limit: Only T-115 task 01a0604f-ad55-70f2-a138-001a1b6fd92f in C:\Users\jensh\.codex\worktrees\e53c\PB-W00-control may write the registered integration host, and only to install the exact T-114 replay and produce contracted build/test outputs. It may not mutate deployed BotConfig, start Login/Game or observers, touch runtime evidence, access database/client, or perform runtime control. T-112's immutable v9 FAIL remains independently integrated and the live runtime remains stopped.
+    authority_limit: T-115 is finished and its build-only lease is released. No task may write the registered integration host until PB-000 commits the exact T-116 thread/worktree binding. Once bound, T-116 may only move the clean installed module to its byte-equivalent replay and run contracted focused verification; it must not rebuild or rerun the full suite, mutate deployed BotConfig, start Login/Game/live observers, touch runtime evidence, access database/client, or perform runtime control.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
