@@ -2,7 +2,7 @@ schema_version: 1
 id: T-110
 title: Prove row-valid angular two-wave one-zone autonomy and restart
 track: AAEmu12
-status: active
+status: done
 integration: pending
 outcome: Run a fresh sealed physical proof whose mandatory self-test and both live planners use the literal bot-row own-versus-foreign-fixture criterion over a verified 15-degree angular grid, then prove two independent three-bot lifecycle/refill waves and a clean distinct-PID restart with ordered rebootstrap and sustained target population.
 depends_on: [T-109]
@@ -43,3 +43,7 @@ gates:
 validation_boundary: Physical AAEmu 1.2 one-zone runtime proof only. Do not edit module source, tests, global ledgers/lease/workspace registry, registered reference, database, client, AAEmu 3.0, scale, soak, packaging, or predecessor evidence. No build/full suite, directed gameplay commands, fixture retries, runtime force-stop, destructive cleanup, or persistence of the full 18,399,744-row enumeration.
 contract: ops/tasks/T-110/CONTRACT.md
 handoff: ops/tasks/T-110/HANDOFF.md
+candidate_commit: 1b914085d64b3957b3c394d9b9f75600c91e2a96
+candidate_tree: 03d3e8fcda1ae196023c9acd412e212770940261
+evidence_receipt: ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
+result: INCOMPLETE-grade-Weak-parser-rejection-and-autonomy-observer-gap

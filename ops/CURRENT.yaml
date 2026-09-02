@@ -1,6 +1,6 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: prepare-row-valid-one-zone-runtime-proof-v8
+phase: integrate-retained-t110-incomplete-and-correct-v9-harness
 verdict: active
 
 source:
@@ -30,11 +30,11 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-pre-t110-runtime-lease-held
+    state: stopped-clean-after-t110-incomplete-lease-released
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
-    evidence_receipt: aaemu12-t108-one-zone-autonomy-v7
+    evidence_receipt: aaemu12-t110-one-zone-autonomy-v8
     integration_receipt: aaemu12-t108-incomplete-integration-v1
     installed_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
@@ -44,7 +44,7 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 46-passed-0-skipped-0-failed
     unit_tests: 1870-passed-4-intentional-skips-0-failed-exactly-one-invocation
-    runtime_boundary: T-109 independently verified and integrated T-108 as retained INCOMPLETE: 31 payloads and 86107 bytes green, row counts 142/0 versus diagnostic column 4386/2430, zero runtime/config/client/database mutation. An independent 15-degree search found 125 literal-row-valid retained-transform tuples and deterministic choice orders 28/68/56 at 10/+60,15/-60,15/+120 with 23.728951 m separation and 3.820467 m row margin. Runtime remains stopped; the exact committed T-110 thread/worktree now exclusively holds the v8 lease.
+    runtime_boundary: T-110 proved the 18399744-tuple literal-row planner at 125 eligible, exact orders 28/68/56, and run-one ordered bootstrap at 180038.044 ms. It stopped without retry after the first valid response emitted grade=Weak but the local parser required numeric grade; independent audit also found 2565-2575 ms autonomy gaps above 2000 ms. Game then Login stopped gracefully, config was restored byte-exact, the 5918-payload root was sealed, and the lease is released.
 
 control_tower:
   permanent_task:
@@ -55,10 +55,10 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Bind T-110 to an exact isolated runtime worker and committed aaemu12 lease for the fresh absent v8 root.
-  - Require its pre-runtime self-test to enumerate 18399744 tuples, use only literal bot-row ownership, find exactly 125 eligible, and select choice orders 28/68/56 at 10/+60,15/-60,15/+120.
-  - From exact live transforms, recompute the complete 15-degree grid with compact semantic hashing before each one-shot fixture batch, then prove both lifecycle/refill waves plus distinct-PID restart/rebootstrap and two-minute dwell.
-  - Independently integrate only a T-110 PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
+  - Independently verify and integrate the exact two-path T-110 candidate as retained INCOMPLETE without runtime or evidence mutation.
+  - Prepare a fresh v9 runtime successor whose parser accepts the authoritative named grade token and whose exhaustive live planner does not starve 500 ms observers past the 2000 ms ceiling.
+  - Preserve the proven literal-row grid, semantic hash, and exact 180-second bootstrap requirements; never reuse the v8 root or retry its partial fixture batch.
+  - Independently integrate only a fresh successor PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
@@ -695,7 +695,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t108-incomplete-integration-v1.yaml
     proof: PASS-receipt-integrity-31-of-31-payloads-row-142-0-column-4386-2430-subject-retained-INCOMPLETE
   - task: T-110
-    state: active-exact-thread-bound-runtime-lease-held-row-valid-v8
+    state: done-retained-incomplete-awaiting-independent-integration
     client_thread_id: client-new-thread:27b390c6-7b31-4d2e-b471-c63e85600ab4
     task_thread_id: 01a05fb0-5d05-72b0-970f-cdd231a2fbe5
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\9aaa\PB-W00-control'
@@ -705,6 +705,18 @@ prepared_workstreams:
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
     evidence_root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
     deterministic_selftest: 264-choices-per-bot-18399744-tuples-125-literal-row-eligible
+    candidate_commit: 1b914085d64b3957b3c394d9b9f75600c91e2a96
+    candidate_parent: 80bb3b9f3dc028e2b1830ef10421eed4dc13f4e1
+    candidate_tree: 03d3e8fcda1ae196023c9acd412e212770940261
+    candidate_patch_id: 211ac120413c1c483c1ad9892afa08eecc9af3a9
+    evidence_receipt: ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
+    proof: INCOMPLETE-planner-and-bootstrap-pass-grade-Weak-parser-rejection-autonomy-gap-clean-sealed-5918-payload-root
+  - task: T-111
+    state: prepared-unbound-retained-incomplete-integration
+    contract: ops/tasks/T-111/CONTRACT.md
+    source_candidate: 1b914085d64b3957b3c394d9b9f75600c91e2a96
+    evidence_root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
+    runtime_lease: null
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution
@@ -949,6 +961,6 @@ wave_2:
     installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
     integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
     evidence_receipt: aaemu12-startup-log-integration-v2
-  runtime_lease: aaemu12-held-by-T-110-thread-01a05fb0-5d05-72b0-970f-cdd231a2fbe5
+  runtime_lease: aaemu12-released-after-T-110-clean-incomplete
   runtime_database_identity: aaemu12_database_public_alpha_v1
-  runtime_start: authorized-only-for-T-110-exact-v8-contract-and-graceful-control-paths
+  runtime_start: prohibited-until-PB-000-commits-a-fresh-exact-successor-lease

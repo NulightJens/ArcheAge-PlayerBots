@@ -155,9 +155,9 @@ workspaces:
   aaemu12_t110_evidence_v8:
     role: one-zone-row-valid-angular-autonomous-director-runtime-evidence-v8
     path: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
-    access: lease-controlled
+    access: evidence-only
     lease: aaemu12
-    expected_state: fresh-absent-claimed-by-exact-T110-until-first-create
+    expected_state: immutable-retained-incomplete-parser-and-observer-gap
 
   aaemu12_client:
     role: matching-client-fixture
