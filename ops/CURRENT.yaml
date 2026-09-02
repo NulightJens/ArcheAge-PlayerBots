@@ -1,13 +1,13 @@
 schema_version: 1
 updated_at: 2026-09-02
-phase: autonomous-quest-intake-integration-and-live-acceptance
+phase: bot-identity-quest-lifecycle-and-world-navigation-source-wave
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: fc6a5b9044d7e7aef1c2b6a6d93590256f3f89a3
-  tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
-  integration_evidence: ops/evidence/aaemu12-runtime-recovery-observability-integration-v1.yaml
+  integrated_head: 0bff81c350a216b7018099749fd64096fbffc098
+  tested_module_source: fb0a315c9579fb2e7e249e47b37efa07a9404c51
+  integration_evidence: ops/evidence/aaemu12-autonomous-quest-intake-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
   integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
   accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
@@ -30,29 +30,30 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: clean-stopped-leased-to-t120-pre-integration
+    state: healthy-interactive-retained-under-blocked-t120
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
     evidence_receipt: aaemu12-t112-one-zone-autonomy-v9
-    integration_receipt: aaemu12-runtime-recovery-observability-integration-v1
-    installed_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
-    installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+    integration_receipt: aaemu12-autonomous-quest-intake-integration-v1
+    installed_module_source: fb0a315c9579fb2e7e249e47b37efa07a9404c51
+    installed_module_tree: a7dfc4d1bffcdddc25c2dc45fc9feed71365eb70
     database_identity: aaemu12_database_public_alpha_v1
     compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
-    game_assembly_sha256: 0b770b543b167f7ae57fcb8eb9ad18357e75a5241b0b170a9b1fa4ac05f564f6
-    build: 0-errors-79-warnings
-    focused_tests: 91-observer-assertions-46-command-34-host-passed-zero-failed
+    game_assembly_sha256: 1db5e555c8228bd9da131b21a45ed58fbe12dec7574bd53374c9343c0f2d7d04
+    build: 0-errors-30-warnings
+    focused_tests: 98-controller-host-command-and-32-safe-config-passed-zero-failed
     unit_tests: 1871-passed-4-intentional-skips-0-failed-exactly-one-t115-invocation-independently-reused-by-t116
-    live_session_owner: null
+    live_session_owner: T-120
     previous_session_owner: T-118
-    login_pid: null
-    game_pid: null
-    launcher_pid: null
-    listeners: []
-    director: stopped-graceful-shutdown-remaining-bots-0-remaining-runtimes-0
+    login_pid: 111900
+    game_pid: 38844
+    launcher_pid: 92432
+    client_pid: 117252
+    listeners: [1234, 1237, 1239, 1250, 1280]
+    director: disabled-quest-intake-enabled-two-active-idle-bots-zero-runtime-overlaps-or-tick-errors
     preserved_config: 'D:\Codex-Labs\sessions\T-118\interactive-live-demo-v1\config\BotConfig.original.bin'
-    runtime_boundary: T-112 remains an independently integrated immutable FAIL. T-116 independently reconciled T-115's count-only contract error and remains the installed baseline before T-120. T-117's consumed v10 root remains retained. T-118 cleanup completed with normal client close, graceful Game then Login shutdown, zero relevant processes/listeners/live logs, and exact original config restoration. T-120 now owns the clean lease for exact T-119 integration, install, build, and live quest-intake acceptance.
+    runtime_boundary: T-120 integrated and installed T-119 successfully but is BLOCKED because the retained dataset has no eligible level-one Nuian. Its healthy interactive runtime remains leased to T-120 with two active idle ScaleBots after exploratory native high-level side-quest intake. No source worker may deploy, query or write the database, place more bots, or mutate this runtime; later transition must close the client normally and stop Game then Login gracefully.
 
 control_tower:
   permanent_task:
@@ -63,9 +64,9 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Finish T-118 cleanup through its owning task, transfer the clean AAEmu 1.2 lease to T-120, and do not mutate the registered host before that committed transfer.
-  - Integrate exact T-119 candidate 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15, install, run focused proof, rebuild the registered host, enable quest intake with the Director disabled, and restart gracefully.
-  - Launch the registered client for user authentication, then physically verify one existing eligible level-one Nuian bot beside the user discovers, walks to, and normally accepts local story and side quests without per-quest commands.
+  - Retain T-120 as BLOCKED because no eligible level-one Nuian identity exists; preserve its healthy interactive runtime under the existing lease until a separately contracted graceful transition.
+  - Complete T-121 server-owned arbitrary-level identity creation, T-122 autonomous doodad kill-quest lifecycle, and T-123 transfer-road world navigation as independent source-only candidates.
+  - Independently integrate reviewed candidates, create a versioned successor test identity without destructive database reset, and run a fresh hands-off Nuian signpost acceptance, objective, report, chaining, and road-routing proof under a new runtime task and lease.
   - Resume physical v10 qualification only with a fresh versioned successor root; never reuse the retained T-117 root.
   - Independently integrate only a fresh successor runtime PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
@@ -858,7 +859,7 @@ prepared_workstreams:
     candidate_tree: 1276326b17cabfb3dbe10010ddbcf65dea729417
     candidate_patch_id: d525d7bc14e72ac0c5042bc6443044762e253084
   - task: T-120
-    state: active-clean-lease-transferred
+    state: blocked-no-existing-eligible-level-one-nuian-runtime-retained
     task_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
     codex_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
     dispatch_base: d42236e77cfc8030b78eb9750db9f78a3df8d35d
@@ -867,7 +868,28 @@ prepared_workstreams:
     preparation_commit: ca6acb96b11daaa862b609fcce19d0641406d869
     cleanup_receipt_commit: a004780cf791bf614342bbe8a41c2b8d207252df
     runtime_lease: aaemu12
-    result: ACTIVE-exact-integration-install-build-and-level-one-nuian-live-acceptance
+    result: BLOCKED-source-integrated-exploratory-high-level-intake-partial-no-level-one-or-objective-proof
+  - task: T-121
+    state: ready-source-only
+    owner_thread_id: pending-control-tower-binding
+    source_base: 0bff81c350a216b7018099749fd64096fbffc098
+    contract: ops/tasks/T-121/CONTRACT.md
+    runtime_lease: null
+    result: READY-server-owned-arbitrary-level-bot-identity-factory
+  - task: T-122
+    state: ready-source-only
+    owner_thread_id: pending-control-tower-binding
+    source_base: 0bff81c350a216b7018099749fd64096fbffc098
+    contract: ops/tasks/T-122/CONTRACT.md
+    runtime_lease: null
+    result: READY-doodad-kill-report-reward-and-nearby-quest-chaining
+  - task: T-123
+    state: ready-source-only
+    owner_thread_id: pending-control-tower-binding
+    source_base: 0bff81c350a216b7018099749fd64096fbffc098
+    contract: ops/tasks/T-123/CONTRACT.md
+    runtime_lease: null
+    result: READY-transfer-road-world-navigation-graph
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

@@ -1,0 +1,30 @@
+schema_version: 1
+id: T-123
+title: Implement transfer-road world navigation graph
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Expose AAEmu's loaded transfer/cart road polylines through a read-only compatibility seam, normalize them into a validated cross-zone graph, and produce deterministic weighted routes that existing local bot movement can follow for long-distance world travel.
+depends_on: [T-116]
+runtime: {required: false, lease: null}
+source_base: 0bff81c350a216b7018099749fd64096fbffc098
+owner_thread_id: pending-control-tower-binding
+write_scope:
+  - src/AAEmu.Game/Bots/Navigation/
+  - tests/AAEmu.UnitTests/Bots/Navigation/
+  - compatibility/aaemu-1.2-r208022-transfer-road-adapter.patch
+  - docs/WORLD-NAVIGATION.md
+  - ops/tasks/T-123/HANDOFF.md
+gates:
+  - read-only-transfer-road-snapshot-seam
+  - finite-world-coordinate-polyline-validation
+  - deterministic-endpoint-snapping-and-cross-zone-connectivity
+  - distance-weighted-a-star-routing
+  - disconnected-invalid-and-ambiguous-route-fail-closed-behavior
+  - local-heightmap-or-bai-final-approach-handoff
+  - route-debug-export-without-client-data-writes
+  - focused-tests-and-isolated-aaemu12-build-zero-errors
+validation_boundary: Navigation module source, a separate reviewed AAEmu 1.2 compatibility patch, synthetic focused tests, isolated build, documentation, and handoff only. Do not edit or unpack the client/game_pak, deploy or control the retained T-120 runtime/client, query or write a database, edit global ledgers or the lease, run the full suite, force a process, or touch AAEmu 3.0.
+contract: ops/tasks/T-123/CONTRACT.md
+handoff: ops/tasks/T-123/HANDOFF.md
+

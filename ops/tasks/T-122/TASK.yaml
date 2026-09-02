@@ -1,0 +1,37 @@
+schema_version: 1
+id: T-122
+title: Implement autonomous signpost kill-quest completion
+track: AAEmu12
+status: ready
+integration: pending
+outcome: An idle bot can discover and natively accept an eligible NPC or signpost quest, understand a supported monster-kill objective, find and defeat valid targets, report through the authoritative quest endpoint, choose a deterministic valid reward, and continue scanning nearby quests without per-quest operator commands.
+depends_on: [T-119]
+runtime: {required: false, lease: null}
+source_base: 0bff81c350a216b7018099749fd64096fbffc098
+owner_thread_id: pending-control-tower-binding
+write_scope:
+  - src/AAEmu.Game/Bots/Questing/
+  - src/AAEmu.Game/Bots/Host/BotRuntime.cs
+  - src/AAEmu.Game/Bots/Host/BotHostTask.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Questing/
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotQuestAutonomyTests.cs
+  - compatibility/aaemu-1.2-r208022-doodad-quest-adapter.patch
+  - docs/QUEST-AUTONOMY.md
+  - ops/tasks/T-122/HANDOFF.md
+gates:
+  - exact-npc-and-doodad-signpost-start-discovery
+  - native-requirement-checked-quest-acceptance
+  - supported-monster-hunt-objective-parsing
+  - bounded-valid-target-selection-and-normal-travel-combat
+  - authoritative-progress-observation-without-fabrication
+  - npc-doodad-or-journal-report-and-deterministic-valid-reward
+  - nearby-quest-rescan-and-safe-unsupported-objective-degradation
+  - focused-tests-and-isolated-aaemu12-build-zero-errors
+validation_boundary: Module source, a separate reviewed AAEmu 1.2 compatibility patch, focused deterministic tests, isolated build, documentation, and handoff only. Do not deploy or control the retained T-120 runtime/client, query or write a database, force quest state, edit global ledgers or the lease, run the full suite, edit client data, force a process, or touch AAEmu 3.0.
+contract: ops/tasks/T-122/CONTRACT.md
+handoff: ops/tasks/T-122/HANDOFF.md
+
