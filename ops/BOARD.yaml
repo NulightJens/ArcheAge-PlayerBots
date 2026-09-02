@@ -1140,10 +1140,10 @@ tasks:
   - id: T-108
     title: Prove angular two-wave one-zone autonomy and restart
     track: AAEmu12
-    status: active
+    status: done
     integration: pending
     depends_on: [T-107]
-    runtime_lease: aaemu12
+    runtime_lease: released-clean-pre-runtime
     gate: physical-angular-preflight-two-wave-restart-dwell
     contract: ops/tasks/T-108/CONTRACT.md
     owner_client_thread_id: client-new-thread:fb735534-d444-4ee6-933c-fe69d503e388
@@ -1153,6 +1153,25 @@ tasks:
     evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
     tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    candidate_commit: 9a9a84532f321fbe6755bcf4957c41c8503086e5
+    candidate_parent: 3c1329cf6e95a46998f889aa71cdd2673aa7ea4c
+    candidate_tree: 01079a441274e1f999307d2b978768fe1c23bf72
+    evidence_receipt: ops/evidence/aaemu12-t108-one-zone-autonomy-v7.yaml
+    result: INCOMPLETE-row-oriented-planner-zero-eligible-clean-pre-runtime-sealed-31-payload-root
+
+  - id: T-109
+    title: Independently integrate retained T-108 runtime incompleteness
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-108]
+    runtime_lease: null
+    gate: sealed-incomplete-evidence-replay-and-integration
+    contract: ops/tasks/T-109/CONTRACT.md
+    source_candidate: 9a9a84532f321fbe6755bcf4957c41c8503086e5
+    source_candidate_parent: 3c1329cf6e95a46998f889aa71cdd2673aa7ea4c
+    source_candidate_tree: 01079a441274e1f999307d2b978768fe1c23bf72
+    evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -1162,4 +1181,4 @@ tasks:
     depends_on: [fresh-post-angular-placement-runtime-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-104-retained-fail-is-integrated-and-T-107-angular-placement-is-qualified-but-fresh-T-108-runtime-pass-and-independent-evidence-integration-remain-required
+    blocker: T-104-retained-fail-is-integrated-and-T-107-angular-placement-is-qualified-but-T-108-stopped-INCOMPLETE-before-runtime; a fresh row-valid successor runtime PASS and independent evidence integration remain required

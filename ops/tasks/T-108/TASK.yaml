@@ -2,7 +2,7 @@ schema_version: 1
 id: T-108
 title: Prove angular two-wave one-zone autonomy and restart
 track: AAEmu12
-status: active
+status: done
 integration: pending
 outcome: Run a fresh sealed physical proof that enumerates exact live distance/angle fixture geometry before one-shot mutation, then proves two independent three-bot lifecycle/refill waves and a clean distinct-PID restart with ordered rebootstrap and sustained target population.
 depends_on: [T-107]
@@ -42,3 +42,7 @@ gates:
 validation_boundary: Physical AAEmu 1.2 one-zone runtime proof only. Do not edit module source, tests, global ledgers/lease/workspace registry, registered reference, database, client, AAEmu 3.0, scale, soak, packaging, or predecessor evidence. No build/full suite, directed gameplay commands, fixture retries, runtime force-stop, or destructive cleanup.
 contract: ops/tasks/T-108/CONTRACT.md
 handoff: ops/tasks/T-108/HANDOFF.md
+candidate_commit: 9a9a84532f321fbe6755bcf4957c41c8503086e5
+candidate_tree: 01079a441274e1f999307d2b978768fe1c23bf72
+evidence_receipt: ops/evidence/aaemu12-t108-one-zone-autonomy-v7.yaml
+result: INCOMPLETE-row-oriented-planner-zero-eligible-clean-pre-runtime

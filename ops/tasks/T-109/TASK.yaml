@@ -1,0 +1,36 @@
+schema_version: 1
+id: T-109
+title: Independently integrate retained T-108 runtime incompleteness
+track: AAEmu12
+status: prepared
+integration: pending
+outcome: Independently verify the immutable T-108 v7 root and exact two-path candidate, replay its retained INCOMPLETE receipt and handoff onto the saved lineage, record an integration receipt, and fast-forward the saved branch without reinterpreting the result as runtime acceptance.
+depends_on: [T-108]
+runtime: {required: false, lease: null}
+branch: codex-managed-worktree
+worktree: null
+owner_client_thread_id: null
+owner_thread_id: null
+inputs:
+  source_candidate: 9a9a84532f321fbe6755bcf4957c41c8503086e5
+  source_candidate_parent: 3c1329cf6e95a46998f889aa71cdd2673aa7ea4c
+  source_candidate_tree: 01079a441274e1f999307d2b978768fe1c23bf72
+  source_candidate_patch_id: 8268d979f201ad25ef2e531fff6e5a7d911d8af2
+  evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
+  manifest_sha256: ba96e8171f58bf1c0c4b600d5ae5d1c981aadb865d8e05ccf260e02f2e8a3430
+write_scope:
+  - ops/evidence/aaemu12-t108-one-zone-autonomy-v7.yaml
+  - ops/tasks/T-108/HANDOFF.md
+  - ops/evidence/aaemu12-t108-incomplete-integration-v1.yaml
+  - ops/tasks/T-109/HANDOFF.md
+external_read_scope:
+  - aaemu12_t108_evidence_v7 immutable root only
+gates:
+  - exact-candidate-parent-tree-two-path-scope-patch-id-and-blob-replay
+  - complete-sealed-manifest-rehash-and-path-safety
+  - independent-row-and-column-planner-recomputation-from-retained-float-bits
+  - zero-config-observer-runtime-command-client-database-mutation-and-cleanup-evidence
+  - retained-incomplete-integration-and-saved-branch-fast-forward
+validation_boundary: Immutable evidence verification and retained INCOMPLETE integration only. Do not write external evidence, runtime host/module/config/reference, global ledgers/lease/workspace registry, database, client, source/tests, AAEmu 3.0, scale, soak, or packaging. Do not run build, focused tests, full suite, Login, Game, or observers.
+contract: ops/tasks/T-109/CONTRACT.md
+handoff: ops/tasks/T-109/HANDOFF.md

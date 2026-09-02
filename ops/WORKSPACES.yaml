@@ -148,9 +148,9 @@ workspaces:
   aaemu12_t108_evidence_v7:
     role: one-zone-angular-autonomous-director-runtime-evidence-v7
     path: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
-    access: lease-controlled
+    access: evidence-only
     lease: aaemu12
-    expected_state: fresh-absent-claimed-by-exact-T108-until-first-create
+    expected_state: immutable-retained-incomplete-pre-runtime-row-geometry-gate
 
   aaemu12_client:
     role: matching-client-fixture
