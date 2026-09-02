@@ -30,7 +30,7 @@ runtime:
     last_observed_pid: 88204
     last_observed_port: 3307
   aaemu12_clean_runtime:
-    state: stopped-clean-after-t116-source-integration-lease-released
+    state: interactive-live-demo-running-t118
     reference_workspace: aaemu12_reference
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
@@ -44,7 +44,14 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 91-observer-assertions-46-command-34-host-passed-zero-failed
     unit_tests: 1871-passed-4-intentional-skips-0-failed-exactly-one-t115-invocation-independently-reused-by-t116
-    runtime_boundary: T-112 remains an independently integrated immutable FAIL. T-116 independently reconciled T-115's count-only contract error, integrated and installed exact per-runtime botdebug/observer counters, reused the unchanged green 1871-plus-4 full-suite receipt without rerun, and passed fresh observer 91, command 46, and host 34 gates. T-117 paused cleanly before runtime mutation at the user's request; its consumed v10 root is retained and cannot be reused. T-118 is the isolated interactive demo session.
+    live_session_owner: T-118
+    login_pid: 103064
+    game_pid: 23160
+    launcher_pid: 62516
+    listeners: [1234, 1237, 1239, 1250, 1280]
+    director: zone-221-three-of-three-successes-3-failures-0-steady
+    preserved_config: 'D:\Codex-Labs\sessions\T-118\interactive-live-demo-v1\config\BotConfig.original.bin'
+    runtime_boundary: T-112 remains an independently integrated immutable FAIL. T-116 independently reconciled T-115's count-only contract error, integrated and installed exact per-runtime botdebug/observer counters, reused the unchanged green 1871-plus-4 full-suite receipt without rerun, and passed fresh observer 91, command 46, and host 34 gates. T-117 paused cleanly before runtime mutation at the user's request; its consumed v10 root is retained and cannot be reused. T-118 is live with Login/Game and a three-bot zone-221 Director; the launcher window is open for user-controlled authentication and gameplay.
 
 control_tower:
   permanent_task:
@@ -820,7 +827,7 @@ prepared_workstreams:
     runtime_lease: released-to-interactive-T-118
     retained_root_state: exactly-config-original-bin-plus-empty-prepared-directories-no-runtime-evidence
   - task: T-118
-    state: active-exact-thread-bound-interactive-session
+    state: active-live-ready-for-user-takeover
     client_thread_id: client-new-thread:a9966d94-fda8-44b2-b01e-4c408b892742
     task_thread_id: 01a06077-2a1b-7733-be91-e4bae28f2d55
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\1d32\PB-W00-control'
@@ -829,6 +836,12 @@ prepared_workstreams:
     tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
     installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
     runtime_lease: aaemu12
+    login_pid: 103064
+    game_pid: 23160
+    launcher_pid: 62516
+    launcher_state: window-present-user-escape-interrupted-only-skill-visibility-check
+    director_state: zone-221-live-3-of-3-successes-3-failures-0
+    preserved_config: 'D:\Codex-Labs\sessions\T-118\interactive-live-demo-v1\config\BotConfig.original.bin'
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

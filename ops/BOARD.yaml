@@ -1376,6 +1376,7 @@ tasks:
     dispatch_base: 10f7dbafbb34876fb865c695b584ab3e1bf923a7
     tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
     installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+    result: LIVE-login-103064-game-23160-launcher-62516-five-listeners-zone221-director-3of3-zero-failures-user-takeover
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
