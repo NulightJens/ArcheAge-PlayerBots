@@ -3,7 +3,7 @@ id: T-108
 title: Prove angular two-wave one-zone autonomy and restart
 track: AAEmu12
 status: done
-integration: pending
+integration: integrated-by-T-109
 outcome: Run a fresh sealed physical proof that enumerates exact live distance/angle fixture geometry before one-shot mutation, then proves two independent three-bot lifecycle/refill waves and a clean distinct-PID restart with ordered rebootstrap and sustained target population.
 depends_on: [T-107]
 runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}

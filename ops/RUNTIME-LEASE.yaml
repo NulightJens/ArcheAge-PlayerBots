@@ -3,7 +3,7 @@ owner: PB-000 Control Tower
 
 runtimes:
   aaemu12:
-    status: released-after-T-110-clean-incomplete
+    status: released-after-T-110-clean-incomplete-independently-integrated
     owner_task: null
     owner_thread_id: null
     workspace_id: aaemu12_integration
@@ -17,7 +17,7 @@ runtimes:
     cleanup_receipt: ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
     baseline_evidence: ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
     archeage_client_allowed: false
-    authority_limit: No task may mutate configuration, start Login/Game or observers, or touch runtime evidence until PB-000 commits a fresh exact task/thread/worktree lease. T-110 stopped after one no-retry fixture response, shut down Game then Login gracefully, restored exact config, retained zero processes/listeners/live logs, and sealed its immutable INCOMPLETE v8 root.
+    authority_limit: No task may mutate configuration, start Login/Game or observers, or touch runtime evidence until PB-000 commits the fresh exact T-112 task/thread/worktree lease. T-110 stopped after one no-retry fixture response, shut down Game then Login gracefully, restored exact config, retained zero processes/listeners/live logs, and its immutable INCOMPLETE v8 root was independently integrated by T-111.
 
   aaemu30:
     status: stopped-no-runtime-listeners-observed
