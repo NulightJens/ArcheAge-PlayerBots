@@ -2,8 +2,8 @@ schema_version: 1
 id: T-109
 title: Independently integrate retained T-108 runtime incompleteness
 track: AAEmu12
-status: active
-integration: pending
+status: done
+integration: integrated
 outcome: Independently verify the immutable T-108 v7 root and exact two-path candidate, replay its retained INCOMPLETE receipt and handoff onto the saved lineage, record an integration receipt, and fast-forward the saved branch without reinterpreting the result as runtime acceptance.
 depends_on: [T-108]
 runtime: {required: false, lease: null}
@@ -35,3 +35,9 @@ gates:
 validation_boundary: Immutable evidence verification and retained INCOMPLETE integration only. Do not write external evidence, runtime host/module/config/reference, global ledgers/lease/workspace registry, database, client, source/tests, AAEmu 3.0, scale, soak, or packaging. Do not run build, focused tests, full suite, Login, Game, or observers.
 contract: ops/tasks/T-109/CONTRACT.md
 handoff: ops/tasks/T-109/HANDOFF.md
+replay_commit: 4a8fb0be83cda70113b683d00cd04c2772257a5e
+replay_tree: 84cdb8bcc823dc59b721d7938464de0bf599f167
+integrated_commit: 5601ff40197ec2445f6b7a276429ed84aab6fe34
+integrated_tree: 7ab79f96f8e0e3fde74d7aa1c98985e6daa1d0b7
+evidence_receipt: ops/evidence/aaemu12-t108-incomplete-integration-v1.yaml
+result: PASS-receipt-integrity-subject-retained-INCOMPLETE

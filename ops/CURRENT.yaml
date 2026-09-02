@@ -1,11 +1,11 @@
 schema_version: 1
 updated_at: 2026-09-01
-phase: integrate-retained-t108-incomplete-and-prepare-row-valid-v8
+phase: prepare-row-valid-one-zone-runtime-proof-v8
 verdict: active
 
 source:
   integration_branch: integration/aaemu12-world
-  integrated_head: fc26a8e9347880efa155bd4fd8ddc94913112b79
+  integrated_head: 5601ff40197ec2445f6b7a276429ed84aab6fe34
   tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
   integration_evidence: ops/evidence/aaemu12-passive-anchor-yaw-offset-integration-v1.yaml
   worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
@@ -35,7 +35,7 @@ runtime:
     integration_workspace: aaemu12_integration
     client_workspace: aaemu12_client
     evidence_receipt: aaemu12-t108-one-zone-autonomy-v7
-    integration_receipt: aaemu12-passive-anchor-yaw-offset-integration-v1
+    integration_receipt: aaemu12-t108-incomplete-integration-v1
     installed_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
     installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
     database_identity: aaemu12_database_public_alpha_v1
@@ -44,7 +44,7 @@ runtime:
     build: 0-errors-79-warnings
     focused_tests: 46-passed-0-skipped-0-failed
     unit_tests: 1870-passed-4-intentional-skips-0-failed-exactly-one-invocation
-    runtime_boundary: T-108 failed closed before configuration, observers, Login, Game, fixture commands, or database/client access because the literal row-oriented 681472-tuple planner had zero eligible tuples. Its immutable v7 root is sealed, BotConfig remains byte-exact, runtime remains stopped, and the lease is released. A read-only 15-degree successor search found 125 row-valid tuples and a deterministic 10/+60,15/-60,15/+120 candidate; independent T-108 integration precedes a fresh v8 lease.
+    runtime_boundary: T-109 independently verified and integrated T-108 as retained INCOMPLETE: 31 payloads and 86107 bytes green, row counts 142/0 versus diagnostic column 4386/2430, zero runtime/config/client/database mutation. Runtime remains stopped and the lease remains released. An independent 15-degree search found 125 literal-row-valid retained-transform tuples and deterministic choice orders 28/68/56 at 10/+60,15/-60,15/+120 with 23.728951 m separation and 3.820467 m row margin; T-110 is prepared for a fresh v8 root.
 
 control_tower:
   permanent_task:
@@ -55,9 +55,10 @@ control_tower:
   operating_mode: local-integration-worktree
 
 next_transition:
-  - Independently verify and integrate the exact two-path T-108 candidate as retained INCOMPLETE without runtime or evidence mutation.
-  - Bind a fresh v8 runtime successor only after the integration, using the literal row-oriented criterion and the independently discovered 15-degree grid with 125 retained-transform eligible tuples.
-  - Require the v8 worker to self-test the exact 15-degree count and deterministic 10/+60,15/-60,15/+120 selection before configuration or runtime, then prove both lifecycle/refill waves plus distinct-PID restart/rebootstrap and two-minute dwell.
+  - Bind T-110 to an exact isolated runtime worker and committed aaemu12 lease for the fresh absent v8 root.
+  - Require its pre-runtime self-test to enumerate 18399744 tuples, use only literal bot-row ownership, find exactly 125 eligible, and select choice orders 28/68/56 at 10/+60,15/-60,15/+120.
+  - From exact live transforms, recompute the complete 15-degree grid with compact semantic hashing before each one-shot fixture batch, then prove both lifecycle/refill waves plus distinct-PID restart/rebootstrap and two-minute dwell.
+  - Independently integrate only a T-110 PASS before activating T-037; retain any FAIL or INCOMPLETE without reinterpretation.
   - Never reuse or overwrite the T-041 evidence root; preserve its no-continuous-client-sampling limitation and shutdown warning.
   - Keep T-065 as INCOMPLETE and T-069 as FAIL; never reuse either evidence root.
   - Keep retained T-041 as FAIL, T-088 as INCOMPLETE, and T-037 blocked until a fresh successor runtime proof passes and its evidence is independently integrated.
@@ -678,7 +679,7 @@ prepared_workstreams:
     evidence_receipt: ops/evidence/aaemu12-t108-one-zone-autonomy-v7.yaml
     proof: INCOMPLETE-row-oriented-0-eligible-column-oriented-2430-clean-pre-runtime-31-payload-root
   - task: T-109
-    state: active-exact-thread-bound-retained-incomplete-integration
+    state: done-integrated-retained-t108-incomplete
     client_thread_id: client-new-thread:4290d23d-1419-4ff3-9566-34793b51b939
     task_thread_id: 01a05fa3-b4c5-73b1-b3cc-2d0db58dc2a7
     codex_worktree: 'C:\Users\jensh\.codex\worktrees\19cc\PB-W00-control'
@@ -687,6 +688,19 @@ prepared_workstreams:
     source_candidate: 9a9a84532f321fbe6755bcf4957c41c8503086e5
     evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
     runtime_lease: null
+    replay_commit: 4a8fb0be83cda70113b683d00cd04c2772257a5e
+    replay_tree: 84cdb8bcc823dc59b721d7938464de0bf599f167
+    integrated_head: 5601ff40197ec2445f6b7a276429ed84aab6fe34
+    integrated_tree: 7ab79f96f8e0e3fde74d7aa1c98985e6daa1d0b7
+    evidence_receipt: ops/evidence/aaemu12-t108-incomplete-integration-v1.yaml
+    proof: PASS-receipt-integrity-31-of-31-payloads-row-142-0-column-4386-2430-subject-retained-INCOMPLETE
+  - task: T-110
+    state: prepared-unbound-row-valid-runtime-v8
+    contract: ops/tasks/T-110/CONTRACT.md
+    tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+    installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    evidence_root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
+    deterministic_selftest: 264-choices-per-bot-18399744-tuples-125-literal-row-eligible
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

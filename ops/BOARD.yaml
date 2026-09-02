@@ -1162,8 +1162,8 @@ tasks:
   - id: T-109
     title: Independently integrate retained T-108 runtime incompleteness
     track: AAEmu12
-    status: active
-    integration: pending
+    status: done
+    integration: integrated
     depends_on: [T-108]
     runtime_lease: null
     gate: sealed-incomplete-evidence-replay-and-integration
@@ -1176,6 +1176,26 @@ tasks:
     source_candidate_parent: 3c1329cf6e95a46998f889aa71cdd2673aa7ea4c
     source_candidate_tree: 01079a441274e1f999307d2b978768fe1c23bf72
     evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
+    replay_commit: 4a8fb0be83cda70113b683d00cd04c2772257a5e
+    replay_tree: 84cdb8bcc823dc59b721d7938464de0bf599f167
+    integrated_commit: 5601ff40197ec2445f6b7a276429ed84aab6fe34
+    integrated_tree: 7ab79f96f8e0e3fde74d7aa1c98985e6daa1d0b7
+    evidence_receipt: ops/evidence/aaemu12-t108-incomplete-integration-v1.yaml
+    result: PASS-receipt-integrity-subject-retained-INCOMPLETE
+
+  - id: T-110
+    title: Prove row-valid angular two-wave one-zone autonomy and restart
+    track: AAEmu12
+    status: prepared
+    integration: pending
+    depends_on: [T-109]
+    runtime_lease: pending-exact-binding
+    gate: physical-row-valid-angular-preflight-two-wave-restart-dwell
+    contract: ops/tasks/T-110/CONTRACT.md
+    evidence_root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
+    tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+    installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    deterministic_selftest: 18399744-tuples-125-literal-row-eligible-selected-orders-28-68-56
 
   - id: T-037
     title: AAEmu 1.2 functional scale budget and recovery qualification
@@ -1185,4 +1205,4 @@ tasks:
     depends_on: [fresh-post-angular-placement-runtime-pass-independently-integrated]
     runtime_lease: aaemu12
     gate: serialized-functional-scale-proof
-    blocker: T-104-retained-fail-is-integrated-and-T-107-angular-placement-is-qualified-but-T-108-stopped-INCOMPLETE-before-runtime; a fresh row-valid successor runtime PASS and independent evidence integration remain required
+    blocker: T-108-retained-INCOMPLETE-is-integrated-and-T-107-angular-placement-is-qualified-but-fresh-row-valid-T-110-runtime-PASS-and-independent-evidence-integration-remain-required
