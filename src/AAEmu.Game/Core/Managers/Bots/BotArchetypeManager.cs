@@ -7,6 +7,7 @@ using System.Threading;
 using AAEmu.Commons.IO;
 using AAEmu.Commons.Utils;
 using AAEmu.Commons.Utils.DB;
+using AAEmu.Game.Bots.Population.Identity;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Core.Packets.G2C;
@@ -23,7 +24,8 @@ using NLog;
 
 namespace AAEmu.Game.Core.Managers.Bots
 {
-    public class BotArchetypeManager : Singleton<BotArchetypeManager>, IBotArchetypeManager, ILoadable
+    public class BotArchetypeManager : Singleton<BotArchetypeManager>, IBotArchetypeManager,
+        IBotArchetypeCreationPlanStore, ILoadable
     {
         private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
@@ -427,6 +429,65 @@ namespace AAEmu.Game.Core.Managers.Bots
                 .Select(definition => definition.Name)
                 .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
                 .ToArray();
+        }
+
+        public bool TryResolveCreationPlan(string archetypeName, byte level, out BotArchetypeCreationPlan plan)
+        {
+            plan = null;
+            if (string.IsNullOrWhiteSpace(archetypeName) || level == 0)
+                return false;
+
+            var definition = GetDefinitionsSnapshot().Values.FirstOrDefault(candidate =>
+                string.Equals(candidate.Name, archetypeName, StringComparison.OrdinalIgnoreCase));
+            if (definition?.RequiredAbilities == null || definition.RequiredAbilities.Count != 3 ||
+                definition.RequiredAbilities.Any(IsEmptyAbility) ||
+                definition.RequiredAbilities.Distinct().Count() != 3)
+                return false;
+
+            var ability1 = definition.StartingAbility;
+            if (IsEmptyAbility(ability1) || !definition.RequiredAbilities.Contains(ability1))
+                return false;
+
+            var ability2 = level >= definition.LevelToUnlockSecond
+                ? definition.RequiredAbilities[1]
+                : AbilityType.None;
+            var ability3 = level >= definition.LevelToUnlockThird
+                ? definition.RequiredAbilities[2]
+                : AbilityType.None;
+            plan = new BotArchetypeCreationPlan(
+                definition.Name,
+                ability1,
+                ability2,
+                ability3,
+                !IsEmptyAbility(ability2) && !IsEmptyAbility(ability3));
+            return true;
+        }
+
+        public void RegisterCreationPlan(uint characterId, BotArchetypeCreationPlan plan)
+        {
+            if (characterId == 0)
+                throw new ArgumentOutOfRangeException(nameof(characterId));
+            ArgumentNullException.ThrowIfNull(plan);
+
+            var definition = GetDefinitionsSnapshot().Values.FirstOrDefault(candidate =>
+                string.Equals(candidate.Name, plan.Name, StringComparison.OrdinalIgnoreCase));
+            if (definition == null)
+                throw new InvalidOperationException($"Unknown bot archetype '{plan.Name}'.");
+
+            var state = _archetypeStates.GetOrAdd(characterId, _ => new BotArchetypeState());
+            state.ArchetypeName = plan.IsFinal ? definition.Name : null;
+            state.PlannedArchetype = plan.IsFinal ? null : definition.Name;
+            state.IsInitialized = true;
+            SaveArchetype(characterId, definition.Name, plan.IsFinal);
+        }
+
+        public void RollbackCreationPlan(uint characterId)
+        {
+            if (characterId == 0)
+                return;
+
+            DeleteArchetype(characterId);
+            RemoveState(characterId);
         }
 
         // ---- Database helpers ----

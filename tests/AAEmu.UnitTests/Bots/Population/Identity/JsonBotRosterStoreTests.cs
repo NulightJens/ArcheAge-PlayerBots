@@ -127,6 +127,22 @@ public class JsonBotRosterStoreTests
             store.Update(Entry(8, true, "new", 1, "Resident")));
     }
 
+    [Test]
+    public async Task RemoveForCreationRollback_RemovesOnlyRequestedIdentityAndIsIdempotent()
+    {
+        var store = new JsonBotRosterStore(NewRosterPath(), id => id is 7 or 8);
+        store.Create(Entry(7, true, "first", 1, "Resident"));
+        store.Create(Entry(8, true, "second", 2, "Resident"));
+
+        var removed = store.RemoveForCreationRollback(new BotIdentity(7));
+        var repeated = store.RemoveForCreationRollback(new BotIdentity(7));
+
+        await Assert.That(removed).IsTrue();
+        await Assert.That(repeated).IsTrue();
+        await Assert.That(store.Read().Entries.Select(entry => entry.Identity.CharacterId))
+            .IsEquivalentTo([8u]);
+    }
+
     private static BotRosterEntry Entry(
         uint characterId,
         bool enabled,

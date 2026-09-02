@@ -72,4 +72,5 @@ public interface IBotRosterStore
     BotRosterSnapshot Read();
     BotRosterEntry Create(BotRosterEntry entry);
     BotRosterEntry Update(BotRosterEntry entry);
+    bool RemoveForCreationRollback(BotIdentity identity);
 }

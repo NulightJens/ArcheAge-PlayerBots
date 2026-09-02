@@ -83,6 +83,23 @@ public sealed class JsonBotRosterStore : IBotRosterStore
         }
     }
 
+    /// <summary>
+    /// Compensates only an identity creation that has not been returned as
+    /// successful. This is deliberately not exposed as a retirement command.
+    /// </summary>
+    public bool RemoveForCreationRollback(BotIdentity identity)
+    {
+        lock (_gate)
+        {
+            var snapshot = ReadCore();
+            if (!snapshot.Entries.Any(existing => existing.Identity == identity))
+                return true;
+
+            WriteCore(snapshot.Entries.Where(existing => existing.Identity != identity));
+            return true;
+        }
+    }
+
     private BotRosterSnapshot ReadCore()
     {
         if (!File.Exists(_path))
