@@ -1,7 +1,9 @@
 # T-116 contract: corrected-count integration with green receipt reuse
 
 Act only after PB-000 commits the exact T-116 task/thread/worktree binding and
-build-only lease. T-115 stopped correctly because its contract expected two
+build-only lease. Require that binding's sole parent to be preparation commit
+`0ff36bf5a512602cd1f14e3685c1cbab98ac513b`; PB-000 reports the binding's
+exact commit and tree after creating it. T-115 stopped correctly because its contract expected two
 new discovered tests, but its sole full-suite execution was green at 1,871
 passed, the exact four intentional skips, and zero failed. This task may accept
 that execution only by independently proving the contract count was wrong and

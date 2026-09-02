@@ -2,17 +2,17 @@ schema_version: 1
 id: T-116
 title: Reconcile T-115 count and integrate recovery observability
 track: AAEmu12
-status: prepared-awaiting-exact-thread-binding
+status: active
 integration: pending
 outcome: Independently prove T-115's sole full suite is a reusable green receipt for the exact one-test T-114 discovery delta, replay the same seven T-114 blobs onto the saved lineage, retain T-115's exact handoff, and integrate without rebuilding or rerunning the full suite.
 depends_on: [T-115]
 runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
 branch: codex-managed-worktree
-worktree: pending-exact-thread-binding
-owner_client_thread_id: pending-exact-thread-binding
-owner_thread_id: pending-exact-thread-binding
+worktree: 'C:\Users\jensh\.codex\worktrees\c9da\PB-W00-control'
+owner_client_thread_id: client-new-thread:d603189d-48ed-45a8-9ccc-6106b99e033a
+owner_thread_id: 01a0605e-2939-75e0-b6cc-1fbb1b617f40
 inputs:
-  dispatch_base: pending-preparation-commit
+  dispatch_base: 0ff36bf5a512602cd1f14e3685c1cbab98ac513b
   source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
   source_candidate_parent: d335ce053c58eaebbfda384412ef9be5c9d839da
   source_candidate_tree: e342e61030ae78ab411fa7cb6a109839199ca610

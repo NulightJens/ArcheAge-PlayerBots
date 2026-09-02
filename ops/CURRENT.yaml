@@ -792,15 +792,15 @@ prepared_workstreams:
     full_suite_log_sha256: bb8b3ed89578c304e3114b7885528b09c5bd6811ccd4a4208aaf91f6facccf08
     proof: BLOCKED-contract-count-1872-versus-exact-green-1871-plus-4-skips-one-new-discovered-test
   - task: T-116
-    state: prepared-awaiting-exact-thread-binding
-    client_thread_id: pending-exact-thread-binding
-    task_thread_id: pending-exact-thread-binding
-    codex_worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
+    state: active-exact-thread-bound-green-receipt-reuse-integration
+    client_thread_id: client-new-thread:d603189d-48ed-45a8-9ccc-6106b99e033a
+    task_thread_id: 01a0605e-2939-75e0-b6cc-1fbb1b617f40
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c9da\PB-W00-control'
+    dispatch_base: 0ff36bf5a512602cd1f14e3685c1cbab98ac513b
     contract: ops/tasks/T-116/CONTRACT.md
     source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
     retained_t115_replay: 5f544acffdbef48b83278978b68c3f62b1441808
-    runtime_lease: pending-exact-build-only-thread-binding
+    runtime_lease: aaemu12-build-only
   - task: T-038
     client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
     task_thread_id: pending-task-list-resolution

@@ -1323,16 +1323,16 @@ tasks:
   - id: T-116
     title: Reconcile T-115 count and integrate recovery observability
     track: AAEmu12
-    status: prepared-awaiting-exact-thread-binding
+    status: active
     integration: pending
     depends_on: [T-115]
-    runtime_lease: pending-exact-build-only-thread-binding
+    runtime_lease: aaemu12-build-only
     gate: exact-replay-green-receipt-reuse-and-count-correction-integration
     contract: ops/tasks/T-116/CONTRACT.md
-    owner_client_thread_id: pending-exact-thread-binding
-    owner_thread_id: pending-exact-thread-binding
-    worktree: pending-exact-thread-binding
-    dispatch_base: pending-preparation-commit
+    owner_client_thread_id: client-new-thread:d603189d-48ed-45a8-9ccc-6106b99e033a
+    owner_thread_id: 01a0605e-2939-75e0-b6cc-1fbb1b617f40
+    worktree: 'C:\Users\jensh\.codex\worktrees\c9da\PB-W00-control'
+    dispatch_base: 0ff36bf5a512602cd1f14e3685c1cbab98ac513b
     source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
     retained_t115_replay: 5f544acffdbef48b83278978b68c3f62b1441808
 
