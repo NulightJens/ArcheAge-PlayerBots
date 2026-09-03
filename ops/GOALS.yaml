@@ -3,7 +3,7 @@ owner: PB-000 Control Tower
 authority: product-outcomes
 delivery_model: ops/DELIVERY-MODEL-V2.md
 audit_basis: ops/AUDIT-2026-09-02.md
-updated_at: 2026-09-02
+updated_at: 2026-09-03
 active_track: AAEmu12
 active_goal: G-001
 active_task: T-127
@@ -19,15 +19,16 @@ allowed_states:
   - blocked
 
 current_candidate:
-  product_source: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+  product_source: 10b014f8bc26bd20abdc896ec9d49661365cd1b1
   integrated_state: source-green
-  deployed_source: fb0a315c9579fb2e7e249e47b37efa07a9404c51
+  deployed_source: t127-live-candidate-before-10b014f
   deployment_match: false
-  live_acceptance: false
+  live_acceptance: retained-client-witnessed-seven-native-completions-on-prior-candidate
   runtime_lease_owner: T-127
   blocker: >-
-    The corrected identity and signpost lifecycle are not installed. The
-    retained runtime has no proven level-one Nuian autonomous quest loop.
+    The final route-ownership and native auto-completion accounting hardening
+    in 10b014f is source-green but has not been deployed and repeated. The
+    prior live candidate passed seven native quests with an active client.
 
 goals:
   - id: G-000
@@ -45,11 +46,13 @@ goals:
       starter-area quests, prioritizing main story while also considering
       nearby side quests.
     source_truth:
-      identity_factory: integrated-uninstalled
-      nearby_npc_intake: deployed-partially-live-proven
-      doodad_and_monster_hunt_lifecycle: integrated-uninstalled
-      first_five_mixed_objective_support: incomplete
-      long_range_road_navigation: excluded-until-runtime-wired
+      identity_factory: client-witnessed-on-prior-candidate
+      nearby_npc_and_doodad_intake: client-witnessed-on-prior-candidate
+      monster_hunt_and_item_gather_lifecycle: client-witnessed-on-prior-candidate
+      first_five_mixed_objective_support: seven-native-completions-observed
+      learned_skill_combat: client-witnessed-on-level-one-nuian
+      long_range_road_navigation: experimental-client-witnessed-janky
+      final_source_10b014f: source-green-not-deployed
     start_command_budget:
       allowed: [create-one-bot, start-autonomy, inspect]
       forbidden: [per-target-selection, teleport-route, quest-credit-injection, forced-completion]
@@ -64,9 +67,9 @@ goals:
       - identity-quest-and-position-state-survive-a-distinct-pid-graceful-restart
       - zero-unexplained-tick-errors-runtime-overlaps-or-synthetic-progress
     next_action: >-
-      T-127 gracefully transitions the retained T-120 runtime, deploys the exact
-      corrected candidate and bot-account configuration, then run the first
-      client-witnessed one-bot attempt and fix its first behavioral blocker.
+      T-127 deploys exact source 10b014f at the next runtime window and repeats
+      the fresh Nuian five-quest gate. Accept G-001 only when that exact
+      candidate retains the prior native/client result through graceful restart.
 
   - id: G-002
     title: Three-bot Nuian starter population
