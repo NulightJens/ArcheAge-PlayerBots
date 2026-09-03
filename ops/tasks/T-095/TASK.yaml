@@ -1,0 +1,36 @@
+schema_version: 1
+id: T-095
+title: Independently integrate the T-094 retained FAIL evidence
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Independently verify the immutable T-094 manifest, continuous client observer, successful three-bot pre-arm, runtime delay mismatch, untouched gameplay boundaries, and graceful cleanup, then integrate only the truthful two-file FAIL receipt onto the saved branch.
+depends_on: [T-094]
+runtime: {required: false, lease: null}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\0c40\PB-W00-control'
+owner_client_thread_id: client-new-thread:56b43285-c933-4ebf-9bc9-7064fab3ff27
+owner_thread_id: 01a05e67-3355-7330-aea6-453cf311e49b
+inputs:
+  dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
+  candidate_commit: 453d0bd60cf1e72117b10579d40e549b0a24729f
+  candidate_parent: cc4f9fc6889abc17a149e6dad9d4ff92491a8dc0
+  external_evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
+  manifest_sha256: 46ce346de698964231a522b2e3646af7a7fc0b0fbd5a080959c9e78da7d57293
+write_scope:
+  - ops/evidence/aaemu12-t094-one-zone-autonomy-v4.yaml
+  - ops/tasks/T-094/HANDOFF.md
+  - ops/evidence/aaemu12-t094-fail-integration-v1.yaml
+  - ops/tasks/T-095/HANDOFF.md
+gates:
+  - exact-two-file-candidate-scope
+  - immutable-3244-payload-manifest-verification
+  - continuous-client-observer-chain-verification
+  - three-bot-prearm-delay-mismatch-and-cleanup-semantics
+  - saved-integration-branch-fast-forward
+validation_boundary: Read-only external evidence verification and Git integration only. Do not touch registered host/module/config, Login, GameServer, MySQL/database, client, global ledgers/lease, source/tooling, retained evidence, tests/full suite, scale, soak, packaging, or AAEmu 3.0.
+contract: ops/tasks/T-095/CONTRACT.md
+handoff: ops/tasks/T-095/HANDOFF.md
+integrated_commit: 0030c1b534cdce3e312a8653a8dd21544e420143
+replay_commit: 65b6cec7e612f5d5d3945d8fee0a6cdfd463889e
+result: PASS-3244-payloads-1001-client-rows-subject-remains-FAIL

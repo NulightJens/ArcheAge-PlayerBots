@@ -1,0 +1,64 @@
+schema_version: 1
+program_id: archeage-playerbots
+name: ArcheAge PlayerBots
+objective: >-
+  Deliver a shareable, installable PlayerBots module that produces believable,
+  recoverable player-like world population through autonomous ArcheAge-native
+  activity, with performance, social, and governance systems built on that
+  proven gameplay foundation.
+
+canonical_source:
+  repository: 'C:\Users\jensh\Documents\Codex\2026-08-29\archeage-playerbots-module'
+  control_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+  integration_branch: integration/aaemu12-world
+  accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
+
+environment_control:
+  workspace_registry: ops/WORKSPACES.yaml
+  contingency_runbook: ops/ENVIRONMENT-CONTINGENCY.md
+  build_test_loop: ops/BUILD-TEST-LOOP.md
+  runtime_lease: ops/RUNTIME-LEASE.yaml
+  delivery_model: ops/DELIVERY-MODEL-V2.md
+  product_goals: ops/GOALS.yaml
+  latest_delivery_audit: ops/AUDIT-2026-09-02.md
+  current_execution_state: ops/NOW.yaml
+  execution_brief: ops/EXECUTION-BRIEF.md
+  rule: Resolve every external path by registry ID before reading or writing it.
+
+active_track:
+  id: AAEmu12
+  label: ArcheAge 1.2 r208022
+  host_repository: https://github.com/AAEmu/AAEmu
+  host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  status: sole-feature-target
+
+compatibility_track:
+  id: AAEmu30
+  label: ArcheAge 3.0.4.2 r336598
+  host_repository: https://github.com/NL0bP/AAEmu
+  host_base_commit: 8c1c943bb2309eefffb9da2aa99a408d0acbb095
+  module_checkpoint: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
+  compatibility_patch: compatibility/aaemu-3.0.4.2-r336598-alpha-v4.patch
+  policy: frozen-release-boundary-regression-only
+
+current_milestone:
+  id: G-001
+  name: Level-one Nuian five-quest vertical slice
+  acceptance: >-
+    One newly created level-one Nuian bot finds, accepts, travels to, executes,
+    reports, and chains five eligible starter-area quests under native AAEmu
+    authority without per-action operator control, while an active client
+    witnesses the behavior and a graceful distinct-PID restart preserves it.
+
+program_rules:
+  authoritative_product_ledger: ops/GOALS.yaml
+  one_active_vertical_slice: true
+  maximum_concurrent_durable_workspaces: 3
+  source_green_is_product_done: false
+  active_client_required_for_feature_acceptance: true
+  native_server_marker_required_for_feature_acceptance: true
+  runtime_proofs_serialized: true
+  full_suite_cadence: accepted-slice-or-shared-infrastructure-change
+  raw_evidence_in_git: false
+  global_ledger_owner: PB-000 Control Tower
+  historical_task_ledger: retained-not-roadmap-authority

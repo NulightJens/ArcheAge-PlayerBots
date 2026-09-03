@@ -1,0 +1,45 @@
+schema_version: 1
+id: T-042
+title: Wave 1 review and AAEmu 1.2 integration
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Independently review, integrate, and verify the T-038, T-039, and T-040 source outcomes as one AAEmu 1.2 wave.
+depends_on: [T-038, T-039, T-040]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+
+inputs:
+  integration_branch: integration/aaemu12-world
+  minimum_integration_base: 8a956da5cd7ec194ffb0d90470e288bfcd1d74ff
+  T-038: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
+  T-039: dcc27f42eb5e691d426235b86295a8106c9073b3
+  T-040: a99663059db71afaa227bdce8f680b5196e36226
+  host_reference: aaemu12_reference
+  validation_host: aaemu12_integration
+  client_fixture: aaemu12_client
+  baseline_receipt: aaemu12-integration-baseline-v1
+
+write_scope:
+  - src/AAEmu.Game/Bots/Navigation/**
+  - src/AAEmu.Game/Models/Tasks/Bots/BotMovementTask.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotMovementState.cs
+  - tests/AAEmu.UnitTests/Bots/Navigation/**
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotMovementTaskTests.cs
+  - src/AAEmu.Game/Bots/Life/**
+  - tests/AAEmu.UnitTests/Bots/Life/**
+  - src/AAEmu.Game/Bots/Population/Identity/**
+  - tests/AAEmu.UnitTests/Bots/Population/Identity/**
+  - sql/*bot_roster*.sql
+  - ops/tasks/T-038/HANDOFF.md
+  - ops/tasks/T-039/HANDOFF.md
+  - ops/tasks/T-040/HANDOFF.md
+  - ops/tasks/T-042/HANDOFF.md
+  - ops/evidence/aaemu12-wave1-integration-*.yaml
+
+runtime:
+  required: false
+  lease: null
+gates: [focused-aaemu12-tests, full-aaemu12-suite]
+validation_boundary: No live server or database may be started. The integration branch advances only after review and registered AAEmu 1.2 source gates are green.
+handoff: ops/tasks/T-042/HANDOFF.md

@@ -256,6 +256,30 @@ public class BotArchetypeManagerTests
     }
 
     [Test]
+    public async Task Abolisher_UsesNativeVisibleTripleSlashStarter()
+    {
+        var definition = BotArchetypeManager.DefaultDefinitions().Single(def => def.Name == "Abolisher");
+
+        await Assert.That(definition.SkillLearnOrder[0]).IsEqualTo(18132u);
+        await Assert.That(definition.SkillLearnOrder).DoesNotContain(18131u);
+    }
+
+    [Test]
+    public async Task PlayerLearnableSkill_RejectsHiddenInternalVariant()
+    {
+        await Assert.That(BotArchetypeManager.IsPlayerLearnableActiveSkill(new SkillTemplate
+        {
+            Show = false,
+            NeedLearn = false
+        })).IsFalse();
+        await Assert.That(BotArchetypeManager.IsPlayerLearnableActiveSkill(new SkillTemplate
+        {
+            Show = true,
+            NeedLearn = true
+        })).IsTrue();
+    }
+
+    [Test]
     public async Task DefaultDefinitions_SerializeThenLoadDefinitions_RoundTrips()
     {
         var manager = new BotArchetypeManager();

@@ -1,0 +1,43 @@
+schema_version: 1
+owner: PB-000 Control Tower
+
+runtimes:
+  aaemu12:
+    status: leased-to-T-127-g001-nuian-five-quest-live-slice
+    owner_task: T-127
+    owner_thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
+    workspace_id: aaemu12_integration
+    host_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
+    reference_path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
+    client_path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'
+    pinned_host_commit: 62e3eb1d87da01194802ac886cd500134facad28
+    database_identity: aaemu12_database_public_alpha_v1
+    claimed_at: 2026-09-02
+    released_at: null
+    cleanup_receipt: ops/tasks/T-118/HANDOFF.md
+    baseline_evidence: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
+    archeage_client_allowed: true
+    previous_owner_task: T-120
+    transfer_note: User-directed successor handoff of the retained running session; T-127 must perform a graceful shutdown before deployment.
+    authority_limit: Only T-127 task 01a06457-8a64-73a1-941d-21e09eec4a5a in C:\Users\jensh\.codex\worktrees\7e13\PB-W00-control may close the retained client normally, stop Game then Login gracefully, install and build the exact G-001 candidate and reviewed AAEmu 1.2 adapters, configure the dedicated bot account, start and control the registered server and client, create versioned non-destructive test data, create one level-one Nuian at the observed location, run autonomous five-quest testing, capture contracted evidence, and fix/redeploy the first blocker within G-001. Per-action target commands, teleport routing, synthetic quest progress, forced completion, destructive database reset, reference/client-fixture writes, evidence-root reuse, forced process control, task fanout, AAEmu 3.0, G-002, and G-003 remain prohibited.
+
+  aaemu30:
+    status: stopped-no-runtime-listeners-observed
+    owner_task: null
+    owner_thread_id: null
+    host_path: 'D:\Codex-Labs\aaemu-3.0.4.2-r336598-runtime-v1\host'
+    pinned_host_commit: 8c1c943bb2309eefffb9da2aa99a408d0acbb095
+    listeners:
+      game: []
+      login: []
+      mysql: []
+    claimed_at: null
+    released_at: 2026-08-31
+    cleanup_receipt: prior-game-graceful-login-and-mysql-no-longer-observed-at-wave2-boundary
+
+release_requirements:
+  - Graceful server shutdown or graceful Ctrl+C path.
+  - Zero retained bots and runtimes when a populated gate was run.
+  - Process and listener verification.
+  - Database retained; destructive reset is prohibited.
+  - Evidence receipt written before another task receives the lease.

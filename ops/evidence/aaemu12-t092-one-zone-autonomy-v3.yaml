@@ -1,0 +1,221 @@
+schema_version: 1
+id: aaemu12-t092-one-zone-autonomy-v3
+recorded_at: '2026-09-01T18:07:00Z'
+verdict: FAIL
+
+failure:
+  first_material_invalid_gate: observer-prearmed-zero-to-three-director-bootstrap
+  classification: complete-autonomy-observer-prearm-after-director-admission
+  reason: >-
+    Bots 20001 and 20002 were already online in autonomy-observer sample zero.
+    Only bot 20003 produced two valid offline samples before its admission.
+    The contract states that admission before complete pre-arm is non-PASS, so
+    the task stopped without fixture commands, waves, refill, or restart.
+  retry_attempted: false
+  runtime_relaunched: false
+
+fingerprint:
+  task: T-092
+  binding_commit: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
+  dispatch_base: 38b6ca7518215521dc3bb34389de4c5a4d547368
+  task_thread_id: 01a05e17-fb8b-7610-a0de-e8693dc0af91
+  owner_client_thread_id: client-new-thread:50955241-43de-4c78-ad98-794e7fdc7e2b
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\86b9\PB-W00-control'
+  runtime_lease: aaemu12
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  module_source_commit: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: a4508402e8564a6c6807471c9cd6c9e9bc5950e279ea1a9e7841d35a61d35075
+  client_observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+  database_identity: aaemu12_database_public_alpha_v1
+
+preflight:
+  exact_committed_task_thread_worktree_and_lease_binding: true
+  control_at_binding_commit_and_clean: true
+  reference_head_exact_clean_and_detached: true
+  installed_module_head_tree_exact_and_clean: true
+  integration_host_status_entry_count: 30
+  installed_host_overlay_expected: true
+  fresh_evidence_root_was_absent: true
+  evidence_root_created_once: true
+  game_database: aaemu_playerbots_game_public_alpha_v1
+  login_database: aaemu_playerbots_login_public_alpha_v1
+  all_runtime_hosts_loopback: true
+  required_ports: [1234, 1237, 1239, 1250, 1280]
+  occupied_required_port_count: 0
+  aaemu_game_login_process_count: 0
+  archeage_client_process_count: 0
+  runtime_log_entry_count: 0
+  mysql_observed_process_ids: [6308, 8076]
+  direct_database_access: false
+
+configuration:
+  deployed_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\Configurations\BotConfig.json'
+  original_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  edited_sha256: 8704a503d2beadb7e5e6a241ed8a61ffe7b72d14fc0e0fcebf4ae1f46a19021d
+  assignments:
+    enabled: true
+    zone_id: 221
+    character_ids: [20001, 20002, 20003]
+    minimum_population: 2
+    target_population: 3
+    maximum_population: 3
+    initial_delay_ms: 60000
+    reconciliation_interval_ms: 15000
+    retry_backoff_ms: 30000
+  final_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  final_exact_original_bytes: true
+
+client_process_observer:
+  launcher_process_id: 123292
+  launch_environment: Windows PowerShell via powershell.exe
+  relaunch_count: 0
+  sample_interval_ms: 500
+  row_zero:
+    first_sample_at_utc: '2026-09-01T17:57:40.3443432Z'
+    raw_relative_path: client-observer/raw/000000.json
+    raw_length: 225
+    raw_sha256: 72d002f3397952533567d8ddd236da9c23395c5fa440b1d18ba7424508eb83cb
+    row_hash: 2d55e77c9570b8f48e437d4d30caa44ff55ac58a8b624a2a41ec3dba87ccd23d
+    independently_validated_before_login: true
+    process_count: 0
+  exit: cooperative-sentinel
+  sample_count: 866
+  raw_file_count: 866
+  ledger_row_count: 866
+  last_sample_at_utc: '2026-09-01T18:05:43.6525726Z'
+  first_sample_precedes_runtime_start_evidence: true
+  last_sample_follows_final_cleanup: true
+  maximum_adjacent_gap_ms: 653.19
+  nonzero_sample_count: 0
+  error_count: 0
+  terminal_chain_hash: d65dcd4204332615de276dc8f0ea67f117f1b2012e732ef946c46db32439c664
+  raw_hash_and_row_chain_validation: 866-of-866-green
+  error_json_present: false
+
+runtime:
+  run_one:
+    login_process_id: 108212
+    game_process_id: 81188
+    runtime_start_evidence_at_utc: '2026-09-01T18:01:16.6095047Z'
+    autonomy_observers:
+      - bot_id: 20001
+        process_id: 34840
+        first_sample_at_utc: '2026-09-01T18:02:32.2245039Z'
+        first_two_classifications: [online, online]
+        first_object_id: 7797
+        armed: false
+        live: false
+      - bot_id: 20002
+        process_id: 61452
+        first_sample_at_utc: '2026-09-01T18:02:32.2426751Z'
+        first_two_classifications: [online, online]
+        first_object_id: 37952
+        armed: false
+        live: false
+      - bot_id: 20003
+        process_id: 124824
+        first_sample_at_utc: '2026-09-01T18:02:32.2429693Z'
+        first_two_classifications: [offline, offline]
+        first_object_id: null
+        armed: true
+        live: true
+    director:
+      start_count: 1
+      started_at_utc: '2026-09-01T18:01:07.6934856Z'
+      valid_configuration: true
+      admission_order: [20001, 20002, 20003]
+      admission_times_utc:
+        20001: '2026-09-01T18:02:07.7555867Z'
+        20002: '2026-09-01T18:02:22.7661669Z'
+        20003: '2026-09-01T18:02:37.7786292Z'
+      attempts: 3
+      successes: 3
+      failures: 0
+      maximum_breach: false
+      wrong_zone_activation: false
+      stop_count: 1
+      stop_reason: graceful_shutdown
+    fixture_command_count: 0
+    directed_gameplay_command_count: 0
+    metrics_query_count: 0
+    roster_query_count: 0
+    wave_one_attempted: false
+    wave_two_attempted: false
+    restart_attempted: false
+
+cleanup:
+  shutdown_order: [Game, Login]
+  graceful_game_stop: true
+  graceful_login_stop: true
+  forced_termination: false
+  autonomy_observers_stopped_by_console_cancellation: true
+  final_game_login_process_count: 0
+  final_autonomy_observer_process_count: 0
+  final_client_observer_process_count: 0
+  final_archeage_client_process_count: 0
+  final_occupied_required_port_count: 0
+  final_runtime_log_entry_count: 0
+  remaining_bots: 0
+  remaining_runtimes: 0
+  shutdown_cleanup_count: 1
+  mysql_process_ids_unchanged: [6308, 8076]
+  database_queries_or_mutations: 0
+  reference_and_installed_module_clean: true
+  host_overlay_entry_count: 30
+  bot_config_exact_original_bytes: true
+  run_one_logs_moved_losslessly: true
+
+retained_anomalies:
+  - category: read-only-preflight-probes
+    finding: >-
+      One detached-branch formatting probe and one apphost-versus-managed-assembly
+      probe failed locally before the exact preflight was durably recorded; no
+      external state changed.
+  - category: client-observer-validation-probes
+    finding: >-
+      Three local validator/recording probes failed before the exact ledger-byte
+      method passed. The observer remained the same PID and was never relaunched.
+  - category: autonomy-observer-launch-delay
+    finding: >-
+      Two Start-Process wrappers were rejected by command policy before execution
+      and created no observer process or output. The three accepted observers
+      launched once as independent PTY sessions, after bots 20001 and 20002 had
+      already been admitted.
+  - category: client-observer-cooperative-exit
+    finding: >-
+      The process exited between sentinel creation and post-stop handle lookup;
+      summary.json records cooperative-sentinel exit and the PID is absent.
+  - category: native-shutdown-warning
+    finding: >-
+      Retained Game Error.log contains the PhysicsManager disposed-service-provider
+      warning after graceful shutdown. Cleanup markers and final boundaries passed.
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
+  attempt_summary_present: true
+  manifest_payload_file_count: 1523
+  manifest_payload_total_bytes: 22604049
+  manifest_sha256: 39f6c85e69faa78d87824632f0db168bcbc87db4fd26b8d350f7bea70370809c
+  manifest_validation: 1523-of-1523-length-and-sha256-matched-zero-missing-mismatched-duplicate-unsafe-or-unlisted
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_boundaries:
+  - Complete all-three two-offline-sample autonomy-observer pre-arm before Director admission was not proven.
+  - No fixture command, coordinate audit, pairwise separation, credit, progression, recovery, normal logout, or refill was attempted or proven.
+  - Wave one, wave two, second refill, distinct-PID restart, rebootstrap, and two-minute dwell were not attempted or proven.
+  - Scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+
+control_actions:
+  integrator: >-
+    Independently verify the sealed root and integrate this task commit only as
+    the retained T-092 FAIL receipt. Do not reinterpret it as autonomy proof.
+  pb_000_release: >-
+    PB-000 alone may release or reassign the aaemu12 lease after accepting the
+    graceful cleanup, exact config restoration, unchanged MySQL PIDs, and sealed
+    evidence boundaries.
+  downstream: >-
+    Keep T-037 blocked. Any successor requires a new task, exact binding and
+    lease, and a new versioned evidence root; never reuse or overwrite this root.

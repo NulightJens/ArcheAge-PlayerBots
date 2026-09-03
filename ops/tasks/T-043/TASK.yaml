@@ -1,0 +1,37 @@
+schema_version: 1
+id: T-043
+title: Isolated AAEmu 1.2 public-alpha database runway
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Create and prove new versioned Game and Login database clones for PlayerBots runtime qualification without altering retained schemas.
+depends_on: [PB-W00]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:79f73bc9-6fb3-497f-8e13-1090909474c6
+
+inputs:
+  provisioning_script: scripts/scale/New-IsolatedScaleDatabase.ps1
+  donor_workspace: aaemu12_legacy_t022
+  validation_host: aaemu12_integration
+  game_database: aaemu_playerbots_game_public_alpha_v1
+  login_database: aaemu_playerbots_login_public_alpha_v1
+  output_directory: 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1'
+  template_character_id: 2
+  bot_count: 100
+
+write_scope:
+  - ops/tasks/T-043/HANDOFF.md
+  - ops/evidence/aaemu12-database-public-alpha-v1.yaml
+
+external_write_scope:
+  - 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1'
+  - mysql-schema:aaemu_playerbots_game_public_alpha_v1
+  - mysql-schema:aaemu_playerbots_login_public_alpha_v1
+
+runtime:
+  required: false
+  lease: null
+gates: [database-provisioning-proof]
+validation_boundary: No AAEmu process may be started. Donor databases and registered checkouts are read-only inputs; only the two absent destination schemas and new output directory may be created.
+handoff: ops/tasks/T-043/HANDOFF.md

@@ -108,9 +108,11 @@ public sealed class RotationCastAction : IBotAction
         Func<uint, SkillTemplate> templateResolver, IReadOnlyList<BotNextAction> alternatives = null,
         Func<BotCastRequest, SkillResult> cast = null, bool castWhileControlled = false,
         Action<BotContext> onSuccess = null,
-        Func<BotContext, bool> guard = null)
+        Func<BotContext, bool> guard = null,
+        bool requireKnownSkill = false)
     {
-        _inner = new BotCastSkillAction(skillId, targetSource, templateResolver, cast, name, castWhileControlled);
+        _inner = new BotCastSkillAction(skillId, targetSource, templateResolver, cast, name, castWhileControlled,
+            requireKnownSkill);
         _onSuccess = onSuccess;
         _guard = guard;
         Name = name;

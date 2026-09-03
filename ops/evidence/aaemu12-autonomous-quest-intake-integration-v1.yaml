@@ -1,0 +1,301 @@
+schema_version: 1
+receipt_id: aaemu12-autonomous-quest-intake-integration-v1
+task: T-120
+track: AAEmu12
+recorded_at: '2026-09-02T02:45:58-06:00'
+updated_at: '2026-09-02T07:16:00-06:00'
+verdict: BLOCKED-no-existing-eligible-level-one-nuian
+
+source_identity:
+  receipt_amended_from_commit: ed1954edc10addcca4228d31238f8360b9297fa0
+  integration_branch: integration/aaemu12-world
+  dispatch_base: d42236e77cfc8030b78eb9750db9f78a3df8d35d
+  t119_candidate:
+    commit: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
+    parent: d42236e77cfc8030b78eb9750db9f78a3df8d35d
+    tree: 1276326b17cabfb3dbe10010ddbcf65dea729417
+    stable_patch_id: d525d7bc14e72ac0c5042bc6443044762e253084
+  t120_replay:
+    commit: fb0a315c9579fb2e7e249e47b37efa07a9404c51
+    parent: 881570d06edacaedd115ed0934658d2f1e85b8bd
+    tree: a7dfc4d1bffcdddc25c2dc45fc9feed71365eb70
+    stable_patch_id: d525d7bc14e72ac0c5042bc6443044762e253084
+  current_control_head_before_receipt: adf588c8874dddd24478bbece69b3443f17284cb
+  installed_module_commit: fb0a315c9579fb2e7e249e47b37efa07a9404c51
+  installed_module_clean_detached: true
+  aaemu12_reference_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  aaemu12_reference_clean_detached: true
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+
+focused_verification:
+  execution: direct-prebuilt-tunit-executable
+  controller_host_command:
+    trx: 'D:\Codex-Labs\sessions\T-120\quest-intake-live-v1\tests\T120-controller-host-command.trx'
+    total: 98
+    executed: 98
+    passed: 98
+    failed: 0
+  safe_config:
+    trx: 'D:\Codex-Labs\sessions\T-120\quest-intake-live-v1\tests\T120-safe-config.trx'
+    total: 32
+    executed: 32
+    passed: 32
+    failed: 0
+    destructive_cleanup_test_excluded: Load_MissingFile_WritesDefaultFileAndKeepsDefaults
+  retained_tooling_invocation:
+    result: no-source-failure
+    detail: >-
+      The first dotnet-test-style invocation compiled successfully, but the
+      TUnit runner rejected --filter and --logger and exited 5 without running
+      tests. The corrected direct TUnit executions above are the accepted proof.
+
+registered_build:
+  log: 'D:\Codex-Labs\sessions\T-120\quest-intake-live-v1\T120-registered-game-build.log'
+  command_kind: AAEmu.Game-rebuild-no-incremental
+  result: PASS
+  warnings: 30
+  errors: 0
+  elapsed: '00:00:05.39'
+  assembly: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\AAEmu.Game.dll'
+  assembly_length: 4395008
+  assembly_sha256: 1db5e555c8228bd9da131b21a45ed58fbe12dec7574bd53374c9343c0f2d7d04
+
+configuration:
+  deployed_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\Configurations\BotConfig.json'
+  prior_bytes_path: 'D:\Codex-Labs\sessions\T-120\quest-intake-live-v1\config\BotConfig.pre-t120.bin'
+  prior_length: 1772
+  prior_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  deployed_length: 1910
+  deployed_sha256: dac891aa41a8e691973208ecfb79f8a996db42c052f46175998725dd53221ca6
+  values:
+    quest_intake_enabled: true
+    quest_intake_scan_radius: 60.0
+    quest_intake_interaction_radius: 6.0
+    quest_intake_retry_backoff_ms: 30000
+    activity_director_enabled: false
+    activity_director_character_ids: []
+
+runtime:
+  session_root: 'D:\Codex-Labs\sessions\T-120\quest-intake-live-v1'
+  start_receipt: 'D:\Codex-Labs\sessions\T-120\quest-intake-live-v1\runtime\start.json'
+  database_identity: aaemu12_database_public_alpha_v1
+  login_process_id: 111900
+  game_process_id: 38844
+  launcher_process_id: 92432
+  client_process_id: 117252
+  required_listeners:
+    1234: 111900
+    1237: 111900
+    1239: 38844
+    1250: 38844
+    1280: 38844
+  all_processes_responding: true
+  game_http_api: PASS
+  game_error_log: absent
+  startup_error_or_fatal_count: 0
+  activity_director_runtime_state: disabled
+  live_bot_metrics:
+    captured_at_utc: '2026-09-02T08:43:40.9966162Z'
+    runtime_count: 0
+    bots: 0
+    active_bots: 0
+    spawn_count: 0
+    spawn_failures: 0
+
+computer_use_observation:
+  selected_window_id: 16519870
+  selected_window_title: '- ArcheAge DX11 - Oct 14 2014 (14:45:33) AAEmu.Game'
+  observed_character: Over
+  observed_level: 50
+  observed_zone_label: Desiree Peak
+  observed_state: in-world-and-responsive
+  refreshed_state: in-world-away-and-responsive
+  refreshed_at_utc: '2026-09-02T13:15:00Z'
+  authentication_automated: false
+  gameplay_input_sent_after_identity_blocker: false
+  world_api_character:
+    id: 1
+    name: Over
+    level: 50
+    online: true
+
+physical_acceptance:
+  result: BLOCKED
+  bot_admission_attempted: true
+  initial_placement_attempted: true
+  quest_mutation_commands_issued: false
+  quest_read_only_commands_issued: true
+  direct_database_queried_or_written: false
+  normal_runtime_persistence_writes_expected: true
+  reason: >-
+    No existing eligible level-one Nuian identity exists in the leased public
+    alpha dataset. Server startup logged exactly 104 character names and 104
+    used character IDs. The retained donor dump accounts for four originals at
+    levels 50, 51, 50, and 50. The retained seed manifest accounts for the
+    other 100 identities, IDs 20001 through 20100, as clones of character 2,
+    the level-51 Nuian template. Together these account for all 104 identities.
+    The only user character is level-50 Over. Continued diagnostics admitted
+    three ineligible level-51 ScaleBots and proved autonomous side-quest intake,
+    but they cannot satisfy or be reported as the contracted level-one,
+    story-first acceptance.
+  authoritative_sources:
+    server_log: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\Logs\Server.log'
+    server_startup_markers:
+      - 'NameManager - Loaded 104 character names'
+      - 'CharacterIdManager: Extracting 104 used id''s from data tables'
+      - 'CharacterIdManager: Successfully extracted 104 used id''s from data tables.'
+    retained_donor_dump: 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1\aaemu_game-20260831T225958Z.sql'
+    retained_seed_manifest: 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1\seed-evidence.json'
+    retained_bot_ids: 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1\retained-bot-ids.json'
+  prohibited_substitutions_not_used:
+    - down-level-a-scale-bot
+    - create-a-character-inside-t120
+    - reset-or-edit-quest-state
+    - gm-accept-progress-report-or-complete-quest
+    - stage-an-ineligible-high-level-bot-and-call-it-level-one
+  unproven:
+    - client-visible-level-one-bot-admission
+    - story-first-candidate-selection
+    - level-one-normal-walk-to-giver
+    - native-story-plus-side-quest-acceptance-on-one-chosen-giver
+    - level-one-botdebug-server-log-and-client-journal-agreement
+
+continued_exploratory_live_diagnostic:
+  classification: PARTIAL-PASS-autonomous-side-quest-intake-only
+  acceptance_boundary: >-
+    These samples use level-51 test identities and are retained only as
+    exploratory proof of the T-119 intake controller. They do not change the
+    official BLOCKED verdict, prove story-first choice, or prove completion of
+    even one quest.
+  config_control:
+    quest_intake_was_temporarily_disabled_for_one_baseline_admission: true
+    baseline_result: >-
+      ScaleBot000 entered the pre-existing one-kill lifecycle, earned ordinary
+      combat experience, recovered, and logged out normally before intake was
+      re-enabled.
+    quest_intake_restored_before_accepted_samples: true
+    final_deployed_sha256: dac891aa41a8e691973208ecfb79f8a996db42c052f46175998725dd53221ca6
+  samples:
+    - bot_id: 20001
+      bot_name: ScaleBot000
+      level: 51
+      staging: one-explicit-initial-teleport-beside-user-before-sample
+      zone: 179
+      quest_id: 330
+      quest_name: A Friendly Reminder
+      quest_level: 1
+      main_story: false
+      giver_name: Maude
+      giver_template_id: 3597
+      giver_object_id: 44869
+      selected_distance_m: 33.58
+      requested_destination: [15562.45, 15354.32, 127.47739]
+      observed_movement:
+        start: [15532.366, 15349.34, 131.92491]
+        last_pre_accept_sample: [15556.891, 15353.397, 129.07507]
+        mode: ordinary-native-path-movement
+      native_start_marker: 'StartQuest, Quest:330, Player ScaleBot000 (20001)'
+      controller_result: accepted
+      accepted_count: 1
+      rejected_count: 0
+      native_status_after_accept: 'lifecycle=active step=Ready status=Ready objective=QuestComplete acceptor=Npc:3597'
+      after_accept: >-
+        A 60-meter scan found only Maude and the same already-active quest.
+        With no further eligible intake, the older one-kill lifecycle activated
+        and the bot later logged out normally.
+    - bot_id: 20002
+      bot_name: ScaleBot001
+      level: 51
+      staging: none
+      zone: 178
+      quest_id: 6628
+      quest_name: Gladiator
+      quest_level: 50
+      main_story: false
+      giver_name: Guard
+      giver_template_id: 8172
+      giver_object_id: 44953
+      selected_distance_m: 29.13
+      requested_destination: [15299.61, 13964.613, 145.86052]
+      observed_movement:
+        start: [15281.0, 13942.2, 145.804]
+        last_pre_accept_sample: [15295.823, 13960.051, 145.68973]
+        mode: ordinary-native-path-movement
+      native_start_marker: 'StartQuest, Quest:6628, Player ScaleBot001 (20002)'
+      controller_result: accepted
+      accepted_count: 1
+      rejected_count: 0
+      native_status_after_accept: 'lifecycle=active step=Ready status=Ready objective=QuestComplete acceptor=Npc:8172'
+      final_runtime_state: active-idle
+    - bot_id: 20003
+      bot_name: ScaleBot002
+      level: 51
+      staging: none
+      zone: 178
+      quest_id: 6628
+      quest_name: Gladiator
+      quest_level: 50
+      main_story: false
+      giver_name: Guard
+      giver_template_id: 8172
+      giver_object_id: 44953
+      selected_distance_m: 30.57
+      requested_destination: [15299.61, 13964.613, 145.86052]
+      observed_movement:
+        start: [15281.014, 13943.133, 145.82565]
+        last_pre_accept_sample: [15295.861, 13960.277, 145.68973]
+        mode: ordinary-native-path-movement
+      native_start_marker: 'StartQuest, Quest:6628, Player ScaleBot002 (20003)'
+      controller_result: accepted
+      accepted_count: 1
+      rejected_count: 0
+      native_status_after_accept: 'lifecycle=active step=Ready status=Ready objective=QuestComplete acceptor=Npc:8172'
+      final_runtime_state: active-idle
+  aggregate:
+    bots_with_autonomous_native_acceptance: 3
+    native_side_quests_accepted: 3
+    native_story_quests_accepted: 0
+    rejected_accepts: 0
+    tick_errors: 0
+    runtime_overlaps: 0
+  authoritative_log_markers:
+    server_log: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\Logs\Server.log'
+    scale_bot_000_lines: [450712, 450714, 450765, 450770]
+    scale_bot_001_lines: [454957, 454959, 455419, 455442]
+    scale_bot_002_lines: [455827, 455829, 455938, 455961]
+    recent_error_or_fatal_count: 0
+    error_log_present: false
+  demonstrated_capability: >-
+    Nearby exact-NPC discovery, side-quest candidate selection, normal bounded
+    movement into interaction range, and AAEmu-native acceptance work live for
+    three independent bot identities.
+  missing_capability: >-
+    The deployed controller is intake-only. It does not execute objectives,
+    travel to reporters, report rewards, or chain onward through the first five
+    Nuian quests.
+
+final_state:
+  interactive_session_left_running: true
+  user_character_left_in_world: true
+  bots_left_running: 2
+  bots_left_running_ids: [20002, 20003]
+  bots_left_running_state: active-idle-after-native-quest-acceptance
+  live_metrics_captured_at_utc: '2026-09-02T13:15:35.6168649Z'
+  live_metrics_tick_errors: 0
+  live_metrics_runtime_overlaps: 0
+  deployed_quest_intake_left_enabled: true
+  activity_director_left_disabled: true
+  prior_config_bytes_retained: true
+  client_fixture_written: false
+  direct_database_access: false
+  normal_runtime_quest_and_progression_persisted: true
+  graceful_cleanup_required_later: true
+
+next_action: >-
+  Authorize a separate data-provisioning task to create and retain a clean
+  level-one Nuian bot identity in a versioned successor test dataset without
+  deleting or resetting the current database. Then rerun only the blocked
+  story-first physical acceptance against that explicit identity under the
+  AAEmu 1.2 runtime lease. A separate implementation task is also required for
+  autonomous objective execution, reporting, reward choice, and multi-quest
+  chaining; T-119/T-120 only implement and integrate quest intake.

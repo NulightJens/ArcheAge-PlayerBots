@@ -307,7 +307,7 @@ public sealed class RotationSynthesizer
         16486 => "thwart",
         16783 => "infuse",
         17412 => "renewal",
-        18131 => "tripleSlash",
+        18131 or 18132 => "tripleSlash",
         _ => $"id_{skillId}"
     };
 

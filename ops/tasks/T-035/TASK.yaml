@@ -1,0 +1,27 @@
+schema_version: 1
+id: T-035
+title: Exact native emote executor checkpoint
+track: AAEmu30
+status: paused
+integration: not-requested
+outcome: Preserve the exact native emote executor work without continuing the frozen 3.0 feature lane.
+depends_on: [T-034]
+
+source:
+  base_commit: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
+  branch: task/T-035-exact-native-emote
+  checkpoint_commit: a28d9671085af04fc85dcada4eceff0286e6f248
+
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/BotQuestCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - tests/AAEmu.UnitTests30/Compatibility/AAEmu30CompatibilityTests.cs
+
+runtime:
+  required: false
+  lease: null
+
+proof:
+  aaemu12_suite: 1763-passed-4-intentional-skips-0-failed
+  aaemu30_suite: 161-passed-0-failed
+  physical_emote: not-run

@@ -1,0 +1,42 @@
+schema_version: 1
+id: T-060
+title: AAEmu 1.2 live headless combat and stealth attempt v5
+track: AAEmu12
+status: active
+integration: runtime-pending
+outcome: Produce a fresh immutable live-headless AAEmu 1.2 receipt for matched Idle controls, mortal combat, stealth reacquisition and release, cleanup, graceful shutdown, and clean restart after the qualified active-bot anchor integration.
+depends_on: [T-059]
+branch: codex-managed-detached-worktree
+worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\160a\\PB-W00-control'
+owner_client_thread_id: client-new-thread:a4beac22-f41f-4789-a907-5f40fee9f877
+owner_thread_id: 01a05b47-b0b7-71b3-90df-be5f07c6e81f
+
+inputs:
+  pre_preparation_integration_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a
+  tested_module_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+  installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+  compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  integration_receipt: ops/evidence/aaemu12-qualified-anchor-integration-v1.yaml
+  retained_incomplete_receipt: ops/evidence/aaemu12-t057-combat-stealth-v4.yaml
+  retained_external_manifest_sha256: e505f4dceb5220496b278bf5c948f17d7ee002b559027e1bf3e84e6b154df576
+  runtime_workspace: aaemu12_integration
+  database_workspace: aaemu12_database_public_alpha_v1
+  client_workspace: aaemu12_client
+  external_evidence_root: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v5'
+
+write_scope:
+  - ops/evidence/aaemu12-t060-combat-stealth-v5.yaml
+  - ops/tasks/T-060/HANDOFF.md
+
+external_write_scope:
+  - 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v5'
+  - normal AAEmu runtime writes to the isolated public-alpha schemas
+
+runtime:
+  required: true
+  lease: aaemu12
+  services: [AAEmu.Login, AAEmu.Game]
+  archeage_client_allowed: false
+gates: [serialized-live-aaemu12-proof, combat-stealth-analyzer-exit-zero, graceful-clean-restart]
+validation_boundary: One lease-authorized live headless runner owns Login, GameServer, and the loopback API. Do not launch or control the ArcheAge client, use another task as runtime operator, access databases directly, edit or deploy source, alter global ledgers, or touch AAEmu 3.0.
+handoff: ops/tasks/T-060/HANDOFF.md

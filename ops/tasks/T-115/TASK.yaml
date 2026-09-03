@@ -1,0 +1,52 @@
+schema_version: 1
+id: T-115
+title: Integrate and install per-runtime recovery observability
+track: AAEmu12
+status: blocked
+integration: retained-count-contract-mismatch
+outcome: Independently replay the exact T-114 seven-path candidate onto the saved lineage, install that replay into the registered AAEmu 1.2 module under a committed build-only lease, rerun observer and focused proof, one clean build, and exactly one full-suite integration wave, then fast-forward the saved branch with a durable receipt.
+depends_on: [T-114]
+runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\e53c\PB-W00-control'
+owner_client_thread_id: client-new-thread:4d5d7429-1e31-4234-b650-40d3ffee5906
+owner_thread_id: 01a0604f-ad55-70f2-a138-001a1b6fd92f
+inputs:
+  dispatch_base: e47bcf03468bdeeee73877c95936a1a969e58eb5
+  accepted_head_before_preparation: d147bebce60ee79588e0e430f47969e9ba8662b9
+  saved_head: exact-binding-commit-reported-by-PB-000
+  source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
+  source_candidate_parent: d335ce053c58eaebbfda384412ef9be5c9d839da
+  source_candidate_tree: e342e61030ae78ab411fa7cb6a109839199ca610
+  source_candidate_patch_id: f2172268436a17d0642b837ed5e0696b81c316d6
+  prior_installed_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  prior_installed_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - scripts/autonomy/AutonomyObserver.psm1
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - scripts/autonomy/tests/Test-AutonomyObserver.ps1
+  - ops/evidence/aaemu12-runtime-recovery-observability-v1.yaml
+  - ops/tasks/T-114/HANDOFF.md
+  - ops/evidence/aaemu12-runtime-recovery-observability-integration-v1.yaml
+  - ops/tasks/T-115/HANDOFF.md
+external_write_scope:
+  - aaemu12_integration host/module install and build/test outputs under exact build-only lease
+gates:
+  - exact-candidate-parent-tree-seven-path-scope-patch-id-and-byte-identical-replay
+  - exact-installed-replay-source-tree-and-unchanged-compatibility-patch
+  - deterministic-observer-91-assertions-green
+  - focused-46-command-and-34-host-behavior-tests-green
+  - clean-no-incremental-build-zero-errors
+  - exactly-one-full-suite-1872-pass-4-intentional-skips-zero-fail
+  - saved-branch-fast-forward-and-clean-installed-state
+validation_boundary: Source integration, registered module install, build, and tests only. Never start Login/Game/runtime observers, edit deployed BotConfig.json, access/control MySQL/database or ArcheAge client, edit global ledgers/lease/workspace registry, touch external runtime evidence, reference source, AAEmu 3.0, scale, soak, or packaging.
+contract: ops/tasks/T-115/CONTRACT.md
+handoff: ops/tasks/T-115/HANDOFF.md
+replay_commit: 5f544acffdbef48b83278978b68c3f62b1441808
+replay_tree: 6bf7927fc28ca163ffa67da6a280fce4f22d4460
+retained_handoff_blob: 01af6882c7143960bfa2b2fefb3a0ab05fff52c2
+full_suite_log_sha256: bb8b3ed89578c304e3114b7885528b09c5bd6811ccd4a4208aaf91f6facccf08
+result: BLOCKED-contract-expected-1872-but-exact-one-test-delta-produced-green-1871-plus-4-skips

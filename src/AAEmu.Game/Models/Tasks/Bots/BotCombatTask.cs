@@ -26,6 +26,9 @@ namespace AAEmu.Game.Models.Tasks.Bots;
 
 public class BotCombatTask : Task
 {
+    internal const float MaximumQuestTargetSearchRadius = 100f;
+    internal const float MaximumQuestTargetSurfaceOffset = 15f;
+
     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
     private readonly Character _bot;
     private readonly BotCombatState _state;
@@ -36,10 +39,11 @@ public class BotCombatTask : Task
     private readonly Func<Character, float, List<Npc>> _nearbyNpcs;
     private readonly BotBlackboard _blackboard;
     private readonly TimeProvider _timeProvider;
+    private readonly Func<float, float, float> _heightProvider;
     private DateTime _lastHealTick;
 
     public BotCombatTask(Character bot, BotCombatState state, BotMovementBroadcaster broadcaster)
-        : this(bot, state, broadcaster, null, null, null, null, null)
+        : this(bot, state, broadcaster, null, null, null, null, null, null)
     {
     }
 
@@ -51,7 +55,8 @@ public class BotCombatTask : Task
         Func<Character, bool> handler = null,
         Func<Character, float, List<Npc>> nearbyNpcs = null,
         BotBlackboard blackboard = null,
-        TimeProvider timeProvider = null)
+        TimeProvider timeProvider = null,
+        Func<float, float, float> heightProvider = null)
     {
         _bot = bot;
         _state = state;
@@ -62,6 +67,7 @@ public class BotCombatTask : Task
         _nearbyNpcs = nearbyNpcs ?? ((character, radius) => WorldManager.GetAround<Npc>(character, radius, true));
         _blackboard = blackboard ?? WorldValues.Create(bot, _nearbyNpcs);
         _timeProvider = timeProvider ?? TimeProvider.System;
+        _heightProvider = heightProvider ?? ((x, y) => _bot.ParentWorld.GetHeight(x, y));
         _lastHealTick = Now;
     }
 
@@ -71,6 +77,7 @@ public class BotCombatTask : Task
     }
 
     internal uint BotId => _bot.Id;
+    internal BotCombatState State => _state;
     internal BotBlackboard Blackboard => _blackboard;
     internal BotHostMetrics HostMetrics { get; set; }
     private DateTime Now => _timeProvider.GetUtcNow().UtcDateTime;
@@ -236,7 +243,19 @@ public class BotCombatTask : Task
                     continue;
                 if (IsStealthed(npc))
                     continue;
-                var distance = _bot.GetDistanceTo(npc, true);
+                var botPosition = _bot.Transform.World.Position;
+                var npcPosition = npc.Transform.World.Position;
+                var distance = Vector3.Distance(botPosition, npcPosition);
+                if (_state.TargetTypeFilter.HasValue)
+                {
+                    var navigationSurfaceZ = _heightProvider(npcPosition.X, npcPosition.Y);
+                    if (!IsWithinNavigableQuestTargetVolume(
+                            botPosition,
+                            npcPosition,
+                            navigationSurfaceZ,
+                            QuestTargetSearchRadius()))
+                        continue;
+                }
                 if (distance < closestDistance)
                 {
                     closest = npc;
@@ -342,8 +361,35 @@ public class BotCombatTask : Task
             return;
         }
 
+        if (_state.TargetTypeFilter.HasValue && _state.Target is Npc questTarget)
+        {
+            var botPosition = _bot.Transform.World.Position;
+            var targetPosition = questTarget.Transform.World.Position;
+            var navigationSurfaceZ = _heightProvider(targetPosition.X, targetPosition.Y);
+            if (!IsWithinNavigableQuestTargetVolume(
+                    botPosition,
+                    targetPosition,
+                    navigationSurfaceZ,
+                    QuestTargetSearchRadius()))
+            {
+                Logger.Trace(
+                    $"BOT id={_bot.Id} ev=quest_target_rejected target={questTarget.ObjId} " +
+                    $"distance={Vector3.Distance(botPosition, targetPosition):F1} " +
+                    $"surface_offset={Math.Abs(navigationSurfaceZ - targetPosition.Z):F1}");
+                _state.Target = null;
+                _bot.CurrentTarget = null;
+                _state.TransitionTo(BotCombatStateType.Questing);
+                BotManager.Instance.StopImmediately(_bot);
+                return;
+            }
+        }
+
+        if (TryEnforceNonlethalFloor())
+            return;
+
         if (IsStealthed(_state.Target))
         {
+            _state.LostTarget = _state.Target;
             _state.LastKnownTargetPosition = _state.Target.Transform.World.Position;
             _state.Target = null;
             BeginSearch(_state.LastKnownTargetPosition.Value);
@@ -354,6 +400,25 @@ public class BotCombatTask : Task
 
         UpdateFight(_state.Target, useInjectedHandler: true);
     }
+
+    internal static bool IsWithinNavigableQuestTargetVolume(
+        Vector3 botPosition,
+        Vector3 targetPosition,
+        float navigationSurfaceZ,
+        float searchRadius)
+    {
+        if (searchRadius <= 0f || Vector3.Distance(botPosition, targetPosition) > searchRadius)
+            return false;
+
+        // A zero/negative height is the host's sentinel for maps without usable
+        // height data. When height data exists, reject cave/flying fixtures that
+        // the simple heightmap mover would project onto a different surface.
+        return navigationSurfaceZ <= 0f ||
+               Math.Abs(navigationSurfaceZ - targetPosition.Z) <= MaximumQuestTargetSurfaceOffset;
+    }
+
+    private static float QuestTargetSearchRadius() =>
+        Math.Min(MaximumQuestTargetSearchRadius, Math.Max(0f, (float)BotConfig.Instance.SearchRadius));
 
     private void UpdateDueling()
     {
@@ -367,6 +432,7 @@ public class BotCombatTask : Task
 
         if (IsStealthed(_state.DuelOpponent))
         {
+            _state.LostTarget = _state.DuelOpponent;
             _state.LastKnownTargetPosition = _state.DuelOpponent.Transform.World.Position;
             _state.Target = null;
             BeginSearch(_state.LastKnownTargetPosition.Value);
@@ -383,6 +449,7 @@ public class BotCombatTask : Task
         if (!_state.LastKnownTargetPosition.HasValue)
         {
             _state.IsSearching = false;
+            _state.LostTarget = null;
             _state.SearchRadius = 0f;
             _state.SearchAngle = 0f;
             ExitTemporaryState(resetRelaxedAfterCombat: false);
@@ -394,6 +461,7 @@ public class BotCombatTask : Task
             Logger.Trace($"BOT id={_bot.Id} ev=search_give_up");
             _state.LastKnownTargetPosition = null;
             _state.IsSearching = false;
+            _state.LostTarget = null;
             _state.SearchRadius = 0f;
             _state.SearchAngle = 0f;
             ExitTemporaryState(resetRelaxedAfterCombat: false);
@@ -404,10 +472,33 @@ public class BotCombatTask : Task
         var currentPosition = _bot.Transform.World.Position;
         var distanceToLast = Vector3.Distance(currentPosition, targetPosition);
         HostMetrics?.RecordWorldScan(BotWorldScanKind.Search);
-        var nearbyCharacters = WorldManager.GetAround<Character>(_bot, 30f, true);
         Unit foundTarget = null;
 
-        foreach (var character in nearbyCharacters)
+        // A contained NPC trial must reacquire the exact supplied object after
+        // stealth clears. Retaining the lost Unit also prevents an unrelated
+        // nearby character from satisfying the qualification accidentally.
+        var lostTarget = _state.LostTarget;
+        if (lostTarget?.IsDead == true)
+        {
+            _state.LastKnownTargetPosition = null;
+            _state.LostTarget = null;
+            _state.IsSearching = false;
+            _state.SearchRadius = 0f;
+            _state.SearchAngle = 0f;
+            ExitTemporaryState(resetRelaxedAfterCombat: false);
+            return;
+        }
+
+        if (lostTarget != null)
+        {
+            var distanceToTarget = Vector3.Distance(currentPosition, lostTarget.Transform.World.Position);
+            if (distanceToTarget <= 30f && (distanceToTarget <= 2f || !IsStealthed(lostTarget)))
+                foundTarget = lostTarget;
+        }
+
+        foreach (var character in foundTarget == null && lostTarget == null
+                     ? WorldManager.GetAround<Character>(_bot, 30f, true)
+                     : [])
         {
             if (character == _bot)
                 continue;
@@ -426,6 +517,7 @@ public class BotCombatTask : Task
         {
             _state.Target = foundTarget;
             _state.LastKnownTargetPosition = null;
+            _state.LostTarget = null;
             _state.IsSearching = false;
             _state.SearchRadius = 0f;
             _state.SearchAngle = 0f;
@@ -439,7 +531,7 @@ public class BotCombatTask : Task
                 _state.TransitionTo(BotCombatStateType.Combat);
             }
 
-            if (UpdateFight(foundTarget, useInjectedHandler: false))
+            if (UpdateFight(foundTarget, useInjectedHandler: true))
                 _state.LastSkillTime = Now;
             Logger.Trace($"BOT id={_bot.Id} ev=target_found target={foundTarget.ObjId}");
             return;
@@ -544,6 +636,9 @@ public class BotCombatTask : Task
 
     private void ExitTemporaryState(bool resetRelaxedAfterCombat)
     {
+        _state.StopAtTargetHpPercent = null;
+        _state.NonlethalFloorReached = null;
+        _state.LostTarget = null;
         _state.RestorePreviousState();
         _state.RevertToForcedState();
         BotManager.Instance.StopImmediately(_bot);
@@ -572,6 +667,44 @@ public class BotCombatTask : Task
     private static int HpPercent(Unit unit)
     {
         return (int)((float)unit.Hp / unit.MaxHp * 100);
+    }
+
+    internal static bool HasReachedHpFloor(Unit target, byte stopPercent)
+    {
+        return target != null && target.MaxHp > 0 &&
+               (long)target.Hp * 100 <= (long)target.MaxHp * stopPercent;
+    }
+
+    internal bool TryEnforceNonlethalFloor()
+    {
+        if (_state.CurrentState != BotCombatStateType.Combat ||
+            _state.Target == null ||
+            _state.StopAtTargetHpPercent is not { } stopPercent ||
+            !HasReachedHpFloor(_state.Target, stopPercent))
+        {
+            return false;
+        }
+
+        var target = _state.Target;
+        var onFloorReached = _state.NonlethalFloorReached;
+        _state.Target = null;
+        _bot.CurrentTarget = null;
+        ExitTemporaryState();
+        Logger.Info($"BOT id={_bot.Id} ev=nonlethal_floor target={target.ObjId} " +
+                    $"hp={target.Hp}/{target.MaxHp} floor_pct={stopPercent}");
+        if (onFloorReached != null)
+        {
+            try
+            {
+                onFloorReached();
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception,
+                    $"BOT id={_bot.Id} ev=nonlethal_floor_callback_failed target={target.ObjId}");
+            }
+        }
+        return true;
     }
 
     private bool TryDefend(out Unit attacker)

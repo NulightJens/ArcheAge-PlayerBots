@@ -1,0 +1,93 @@
+schema_version: 1
+id: aaemu12-activity-director-delay-range-v1
+task: T-096
+track: AAEmu12
+verdict: PASS
+
+source:
+  binding_commit: 1ebfd0ec47138ebf15268befde9ed1671aa05ef8
+  dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
+  accepted_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  candidate_parent: 1ebfd0ec47138ebf15268befde9ed1671aa05ef8
+  accepted_source_content_check: no-src-tests-or-compatibility-diff-at-binding
+  writer_worktree: 'C:\Users\jensh\.codex\worktrees\661e\PB-W00-control'
+
+correction:
+  property: ActivityDirectorInitialDelayMs
+  prior_ceiling_ms: 60000
+  supported_ceiling_ms: 300000
+  preserved_value_ms: 180000
+  implementation: one-private-constant-shared-by-validation-and-runtime-timespan-conversion
+
+focused_tests:
+  framework: TUnit-1.54.0.0
+  runtime: net10.0-x64
+  bot_config:
+    filter: '/*/AAEmu.UnitTests.Game.Core.Managers.BotManagers/BotConfigTests/*'
+    passed: 32
+    failed: 0
+    skipped: 0
+  activity_director:
+    filter: '/*/AAEmu.UnitTests.Bots.Ops/BotActivityDirectorTaskTests/*'
+    passed: 8
+    failed: 0
+    skipped: 0
+  total:
+    passed: 40
+    failed: 0
+    skipped: 0
+  required_delay_proof:
+    negative_ms: {input: -1, expected: 0, result: PASS}
+    legacy_ms: {input: 60000, expected: 60000, result: PASS}
+    widened_ms: {input: 180000, expected: 180000, result: PASS}
+    exact_ceiling_ms: {input: 300000, expected: 300000, result: PASS}
+    above_ceiling_ms: {input: 300001, expected: 300000, result: PASS}
+    runtime_timespan: {input_ms: 180000, expected: '00:03:00', result: PASS}
+
+clean_build:
+  proof_workspace: 'D:\Codex-Labs\t096-aaemu12-source-build-v1'
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  command: >-
+    dotnet build AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-incremental
+    --no-restore
+    -p:PlayerBotsModuleRoot=C:\Users\jensh\.codex\worktrees\661e\PB-W00-control\
+  result: PASS
+  warnings: 40
+  errors: 0
+  retained_warning_boundary: pinned-package-host-module-compiler-analyzer-and-tunit-warnings
+
+compatibility_patch:
+  path: compatibility/aaemu-1.2-r208022-v3.patch
+  regenerated_from_proof_workspace: true
+  host_diff_file_count: 28
+  prior_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  byte_identical_after_regeneration: true
+  apply_check:
+    workspace: aaemu12_reference
+    host_base: 62e3eb1d87da01194802ac886cd500134facad28
+    whitespace: error-all
+    result: PASS
+    reference_remained_clean: true
+  reverse_check:
+    workspace: 'D:\Codex-Labs\t096-aaemu12-source-build-v1'
+    result: PASS
+  module_delivery_boundary: >-
+    The host patch remains the 28-file AAEmu seam and imports the module Game
+    and test targets. The corrected BotConfig source and focused tests remain
+    module-owned and were compiled through those imports; they are not
+    duplicated as host-owned patch payloads.
+
+scope:
+  full_suite_invocations: 0
+  deployment_performed: false
+  runtime_started_or_controlled: false
+  registered_integration_host_or_module_written: false
+  registered_reference_written: false
+  database_or_client_accessed: false
+  global_ledgers_or_runtime_lease_written: false
+  aaemu30_touched: false
+
+retained_boundaries:
+  - T-094 remains a retained runtime FAIL; this source proof does not reinterpret its evidence.
+  - Installation, the once-per-wave full suite, and a fresh physical runtime proof remain pending for an independent Integrator and successor runtime task.

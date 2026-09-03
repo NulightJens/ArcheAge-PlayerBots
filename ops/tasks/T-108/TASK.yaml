@@ -1,0 +1,48 @@
+schema_version: 1
+id: T-108
+title: Prove angular two-wave one-zone autonomy and restart
+track: AAEmu12
+status: done
+integration: integrated-by-T-109
+outcome: Run a fresh sealed physical proof that enumerates exact live distance/angle fixture geometry before one-shot mutation, then proves two independent three-bot lifecycle/refill waves and a clean distinct-PID restart with ordered rebootstrap and sustained target population.
+depends_on: [T-107]
+runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\48c0\PB-W00-control'
+owner_client_thread_id: client-new-thread:fb735534-d444-4ee6-933c-fe69d503e388
+owner_thread_id: 01a05f89-2616-7f82-945d-a397a839f024
+inputs:
+  dispatch_base: 6a4444cba7bb3e2e9452787afe4a85b24ee522f3
+  installed_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: 2385d16554b1fc9df1c77d45612b39c8fdac20721f20eac31ec9d0c32cc71696
+  client_observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+  autonomy_observer_blob: 94b82fb18a39e2356d43796b54e3eeea5ad7ee12
+  database_identity: aaemu12_database_public_alpha_v1
+  evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
+write_scope:
+  - ops/evidence/aaemu12-t108-one-zone-autonomy-v7.yaml
+  - ops/tasks/T-108/HANDOFF.md
+external_write_scope:
+  - aaemu12_t108_evidence_v7 fresh root only
+  - deployed AAEmu 1.2 BotConfig.json exact contracted assignments with byte-exact restoration
+  - aaemu12_integration Login/Game runtime and accepted graceful control path under exact lease
+gates:
+  - exact-source-host-patch-assembly-config-observer-and-fresh-root-preflight
+  - continuous-zero-client-process-observer-with-raw-chain-validation
+  - prearmed-three-bot-observers-and-180-second-ordered-director-bootstrap
+  - invariant-live-transform-parser-and-complete-681472-tuple-single-precision-angular-plan
+  - predicted-pairwise-at-least-20m-and-unique-nearest-ownership-before-mutation
+  - exact-six-one-shot-angular-fixtures-and-two-distinct-native-credits-per-identity
+  - two-complete-lifecycle-recovery-logout-refill-waves
+  - graceful-distinct-pid-restart-ordered-rebootstrap-and-two-minute-dwell
+  - exact-config-restoration-zero-runtime-cleanup-and-sealed-manifest
+validation_boundary: Physical AAEmu 1.2 one-zone runtime proof only. Do not edit module source, tests, global ledgers/lease/workspace registry, registered reference, database, client, AAEmu 3.0, scale, soak, packaging, or predecessor evidence. No build/full suite, directed gameplay commands, fixture retries, runtime force-stop, or destructive cleanup.
+contract: ops/tasks/T-108/CONTRACT.md
+handoff: ops/tasks/T-108/HANDOFF.md
+candidate_commit: 9a9a84532f321fbe6755bcf4957c41c8503086e5
+candidate_tree: 01079a441274e1f999307d2b978768fe1c23bf72
+evidence_receipt: ops/evidence/aaemu12-t108-one-zone-autonomy-v7.yaml
+result: INCOMPLETE-row-oriented-planner-zero-eligible-clean-pre-runtime

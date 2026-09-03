@@ -1,0 +1,41 @@
+schema_version: 1
+id: T-057
+title: AAEmu 1.2 live headless combat and stealth attempt v4
+track: AAEmu12
+status: active
+integration: runtime-pending
+outcome: Produce a fresh immutable live-headless AAEmu 1.2 receipt for matched Idle controls, mortal combat, stealth reacquisition/release, cleanup, graceful shutdown, and clean restart after the integrated system-actor correction.
+depends_on: [T-056]
+branch: codex-managed-detached-worktree
+worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\e95a\\PB-W00-control'
+owner_client_thread_id: client-new-thread:53878ca2-3750-4d8d-9d68-ba764743c5d8
+owner_thread_id: 01a05b06-ee62-77e0-81fe-684c85116af2
+
+inputs:
+  integration_commit: d26211711cb8597d00deab1be4ca7a731f428c71
+  tested_module_source: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+  installed_module_tree: 1f3befa4dc3c01222b057c28279e82d25fcc176e
+  compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  integration_receipt: ops/evidence/aaemu12-system-actor-integration-v1.yaml
+  retained_incomplete_receipt: ops/evidence/aaemu12-t054-combat-stealth-v3.yaml
+  runtime_workspace: aaemu12_integration
+  database_workspace: aaemu12_database_public_alpha_v1
+  client_workspace: aaemu12_client
+  external_evidence_root: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v4'
+
+write_scope:
+  - ops/evidence/aaemu12-t057-combat-stealth-v4.yaml
+  - ops/tasks/T-057/HANDOFF.md
+
+external_write_scope:
+  - 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v4'
+  - normal AAEmu runtime writes to the isolated public-alpha schemas
+
+runtime:
+  required: true
+  lease: aaemu12
+  services: [AAEmu.Login, AAEmu.Game]
+  archeage_client_allowed: false
+gates: [serialized-live-aaemu12-proof, combat-stealth-analyzer-exit-zero, graceful-clean-restart]
+validation_boundary: One lease-authorized live headless runner owns Login, GameServer, and the loopback API. Do not launch or control the ArcheAge client, use another task as runtime operator, access databases directly, edit/deploy source, alter global ledgers, or touch AAEmu 3.0.
+handoff: ops/tasks/T-057/HANDOFF.md

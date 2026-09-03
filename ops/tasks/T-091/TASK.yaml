@@ -1,0 +1,38 @@
+schema_version: 1
+id: T-091
+title: Integrate the portable client-process observer
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Independently review, replay, dual-shell test, and saved-branch integrate the exact T-090 portable continuous client-process observer without using any runtime lease.
+depends_on: [T-090]
+runtime:
+  required: false
+  lease: null
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\8db4\PB-W00-control'
+owner_client_thread_id: client-new-thread:f3154b6d-6837-4d5b-8212-61d1b346b8af
+owner_thread_id: 01a05e0e-a085-7623-b86f-95cc25ebdc89
+inputs:
+  dispatch_base: 020c5cc1b4bfabb002a94af004ab78dfa2fb3922
+  integration_head_before_dispatch: 020c5cc1b4bfabb002a94af004ab78dfa2fb3922
+  candidate_commit: e03ca62e623350cfd88e9f1abe09e6b810b8626a
+  candidate_parent: 13522612e1af23c7066bd7836da412d02f018fad
+write_scope:
+  - scripts/autonomy/Observe-ClientProcessAbsence.ps1
+  - scripts/autonomy/tests/Test-ClientProcessObserver.ps1
+  - ops/tasks/T-090/HANDOFF.md
+  - ops/evidence/aaemu12-client-process-observer-integration-v1.yaml
+  - ops/tasks/T-091/HANDOFF.md
+gates:
+  - exact-three-file-candidate-scope-and-semantics
+  - framework-sha256-and-ready-order-review
+  - windows-powershell-105-assertion-gate
+  - pwsh-105-assertion-gate
+  - saved-integration-branch-fast-forward
+validation_boundary: Repository integration and isolated script tests only. Do not touch registered host/module/config, runtime/evidence roots, Login/Game/MySQL/database/client, global ledgers/lease, product source, patches, full suite, scale, soak, packaging, or AAEmu 3.0.
+contract: ops/tasks/T-091/CONTRACT.md
+handoff: ops/tasks/T-091/HANDOFF.md
+integrated_commit: fdb47f9dc2dc2ca82c8fb95e67171b05d6baf02a
+replay_commit: bf386e981649ee609fb9a38b6ffb7a2218dc2f67
+result: PASS-powershell-105-and-pwsh-105-assertions

@@ -1,0 +1,66 @@
+schema_version: 1
+id: T-127
+title: Execute G-001 Nuian five-quest live slice
+track: AAEmu12
+status: source-green
+integration: vertical-slice-owner
+outcome: >-
+  Create one level-one Nuian bot and prove five native starter-quest
+  completions through autonomous decisions, real movement, server authority,
+  and an active client on one fingerprinted build.
+depends_on: [T-126]
+runtime:
+  required: true
+  lease: aaemu12
+  transfer: bound-from-retained-T-120-session
+branch: codex/t-127-g001-live-fix
+worktree: 'C:\Users\jensh\.codex\worktrees\7e13\PB-W00-control'
+source_commit: 10b014f8bc26bd20abdc896ec9d49661365cd1b1
+release_candidate: 0.2.0-alpha.6
+live_result: seven-native-quest-completions-client-witnessed-on-prior-candidate
+remaining_gate: exact-source-deploy-repeat-and-graceful-restart-persistence
+owner_thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
+write_scope:
+  - playerbots.module.json
+  - CHANGELOG.md
+  - README.md
+  - src/**
+  - tests/**
+  - compatibility/aaemu-1.2-*.patch
+  - compatibility/README.md
+  - docs/BOT-IDENTITIES.md
+  - docs/PREVIEW.md
+  - docs/QUEST-AUTONOMY.md
+  - docs/WORLD-NAVIGATION.md
+  - scripts/Install-PlayerBots.ps1
+  - scripts/install-playerbots.sh
+  - scripts/New-PlayerBotsPreview.ps1
+  - scripts/autonomy/Show-LiveBotMonitor.ps1
+  - ops/NOW.yaml
+  - ops/GOALS.yaml
+  - ops/CURRENT.yaml
+  - ops/BOARD.yaml
+  - ops/WORKSPACES.yaml
+  - ops/RUNTIME-LEASE.yaml
+  - ops/tasks/T-127/**
+  - ops/evidence/aaemu12-g001-nuian-five-quest-v1.yaml
+external_write_scope:
+  - D:\Codex-Labs\aaemu-1.2-r208022-integration-v1
+  - D:\Codex-Labs\evidence\T-127\g001-nuian-five-quest-v1
+runtime_controls:
+  - normal-client-close
+  - graceful-game-then-login-shutdown
+  - exact-candidate-install-build-config-start
+  - registered-client-launch-and-computer-use
+  - versioned-test-data-creation-without-destructive-reset
+gates:
+  - deployed-source-and-integrated-source-match
+  - active-server-and-client
+  - one-level-one-nuian-created-at-observed-location
+  - five-native-starter-quest-completions
+  - client-visible-movement-interaction-combat-and-reporting
+  - no-per-action-command-or-synthetic-progress
+  - graceful-distinct-pid-restart-persistence
+  - zero-unexplained-tick-errors-or-runtime-overlaps
+contract: ops/tasks/T-127/CONTRACT.md
+handoff: ops/tasks/T-127/HANDOFF.md

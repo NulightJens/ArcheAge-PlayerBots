@@ -1,0 +1,44 @@
+schema_version: 1
+id: T-088
+title: Reprove one-zone autonomy with isolated anchored fixtures
+track: AAEmu12
+status: blocked
+integration: pending
+outcome: Produce one fresh immutable live AAEmu 1.2 proof that the Activity Director bootstraps, all three configured bots independently complete two autonomous one-kill lifecycles using separated anchored passive fixtures, each normal logout is refilled, and a distinct-PID restart reboots and holds target population.
+depends_on: [T-087]
+runtime:
+  required: true
+  lease: aaemu12
+  archeage_client_allowed: false
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\578d\PB-W00-control'
+owner_client_thread_id: client-new-thread:6e47bdff-97cd-45cf-9d1d-5f439ce9943b
+owner_thread_id: 01a05df1-47a7-7b70-b851-dbea1c6a69f7
+inputs:
+  dispatch_base: 4e89fff7b1ca89cf44fda28099c6ee657629bc95
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_module_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  integration_receipt: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
+  retained_predecessor_receipt: ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
+  retained_predecessor_root: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
+  evidence_root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
+write_scope:
+  - ops/evidence/aaemu12-t088-one-zone-autonomy-v2.yaml
+  - ops/tasks/T-088/HANDOFF.md
+external_write_scope:
+  - aaemu12_t088_evidence_v2
+  - deployed BotConfig.json exact contracted edit and byte restoration
+gates:
+  - exact-lease-source-config-and-fresh-root-preflight
+  - continuously-retained-zero-client-process-sampling
+  - observer-prearmed-zero-to-three-director-bootstrap
+  - two-separated-three-bot-autonomy-waves-and-refills
+  - distinct-pid-restart-rebootstrap-and-two-minute-dwell
+  - graceful-cleanup-exact-config-restoration-and-sealed-manifest
+validation_boundary: Runtime evidence only. Do not edit product/module/host source, tests, tools, scripts, manifests, global ledgers/lease, predecessor evidence, client files, database state, scale, soak, packaging, or AAEmu 3.0. Never start/control/query MySQL or a database or start/control the ArcheAge client. Never issue directed bot gameplay commands.
+contract: ops/tasks/T-088/CONTRACT.md
+handoff: ops/tasks/T-088/HANDOFF.md
+candidate_commit: 7919a43fc370ea5f59edd77112385366f4928a94
+result: INCOMPLETE-client-sampler-exit-before-derived-ledger-runtime-never-started

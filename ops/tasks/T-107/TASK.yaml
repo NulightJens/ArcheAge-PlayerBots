@@ -1,0 +1,48 @@
+schema_version: 1
+id: T-107
+title: Integrate and install bounded relative-yaw fixture placement
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Independently replay the exact T-106 four-path candidate onto the saved lineage, install that replay into the registered AAEmu 1.2 module under a committed build-only lease, rerun focused proof, one clean build, and exactly one full-suite wave, then fast-forward the saved branch with a durable integration receipt.
+depends_on: [T-106]
+runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\7da5\PB-W00-control'
+owner_client_thread_id: client-new-thread:aa21dc2d-c74b-4201-9e60-39eda2d6b709
+owner_thread_id: 01a05f74-3d1b-7e03-9418-60148911d9a2
+inputs:
+  dispatch_base: 0ebac76ed88a80b3a75c1f13478da269821b4e96
+  saved_head: 0ebac76ed88a80b3a75c1f13478da269821b4e96
+  source_candidate: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
+  source_candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+  source_candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+  source_candidate_patch_id: 1658582af94e18e4376ec0e8ffde12926d32fa0b
+  prior_installed_source: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+  prior_installed_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/evidence/aaemu12-passive-anchor-yaw-offset-v1.yaml
+  - ops/tasks/T-106/HANDOFF.md
+  - ops/evidence/aaemu12-passive-anchor-yaw-offset-integration-v1.yaml
+  - ops/tasks/T-107/HANDOFF.md
+external_write_scope:
+  - aaemu12_integration host/module install and build/test outputs under exact build-only lease
+gates:
+  - exact-candidate-parent-tree-scope-patch-id-and-byte-identical-replay
+  - exact-installed-replay-source-tree-and-unchanged-patch
+  - focused-46-spawn-passive-command-tests-green
+  - clean-build-zero-errors
+  - exactly-one-full-suite-1870-pass-4-intentional-skips-zero-fail
+  - saved-branch-fast-forward-and-clean-installed-state
+validation_boundary: Source integration/install/build/test only. Never start Login/Game/runtime observers, edit deployed BotConfig.json, access/control MySQL/database or ArcheAge client, edit global ledgers/lease, external runtime evidence, reference checkout, AAEmu 3.0, scale, soak, or packaging.
+contract: ops/tasks/T-107/CONTRACT.md
+handoff: ops/tasks/T-107/HANDOFF.md
+replay_commit: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+replay_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+integrated_commit: fc26a8e9347880efa155bd4fd8ddc94913112b79
+integrated_tree: aeed65ca98ae10f9bd461602f2fe32a998735e24
+installed_game_assembly_sha256: 2385d16554b1fc9df1c77d45612b39c8fdac20721f20eac31ec9d0c32cc71696
+result: PASS-46-focused-build-0-errors-79-warnings-full-1870-pass-4-intentional-skips-once

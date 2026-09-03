@@ -1,0 +1,26 @@
+schema_version: 1
+updated_at: 2026-09-03
+goal: G-001
+task: T-127
+task_state: source-green
+task_thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
+task_worktree: 'C:\Users\jensh\.codex\worktrees\7e13\PB-W00-control'
+product_source: 10b014f8bc26bd20abdc896ec9d49661365cd1b1
+release_candidate: 0.2.0-alpha.6
+deployed_source: t127-live-candidate-before-10b014f
+deployed_game_assembly_sha256: c10fcd802124406f349253cfafd9413e1768605b90f36110d40c248a85fbc79e
+deployment_match: false
+runtime:
+  workspace: aaemu12_integration
+  database: aaemu12_database_public_alpha_v1
+  client: aaemu12_client
+  lease: aaemu12
+  current_owner: T-127
+  state: retained-running-without-bot-after-client-witnessed-seven-quest-run
+first_action: >-
+  At the next agreed runtime window, stop Game then Login gracefully, deploy
+  exact source 10b014f8bc26bd20abdc896ec9d49661365cd1b1, and repeat the fresh
+  Nuian five-quest gate to bind the final route-ownership hardening.
+execution_brief: ops/EXECUTION-BRIEF.md
+contract: ops/tasks/T-127/CONTRACT.md
+report_fields: [State, Build, Server marker, Client marker, Blocker, Next action]

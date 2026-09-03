@@ -1,0 +1,227 @@
+schema_version: 1
+owner: PB-000 Control Tower
+updated_at: 2026-09-01
+
+selection_rules:
+  - Resolve locations by workspace ID, never by nearest name or directory age.
+  - Confirm the declared revision and state before use.
+  - A missing or mismatched workspace is a validation blocker, not permission to substitute another path.
+  - Pure module source work may continue when runtime inputs are unavailable; physical acceptance remains pending.
+  - Never edit client fixtures or game_pak files.
+  - Never clean or reset a contaminated checkout; retain it and provision the next versioned workspace.
+
+workspaces:
+  playerbots_control:
+    role: program-ledger-and-integration-source
+    path: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+    access: control-tower-and-integrator-write
+    repository: archeage-playerbots
+    branch: integration/aaemu12-world
+
+  playerbots_checkpoint_source:
+    role: canonical-repository-and-paused-t035-checkpoint
+    path: 'C:\Users\jensh\Documents\Codex\2026-08-29\archeage-playerbots-module'
+    access: task-specific-only
+    repository: archeage-playerbots
+    branch: task/T-035-exact-native-emote
+    expected_head: a28d9671085af04fc85dcada4eceff0286e6f248
+
+  aaemu12_reference:
+    role: clean-host-reference
+    path: 'D:\Codex-Labs\aaemu-1.2-r208022-reference-v1'
+    access: read-only
+    repository: AAEmu/AAEmu
+    expected_head: 62e3eb1d87da01194802ac886cd500134facad28
+    expected_state: clean-detached
+    last_verified: 2026-08-31
+
+  aaemu12_integration:
+    role: module-install-build-and-runtime-host
+    path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1'
+    access: lease-controlled
+    repository: AAEmu/AAEmu
+    base_head: 62e3eb1d87da01194802ac886cd500134facad28
+    expected_state: receipted-module-install-changes
+    lease: aaemu12
+    installed_module_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\modules\archeage-playerbots'
+    installed_module_head: fb0a315c9579fb2e7e249e47b37efa07a9404c51
+    installed_module_tree: a7dfc4d1bffcdddc25c2dc45fc9feed71365eb70
+    compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+    evidence_receipt: ops/evidence/aaemu12-autonomous-quest-intake-integration-v1.yaml
+
+  aaemu12_database_public_alpha_v1:
+    role: isolated-public-alpha-runtime-database
+    access: lease-controlled
+    lease: aaemu12
+    game_database: aaemu_playerbots_game_public_alpha_v1
+    login_database: aaemu_playerbots_login_public_alpha_v1
+    retained_output_path: 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1'
+    donor_workspace: aaemu12_legacy_t022
+    evidence_receipt: ops/evidence/aaemu12-database-public-alpha-v1.yaml
+    database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+    credentials: not-recorded
+
+  aaemu12_t061_evidence_v1:
+    role: retained-single-bot-autonomy-runtime-evidence
+    path: 'D:\Codex-Labs\evidence\T-061\one-bot-autonomy-v1'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: absent-before-first-run-then-immutable
+
+  aaemu12_t065_evidence_v2:
+    role: retained-single-bot-autonomy-runtime-evidence-v2
+    path: 'D:\Codex-Labs\evidence\T-065\one-bot-autonomy-v2'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: immutable-retained-incomplete
+
+  aaemu12_t069_evidence_v3:
+    role: single-bot-autonomy-runtime-evidence-v3
+    path: 'D:\Codex-Labs\evidence\T-069\one-bot-autonomy-v3'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: immutable-retained-fail
+
+  aaemu12_t073_evidence_v4:
+    role: single-bot-autonomy-runtime-evidence-v4
+    path: 'D:\Codex-Labs\evidence\T-073\one-bot-autonomy-v4'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: immutable-retained-incomplete
+
+  aaemu12_t075_evidence_v5:
+    role: single-bot-autonomy-runtime-evidence-v5
+    path: 'D:\Codex-Labs\evidence\T-075\one-bot-autonomy-v5'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: immutable-retained-incomplete
+
+  aaemu12_t079_evidence_v6:
+    role: single-bot-autonomy-runtime-evidence-v6
+    path: 'D:\Codex-Labs\evidence\T-079\one-bot-autonomy-v6'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: immutable-retained-pass
+
+  aaemu12_t041_evidence_v1:
+    role: one-zone-autonomous-director-runtime-evidence
+    path: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: immutable-retained-fail
+
+  aaemu12_t088_evidence_v2:
+    role: one-zone-autonomous-director-runtime-evidence-v2
+    path: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: immutable-retained-incomplete
+
+  aaemu12_t092_evidence_v3:
+    role: one-zone-autonomous-director-runtime-evidence-v3
+    path: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
+    access: evidence-only
+    lease: aaemu12
+    expected_state: immutable-retained-fail
+
+  aaemu12_t094_evidence_v4:
+    role: one-zone-autonomous-director-runtime-evidence-v4
+    path: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
+    access: evidence-only
+    lease: aaemu12
+    expected_state: immutable-retained-fail
+
+  aaemu12_t098_evidence_v5:
+    role: one-zone-autonomous-director-runtime-evidence-v5
+    path: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: immutable-retained-fail
+
+  aaemu12_t104_evidence_v6:
+    role: one-zone-autonomous-director-runtime-evidence-v6
+    path: 'D:\Codex-Labs\evidence\T-104\one-zone-autonomy-v6'
+    access: evidence-only
+    lease: aaemu12
+    expected_state: immutable-retained-fail
+
+  aaemu12_t108_evidence_v7:
+    role: one-zone-angular-autonomous-director-runtime-evidence-v7
+    path: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
+    access: evidence-only
+    lease: aaemu12
+    expected_state: immutable-retained-incomplete-pre-runtime-row-geometry-gate
+
+  aaemu12_t110_evidence_v8:
+    role: one-zone-row-valid-angular-autonomous-director-runtime-evidence-v8
+    path: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
+    access: evidence-only
+    lease: aaemu12
+    expected_state: immutable-retained-incomplete-parser-and-observer-gap
+
+  aaemu12_t112_evidence_v9:
+    role: one-zone-parser-and-scheduler-safe-autonomous-director-runtime-evidence-v9
+    path: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
+    access: evidence-only
+    lease: aaemu12
+    expected_state: immutable-retained-fail-recovery-counters-and-shutdown-tail-gap
+
+  aaemu12_t117_evidence_v10:
+    role: one-zone-per-runtime-recovery-and-cooperative-observer-autonomy-evidence-v10
+    path: 'D:\Codex-Labs\evidence\T-117\one-zone-autonomy-v10'
+    access: task-evidence-write
+    lease: aaemu12
+    expected_state: absent-before-first-run-then-immutable
+
+  aaemu12_client:
+    role: matching-client-fixture
+    path: 'D:\AAEmu\Client\ArcheAge 1.2 (r208022) for AAEmu'
+    junction: 'C:\AAEmu\.client_files\ArcheAge 1.2 (r208022) for AAEmu'
+    access: read-only
+    version: ArcheAge 1.2 r208022
+    provenance: path-and-version-confirmed-hash-pending
+
+  aaemu12_legacy_t022:
+    role: retained-legacy-task-checkout
+    path: 'C:\AAEmu'
+    access: evidence-only
+    observed_branch: pc/t022-party-control-20260828-010200
+    observed_head: 72fd2cc70bba3887e093e8a3800f13fed9b3e111
+
+  aaemu12_legacy_d_drive:
+    role: retained-legacy-checkout
+    path: 'D:\AAEmu\AAEmu'
+    access: evidence-only
+    observed_head: 27bb98d32b6939b363811e15ebf192f87ad452c4
+    observed_state: dirty
+
+  aaemu12_install_evidence_v1:
+    role: retained-installed-host-evidence
+    path: 'D:\Codex-Labs\aaemu-1.2-class-gear-compat-v1'
+    access: evidence-only
+
+  aaemu12_install_evidence_v2:
+    role: retained-installed-host-evidence
+    path: 'D:\Codex-Labs\aaemu-1.2-class-gear-compat-v2'
+    access: evidence-only
+
+  aaemu12_install_evidence_v3:
+    role: retained-installed-host-evidence
+    path: 'D:\Codex-Labs\aaemu-1.2-public-class-gear-v3'
+    access: evidence-only
+
+  aaemu30_runtime_frozen:
+    role: release-boundary-compatibility-runtime
+    path: 'D:\Codex-Labs\aaemu-3.0.4.2-r336598-runtime-v1\host'
+    access: frozen-lease-controlled
+    lease: aaemu30
+
+  aaemu30_client_frozen:
+    role: release-boundary-client-fixture
+    path: 'D:\Codex-Labs\archeage-3.0.4.2-r336598-client-runtime-v1'
+    access: frozen-read-only
+
+  aaemu30_assets_frozen:
+    role: release-boundary-server-assets
+    path: 'D:\Codex-Labs\archeage-3.0.4.2-r336598-assets-v1'
+    access: frozen-read-only

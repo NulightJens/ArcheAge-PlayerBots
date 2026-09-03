@@ -64,10 +64,14 @@ These commands are useful for staging bots outside a normal party:
 | `/botfollow <id\|all> <characterName>` | Follow an online character |
 | `/botfollow <id\|all> stop` | Stop direct follow |
 | `/botfollow <id\|all> status` | Show direct-follow status |
-| `/movebot <id> <x> <y> <z> [walk\|run]` | Move one bot toward coordinates |
-| `/botattackobject <id\|all> <npcObjId>` | Attack one exact NPC object |
+| `/movebot <id> <x> <y> <z> [walk\|run\|teleport]` | Move one bot toward coordinates, or explicitly teleport it for isolated GM staging |
+| `/botattackobject <id\|all> <npcObjId> [stopAtHpPercent]` | Attack one exact NPC object, optionally stopping non-lethally at 1-99% HP |
 | `/botreset <id>` | Clear current combat work and start a fresh target search |
 | `/botduel <id1> <id2>` | Start a duel between two bots |
+
+The optional `stopAtHpPercent` floor on `/botattackobject` is checked before each combat decision. Once the exact target reaches that 1-99% threshold, the bot clears the target and returns to `Idle`; the command does not write target HP directly.
+
+`/movebot ... teleport` is an explicit GM-only fixture-staging tool. It does not prove autonomous travel or route safety; use `walk` or `run` when movement itself is under test.
 
 Direct follow accepts optional formation settings:
 
@@ -126,6 +130,33 @@ Some Magnificent families do not contain a literal seven-piece armor set, bow, o
 
 `/botequip` is an alias for `/botgear`. ArcheAge's remote-detail protocol is read-only: the stock client cannot safely drag equipment into another character's inventory. PlayerBots forces every connectionless bot's equipment visibility to **public** at spawn and whenever a new client sees it; `/botgear inspect` reasserts that state before sending the detail packet. Use `/kit`, `/botgear ... create`, and `/botgear ... equip` for server-authoritative changes.
 
+## Staged quest development
+
+These commands expose deliberately narrow quest vertical slices for GM testing. They do not enable autonomous quest selection, routing, or objective chaining.
+
+| Command | Purpose |
+| --- | --- |
+| `/botquest scan <id> [radius]` | List nearby exact-NPC quest starters and active reporters, bounded to 100 meters |
+| `/botquest nearby <id> <npcTemplateId> [radius]` | List live NPCs matching one exact template with object ID, health, distance, and position, bounded to 100 meters |
+| `/botquest locate <id> <npcTemplateId>` | Read-only exact-template discovery across the bot's current world, sorted by distance and capped at ten results |
+| `/botquest inspect <id> <questId>` | Show the quest's localized name and structured AAEmu acts, including exact native fixture identifiers |
+| `/botquest status <id> <questId>` | Show active step/status/objective state or completed/inactive lifecycle |
+| `/botquest accept <id> <questId>` | Accept through AAEmu's normal lifecycle while within 6 meters of the exact starter |
+| `/botquest talk <id> <questId>` | Advance only that active quest's exact-NPC talk acts within 6 meters; team-shared acts fail closed |
+| `/botquest use <id> <questId> <npcObjId>` | Use that selected quest's one carried quest-linked supply item against one exact living NPC through AAEmu's native item-skill engine |
+| `/botquest acquire <id> <questId> <npcObjId>` | Derive one exact NPC and health ceiling from the selected quest item's native skill requirements, run contained combat to that ceiling, disengage, and launch the native item skill |
+| `/botquest loot <id> <questId> <corpseObjId>` | Transfer exactly one quest-linked item from an exact nearby corpse exclusively tagged by the bot through AAEmu's native loot machinery |
+| `/botquest hunt <id> <questId>` | Derive one exact active monster-hunt target and remaining kill count, then repeatedly select and kill nearby matching NPCs |
+| `/botquest travel <id> <questId>` | Run to one exact same-world static sphere destination within 100 meters and let AAEmu's native enter-sphere event advance the objective |
+| `/botquest report <id> <questId> [rewardIndex]` | Report only that selected active quest while within 6 meters of its exact reporter |
+
+Only plain exact-NPC starters, talk objectives, reporters, the narrow selected-quest supply-item path, one native corpse-loot path, one exact monster-hunt path, and one static sphere-travel path are supported in this milestone. `use` requires the selected quest to be active at Progress with exactly one active item-gather act and exactly one carried Supply item whose native template links it to that quest and defines a use skill. It asks AAEmu to cast that real item skill; a successful command means the cast started, not that the objective advanced. `acquire` adds one bounded combat executor: the item's skill must expose one non-OR requirement set containing exactly one target NPC template, one 1-99% target-health ceiling, and the matching progress-quest context. The caller still selects the exact live object; ambiguous native requirements fail closed. `loot` requires a dead NPC within 6 meters, an exclusive solo tag by that bot, and exactly one generated corpse entry whose item ID and native `loot_quest_id` match the selected quest's only gather act. It delegates the actual transfer to the host loot implementation and never creates an item. `hunt` requires exactly one currently active native monster-hunt act, rejects group and mixed objective sets, derives the remaining count, and uses the normal combat and quest-credit paths until that goal is met. `travel` requires exactly one active static sphere act and exactly one same-world geometry result; it clears follow and combat work, runs to the heightmap-projected center, and leaves objective credit to AAEmu's live sphere trigger. After any channel, loot transfer, hunt, or travel, verify the result with `/botquest status`.
+
+NPC groups, mixed objectives, team-shared talk acts, general-purpose item use, team or shared corpse claims, emotion, kill-trigger starters, NPC-centered and multi-sphere travel, autonomous quest selection/routing, objective chaining, and reward-choice policy remain future work. Exact hunt and travel selection are bounded to 100 meters, use true three-dimensional distance, and reject destinations that do not agree with the bot's navigation-height surface. This deliberately fails closed on cave or stacked-world fixtures that the current heightmap mover cannot reach safely. Report-time cleanup for a native item-delivery quest is part of this slice; broader delivery policy remains deferred. Use `/movebot ... teleport` only to stage the bot between exact live objects during isolated controlled tests.
+
+Inspection is read-only. For supported act types it reports the exact NPC, NPC-group, doodad, item, distance, sphere, cleanup, and selective-reward fields loaded by AAEmu; a printed identifier is evidence about the quest template, not permission to fabricate that fixture or advance the objective.
+The `nearby` and `locate` verbs are read-only and are intended to resolve exact live object IDs for native fixtures instead of guessing object allocation order. `nearby` enforces the bounded local scan; `locate` is an explicit GM discovery tool across the bot's current world and never selects, moves, or attacks a result.
+
 ## Diagnostics
 
 | Command | Purpose |
@@ -168,5 +199,14 @@ Invoke-RestMethod -Method Post `
   -Uri 'http://127.0.0.1:1280/api/commands/addbot' `
   -ContentType 'application/json' -Body $body
 ```
+
+Each request creates a fresh, unregistered actor. When active bots exist, the
+actor copies the matching world, instance, non-zero zone, coordinates, and
+rotation from the qualified bot with the lowest character ID. Bots with no
+world, a mismatched instance, ZoneId `0`, or a non-finite transform are ignored.
+If no bot qualifies, the actor remains worldless: worldless commands such as
+`addbot` still work, while world-positioned commands such as `spawnpassive`
+fail closed at their existing world guard. Add a qualified bot before invoking
+world-positioned fixture commands through the loopback API.
 
 > **Security:** `@system` has administrator access and no user authentication. Keep the command API bound to `127.0.0.1`; never expose its port publicly.

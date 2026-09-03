@@ -7,6 +7,8 @@ using AAEmu.Game.Models.Tasks.Bots;
 using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Kernel;
 using AAEmu.Game.Bots.Social;
+using AAEmu.Game.Bots.Life;
+using AAEmu.Game.Bots.Questing;
 
 namespace AAEmu.Game.Bots.Host;
 
@@ -20,7 +22,10 @@ public sealed class BotRuntime
         BotMovementTask mover = null,
         BotCombatTask brain = null,
         BotBlackboard blackboard = null,
-        BotConfig config = null)
+        BotConfig config = null,
+        BotLifeController lifeController = null,
+        BotQuestIntakeController questIntakeController = null,
+        BotQuestLifecycleController questLifecycleController = null)
     {
         Bot = bot ?? throw new ArgumentNullException(nameof(bot));
         MovementState = movementState ?? throw new ArgumentNullException(nameof(movementState));
@@ -30,6 +35,9 @@ public sealed class BotRuntime
         Mover?.BindCombatState(combatState);
         Brain = brain;
         Blackboard = blackboard ?? new BotBlackboard();
+        LifeController = lifeController ?? new BotLifeController();
+        QuestIntakeController = questIntakeController ?? new BotQuestIntakeController();
+        QuestLifecycleController = questLifecycleController ?? new BotQuestLifecycleController();
         CombatState.BotId = bot.Id;
         KillCreditSubscription = new BotKillCreditSubscription(Bot, CombatState);
         Social = new BotSocialState(this);
@@ -65,6 +73,9 @@ public sealed class BotRuntime
     public int AttachedRotationVersion { get; set; }
     public string AttachedRotationArchetype { get; set; }
     public BotBlackboard Blackboard { get; }
+    public BotLifeController LifeController { get; }
+    public BotQuestIntakeController QuestIntakeController { get; }
+    public BotQuestLifecycleController QuestLifecycleController { get; }
     public BotSocialState Social { get; }
     public BotTeamHooks TeamHooks { get; }
     public BotStuckWatch StuckWatch { get; }

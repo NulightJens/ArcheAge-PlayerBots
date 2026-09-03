@@ -4,6 +4,61 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ## Unreleased
 
+## 0.2.0-alpha.6 - 2026-09-03
+
+### Nuian starter quest autonomy
+
+- Added a dedicated-account identity factory that can create and immediately admit a persistent level-one Nuian bot at its native race spawn or a validated player location.
+- Replaced invalid starter rotations with learned-skill-aware decisions that select only skills the character actually knows and pass native cooldown, mana, range, and facing gates.
+- Added opt-in nearby NPC and doodad quest intake, sticky local-first quest prioritization, native monster-hunt and owned-corpse item-gather execution, respawn waiting, guarded reporting, and native auto-completion observation.
+- Added a lightweight quest destination index that combines AAEmu quest markers and static spawns with transfer-road routing, then yields final approaches to bounded local movement.
+- Preserved the logical quest route during unsticking and lifecycle/intake handoffs so recovery nudges cannot silently replace the active quest destination.
+- Added a static, color-coded live decision board showing acquired quest priorities plus current quest, combat, navigation, and health/execution reasoning.
+- Retained client-witnessed AAEmu 1.2 proof from fresh Nuian `Freshnav14`: native quests 330, 250, 6198, 2531, 251, 324, and 325 completed autonomously, including the main-story chain and the signpost fox quest's native 3/3 auto-completion. The final route-ownership hardening remains pending one exact-candidate redeploy confirmation.
+- Consolidated the AAEmu 1.2 identity, doodad quest, and transfer-road adapters into immutable installer patch `aaemu-1.2-r208022-v4.patch`.
+
+### Loopback command fixtures
+
+- Fixed fresh AAEmu 1.2 loopback `@system` actors to snapshot the lowest-character-ID qualified active bot's matching world, instance, non-zero zone, coordinates, and rotation without creating or registering a player, account, or connection.
+- Excluded worldless, mismatched-instance, ZoneId-0, and non-finite bot anchors. When no bot qualifies, worldless commands such as `addbot` remain available while `spawnpassive` keeps its existing fail-closed world guard instead of using the T-057 `(0,0,0)` / ZoneId `0` main-world template origin.
+
+### Staged quest controls
+
+- Added an exact-target non-lethal health floor to `/botattackobject`, allowing normal bot combat to disengage at a requested 1-99% threshold for quest-item interactions without mutating target HP.
+- Added `/botquest scan`, `inspect`, `status`, `accept`, and `report` as bounded GM development controls for exact-NPC quest discovery and one selected quest lifecycle. This is a vertical slice, not an autonomous questing claim.
+- Expanded read-only quest inspection with exact NPC, NPC-group, doodad, item, distance, sphere, cleanup, and selective-reward fields so objective fixtures can be chosen from native data without guessing identifiers.
+- Added bounded read-only `/botquest nearby` exact-template inspection for live NPC object IDs, health, distance, and position.
+- Added `/botquest talk` for one selected active quest and exact nearby NPC. It invokes only that quest's live native talk acts, verifies an objective increase, and fails closed on team-shared acts to prevent cross-character broadcasts.
+- Added `/botquest use <botId> <questId> <npcObjId>` for one narrow native item-objective slice. It requires exactly one active gather act and one carried quest-linked Supply item, then asks AAEmu's normal item-skill engine to cast against the exact living NPC; it never mints the result item or broadcasts quest progress.
+- Added `/botquest acquire <botId> <questId> <npcObjId>` as a bounded one-target executor. It derives the exact NPC template and health ceiling from the carried quest item's native unit requirements, runs normal contained combat to that ceiling, disengages, and automatically launches the real item skill. Ambiguous or alternative requirement branches fail closed.
+- Added read-only `/botquest locate <botId> <npcTemplateId>` for explicit exact-template discovery across the bot's current world, sorted by distance and capped at ten results without selecting or moving the bot.
+- Added `/botquest loot <botId> <questId> <corpseObjId>` for one bounded native corpse-acquisition slice. It requires the selected quest's only gather act, a nearby dead NPC exclusively tagged by that bot, and exactly one generated item matching both the gather item and its native quest link; the host loot implementation performs the transfer, and no item is created by PlayerBots.
+- Added `/botquest hunt <botId> <questId>` for one bounded exact-NPC monster-hunt slice. It derives the target template and remaining kill goal from exactly one active native hunt act, repeatedly selects the nearest legal match, and returns to automatic Idle after native kill credit reaches the goal.
+- Added `/botquest travel <botId> <questId>` for one bounded static sphere-objective slice. It requires exactly one active native sphere act, exactly one same-world destination, a destination within 100 meters, and a heightmap arrival that remains inside the live sphere; NPC-centered, multi-sphere, mixed, remote, and vertically unsafe routes fail closed.
+- Expanded `/botquest status` with the active sphere act, component, native sphere identifier, objective count, and same-world destination count.
+- Added true three-dimensional and navigation-height safety checks to exact quest-hunt preflight and target retention. Vertically stacked or cave fixtures that the current heightmap mover cannot safely reach now fail closed.
+- Added explicit `/movebot <id> <x> <y> <z> teleport` for isolated GM fixture staging without presenting teleportation as autonomous travel proof.
+- Added compile-time 1.2 and 3.0 corpse-loot adapters while retaining fail-closed ownership and item-identity checks in the shared command.
+- Fixed long-distance bot movement leaving the character registered in its spawn region. Movement now refreshes AAEmu visibility and zone membership only when crossing a 64-meter spatial-region boundary, keeping nearby discovery, combat, and quest interaction authoritative without adding per-tick region mutations.
+- Expanded `/botquest status` with the active gather act, item ID, native objective count, inventory count, and cleanup flag so a completed channel can be verified independently of cast acceptance.
+- Fixed connectionless native item use so AAEmu sees the exact selected NPC while evaluating pre-cast unit requirements. Rejected casts restore the previous selection; accepted channels retain the exact target for delayed native effects.
+- Enforced the exact-target non-lethal floor ahead of compiled engine rotations and replaced stale combat tasks after bot respawn, preventing autonomous rotations from bypassing a quest staging floor.
+- Physically passed quest 293's first native acquisition on 3.0: normal bot combat stopped exact Nymph object 102887 alive at 8,955/18,849 HP, skill 11684 was accepted from the carried Magic Crystal, and AAEmu advanced item 8243 and the gather objective from 0/8 to 1/8 without fabricated state.
+- Physically passed the repeatable one-command acquisition on 3.0: one `/botquest acquire` call stopped exact Nymph object 102886 alive at 8,631/18,849 HP, automatically launched skill 11684, and advanced the native objective and inventory from 1/8 and one result item to 2/8 and two result items without a separate use command.
+- Physically passed quest 251's full corpse-delivery lifecycle on 3.0. Three normal Solzreed Boar kills and three exact native corpse transfers advanced objective/inventory 0->1->2->3; an unrelated corpse entry remained untouched. Reporting at Mayor Gott completed the quest, consumed all three cleanup items, and placed reward item 18791 x2 in native quest-reward mail because the 50-slot test bag was full.
+- Physically passed cross-region movement during that lifecycle: the bot crossed a 64-meter region boundary toward the boars and back, and ordinary bounded nearby discovery found the exact NPCs after both crossings.
+- Passed fresh dual-track gates for the corpse-delivery and movement-region slices: 1.2 at 1,753 passed plus 4 intentional skips and 3.0 at 159/159. The live 3.0 Game build completed with 32 existing warnings and 0 errors.
+- Physically passed quest 620's selected hunt on 3.0: three exact Plains Razorbeak kills advanced the native objective 0/3 to 3/3, produced three observed and three credited kills, cleared the target, restored automatic Idle, and reported normally with zero tick errors, skipped ticks, or runtime overlaps.
+- Retained and corrected a physical cave-path failure from quest 3427: after a Cave Bat target below the terrain exposed the simple heightmap mover's vertical limitation, the new preflight rejected the same unreachable fixture before combat. Fresh gates passed 1,759 plus 4 intentional skips on 1.2 and 159/159 on 3.0; the live 3.0 Game build completed with 32 existing warnings and 0 errors.
+- Physically passed quest 312's static sphere travel on 3.0. From a confirmed 0/1 objective and a staged point 95.4 meters away, `/botquest travel` derived the exact 30-meter live sphere and heightmap destination, ordinary bot movement entered it, AAEmu finalized `QuestActObjSphere`, and native auto-complete moved the quest to completed without fabricated progress. Fresh gates passed 1,761 plus 4 intentional skips on 1.2 and 160/160 on 3.0.
+- Added the first read-only `AAEmu.ClientDriver` slice: deterministic client process/window discovery, ArcheAge log lifecycle parsing, and a loopback-only JSON status API with a black-box validation script.
+- Fixed `/botattackobject` object lookup for loopback `@system` commands so exact objects discovered by `/botquest nearby` can be inspected and attacked through the live API.
+- Quest scanning uses lazy NPC-to-quest indexes built once after AAEmu loads quest templates; it does not rescan all 6,606 3.0 quests during bot brain ticks.
+- Acceptance and reporting fail closed unless the bot is within 6 meters of the exact supported NPC. Emotion, kill-trigger, and NPC-group starters remain deferred.
+- Reporting invokes only the selected active quest's live report act. It does not use AAEmu's broadcast report helper, which can advance multiple active quests sharing the same NPC.
+- Live 3.0 quest 330 acceptance survived a graceful server save/restart, rejected a report at 17.9 meters, completed at the exact reporter, left nearby quest 6198 inactive, and remained completed after normal bot logout/re-add.
+- Published new immutable full installer patches for both host lines: 1.2 v3 and 3.0 alpha-v4. Previous compatibility patches remain byte-identical; the new versions add the explicit GM access contract for `/botquest`.
+
 ### Human class and gear controls
 
 - Restored `/setclass [botId] <archetype> [level]` from the T-009 development path. It replaces all three skill trees, rebuilds active/passive skills, saves the final archetype, refreshes compatible gear, and normally respawns the bot so clients receive a fresh sheet.
@@ -15,10 +70,12 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Live 3.0 acceptance created `/botgear 2 create celestial flame leather nodachi`, equipped all 15 requested slots, and retained the identical item instances across normal logout/re-add. The active data pack resolved the missing literal Flame pieces honestly as Magnificent Desert leather, a Lightning Bow, and a Quake Flute while retaining Flame jewelry and the Flame Nodachi.
 - Corrected equipment reporting to read each item's authoritative equipment-container slot; 3.0 no longer mislabels a main-hand weapon by its list position.
 - Made equipment visibility an enforced bot policy: every 3.0 bot publishes **public** after spawning, newly nearby clients receive the public flag with its world snapshot, and `/botgear inspect` reasserts public before sending character details. Connectionless bots cannot drift back to private after logout/re-add, and no database preference or per-tick work was added.
-- Passed the clean 1.2 installer suite at 1,741 total (1,737 passed, 4 intentional skips) and the 3.0 adapter suite at 157/157.
+- Passed the clean 1.2 installer suite at 1,742 total (1,738 passed, 4 intentional skips) and the clean 3.0 adapter suite at 158/158.
 
 ### Documentation and onboarding
 
+- Added a fail-closed source-preview packager that requires a clean Git commit, verifies compatibility-patch and migration hashes, checks archive contents, excludes Git internals, and emits JSON provenance plus a SHA-256 sidecar.
+- Added a shareable-preview guide with exact support claims, archive installation steps, and explicit exclusions for clients, databases, credentials, runtime logs, and local evidence.
 - Reworked the public README and user guides around installation, first bot, party control, configuration, commands, and troubleshooting.
 - Clarified that ArcheAge PlayerBots controls selected existing characters and does not claim random-account populations, automated raid or battleground completion, or a public server-capacity target.
 - Simplified `/bot` help topics and updated compatibility guidance for the supported 1.2 track and experimental, server-start-validated 3.0 track.
@@ -28,7 +85,7 @@ Player-facing patch notes come first; developer packaging detail follows.
 - Added a standalone, opt-in adapter for NL0bP/AAEmu client `3.0.4.2 r336598`, pinned to base `8c1c943bb2309eefffb9da2aa99a408d0acbb095`.
 - Added version-specific build/test compatibility plus a reviewed host patch covering lifecycle, startup/shutdown, party events, world lookup, tick metrics, combat attribution, persistence, operator command registration, kit auto-equip, bot equipment visibility, and the loopback `@system` actor.
 - Added fail-closed dual-track PowerShell and Bash installation. The 3.0 path requires an explicit experimental flag while runtime acceptance is outstanding.
-- Passed non-incremental 3.0 Game and full-solution compilation with zero errors and the complete 157/157 adapter suite. Coverage includes persisted HP/MP restoration, aggro cleanup, kill attribution, tick-metric maxima, connectionless administrative access, Web API actor resolution, human-facing class/gear commands, the equipment-visibility packet contract, and the gear-create restart lifecycle.
+- Passed non-incremental 3.0 Game and full-solution compilation with zero errors and the complete 158/158 adapter suite. Coverage includes persisted HP/MP restoration, aggro cleanup, kill attribution, tick-metric maxima, connectionless administrative access, Web API actor resolution, human-facing class/gear/quest commands, the equipment-visibility packet contract, and the gear-create restart lifecycle.
 - Acquired and integrity-checked the matching compact databases, then passed isolated 3.0 Login/Game startup, module migration, loopback status/metrics, zero-bot graceful cleanup, and clean restart on non-1.2 ports. Runtime support is not claimed until client login, one-bot lifecycle, four-role combat, and scale/recovery gates pass.
 - Audited all 94 configured skill IDs and 38 passive-buff IDs against 3.0 data. The four role anchors retain their expected ranges; 36 skills differ from 1.2 and five rotation skills changed target semantics, which are explicit physical-test gates rather than assumed parity.
 - Added a read-only 3.0 asset-provenance preflight that verifies the pinned emulator lineage, all three required files, SQLite headers, recorded SHA-256 hashes, and explicit rejection of known 1.2 compact databases before runtime startup.

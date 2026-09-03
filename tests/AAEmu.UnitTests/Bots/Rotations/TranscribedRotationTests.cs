@@ -239,6 +239,8 @@ public sealed class TranscribedRotationTests
             bot.Hp = bot.MaxHp = target.Hp = target.MaxHp = 100;
             bot.CurrentTarget = target;
             bot.IsInBattle = true;
+            bot.Skills = new CharacterSkills(bot);
+            bot.Skills.Skills[14835] = new Skill(new SkillTemplate { Id = 14835 });
             var runtime = new BotRuntime(bot, new BotMovementState(), new BotCombatState
             {
                 CurrentState = BotCombatStateType.Combat,
@@ -531,7 +533,6 @@ public sealed class TranscribedRotationTests
                 [strategy], strategy.Actions.Append(strategy.Filler));
             var context = new BotContext(bot, runtime, runtime.Blackboard, now,
                 new BotConfig { UseEngine = false }, BotEngineKind.Combat);
-
             await Assert.That(engine.DoNextAction(context, minimal: false)).IsTrue();
             await Assert.That(events).Contains(followUp);
         }
@@ -576,6 +577,8 @@ public sealed class TranscribedRotationTests
                 [strategy], strategy.Actions.Append(strategy.Filler));
             var context = new BotContext(bot, runtime, runtime.Blackboard, now,
                 new BotConfig { UseEngine = false }, BotEngineKind.Combat);
+            bot.Skills = new CharacterSkills(bot);
+            bot.Skills.Skills[expected] = new Skill(new SkillTemplate { Id = expected });
 
             await Assert.That(engine.DoNextAction(context, minimal: false)).IsTrue();
             await Assert.That(events).Contains(expected);
@@ -674,6 +677,9 @@ public sealed class TranscribedRotationTests
             LastComboSkill = opener,
             PendingComboFollowUp = followUp
         }, config: new BotConfig { UseEngine = false });
+        bot.Skills = new CharacterSkills(bot);
+        bot.Skills.Skills[opener] = new Skill(new SkillTemplate { Id = opener });
+        bot.Skills.Skills[followUp] = new Skill(new SkillTemplate { Id = followUp });
         return (bot, runtime, target, now);
     }
 

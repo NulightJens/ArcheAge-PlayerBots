@@ -9,8 +9,22 @@ using NLog;
 
 namespace AAEmu.Game.Models.Game.Bots
 {
+    public readonly record struct BotActivityDirectorConfiguration(
+        bool Enabled,
+        bool Valid,
+        string Reason,
+        uint ZoneId,
+        uint[] CharacterIds,
+        int MinimumPopulation,
+        int TargetPopulation,
+        int MaximumPopulation,
+        TimeSpan InitialDelay,
+        TimeSpan ReconciliationInterval,
+        TimeSpan RetryBackoff);
+
     public class BotConfig : Singleton<BotConfig>, ILoadable
     {
+        private const int ActivityDirectorInitialDelayMaximumMs = 300000;
         private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
         /// <summary>Fallback hazard radius in metres when an area-trigger row has no positive radius; 40 m covers the legacy hazard envelope.</summary>
         public const float DefaultHazardRadius = 40f;
@@ -69,9 +83,29 @@ namespace AAEmu.Game.Models.Game.Bots
         public int IterationsPerTick { get; set; } = 10;
         public int ExpireActionTimeMs { get; set; } = 5000;
         public int GlobalSkillDelayMs { get; set; } = 600;
-        public List<uint> AutoSpawnCharacterIds { get; set; } = [];
-        public string AutoSpawnState { get; set; } = "grind";
-        public int AutoSpawnDelayMs { get; set; } = 2000;
+        /// <summary>Opt-in autonomous discovery, movement, and normal NPC/doodad acceptance of nearby quests.</summary>
+        public bool QuestIntakeEnabled { get; set; }
+        public double QuestIntakeScanRadius { get; set; } = 60.0;
+        public double QuestIntakeInteractionRadius { get; set; } = 6.0;
+        public int QuestIntakeRetryBackoffMs { get; set; } = 30000;
+        /// <summary>Opt-in autonomous execution and reporting of supported active quests.</summary>
+        public bool QuestCompletionEnabled { get; set; }
+        public double QuestObjectiveScanRadius { get; set; } = 60.0;
+        public double QuestReportScanRadius { get; set; } = 60.0;
+        public double QuestReportInteractionRadius { get; set; } = 6.0;
+        public int QuestTargetSelectionTimeoutMs { get; set; } = 30000;
+        public int QuestProgressObservationMs { get; set; } = 3000;
+        public int QuestCompletionObservationMs { get; set; } = 5000;
+        public int QuestCompletionRetryBackoffMs { get; set; } = 30000;
+        public bool ActivityDirectorEnabled { get; set; }
+        public uint ActivityDirectorZoneId { get; set; }
+        public List<uint> ActivityDirectorCharacterIds { get; set; } = [];
+        public int ActivityDirectorMinimumPopulation { get; set; }
+        public int ActivityDirectorTargetPopulation { get; set; }
+        public int ActivityDirectorMaximumPopulation { get; set; }
+        public int ActivityDirectorInitialDelayMs { get; set; } = 2000;
+        public int ActivityDirectorReconciliationIntervalMs { get; set; } = 5000;
+        public int ActivityDirectorRetryBackoffMs { get; set; } = 30000;
 
         private static string ConfigPath => Path.Combine(FileManager.AppPath, "Configurations", "BotConfig.json");
 
@@ -173,19 +207,128 @@ namespace AAEmu.Game.Models.Game.Bots
             IterationsPerTick = Math.Max(1, IterationsPerTick);
             ExpireActionTimeMs = Math.Max(0, ExpireActionTimeMs);
             GlobalSkillDelayMs = Math.Max(0, GlobalSkillDelayMs);
-            AutoSpawnCharacterIds ??= [];
-            var normalizedState = AutoSpawnState?.Trim().ToLowerInvariant();
-            if (!TryParseAutoSpawnState(normalizedState, out _))
+            QuestIntakeScanRadius = Math.Clamp(
+                double.IsFinite(QuestIntakeScanRadius) ? QuestIntakeScanRadius : 60.0,
+                1.0,
+                100.0);
+            QuestIntakeInteractionRadius = Math.Clamp(
+                double.IsFinite(QuestIntakeInteractionRadius) ? QuestIntakeInteractionRadius : 6.0,
+                1.0,
+                Math.Min(10.0, QuestIntakeScanRadius));
+            QuestIntakeRetryBackoffMs = Math.Clamp(QuestIntakeRetryBackoffMs, 1000, 600000);
+            QuestObjectiveScanRadius = Math.Clamp(
+                double.IsFinite(QuestObjectiveScanRadius) ? QuestObjectiveScanRadius : 60.0,
+                1.0,
+                100.0);
+            QuestReportScanRadius = Math.Clamp(
+                double.IsFinite(QuestReportScanRadius) ? QuestReportScanRadius : 60.0,
+                1.0,
+                100.0);
+            QuestReportInteractionRadius = Math.Clamp(
+                double.IsFinite(QuestReportInteractionRadius) ? QuestReportInteractionRadius : 6.0,
+                1.0,
+                Math.Min(10.0, QuestReportScanRadius));
+            QuestTargetSelectionTimeoutMs = Math.Clamp(
+                QuestTargetSelectionTimeoutMs,
+                1000,
+                600000);
+            QuestProgressObservationMs = Math.Clamp(QuestProgressObservationMs, 100, 60000);
+            QuestCompletionObservationMs = Math.Clamp(
+                QuestCompletionObservationMs,
+                100,
+                60000);
+            QuestCompletionRetryBackoffMs = Math.Clamp(
+                QuestCompletionRetryBackoffMs,
+                1000,
+                600000);
+            ActivityDirectorCharacterIds ??= [];
+            ActivityDirectorInitialDelayMs = Math.Clamp(
+                ActivityDirectorInitialDelayMs,
+                0,
+                ActivityDirectorInitialDelayMaximumMs);
+            ActivityDirectorReconciliationIntervalMs = Math.Clamp(
+                ActivityDirectorReconciliationIntervalMs,
+                100,
+                60000);
+            ActivityDirectorRetryBackoffMs = Math.Clamp(ActivityDirectorRetryBackoffMs, 100, 600000);
+        }
+
+        public BotActivityDirectorConfiguration GetActivityDirectorConfiguration()
+        {
+            var characterIds = ActivityDirectorCharacterIds?.ToArray() ?? [];
+            var initialDelay = TimeSpan.FromMilliseconds(Math.Clamp(
+                ActivityDirectorInitialDelayMs,
+                0,
+                ActivityDirectorInitialDelayMaximumMs));
+            var interval = TimeSpan.FromMilliseconds(Math.Clamp(ActivityDirectorReconciliationIntervalMs, 100, 60000));
+            var backoff = TimeSpan.FromMilliseconds(Math.Clamp(ActivityDirectorRetryBackoffMs, 100, 600000));
+
+            if (!ActivityDirectorEnabled)
             {
-                Logger.Warn($"Invalid AutoSpawnState '{AutoSpawnState}', using idle.");
-                AutoSpawnState = "idle";
-            }
-            else
-            {
-                AutoSpawnState = normalizedState;
+                return new BotActivityDirectorConfiguration(
+                    false,
+                    true,
+                    "disabled",
+                    ActivityDirectorZoneId,
+                    characterIds,
+                    ActivityDirectorMinimumPopulation,
+                    ActivityDirectorTargetPopulation,
+                    ActivityDirectorMaximumPopulation,
+                    initialDelay,
+                    interval,
+                    backoff);
             }
 
-            AutoSpawnDelayMs = Math.Clamp(AutoSpawnDelayMs, 0, 60000);
+            var reason = ValidateActivityDirector(
+                ActivityDirectorZoneId,
+                characterIds,
+                ActivityDirectorMinimumPopulation,
+                ActivityDirectorTargetPopulation,
+                ActivityDirectorMaximumPopulation);
+            return new BotActivityDirectorConfiguration(
+                true,
+                reason == null,
+                reason ?? "valid",
+                ActivityDirectorZoneId,
+                characterIds,
+                ActivityDirectorMinimumPopulation,
+                ActivityDirectorTargetPopulation,
+                ActivityDirectorMaximumPopulation,
+                initialDelay,
+                interval,
+                backoff);
+        }
+
+        private static string ValidateActivityDirector(
+            uint zoneId,
+            IReadOnlyList<uint> characterIds,
+            int minimum,
+            int target,
+            int maximum)
+        {
+            if (zoneId == 0)
+                return "zone_zero";
+            if (characterIds.Count == 0)
+                return "identities_empty";
+
+            var unique = new HashSet<uint>();
+            for (var index = 0; index < characterIds.Count; index++)
+            {
+                var characterId = characterIds[index];
+                if (characterId == 0)
+                    return "identity_zero";
+                if (!unique.Add(characterId))
+                    return "identity_duplicate";
+            }
+
+            if (minimum < 0 || target < 0 || maximum < 0)
+                return "population_negative";
+            if (minimum > target || target > maximum)
+                return "population_order_invalid";
+            if (maximum > characterIds.Count)
+                return "maximum_exceeds_identities";
+
+            return null;
         }
 
         internal static bool TryParseAutoSpawnState(string state, out BotCombatStateType? parsedState)

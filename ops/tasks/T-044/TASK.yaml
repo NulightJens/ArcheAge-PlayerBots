@@ -1,0 +1,35 @@
+schema_version: 1
+id: T-044
+title: Deterministic combat and stealth qualification harness
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Prepare the deterministic offline fixtures and fail-closed harness needed for T-036 physical mortal-combat, stealth, cleanup, and restart qualification.
+depends_on: [PB-W00]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:eec3a1e8-c920-4a9c-b140-0b64c5f36a4c
+
+write_scope:
+  - scripts/combat/**
+  - src/AAEmu.Game/Core/Managers/Bots/BotCombatManager.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotCombatState.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotDiagnostics.cs
+  - src/AAEmu.Game/Models/Tasks/Bots/BotCombatTask.cs
+  - src/AAEmu.Game/Scripts/Commands/BotAttackObjectCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/BotBuffCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/BotMetricsCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotCombatManagerTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotCombatStateTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotCombatTaskTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/tasks/T-044/HANDOFF.md
+
+runtime:
+  required: false
+  lease: null
+gates: [deterministic-harness-tests, focused-aaemu12-tests]
+validation_boundary: Offline source and harness preparation only. No client, server, database, deployed host, or runtime lease may be changed.
+handoff: ops/tasks/T-044/HANDOFF.md

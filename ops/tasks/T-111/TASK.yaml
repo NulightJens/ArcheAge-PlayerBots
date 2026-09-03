@@ -1,0 +1,44 @@
+schema_version: 1
+id: T-111
+title: Independently integrate retained T-110 runtime incompleteness
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Independently verify the immutable T-110 v8 evidence root and exact two-path candidate, replay its retained INCOMPLETE receipt and handoff onto the saved lineage, record an integration receipt, and fast-forward the saved branch without reinterpreting partial planner/bootstrap proof as autonomy acceptance.
+depends_on: [T-110]
+runtime: {required: false, lease: null}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\c1ab\PB-W00-control'
+owner_client_thread_id: client-new-thread:76cfa252-f51d-44ea-ab5f-3646117da15d
+owner_thread_id: 01a05fdd-0f55-75f3-8f95-a596588c6520
+inputs:
+  dispatch_base: 8e1659331eba986f4c6742c3e77d29173a7f8fbe
+  source_candidate: 1b914085d64b3957b3c394d9b9f75600c91e2a96
+  source_candidate_parent: 80bb3b9f3dc028e2b1830ef10421eed4dc13f4e1
+  source_candidate_tree: 03d3e8fcda1ae196023c9acd412e212770940261
+  source_candidate_patch_id: 211ac120413c1c483c1ad9892afa08eecc9af3a9
+  evidence_root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
+  manifest_sha256: b8678f4526f80197a0b659c9f22b660b686b3ed75731c3f57095123aedc943e1
+write_scope:
+  - ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
+  - ops/tasks/T-110/HANDOFF.md
+  - ops/evidence/aaemu12-t110-incomplete-integration-v1.yaml
+  - ops/tasks/T-111/HANDOFF.md
+external_read_scope:
+  - aaemu12_t110_evidence_v8 immutable root only
+gates:
+  - exact-candidate-parent-tree-two-path-scope-patch-id-and-blob-replay
+  - complete-sealed-manifest-rehash-and-path-safety
+  - independent-selftest-and-live-row-planner-recomputation
+  - independent-bootstrap-client-chain-autonomy-raw-response-and-gap-replay
+  - exact-config-runtime-process-listener-log-and-mysql-cleanup-evidence
+  - retained-incomplete-integration-and-saved-branch-fast-forward
+validation_boundary: Immutable evidence verification and retained INCOMPLETE integration only. Do not write external evidence, runtime host/module/config/reference, global ledgers/lease/workspace registry, database, client, source/tests, AAEmu 3.0, scale, soak, or packaging. Do not run build, focused tests, full suite, Login, Game, or observers.
+contract: ops/tasks/T-111/CONTRACT.md
+handoff: ops/tasks/T-111/HANDOFF.md
+replay_commit: d4e1bede6647ea8d7d97fed14a4819042cb9c15e
+replay_tree: 7d5b6b1c90da1ef79a237c3bf6e9d95e780c4fe5
+integrated_commit: bc7279be7a5d5fb0aff1d04474ddb1fc7480f66c
+integrated_tree: 46225ff22f3c9a495de485a928df4860f3c64f29
+evidence_receipt: ops/evidence/aaemu12-t110-incomplete-integration-v1.yaml
+result: PASS-receipt-integrity-subject-retained-INCOMPLETE

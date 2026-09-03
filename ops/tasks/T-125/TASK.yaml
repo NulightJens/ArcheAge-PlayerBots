@@ -1,0 +1,32 @@
+schema_version: 1
+id: T-125
+title: Verify corrected intelligence wave and lock fast-feedback build loop
+track: AAEmu12
+status: done
+integration: verified
+outcome: Run exactly one corrected full AAEmu 1.2 suite against the T-124 integrated source and codify the build/test sequence that gives every feature immediate focused proof before live deployment.
+depends_on: [T-124]
+runtime: {required: false, lease: null}
+branch: integration/aaemu12-world
+worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+inputs:
+  corrected_source: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+  corrected_tree: 3f473420369dc46bcf3884c90cfc140b58d30c34
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+write_scope:
+  - ops/PROJECT.yaml
+  - ops/BUILD-TEST-LOOP.md
+  - ops/evidence/aaemu12-bot-intelligence-wave-verification-v1.yaml
+  - ops/tasks/T-125/HANDOFF.md
+external_write_scope:
+  - retained logs beneath D:\Codex-Labs\evidence\T-125\bot-intelligence-wave-verification-v1
+gates:
+  - source-and-assembly-fingerprints-match-corrected-T-124
+  - exactly-one-corrected-full-suite-zero-failures
+  - nonzero-test-count-and-exact-skip-identities-retained
+  - fast-feedback-build-loop-documented-and-linked
+  - registered-runtime-database-client-and-lease-untouched
+validation_boundary: Corrected full-suite verification and durable build/test policy only. Do not edit feature source, deploy, stop or configure the retained runtime, query or write a database, mutate the client or lease, force a process, delete prior artifacts, or touch AAEmu 3.0.
+contract: ops/tasks/T-125/CONTRACT.md
+handoff: ops/tasks/T-125/HANDOFF.md

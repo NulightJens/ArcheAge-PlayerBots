@@ -40,6 +40,9 @@ public sealed class RotationFillerGateTests
             TargetType = SkillTargetType.Hostile,
             TargetRelation = SkillTargetRelation.Hostile
         });
+        bot.Skills = new CharacterSkills(bot);
+        foreach (var skillId in BotSkillIds.Darkrunner.SkillLearnOrder)
+            bot.Skills.Skills[skillId] = new Skill(templateResolver(skillId));
         var npcRuntime = new BotRuntime(bot, new BotMovementState(), new BotCombatState { Target = target },
             config: new BotConfig { UseEngine = false });
         var npcRoll = 0;

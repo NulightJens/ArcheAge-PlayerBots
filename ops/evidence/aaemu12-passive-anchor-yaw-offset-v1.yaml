@@ -1,0 +1,134 @@
+schema_version: 1
+id: aaemu12-passive-anchor-yaw-offset-v1
+task: T-106
+track: AAEmu12
+recorded_at: '2026-09-01T18:06:10-06:00'
+verdict: PASS
+
+source:
+  binding_commit: 8b7a10101910c704b5f2d08129d7468cf36b8796
+  binding_tree: 5960ffe01a1ca9f38df9f4b67a1f67df71483021
+  dispatch_base: 41f2d35a9e20bd66fff80a4ae8394321785e172b
+  accepted_integration_source: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
+  candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+  candidate_commit: exact-hash-reported-to-control-tower-after-commit
+  candidate_tree: exact-hash-reported-to-control-tower-after-commit
+  declared_branch: task/T-106-passive-yaw-offset
+  writer_git_state: detached
+  writer_worktree: 'C:\Users\jensh\.codex\worktrees\4173\PB-W00-control'
+
+command:
+  name: SpawnPassiveNpcCommand
+  grammar: 'spawnpassive <npcTemplateId> [distance] [anchorBotId] [yawOffsetDegrees]'
+  yaw_offset:
+    position: fourth
+    default_degrees: 0
+    parser: 'float.TryParse(NumberStyles.Float, CultureInfo.InvariantCulture)'
+    finite_required: true
+    inclusive_minimum_degrees: -180
+    inclusive_maximum_degrees: 180
+    invalid_error: 'Yaw offset degrees must be a finite invariant number from -180 through 180.'
+  legacy_overloads:
+    two_output_maximum_arity: 2
+    anchor_output_maximum_arity: 3
+    one_two_three_argument_results_and_errors_changed: false
+  geometry:
+    source: detached CloneDetached transform only
+    zero_path: skips rotation and preserves the prior AddDistanceToFront operation
+    nonzero_conversion: 'yawOffsetDegrees.DegToRad() = MathF.PI / 180f * yawOffsetDegrees'
+    nonzero_rotation: 'spawnTransform.Local.Rotate(0f, 0f, offsetRadians)'
+    placement: 'spawnTransform.Local.AddDistanceToFront(distance)'
+    pinned_x: 'sourceX - distance * MathF.Sin(sourceYaw + offsetRadians)'
+    pinned_y: 'sourceY + distance * MathF.Cos(sourceYaw + offsetRadians)'
+    fixture_facing: existing CalculateAngleFrom(spawnTransform, sourceTransform) behavior
+
+focused_tests:
+  framework: TUnit-1.54.0.0
+  runtime: net10.0-x64
+  command: >-
+    AAEmu.UnitTests.exe --treenode-filter
+    '/*/AAEmu.UnitTests.Game.Scripts.Commands/SpawnPassiveNpcCommandTests/*'
+    --minimum-expected-tests 46 --no-progress --no-ansi --output Detailed
+  total: 46
+  passed: 46
+  failed: 0
+  skipped: 0
+  duration_ms: 1528
+  parsing:
+    invariant_non_english_culture: de-DE
+    accepted_degrees: [0, 45, -45, 180, -180]
+    rejected: [null, empty, NaN, Infinity, -Infinity, malformed, localized-decimal, below-minus180, above-180, excess-arity]
+    invalid_angle_error_exact: PASS
+    prior_one_two_three_argument_cases: PASS
+  geometry:
+    omitted_and_explicit_zero_all_output_float_bits_equal: PASS
+    positive_45_pinned_single_precision_bits: PASS
+    negative_45_pinned_single_precision_bits: PASS
+    terrain_request_coordinates_exact: PASS
+    fixture_facing_exact: PASS
+  invariants:
+    source_position_and_rotation_unchanged: PASS
+    active_bot_target_and_battle_state_unchanged: PASS
+    world_zone_instance_and_default_world_zero: PASS
+    resolver_identity_concurrent_departure_transform_swap_and_staleness: PASS
+    null_world_template_zone_finiteness_and_boundary_guards: PASS
+    invalid_input_resolver_and_ground_calls: zero
+
+isolated_build:
+  proof_workspace: 'D:\Codex-Labs\t106-aaemu12-source-build-v1'
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  host_tree: c7d2d725d31824b9c0f29e505f04e9ab7525b876
+  host_state: detached-pinned-with-28-file-compatibility-patch
+  module_delivery: proof-only-junction-to-exact-writer-worktree
+  restore_command: 'dotnet restore AAEmu.UnitTests\AAEmu.UnitTests.csproj --nologo'
+  build_command: >-
+    dotnet build AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-incremental
+    --no-restore --nologo
+  invocation: first-and-only-complete-build
+  result: PASS
+  warnings: 72
+  errors: 0
+  elapsed: '00:00:31.80'
+  warning_boundary: pinned package advisory plus existing host, module, analyzer, and TUnit warnings
+
+compatibility_patch:
+  path: compatibility/aaemu-1.2-r208022-v3.patch
+  expected_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  observed_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  byte_identical: true
+  registered_reference:
+    workspace_id: aaemu12_reference
+    head: 62e3eb1d87da01194802ac886cd500134facad28
+    clean_detached_before: true
+    strict_apply_check_whitespace_error_all: PASS
+    clean_detached_after: true
+  isolated_proof_workspace_reverse_check_whitespace_error_all: PASS
+
+integrity:
+  writer_and_proof_module_blobs_match: PASS
+  proof_host_diff_file_count: 28
+  precommit_blobs:
+    command_source: 893f7d639477bd8cbc4fc9911f63cb642733a8cf
+    command_tests: 664e1b595e00d9659f3cc13c40e1c8ba5350ac40
+  artifacts:
+    game_assembly_sha256: 0547e8d353260033c2b5d1d4485683e03c9a776204ffbb61c8a6f39d595d5613
+    test_assembly_sha256: 5b8f6b48ae64afb44757033fecbd2f0168a818197a363d7c724a05a5763c5d45
+    test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+    focused_test_report_sha256: 0dfd2df4dbd8b3fca7da03c56033f6cef1730730f6e525c97179aefbc8014a21
+  raw_logs_committed: false
+
+scope:
+  full_suite_invocations: 0
+  deployment_performed: false
+  runtime_started_stopped_inspected_or_controlled: false
+  runtime_lease_read_or_written: false
+  registered_integration_host_or_module_written: false
+  registered_reference_written: false
+  external_runtime_evidence_written: false
+  database_or_client_accessed: false
+  global_ledgers_written: false
+  aaemu30_scale_soak_or_packaging_touched: false
+
+retained_boundaries:
+  - T-104 remains an immutable retained runtime FAIL and is not reinterpreted by this source PASS.
+  - Installation, the once-per-wave full suite, and physical multi-angle fixture placement remain pending for T-107 and fresh T-108 evidence.

@@ -1,0 +1,21 @@
+# T-092 handoff
+
+Verdict: **FAIL**.
+
+T-092 ran from binding commit `dea1c660a076b2db1fbd5586214cfa2b9cde1d7b`, dispatch base `38b6ca7518215521dc3bb34389de4c5a4d547368`, thread `01a05e17-fb8b-7610-a0de-e8693dc0af91`, client thread `client-new-thread:50955241-43de-4c78-ad98-794e7fdc7e2b`, and worktree `C:\Users\jensh\.codex\worktrees\86b9\PB-W00-control` under the exact committed `aaemu12` lease.
+
+The source/config/fresh-root preflight passed. The reference was clean and detached at `62e3eb1d87da01194802ac886cd500134facad28`; the installed module was clean at source `e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4`, tree `4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2`; the patch, managed Game assembly, and integrated client-observer identities matched; the five required ports and live-log directories were empty; no AAEmu or ArcheAge client process existed; and OS-only observation found MySQL PIDs `6308` and `8076` without database connection or control. The fresh v3 root was absent and created exactly once.
+
+The integrated Windows PowerShell client-process observer was launched once as PID `123292`. Raw sample `000000` and ledger row zero were independently hash-validated at process count zero before Login. The final summary and independent replay validate 866 raw files and 866 chained rows, zero client-process samples, zero errors, maximum adjacent gap `653.19 ms`, first sample `2026-09-01T17:57:40.3443432Z`, last sample `2026-09-01T18:05:43.6525726Z`, and terminal hash `d65dcd4204332615de276dc8f0ea67f117f1b2012e732ef946c46db32439c664`. The last sample follows final cleanup. The observer exited through its cooperative sentinel and was never relaunched.
+
+The deployed Director config changed only the nine contracted assignments. Original SHA-256 `7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202` became `8704a503d2beadb7e5e6a241ed8a61ffe7b72d14fc0e0fcebf4ae1f46a19021d`, then was restored byte-for-byte to the original hash after shutdown.
+
+Run one used Login PID `108212` and Game PID `81188`. The Director started once with valid zone `221`, IDs `[20001,20002,20003]`, and population `2/3/3`, then admitted the IDs in the correct order at `18:02:07.7555867Z`, `18:02:22.7661669Z`, and `18:02:37.7786292Z`. The first material invalid gate was complete observer pre-arm: the three autonomy observers did not begin until `18:02:32Z`. Bots `20001` and `20002` were already online in sample zero with object IDs `7797` and `37952`; only bot `20003` produced the required first two offline samples before admission. The contract makes admission first non-PASS, so execution stopped without retry.
+
+No `spawnpassive`, directed gameplay, metrics, or roster command was issued. No fixture coordinate/separation gate, lifecycle credit/progression/recovery/logout/refill wave, second wave, or restart was attempted. Game then Login stopped gracefully; the Director stopped once; all three bots despawned; the once-only cleanup marker reports zero remaining bots and runtimes. The three autonomy observers ended by console cancellation. Run-one logs moved losslessly. Final checks prove zero runtime, autonomy-observer, client-observer, and ArcheAge client processes; zero required listeners and live logs; unchanged MySQL PIDs; exact source/assembly/config; and the expected 30-entry host overlay. The retained Game error log contains the native shutdown `PhysicsManager` disposed-service-provider warning; cleanup still passed.
+
+The immutable evidence root is `D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3`. Its manifest covers 1,523 payloads and 22,604,049 bytes with SHA-256 `39f6c85e69faa78d87824632f0db168bcbc87db4fd26b8d350f7bea70370809c`; validation found zero missing, mismatched, duplicate, unsafe, or unlisted payloads.
+
+Unproven boundaries are complete pre-admission observer arm, all fixture coordinates/separations, both three-bot lifecycle/progression/refill waves, distinct-PID restart/rebootstrap/two-minute dwell, scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0.
+
+Integration action: independently verify the sealed root and integrate this commit only as the retained T-092 `FAIL` receipt. Keep T-037 blocked. PB-000 alone may release/reassign the lease after accepting cleanup; any successor requires a new task, exact binding/lease, and a new versioned evidence root.

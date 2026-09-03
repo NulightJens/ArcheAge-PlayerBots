@@ -8,6 +8,9 @@ namespace AAEmu.Game.Scripts.Commands
 {
     public class MoveBot : ICommand
     {
+        internal static Action<Character, float, float, float> Teleporter { get; set; } =
+            (bot, x, y, z) => BotManager.Instance.MoveBotTo(bot, x, y, z);
+
         public string[] CommandNames { get; set; } = ["movebot", "walkbot"];
 
         public void OnLoad()
@@ -17,12 +20,12 @@ namespace AAEmu.Game.Scripts.Commands
 
         public string GetCommandLineHelp()
         {
-            return "<characterId> <x> <y> <z> [walk|run]";
+            return "<characterId> <x> <y> <z> [walk|run|teleport]";
         }
 
         public string GetCommandHelpText()
         {
-            return "Moves a bot to the given coordinates by walking/running. Use 'walk' or 'run' as optional 5th argument (default run).";
+            return "Moves a bot to the given coordinates by walking/running, or teleports it for explicit GM staging. Use 'walk', 'run', or 'teleport' as optional 5th argument (default run).";
         }
 
         public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -40,6 +43,14 @@ namespace AAEmu.Game.Scripts.Commands
             if (bot == null)
             {
                 BotCommandArgs.SendUnknownBot(this, messageOutput, botId);
+                return;
+            }
+
+            if (args.Length > 4 && args[4].Equals("teleport", StringComparison.OrdinalIgnoreCase))
+            {
+                Teleporter(bot, x, y, z);
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Bot '{bot.Name}' was teleported for GM staging to ({x}, {y}, {z}).");
                 return;
             }
 

@@ -71,13 +71,11 @@ public sealed class BotRotationCommand : ICommand
             }
 
             var rotationId = runtime.RotationOverrideId ?? runtime.AttachedRotationId;
-            var archetype = BotArchetypeManager.Instance.GetState(bot)?.ArchetypeName ??
-                             runtime.CombatState.ActiveArchetype;
-            var rotation = manager.GetRotation(rotationId) ?? manager.GetRotationForArchetype(archetype);
+            var rotation = manager.GetRotation(rotationId);
             if (rotation == null)
             {
                 CommandManager.SendNormalText(this, messageOutput,
-                    $"Bot '{bot.Name}' rotation: (none, legacy tick fallback)");
+                    $"Bot '{bot.Name}' rotation: (none, learned-skill decision fallback)");
                 continue;
             }
 

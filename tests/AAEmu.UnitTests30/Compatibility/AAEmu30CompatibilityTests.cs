@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using AAEmu.Commons.Network;
@@ -10,9 +11,13 @@ using AAEmu.Game.Core.Packets.G2C;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Items;
 using AAEmu.Game.Models.Game.Bots;
+using AAEmu.Game.Models.Game.Quests;
+using AAEmu.Game.Models.Game.Quests.Acts;
+using AAEmu.Game.Models.Game.Quests.Templates;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Game.Units.Static;
+using AAEmu.Game.Models.Game.World;
 using AAEmu.Game.Scripts.Commands;
 using AAEmu.Game.Services.WebApi.Controllers;
 using NetCoreServer;
@@ -39,6 +44,120 @@ public sealed class AAEmu30CompatibilityTests
         Assert.True(BotGearCatalog.TryParseGrade("celestial", out var grade));
         Assert.Equal(ItemGrade.Celestial, grade);
         Assert.Equal("gale", BotGearCatalog.NormalizeProfile("wind"));
+    }
+
+    [Fact]
+    public void QuestDiscoveryCommandsRemainStagedAndBoundedOnThe30Adapter()
+    {
+        var command = new BotQuestCommand();
+
+        Assert.Contains("botquest", command.CommandNames);
+        Assert.True(BotQuestCommand.TryParse(["scan", "2", "35"], out var scan));
+        Assert.Equal(BotQuestVerb.Scan, scan.Verb);
+        Assert.Equal(35f, scan.Radius);
+        Assert.True(BotQuestCommand.TryParse(["nearby", "2", "3495", "100"], out var nearby));
+        Assert.Equal(BotQuestVerb.Nearby, nearby.Verb);
+        Assert.Equal(3495u, nearby.NpcTemplateId);
+        Assert.Equal(100f, nearby.Radius);
+        Assert.True(BotQuestCommand.TryParse(["inspect", "2", "330"], out var inspect));
+        Assert.Equal(BotQuestVerb.Inspect, inspect.Verb);
+        Assert.Equal(330u, inspect.QuestId);
+        Assert.True(BotQuestCommand.TryParse(["status", "2", "330"], out var status));
+        Assert.Equal(BotQuestVerb.Status, status.Verb);
+        Assert.True(BotQuestCommand.TryParse(["talk", "2", "5304"], out var talk));
+        Assert.Equal(BotQuestVerb.Talk, talk.Verb);
+        Assert.Equal(5304u, talk.QuestId);
+        Assert.True(BotQuestCommand.TryParse(["hunt", "2", "251"], out var hunt));
+        Assert.Equal(BotQuestVerb.Hunt, hunt.Verb);
+        Assert.Equal(251u, hunt.QuestId);
+        Assert.False(BotQuestCommand.TryParse(["hunt", "2", "251", "3475"], out _));
+        Assert.True(BotQuestCommand.TryParse(["travel", "2", "137"], out var travel));
+        Assert.Equal(BotQuestVerb.Travel, travel.Verb);
+        Assert.Equal(137u, travel.QuestId);
+        Assert.False(BotQuestCommand.TryParse(["travel", "2", "137", "3653"], out _));
+        Assert.True(BotQuestCommand.TryParse(["report", "2", "330"], out var report));
+        Assert.Equal(BotQuestVerb.Report, report.Verb);
+        Assert.Equal(0, report.SelectedReward);
+        Assert.False(BotQuestCommand.TryParse(["scan", "2", "100.1"], out _));
+        Assert.False(BotQuestCommand.TryParse(["nearby", "2", "3495", "100.1"], out _));
+        Assert.True(BotQuestCommand.IsValidSelectedReward([], 0));
+        Assert.False(BotQuestCommand.IsValidSelectedReward([], 1));
+        Assert.False(BotQuestCommand.IsValidSelectedReward([1, 2], 0));
+        Assert.True(BotQuestCommand.IsValidSelectedReward([1, 2], 2));
+        Assert.True(BotQuestCommand.AnyObjectiveAdvanced([0, 0], [1, 0]));
+        Assert.False(BotQuestCommand.AnyObjectiveAdvanced([1], [1]));
+
+        var component = new QuestComponentTemplate(new QuestTemplate());
+        QuestActTemplate[] huntActs =
+        [
+            new QuestActObjMonsterHunt(component) { NpcId = 3475, Count = 3 }
+        ];
+        Assert.True(BotQuestCommand.TryGetExactHuntContract(
+            huntActs, [1], out var npcTemplateId, out var remainingKills, out var huntError));
+        Assert.Null(huntError);
+        Assert.Equal(3475u, npcTemplateId);
+        Assert.Equal(2, remainingKills);
+    }
+
+    [Fact]
+    public void StaticSphereTravelContractIsBoundedAndFailClosedOnThe30Adapter()
+    {
+        var component = new QuestComponentTemplate(new QuestTemplate()) { Id = 3653 };
+        var sphereAct = new QuestActObjSphere(component) { SphereId = 191 };
+        var sphere = new SphereQuest
+        {
+            ComponentId = 3653,
+            WorldId = "main_world",
+            Radius = 6,
+            Xyz = new Vector3(10, 0, 105)
+        };
+
+        Assert.True(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere], "main_world", new Vector3(0, 0, 100),
+            (_, _) => 100, out var plan, out var error));
+        Assert.Null(error);
+        Assert.Equal(new Vector3(10, 0, 100), plan.Destination);
+        Assert.Equal(10f, plan.Distance);
+        Assert.Equal(5f, plan.SurfaceOffset);
+
+        sphereAct.NpcId = 146;
+        Assert.False(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere], "main_world", Vector3.Zero,
+            (_, _) => 100, out _, out _));
+        sphereAct.NpcId = 0;
+
+        Assert.False(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere, sphere], "main_world", Vector3.Zero,
+            (_, _) => 100, out _, out _));
+
+        sphere.Xyz = new Vector3(101, 0, 100);
+        Assert.False(BotQuestCommand.TryGetStaticSphereTravelContract(
+            [sphereAct], [0], [3653], [sphere], "main_world", Vector3.Zero,
+            (_, _) => 100, out _, out _));
+    }
+
+    [Fact]
+    public void QuestInspectionExposesExact30FixtureTargetsWithoutMutatingQuestState()
+    {
+        var component = new QuestComponentTemplate(new QuestTemplate());
+
+        Assert.Equal(
+            "QuestActObjMonsterGroupHunt npc_group=72 highlight_doodad=91 count=4",
+            BotQuestCommand.DescribeAct(new QuestActObjMonsterGroupHunt(component)
+            {
+                QuestMonsterGroupId = 72,
+                HighlightDoodadId = 91,
+                Count = 4
+            }));
+        Assert.Equal(
+            "QuestActObjInteraction doodad=93 world_interaction=Looting highlight_doodad=94 count=1",
+            BotQuestCommand.DescribeAct(new QuestActObjInteraction(component)
+            {
+                DoodadId = 93,
+                WorldInteractionId = WorldInteractionType.Looting,
+                HighlightDoodadId = 94,
+                Count = 1
+            }));
     }
 
     [Fact]

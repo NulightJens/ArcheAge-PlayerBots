@@ -1,0 +1,38 @@
+schema_version: 1
+id: T-075
+title: AAEmu 1.2 single-bot autonomy proof v5
+track: AAEmu12
+status: blocked
+integration: runtime-incomplete-retained
+outcome: Produce a new immutable runtime receipt proving or falsifying three complete autonomous gameplay iterations by one persistent bot, with pre-armed direct recovery-window brain/mover observation, natural debt-free recovery, exact progression, normal self-logout, and restart persistence.
+depends_on: [T-073, T-074]
+runtime:
+  required: true
+  lease: aaemu12
+  archeage_client_allowed: false
+branch: codex-managed-detached-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\11c9\PB-W00-control'
+owner_client_thread_id: client-new-thread:18eac77e-1067-4eb7-955f-d1108cce9b2c
+owner_thread_id: 01a05cc7-e6bd-70c0-a554-4245ac292feb
+inputs:
+  dispatch_base: ac1d04a1add6e89bddfa67ed63e71f326541f6f0
+  tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+  installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+  integration_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
+  retained_t073_v4_receipt: ops/evidence/aaemu12-t073-one-bot-autonomy-v4.yaml
+  runtime_workspace: aaemu12_integration
+  database_workspace: aaemu12_database_public_alpha_v1
+  evidence_workspace: aaemu12_t075_evidence_v5
+write_scope:
+  - ops/evidence/aaemu12-t075-one-bot-autonomy-v5.yaml
+  - ops/tasks/T-075/HANDOFF.md
+external_write_scope:
+  - 'D:\Codex-Labs\evidence\T-075\one-bot-autonomy-v5'
+gate: serialized-one-bot-autonomy-proof-v5
+minimum_successful_iterations: 3
+failure_policy: Stop at the first smallest verified functional or evidence blocker, retain FAIL or INCOMPLETE evidence, clean up gracefully, and do not activate larger populations.
+validation_boundary: Runtime and evidence only. Managed addbot and inert opportunity staging are allowed at declared boundaries; pre-armed read-only observation is required. Do not issue botstate, target, travel, attack, loot/progression, recovery, or logout gameplay commands. Do not edit source, deployed host files, global ledgers, databases, clients, retained evidence, or AAEmu 3.0.
+handoff: ops/tasks/T-075/HANDOFF.md
+attempt_commit: f24f0f246adfdcf6ce2c692fc43eccd5b0c1d834
+evidence_receipt: ops/evidence/aaemu12-t075-one-bot-autonomy-v5.yaml
+blocker: observer-parser-requires-absent-optional-obj-capture-on-valid-offline-response

@@ -1,0 +1,42 @@
+schema_version: 1
+id: T-050
+title: AAEmu 1.2 mortal-combat and stealth recovery attempt
+track: AAEmu12
+status: blocked
+integration: runtime-incomplete-retained
+outcome: Complete a fresh immutable physical combat/stealth qualification after the exact selected-schema startup correction.
+depends_on: [T-049]
+branch: codex-managed-detached-worktree
+worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\f4cd\\PB-W00-control'
+owner_client_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
+owner_thread_id: 01a05a8e-3f30-7c81-996b-3eab7fe2e934
+
+inputs:
+  integration_commit: da570e3cc3936917c097ddd2302525f56125c916
+  tested_module_source: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+  integration_evidence: ops/evidence/aaemu12-startup-schema-integration-v1.yaml
+  retained_incomplete_receipt: ops/evidence/aaemu12-t036-combat-stealth-v1.yaml
+  database_workspace: aaemu12_database_public_alpha_v1
+  game_database: aaemu_playerbots_game_public_alpha_v1
+  login_database: aaemu_playerbots_login_public_alpha_v1
+  retained_bot_ids: 'D:\Codex-Labs\aaemu-1.2-playerbots-database-public-alpha-v1\retained-bot-ids.json'
+  runtime_workspace: aaemu12_integration
+  external_evidence: 'D:\Codex-Labs\evidence\T-036\public-alpha-v2'
+
+write_scope:
+  - ops/evidence/aaemu12-t050-combat-stealth-v2.yaml
+  - ops/tasks/T-050/HANDOFF.md
+
+external_write_scope:
+  - 'D:\Codex-Labs\evidence\T-036\public-alpha-v2'
+  - 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\Logs'
+  - 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Login\bin\Debug\net10.0\Logs'
+  - aaemu_playerbots_game_public_alpha_v1 via normal AAEmu runtime writes only
+  - aaemu_playerbots_login_public_alpha_v1 via normal AAEmu runtime writes only
+
+runtime:
+  required: true
+  lease: aaemu12
+gates: [serialized-live-aaemu12-proof]
+validation_boundary: Fresh server-only physical attempt. Reuse validated configs/assets without overwriting them. No client, direct database mutation, source edits, destructive cleanup, AAEmu 3.0 control, or force termination.
+handoff: ops/tasks/T-050/HANDOFF.md

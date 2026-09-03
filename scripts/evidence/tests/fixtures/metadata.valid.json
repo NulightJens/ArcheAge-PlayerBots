@@ -1,0 +1,15 @@
+{
+  "schema_version": "playerbots.evidence-metadata.v1",
+  "receipt_id": "t007-fixture-v1",
+  "generated_at_utc": "2026-08-31T12:34:56Z",
+  "gate_id": "deterministic-evidence-tool-tests",
+  "fingerprint": {
+    "module_source_commit": "1111111111111111111111111111111111111111",
+    "aaemu_host_base_commit": "2222222222222222222222222222222222222222",
+    "compatibility_patch_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "client_provenance_sha256_or_not_applicable": "not-applicable",
+    "database_provenance": "not-applicable:deterministic-tooling-fixture-v1",
+    "gate_definition_version": 1,
+    "command_and_environment_fingerprint": "4444444444444444444444444444444444444444444444444444444444444444"
+  }
+}

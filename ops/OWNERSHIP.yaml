@@ -1,0 +1,28 @@
+schema_version: 1
+
+global_single_writer:
+  owner: PB-000 Control Tower
+  paths:
+    - ops/PROJECT.yaml
+    - ops/CURRENT.yaml
+    - ops/BOARD.yaml
+    - ops/ROADMAP.md
+    - ops/RUNTIME-LEASE.yaml
+    - ops/decisions/**
+
+integration_single_writer:
+  owner: PB-WXX Integrator
+  paths:
+    - playerbots.module.json
+    - CHANGELOG.md
+    - compatibility/**
+    - release and packaging metadata
+    - shared BotHost, BotManager, and BotConfig integration files
+
+task_rule: >-
+  A writer owns only the paths listed in its TASK.yaml. New shared paths require
+  Control Tower reassignment before modification. Read access is unrestricted.
+
+runtime_rule: >-
+  Only the task holding the named runtime lease may deploy, start, control, or
+  stop that runtime. A timeout never transfers ownership automatically.

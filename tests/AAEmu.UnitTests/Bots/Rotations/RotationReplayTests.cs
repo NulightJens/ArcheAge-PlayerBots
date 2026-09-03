@@ -119,6 +119,8 @@ public sealed class RotationReplayTests
                 IgnoreGlobalDelay = true
             }]
         };
+        bot.Skills = new CharacterSkills(bot);
+        bot.Skills.Skills[42] = new Skill(new SkillTemplate { Id = 42 });
         var strategy = new BotRotationCompiler(
             templateResolver: _ => new SkillTemplate
             {

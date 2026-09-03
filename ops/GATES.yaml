@@ -1,0 +1,77 @@
+schema_version: 1
+
+receipt_fingerprint:
+  required:
+    - module_source_commit
+    - aaemu_host_base_commit
+    - compatibility_patch_sha256
+    - client_provenance_sha256_or_not_applicable
+    - database_provenance
+    - gate_definition_version
+    - command_and_environment_fingerprint
+
+cadence:
+  writer_task: focused-aaemu12-tests
+  integration_wave: full-aaemu12-suite
+  behavior_milestone: serialized-live-aaemu12-proof
+  release_boundary: clean-install-aaemu12-and-aaemu30-adapter-regression
+
+gates:
+  deterministic-evidence-tool-tests:
+    version: 1
+    owner: tooling-writer
+    rule: Prove stable byte-identical translation, source preservation, required fingerprint validation, overwrite refusal, and fail-closed PASS/FAIL/INCOMPLETE verdicts from deterministic fixtures.
+
+  database-provisioning-proof:
+    version: 1
+    owner: database-provisioner
+    rule: Create only absent versioned schemas, retain donor exports, verify exact seed identities and provenance with read-only queries, and commit a sanitized receipt without starting AAEmu.
+
+  deterministic-harness-tests:
+    version: 1
+    owner: harness-writer
+    rule: Exercise evidence parsing and fail-closed verdict logic from deterministic fixtures without starting AAEmu, a client, or a database.
+
+  focused-aaemu12-tests:
+    version: 1
+    owner: writer
+    rule: Run only tests covering the declared task outcome and its immediate regression surface.
+
+  full-aaemu12-suite:
+    version: 1
+    owner: integrator
+    rule: Install the merged module into a clean pinned 1.2 host and run the complete AAEmu 1.2 unit suite once.
+
+  serialized-live-aaemu12-proof:
+    version: 1
+    owner: runtime-operator
+    requires_lease: aaemu12
+    rule: Retain stimulus, authoritative server result, resource sample, cleanup, and restart result.
+
+  serialized-one-bot-autonomy-proof:
+    version: 1
+    owner: runtime-operator
+    requires_lease: aaemu12
+    rule: Prove at least three complete autonomous iterations from managed spawn and self-selected activity through fail-closed travel, mortal combat and kill credit, loot or recorded progression, recovery, normal logout, zero unintended retained bots, and clean restart with identity and progress preserved; per-action operator commands cannot substitute for bot decisions.
+
+  serialized-one-zone-autonomy-proof:
+    version: 1
+    owner: runtime-operator
+    requires_lease: aaemu12
+    rule: Prove configured population bounds while persistent bots independently rotate through qualified one-zone activities with operator visibility, bounded navigation, functional combat, recovery, and deterministic cleanup.
+
+  serialized-functional-scale-proof:
+    version: 1
+    owner: runtime-operator
+    requires_lease: aaemu12
+    rule: Qualify cohorts incrementally at 0, 1, 5, 10, 25, 50, 100, and the highest safe level; stop at the first functional, cleanup, stability, or resource failure, and accept resource measurements only while autonomous activity remains functional.
+
+  aaemu30-adapter-regression:
+    version: 1
+    owner: integrator
+    cadence: milestone-or-release-only
+    rule: Clean install, build, and adapter tests only; no new 3.0 feature acceptance.
+
+reuse_policy: >-
+  Reuse a green receipt only when every receipt fingerprint field is identical.
+  Failed and interrupted attempts remain indexed and are never overwritten.

@@ -1,0 +1,59 @@
+schema_version: 1
+id: T-116
+title: Reconcile T-115 count and integrate recovery observability
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Independently prove T-115's sole full suite is a reusable green receipt for the exact one-test T-114 discovery delta, replay the same seven T-114 blobs onto the saved lineage, retain T-115's exact handoff, and integrate without rebuilding or rerunning the full suite.
+depends_on: [T-115]
+runtime: {required: false, lease: aaemu12-build-only, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\c9da\PB-W00-control'
+owner_client_thread_id: client-new-thread:d603189d-48ed-45a8-9ccc-6106b99e033a
+owner_thread_id: 01a0605e-2939-75e0-b6cc-1fbb1b617f40
+inputs:
+  dispatch_base: 0ff36bf5a512602cd1f14e3685c1cbab98ac513b
+  source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
+  source_candidate_parent: d335ce053c58eaebbfda384412ef9be5c9d839da
+  source_candidate_tree: e342e61030ae78ab411fa7cb6a109839199ca610
+  source_candidate_patch_id: f2172268436a17d0642b837ed5e0696b81c316d6
+  retained_t115_replay: 5f544acffdbef48b83278978b68c3f62b1441808
+  retained_t115_replay_tree: 6bf7927fc28ca163ffa67da6a280fce4f22d4460
+  installed_module_source: 5f544acffdbef48b83278978b68c3f62b1441808
+  installed_module_tree: 6bf7927fc28ca163ffa67da6a280fce4f22d4460
+  retained_t115_handoff_blob: 01af6882c7143960bfa2b2fefb3a0ab05fff52c2
+  full_suite_log_sha256: bb8b3ed89578c304e3114b7885528b09c5bd6811ccd4a4208aaf91f6facccf08
+  build_log_sha256: 5f642388d853a5cd191d089fe00dcc6211143e423ffa4403cb6baf2b021c28a9
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - scripts/autonomy/AutonomyObserver.psm1
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - scripts/autonomy/tests/Test-AutonomyObserver.ps1
+  - ops/evidence/aaemu12-runtime-recovery-observability-v1.yaml
+  - ops/tasks/T-114/HANDOFF.md
+  - ops/tasks/T-115/HANDOFF.md
+  - ops/evidence/aaemu12-runtime-recovery-observability-integration-v1.yaml
+  - ops/tasks/T-116/HANDOFF.md
+external_read_scope:
+  - exact T-115 full-suite/build logs and clean installed module/host/reference state
+external_write_scope:
+  - aaemu12_integration installed module HEAD only to the exact byte-equivalent T-116 replay plus fresh focused-test output under exact build-only lease
+gates:
+  - exact-t114-candidate-and-t115-replay-seven-path-blob-and-patch-identity
+  - exact-t115-handoff-and-log-length-sha-content-audit
+  - source-discovery-reconciliation-46-to-46-command-and-33-to-34-host-tests
+  - unchanged-build-input-and-assembly-fingerprint-for-byte-equivalent-replay
+  - reused-once-only-full-suite-1871-pass-4-exact-skips-zero-fail
+  - fresh-observer-91-command-46-and-host-34-focused-verification-green
+  - no-build-no-full-suite-rerun-and-saved-branch-fast-forward
+validation_boundary: Evidence reconciliation, byte-identical replay, installed-module pointer update, focused verification, receipt, and integration only. Do not build, rerun the full suite, start Login/Game/live observers, edit deployed BotConfig, access/control database or client, mutate external runtime evidence or reference source, or touch AAEmu 3.0, scale, soak, or packaging. Do not edit global ledgers/lease/workspace registry.
+contract: ops/tasks/T-116/CONTRACT.md
+handoff: ops/tasks/T-116/HANDOFF.md
+replay_commit: 39f748fb3904584b50e1dabc0cfb0b3045793165
+replay_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+integrated_commit: fc6a5b9044d7e7aef1c2b6a6d93590256f3f89a3
+integrated_tree: 1e94a28810827c2666e1713a596644a8c0c925ce
+installed_game_assembly_sha256: 0b770b543b167f7ae57fcb8eb9ad18357e75a5241b0b170a9b1fa4ac05f564f6
+evidence_receipt: ops/evidence/aaemu12-runtime-recovery-observability-integration-v1.yaml
+result: PASS-corrected-count-reused-1871-plus-4-observer-91-command-46-host-34-no-build-or-full-suite-rerun

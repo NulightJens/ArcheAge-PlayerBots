@@ -1,0 +1,39 @@
+schema_version: 1
+id: T-102
+title: Expose exact bot transform telemetry for fixture preflight
+track: AAEmu12
+status: done
+integration: integrated-by-T-103
+outcome: Append invariant round-trip world, instance, zone, position, and yaw telemetry to botdebug so a runtime worker can predict exact passive-fixture geometry before one-shot world mutation, without changing existing diagnostics or bot state.
+depends_on: [T-101]
+runtime: {required: false, lease: null}
+branch: task/T-102-botdebug-transform-telemetry
+worktree: 'C:\Users\jensh\.codex\worktrees\dbb1\PB-W00-control'
+owner_client_thread_id: client-new-thread:89f2a6d0-b593-4bbc-a387-9678a481e9a2
+owner_thread_id: 01a05eed-ea43-71b0-baf8-76b6b0ef7630
+inputs:
+  dispatch_base: 968720578b8e1e85e925e63ac584e410bcc71635
+  source_base: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
+  installed_module_source: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/evidence/aaemu12-botdebug-transform-telemetry-v1.yaml
+  - ops/tasks/T-102/HANDOFF.md
+gates:
+  - invariant-round-trip-transform-line
+  - valid-default-world-zero-instance-zone-position-yaw-preserved
+  - existing-botdebug-output-retained
+  - no-transform-target-combat-movement-or-runtime-mutation
+  - complete-focused-bot-command-tests-green
+  - isolated-aaemu12-build-zero-errors
+  - compatibility-patch-sha-unchanged-and-clean-apply
+validation_boundary: Module source, focused BotCommandsTests, isolated AAEmu 1.2 build, receipt, and handoff only. Do not edit global ledgers/lease, installed/reference host, runtime config/evidence, database, client, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite.
+contract: ops/tasks/T-102/CONTRACT.md
+handoff: ops/tasks/T-102/HANDOFF.md
+candidate_commit: 70b577861a5f8fef8df4be40c61af3ba66298ed3
+candidate_parent: 9a94b21fd4f9855346109cfe7b5b941df13e6b4b
+candidate_tree: 2476ff1be7040f028882d54ef44b5371e4ed9f14
+result: PASS-46-focused-build-0-errors-72-warnings-patch-unchanged
+integrated_commit: f63f3cd56586f968b92462e87948abc1a0d47596

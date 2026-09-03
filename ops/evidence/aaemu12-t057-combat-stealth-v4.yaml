@@ -1,0 +1,230 @@
+schema_version: 1
+id: aaemu12-t057-combat-stealth-v4
+recorded_at: 2026-08-31
+verdict: INCOMPLETE
+
+fingerprint:
+  task_lease_commit: 75549b6e2bc38e1da5694dfcd884590a2a8bbb68
+  task_thread_id: 01a05b06-ee62-77e0-81fe-684c85116af2
+  integration_commit: d26211711cb8597d00deab1be4ca7a731f428c71
+  module_source_commit: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+  installed_module_tree: 1f3befa4dc3c01222b057c28279e82d25fcc176e
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  database_identity: aaemu12_database_public_alpha_v1
+  database_provenance: abcb9bc92e4a8688b8e6908a49ebf8a1b5d4662d398b26756604b72487c5951c
+  game_executable_sha256: c10fcd802124406f349253cfafd9413e1768605b90f36110d40c248a85fbc79e
+  login_executable_sha256: 96ef53555b53e532608eb0352ab993e30968eaae55d6d3e2ae9c83ba7c8c389e
+  game_config_sha256: d87acc71056021abe64aaeca29d37fa6cb60015109cbd81df92c9fef4b98ca1c
+  login_config_sha256: 2b18234b5306f7cd3a44138e94520ec27b3462aa8553f2fcdadad176d3fd58e1
+  retained_bot_ids_sha256: 4990553caca2e0843b3a063e3ebd804f34eac75da58b97901982141e756b6203
+  gate_definition_version: 1
+
+preflight:
+  captured_at_utc: '2026-09-01T03:40:04.5025307Z'
+  lease_proved: true
+  task_worktree_head: 75549b6e2bc38e1da5694dfcd884590a2a8bbb68
+  task_worktree_clean: true
+  integration_commit_ancestor_of_lease: true
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean: true
+  integration_host_status_entry_count: 30
+  installed_module_clean: true
+  required_ports: [1234, 1237, 1239, 1250, 1280]
+  aaemu_game_login_process_count: 0
+  archeage_client_process_count: 0
+  occupied_required_port_count: 0
+  runtime_log_file_count: 0
+  v4_evidence_path_absent_before_creation: true
+  retained_bot_ids_exact_range: [20001, 20100]
+  retained_bot_id_count: 100
+  game_database_in_config: aaemu_playerbots_game_public_alpha_v1
+  login_database_in_config: aaemu_playerbots_login_public_alpha_v1
+  all_task_listeners_loopback: true
+  retained_data_hashes_match_v3: true
+  predecessor_receipts_retained_incomplete: [T-036-v1, T-050-v2, T-054-v3]
+  external_sha256: b1e4ce6900c5aa4491e7643e409dcdf671dd5d152db4e9d57bbe80d2f1316415
+
+startup_attempt_1:
+  command: Start-ScaleGateRuntime.ps1 -SafetyAcknowledged
+  startup_receipt_written: true
+  startup_receipt_sha256: 924864193c8061f3a4a1195984f590731db50108398565a92c36cbd70d6599ca
+  login_process_id: 114896
+  login_process_start_utc: '2026-09-01T03:42:35.7204173Z'
+  game_process_id: 101860
+  game_process_start_utc: '2026-09-01T03:42:39.3602220Z'
+  exact_login_schema_emitted: true
+  exact_game_schema_emitted: true
+  required_startup_markers_present: true
+  exact_five_loopback_listeners_present: true
+  initial_runtime_count: 0
+  initial_bot_count: 0
+  initial_active_bot_count: 0
+  operator_result: INCOMPLETE-parser-assumed-numeric-grade
+  passive_npc_created: true
+  passive_npc_template_id: 10004
+  passive_npc_object_id: 44242
+  exact_response: >-
+    [spawnpassive] Spawned passive NPC template=10004, objId=44242,
+    level=1, grade=Weak, hp=148/148, position=(0.0, 12.0, 0.0),
+    retaliation=disabled, displacement=disabled, respawn=disabled.
+  failure: The retained v3 wrapper required a numeric grade token and stopped before attack or plan work.
+  cleanup: game-then-login-graceful-zero-bot-zero-process-zero-listener-empty-live-logs
+  operator_probe_sha256: 32d32aa4373944c37cf93beca4b332701727b819915504a0655975c155e2910b
+
+startup_attempt_2:
+  command: Start-ScaleGateRuntime.ps1 -SafetyAcknowledged
+  startup_receipt_written: true
+  startup_receipt_sha256: a2996f64191a1b9105c8ba388e09ee1a010020ea8fc2b8769a6c572505bb885f
+  login_process_id: 69312
+  login_process_start_utc: '2026-09-01T03:46:56.6161794Z'
+  game_process_id: 116244
+  game_process_start_utc: '2026-09-01T03:46:57.6560347Z'
+  exact_login_schema_emitted: true
+  exact_game_schema_emitted: true
+  required_startup_markers_present: true
+  exact_five_loopback_listeners_present: true
+  initial_runtime_count: 0
+  initial_bot_count: 0
+  initial_active_bot_count: 0
+  corrected_runner_sha256: dff80737263bed7c399c8cf5bcf5bfb7989800f9a8c37c536199151b9d2907cb
+
+fixture_boundary:
+  loopback_api_accessed: true
+  command_actor: '@system'
+  temporary_bot_id: 20001
+  ordered_template_ids: [10004, 10000, 10001, 10002, 11180]
+  passive_npc_requests: 5
+  bounded_death_poll_seconds_per_template: 120
+  authoritative_combat_transition_pairs: 5
+  accepted_direct_traversal_decisions: 5
+  cast_events: 0
+  credited_kills: 0
+  tick_errors: 0
+  mortal_template_verified: false
+  exact_distinct_target_object_ids_proved: false
+  response_retention_boundary: >-
+    Attempt 2 retained the ordered template list, full death-poll windows, and
+    byte-exact authoritative log segments, but did not externalize successful
+    spawn/status response objects before the mandatory mortal-template failure.
+    Exact target object identities are missing and were not reconstructed.
+  per_template_segments:
+    - template_id: 10004
+      log_offsets: [20447048, 21075983]
+      log_segment_sha256: c57d1c6d8ef75fc8ed366efee8f07cb64423226d2e712778c5e24655869b84ee
+    - template_id: 10000
+      log_offsets: [21076639, 21345024]
+      log_segment_sha256: d64ada8991064d837d60510352cfcc26f2ec288c255ade48c0cf466667f8ff16
+    - template_id: 10001
+      log_offsets: [21345680, 21920652]
+      log_segment_sha256: 047c4a1403392e958031ef2ce5e0d0d267c449dbe5d860aee7deb04148e55d92
+    - template_id: 10002
+      log_offsets: [21921308, 22426383]
+      log_segment_sha256: ba89751c61cbe0c739327cadd1adfca6ad14918446af5b04af3badeeca03f3ea
+    - template_id: 11180
+      log_offsets: [22428148, 22844381]
+      log_segment_sha256: 32bafe34a269d9ee24e07166ec00a6b8332d9d125860e9725d5c924242dfd631
+  segments_receipt_sha256: bbbd49bb358136dd30a22a7973c23a3d1ffbf0a39e6b4f48a27bc21bcf667411
+  source_boundary:
+    system_actor_sha256: f4189dab034a71f4183f8dea30f355a928ed5c3e7131db8d001972ad670fdc57
+    spawn_passive_sha256: 2f7fc6afdf5eab84462bd1f6b151e98c37aa4b6102f42649193d6a45bc46f6fa
+    bot_attack_object_sha256: 51e31f96576fb172bb846cd463bb76f622d2c63b38a29368ed07c673a0862a06
+    basic_combat_sha256: 94780b934e2697b7ee156c7e0b7d84ae1b48e4a860e7268d6603038818f072e7
+    finding: >-
+      SystemActor.Create assigns MainWorld and MainWorld.Template.SpawnPosition.
+      SpawnPassiveNpcCommand queries terrain with that position's ZoneId. Each
+      of the five attempt-2 fixture requests emitted a pre-shutdown ZoneId 0
+      fatal, proving the synthetic actor origin is not a qualified non-zero
+      runtime zone. Every bot attack entered Combat and accepted direct
+      traversal, but never reached a cast or kill. BasicCombat moves while out
+      of range and auto-attacks only in range; the logs are consistent with the
+      ZoneId-0 origin never reaching a usable melee position, while missing
+      per-request debug/status objects prevent a stronger causal claim.
+
+qualification:
+  qualification_input_created: false
+  plan_created: false
+  evidence_created: false
+  cohorts_executed: []
+  stealth_buff_verified: false
+  stealth_reacquire_executed: false
+  stealth_release_executed: false
+  distinct_pid_restart_executed: false
+  analyzer:
+    script: scripts/combat/Test-CombatQualificationEvidence.ps1
+    invoked: false
+    native_exit_code: null
+    analyzer_verdict_claimed: false
+    reason: >-
+      No mortal passive-NPC template and no exact distinct retained target
+      object identities existed. No truthful qualification input, plan, or
+      evidence pair could be created, so the analyzer was not invoked.
+
+runtime_error_classification:
+  attempt_1:
+    zone_zero_pre_shutdown_count: 1
+    missing_world_same_fixture_shutdown_second_count: 1
+    base_bai_loader_collection_error_count: 0
+    disposed_physics_shutdown_count: 1
+  attempt_2:
+    zone_zero_pre_shutdown_count: 5
+    missing_world_instance_count: 0
+    base_bai_loader_collection_error_count: 0
+    disposed_physics_shutdown_count: 1
+  material_finding: >-
+    The five attempt-2 ZoneId-0 entries align with the five ordered fixture
+    requests and all precede graceful shutdown. They are material after T-056.
+  retained_non_blocking_noise: >-
+    One disposed-physics entry per attempt occurs at shutdown after readiness;
+    both attempts retain zero-bot cleanup, clean process exit, and port release.
+  external_sha256: b3573be34c9c3da735e8e074b6ec6ff8df8039a52ac496cd21b98c5cf6b2ceb6
+
+cleanup:
+  game_stopped_before_login: true
+  game_stop: graceful-ctrl-c-exited
+  login_stop: graceful-ctrl-c-exited
+  forced_termination: false
+  final_runtime_count: 0
+  final_bot_count: 0
+  final_aaemu_game_login_process_count: 0
+  final_archeage_client_process_count: 0
+  final_occupied_required_port_count: 0
+  runtime_game_log_file_count: 0
+  runtime_login_log_file_count: 0
+  isolated_databases_retained: true
+  direct_database_queries_or_mutations: 0
+  database_access_boundary: normal-aaemu-runtime-writes-only
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-036\public-alpha-v4'
+  attempt_1_runner_sha256: 2d66b4487bdabc90d85e8bc972f524880d499d3c8c74397f3be318279cfe34f4
+  attempt_1_game_server_sha256: 4a144c10e72847b859a4ac6030847db333d40991652895612022a7e3ab68e184
+  attempt_1_game_error_sha256: 30605c9a44e4aa15911145001c85315f9102275c71e1b176b216ffd211356a0a
+  attempt_2_game_server_sha256: e7d45bc34294c7395789aa1c67e36ca7cdabdc309fdc141011a87e0b5e115dab
+  attempt_2_game_error_sha256: 0ba0f29ed0bfdae8d898f95e3b799c05605e9debee3ac4b9eea45feebd800915
+  attempt_2_operator_probe_sha256: 08ecd2d45ee7ed3df93c6984ab764ab7b05798681471b3451d7720b316f8dc25
+  final_manifest_file_count: 35
+  final_manifest_sha256: e505f4dceb5220496b278bf5c948f17d7ee002b559027e1bf3e84e6b154df576
+  raw_logs_committed: false
+  configs_committed: false
+  credentials_recorded: false
+
+retained_boundaries:
+  - T-036 v1, T-050 v2, and T-054 v3 remain immutable and INCOMPLETE.
+  - No qualification cohort, stealth phase, analyzer, or clean-restart acceptance is claimed.
+  - No source, integration file, global ledger, retained config/Data input, client fixture, schema, predecessor evidence, or AAEmu 3.0 artifact was edited or overwritten.
+  - No direct database command, ArcheAge client control, destructive cleanup, or force termination occurred.
+  - PB-000 directed no third runtime attempt; the aaemu12 lease remains claimed until this committed cleanup receipt is accepted.
+
+control_actions:
+  integrator: Integrate this commit as an INCOMPLETE runtime receipt only; do not mark T-057 passed.
+  pb_000_release: >-
+    After accepting the committed zero-bot, graceful Game-then-Login stop,
+    zero-process, free-listener, and empty-live-log proof, commit the aaemu12
+    lease release. Until that commit, retain T-057 ownership.
+  t_037: Keep T-037 blocked; do not activate it from this receipt.
+  next_source_boundary: >-
+    Dispatch a bounded AAEmu 1.2 source correction that gives @system a
+    qualified non-zero zone/spawn origin for physical fixtures, then use a new
+    immutable evidence version whose runner externalizes every successful
+    spawn/status response before validation.

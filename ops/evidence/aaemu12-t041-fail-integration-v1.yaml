@@ -1,0 +1,183 @@
+schema_version: 1
+id: aaemu12-t041-fail-integration-v1
+recorded_at: '2026-09-01T09:55:53-06:00'
+verdict: PASS-receipt-integrity
+subject_verdict: FAIL-wave-1-kill-credit-concentration-on-20001
+
+integration_identity:
+  task: T-085
+  task_thread_id: 01a05da4-8357-7463-94db-dfc407bacee6
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\84a2\PB-W00-control'
+  dispatch_base: dba356bbadb63343b063a3a64036f762ca3e0df9
+  binding_commit: a4e2c136ddc5a012059afbfaaff1f7b0d977b0c3
+  saved_branch: integration/aaemu12-world
+  saved_branch_head_before: a4e2c136ddc5a012059afbfaaff1f7b0d977b0c3
+
+candidate:
+  commit: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
+  parent: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
+  replay_commit: 205aad0376290cb9b6fa47f38bdd6b8878269df6
+  replay_parent: a4e2c136ddc5a012059afbfaaff1f7b0d977b0c3
+  candidate_stable_patch_id: 747dbd25e603ffdd9db4a476d306075969577ae4
+  replay_stable_patch_id: 747dbd25e603ffdd9db4a476d306075969577ae4
+  stable_patch_id_match: true
+  exact_path_count: 2
+  exact_paths:
+    - path: ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
+      candidate_blob: 6c323d9df785890b615cdf7781c033909f295839
+      replay_blob: 6c323d9df785890b615cdf7781c033909f295839
+      byte_identical: true
+    - path: ops/tasks/T-041/HANDOFF.md
+      candidate_blob: 517ee4b3e9dcfba68e0562a592dccdd342981609
+      replay_blob: 517ee4b3e9dcfba68e0562a592dccdd342981609
+      byte_identical: true
+  rejected_scope_changes: 0
+
+immutable_evidence:
+  root: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
+  manifest_path: manifest/payload-manifest.json
+  manifest_sha256: a141d75bffc87ef37e6a01f53d71261c2f5b441885522637a4a4adb190460a00
+  attempt_summary_sha256: c3915b6555b12751e611518f6c59bc5ad17c4026036d795900db1c0189c5fd9c
+  declared_payload_file_count: 6271
+  actual_payload_file_count: 6271
+  verified_payload_file_count: 6271
+  declared_payload_total_bytes: 28811374
+  verified_payload_total_bytes: 28811374
+  duplicate_paths: 0
+  unsafe_paths: 0
+  missing_paths: 0
+  length_mismatches: 0
+  sha256_mismatches: 0
+  unlisted_payloads: 0
+  reparse_points: 0
+  result: 6271-of-6271-length-and-sha256-green-zero-unlisted
+
+semantic_verification:
+  assertion_result: 67-of-67-green
+  groups:
+    source_binding_and_config: 15-of-15-green
+    observers_and_director: 18-of-18-green
+    commands_wave_and_failure: 18-of-18-green
+    cleanup_and_boundaries: 16-of-16-green
+  fingerprint:
+    t041_binding_commit: 4383c072fbf34ad0c42db248d39e704f8aa42db1
+    t041_thread_id: 01a05d8b-5c96-71c2-9e14-40959480d28f
+    t041_dispatch_head: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
+    aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+    module_source_commit: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+    installed_module_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+    compatibility_patch_sha256: 395a83ab5bf6a4f4f1c0d56289590d6a36ad36b3ab5f87e1701d6aa17ffbefcd
+    installed_host_patch_stable_id: 51cf303462d170dd61551ee2f4d410ac0e293ce8
+    game_assembly_sha256: 98f9ce66a8648d13aa79494e3bae2831df3df2365cab8cb2f55372c5f0ce7516
+    database_identity: aaemu12_database_public_alpha_v1
+  configuration:
+    original_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+    configured_sha256: 8704a503d2beadb7e5e6a241ed8a61ffe7b72d14fc0e0fcebf4ae1f46a19021d
+    restored_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+    restored_exact_original_bytes: true
+    contracted_fields_assigned: 9
+    differing_leaf_values: 8
+    unchanged_assigned_field: ActivityDirectorRetryBackoffMs-already-30000
+    unexpected_property_changes: 0
+  observers:
+    ids: [20001, 20002, 20003]
+    each_armed_offline_sample: 0
+    each_live_offline_sample: 1
+    first_online_samples: {20001: 35, 20002: 64, 20003: 93}
+    derived_samples: 2080
+    transport_samples: 2080
+    raw_responses: 2056
+    expected_post-api-shutdown_transport_errors: 24
+    raw_length_mismatches: 0
+    raw_hash_mismatches: 0
+    missing_or_orphan_raw_responses: 0
+  director:
+    start_count: 1
+    initial_live_qualified: 0
+    zone_id: 221
+    configured_population: {minimum: 2, target: 3, maximum: 3}
+    initial_admission_order: [20001, 20002, 20003]
+    maximum_live_qualified: 3
+    wrong_zone_observed: 0
+    admission_failures: 0
+    runtime_overlaps: 0
+    refill_count: 1
+    refilled_identity: 20001
+  operator_inventory:
+    exact_transport_count: 8
+    botmetrics_snapshot: 4
+    roster_get: 1
+    spawnpassive_10004_12: 3
+    addbot: 0
+    removebot: 0
+    directed_gameplay_commands: 0
+    request_response_length_or_hash_failures: 0
+  wave_1:
+    all_three_selected: grind/nearby_mortal
+    fixture_object_ids: [44963, 44974, 44975]
+    native_kill_credit_distribution: {20001: 3, 20002: 0, 20003: 0}
+    credited_targets_by_20001: [44963, 44975, 44974]
+    experience_before_20001: 8082084
+    experience_after_20001: 8082126
+    experience_delta_20001: 42
+    bot_20001_debt_free_completion_logout_and_refill: true
+    bot_20002_or_20003_credited_completion: false
+    result: FAIL
+  metrics:
+    captures: 4
+    tick_errors: 0
+    runtime_overlaps: 0
+    cast_attempts: 4
+    cast_successes: 4
+    cast_failures: 0
+    observed_kills: 3
+    credited_kills: 3
+  stopped_boundaries:
+    wave_2_attempted: false
+    restart_attempted: false
+    run_2_payload_file_count: 0
+
+cleanup:
+  game_then_login_graceful: true
+  observer_console_interrupt_exit: true
+  forced_termination: false
+  shutdown_cleanup_marker: BOT-remaining_bots-0-remaining_runtimes-0
+  final_aaemu_process_count: 0
+  final_observer_process_count: 0
+  final_archeage_client_process_count: 0
+  final_required_listener_count: 0
+  final_runtime_log_count: 0
+  mysql_process_ids_before_and_after: [6308, 8076]
+  direct_database_access: false
+  restored_config_exact: true
+
+retained_anomalies:
+  - category: continuous-client-observation-boundary
+    finding: Preflight and cleanup client snapshots were zero, but continuous client-process sampling was not retained.
+  - category: native-post-readiness-shutdown-race
+    game_error_log_sha256: 1760ece520bcc4d8ba8cf04148190edc0d0aa8fb924bd64acc66e90600826cab
+    finding: PhysicsThread accessed the disposed IServiceProvider after Director stop and zero-bot/zero-runtime cleanup; graceful exit and final cleanup still passed.
+
+integration:
+  candidate_replayed_byte_identically: true
+  integrator_authored_paths:
+    - ops/evidence/aaemu12-t041-fail-integration-v1.yaml
+    - ops/tasks/T-085/HANDOFF.md
+  saved_branch_update: fast-forward-only-through-the-commit-containing-this-receipt
+  history_rewritten: false
+  runtime_or_host_used: false
+  external_evidence_mutated: false
+  global_ledgers_or_runtime_lease_mutated: false
+  full_suite_consumed: false
+
+retained_boundaries:
+  - T-041 remains FAIL because bots 20002 and 20003 received no native kill credit or credited completion in wave 1.
+  - Wave 2, second refill, distinct-PID restart, Director rebootstrap, and restart dwell remain unproven.
+  - T-037 remains blocked.
+  - Scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+
+control_action: >-
+  PB-000 may accept this sealed FAIL receipt, keep T-041 FAIL and T-037
+  blocked, release or reassign the aaemu12 runtime lease in a separate Control
+  Tower commit, and dispatch a bounded source correction followed by a fresh
+  versioned runtime proof. Never reuse or overwrite the T-041 evidence root.

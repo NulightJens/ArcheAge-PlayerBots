@@ -1,0 +1,1171 @@
+schema_version: 2
+updated_at: 2026-09-02
+phase: g001-level-one-nuian-five-quest-slice
+verdict: RED-integrated-candidate-not-deployed-or-live-accepted
+delivery_model: ops/DELIVERY-MODEL-V2.md
+product_goals: ops/GOALS.yaml
+delivery_audit: ops/AUDIT-2026-09-02.md
+active_goal: G-001
+active_task: T-127
+current_execution_state: ops/NOW.yaml
+new_thread_state: active-bound
+new_thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
+new_thread_worktree: 'C:\Users\jensh\.codex\worktrees\7e13\PB-W00-control'
+
+source:
+  integration_branch: integration/aaemu12-world
+  integrated_head: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+  tested_module_source: 1a52e7b44fab76939d9409561bdfa4739f1425e6
+  source_gate: PASS-1957-passed-4-skipped-0-failed
+  product_acceptance: false
+  integration_evidence: ops/evidence/aaemu12-bot-intelligence-wave-verification-v1.yaml
+  worker_base_commit: 4db079de50304dc63885111c6f05bcf205ce5a9b
+  integration_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+  accepted_module_baseline: 1aa625aef6efc4142fae2ca856a9f4a7586ac8fd
+  checkpointed_wip:
+    task: T-035
+    branch: task/T-035-exact-native-emote
+    head: a28d9671085af04fc85dcada4eceff0286e6f248
+    state: clean-checkpoint-paused
+
+runtime:
+  aaemu30_game:
+    state: stopped-gracefully
+    method: loopback-command-scripts-shutdown-now
+    stopped_at: 2026-08-31
+  aaemu30_login:
+    state: no-process-observed-at-wave2-runtime-boundary
+    last_observed_pid: 107540
+  aaemu30_mysql:
+    state: no-listener-observed-at-wave2-runtime-boundary
+    last_observed_pid: 88204
+    last_observed_port: 3307
+  aaemu12_clean_runtime:
+    state: healthy-interactive-retained-under-blocked-t120
+    reference_workspace: aaemu12_reference
+    integration_workspace: aaemu12_integration
+    client_workspace: aaemu12_client
+    evidence_receipt: aaemu12-t112-one-zone-autonomy-v9
+    integration_receipt: aaemu12-autonomous-quest-intake-integration-v1
+    installed_module_source: fb0a315c9579fb2e7e249e47b37efa07a9404c51
+    installed_module_tree: a7dfc4d1bffcdddc25c2dc45fc9feed71365eb70
+    database_identity: aaemu12_database_public_alpha_v1
+    compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+    game_assembly_sha256: 1db5e555c8228bd9da131b21a45ed58fbe12dec7574bd53374c9343c0f2d7d04
+    build: 0-errors-30-warnings
+    focused_tests: 98-controller-host-command-and-32-safe-config-passed-zero-failed
+    unit_tests: 1871-passed-4-intentional-skips-0-failed-exactly-one-t115-invocation-independently-reused-by-t116
+    live_session_owner: T-127
+    previous_session_owner: T-120
+    login_pid: 111900
+    game_pid: 38844
+    launcher_pid: 92432
+    client_pid: 117252
+    listeners: [1234, 1237, 1239, 1250, 1280]
+    director: disabled-quest-intake-enabled-two-active-idle-bots-zero-runtime-overlaps-or-tick-errors
+    preserved_config: 'D:\Codex-Labs\sessions\T-118\interactive-live-demo-v1\config\BotConfig.original.bin'
+    runtime_boundary: T-127 owns the retained T-120 session only to close the client normally, stop Game then Login gracefully, deploy the G-001 candidate, and run the contracted live slice. No other task may mutate this runtime.
+
+control_tower:
+  permanent_task:
+    thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    title: PB-000 PlayerBots Control Tower — Autonomous Alpha
+    state: retiring-archived-after-T-127-dispatch
+  saved_project_id: 9cdd642a-c900-4027-8f7b-d369835cef26
+  operating_mode: local-integration-worktree
+  dashboard_policy: product-goal-and-deployment-state-only
+  execution_thread:
+    thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
+    title: G-001 Nuian Five-Quest Live Slice
+    worktree: 'C:\Users\jensh\.codex\worktrees\7e13\PB-W00-control'
+
+next_transition:
+  - Preserve the retained T-120 runtime and lease until a separately authorized graceful transition begins.
+  - Close the client normally and stop Game then Login gracefully; never force a process.
+  - Install exact source 1a52e7b44fab76939d9409561bdfa4739f1425e6 plus its reviewed AAEmu 1.2 adapters and dedicated bot-account configuration.
+  - Start the server and an active sentinel client, create one level-one Nuian bot at the observed location, and run G-001 without per-action commands.
+  - Fix and redeploy the first behavioral blocker inside the same vertical slice; do not create receipt/replay/integration task chains.
+  - Keep population scale blocked until G-001 and then G-002 are accepted.
+
+legacy_pre_v2_workstreams:
+  - task: T-062
+    state: done-integrated
+    client_thread_id: client-new-thread:94a6b91f-5fa0-4de9-aa6a-cafa679bec2e
+    task_thread_id: 01a05bf9-cc4e-7072-8f2d-c35505c6de39
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\f8c6\PB-W00-control'
+    base: 10fb2de0038ecb43d3f2e6cf15f5789e2b5926dd
+    head: 4c2d9e8ccdfa1255cef396388ebba2423aa35624
+    handoff: ops/tasks/T-062/HANDOFF.md
+  - task: T-063
+    state: done-integrated
+    client_thread_id: client-new-thread:bbef8555-49ae-4e70-b136-c85ff5f490af
+    task_thread_id: 01a05c0d-ae83-7842-b358-82baab117774
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\2130\PB-W00-control'
+    base: f22ae76d8a401ad374f74df55a6ef6a675c3ad1f
+    head: aadcef712c6ca6c1d797375476611b71cbf86178
+    handoff: ops/tasks/T-063/HANDOFF.md
+  - task: T-064
+    state: done-integrated
+    client_thread_id: client-new-thread:8fc41dcb-c5f6-425c-8fc9-20105b52a8b8
+    task_thread_id: 01a05c2a-a57b-7ed2-a60b-3c21a249f3ed
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\b20f\PB-W00-control'
+    base: 0fcb943552dcefde95bc2af220caab6bfafa77ef
+    source_heads:
+      T-062: 4c2d9e8ccdfa1255cef396388ebba2423aa35624
+      T-063: aadcef712c6ca6c1d797375476611b71cbf86178
+    head: 4d8d085e73a2cbcc05f5d37b68abc2e1122a041d
+    handoff: ops/tasks/T-064/HANDOFF.md
+    tested_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
+    installed_module_tree: 6803d1d7e1d287798390e5aed0b835b9c8f12aef
+    evidence_receipt: aaemu12-lifecycle-fanout-integration-v1
+  - task: T-065
+    state: blocked-retained-incomplete-progression-observability
+    client_thread_id: client-new-thread:5bfce600-5bf5-4894-af66-c0945b368375
+    task_thread_id: 01a05c3c-9169-7eb3-b0a6-3ecaf41ecf16
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\beca\PB-W00-control'
+    base: 4d8d085e73a2cbcc05f5d37b68abc2e1122a041d
+    tested_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
+    installed_module_tree: 6803d1d7e1d287798390e5aed0b835b9c8f12aef
+    evidence_root: 'D:\Codex-Labs\evidence\T-065\one-bot-autonomy-v2'
+    attempt_commit: 630c6c9d24505dc074e0da31ed1d633f84014c0d
+    verdict: INCOMPLETE-absent-authoritative-progression-delta
+    handoff: ops/tasks/T-065/HANDOFF.md
+  - task: T-066
+    state: done-integrated
+    client_thread_id: client-new-thread:5f2ae548-ae67-4f17-ac9b-635105b4e911
+    task_thread_id: 01a05c4b-c985-7890-9909-c80061c13c0e
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\7745\PB-W00-control'
+    base: 04912db77beaac540a45d455fe852ebd6f4284de
+    source_commit: 630c6c9d24505dc074e0da31ed1d633f84014c0d
+    head: 07e230ab959c4147318d3b5228dee492ff18c4fb
+    handoff: ops/tasks/T-066/HANDOFF.md
+  - task: T-067
+    state: done-integrated
+    client_thread_id: client-new-thread:85417e89-8c24-49e9-84ed-8e2ad2753f6e
+    task_thread_id: 01a05c52-d3b2-7913-95d2-7f0f426bad22
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\d453\PB-W00-control'
+    base: 07e230ab959c4147318d3b5228dee492ff18c4fb
+    blocker_receipt: ops/evidence/aaemu12-t065-one-bot-autonomy-v2.yaml
+    head: 4253d0875c5165095621e1e6ff4c672fa21a51d8
+    handoff: ops/tasks/T-067/HANDOFF.md
+    proof: 169-passed-0-failed-build-0-errors-77-retained-warnings
+    integrated_commit: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+  - task: T-068
+    state: done-integrated
+    client_thread_id: client-new-thread:148eafb1-d1fd-4f79-a728-807f9394898f
+    task_thread_id: 01a05c68-05eb-73f2-ab73-a046fa8a1de3
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\da8a\PB-W00-control'
+    base: 7b1ff7b879f40bf2bea8ed82d715534e4c75e3c1
+    candidate: 4253d0875c5165095621e1e6ff4c672fa21a51d8
+    head: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+    source_commit: 4287ec53e998ecff2e5eb9670908166957a79662
+    installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+    evidence_receipt: ops/evidence/aaemu12-progression-observability-integration-v1.yaml
+    handoff: ops/tasks/T-068/HANDOFF.md
+  - task: T-069
+    state: blocked-retained-fail-new-mp-debt-at-completion
+    client_thread_id: client-new-thread:546e51bc-826e-42df-aa7e-fa4c1965d2d6
+    task_thread_id: 01a05c73-58af-7d72-94ef-bca2b2dd39e7
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\dd82\PB-W00-control'
+    base: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+    tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
+    installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+    evidence_root: 'D:\Codex-Labs\evidence\T-069\one-bot-autonomy-v3'
+    head: 1f26c4309868b379ab0fb64cad59ae48a6a75648
+    verdict: FAIL-new-mp-debt-at-completion
+    evidence_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+    handoff: ops/tasks/T-069/HANDOFF.md
+    cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
+  - task: T-070
+    state: done-integrated
+    client_thread_id: client-new-thread:9d7435c9-4545-4bb2-8752-190ec4219a49
+    task_thread_id: 01a05c84-116f-7d30-bd6f-8f733677bc29
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\4538\PB-W00-control'
+    base: 88182ede5f32399d0ffd8684391fb8a5260c7b0e
+    source_commit: 1f26c4309868b379ab0fb64cad59ae48a6a75648
+    head: 2f0cedd6d2400c3f435f2d01415df27b357a13eb
+    handoff: ops/tasks/T-070/HANDOFF.md
+  - task: T-071
+    state: done-integrated
+    client_thread_id: client-new-thread:8bc5f5e0-9730-430b-bb46-730a70a56d08
+    task_thread_id: 01a05c8a-96fb-70c3-aec9-6884445f0e35
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\b798\PB-W00-control'
+    base: 2f0cedd6d2400c3f435f2d01415df27b357a13eb
+    blocker_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+    head: 16e8c2fe707f7bd96e4b6977dd6b7c441124c63f
+    handoff: ops/tasks/T-071/HANDOFF.md
+    proof: 100-passed-0-failed-build-0-errors-40-retained-warnings
+    retained_scope_event: one-pre-clarification-registered-host-output-only-build-no-source-config-module-change
+    integrated_commit: 7aabaa0aafd6e591d50251965bde0a5ab9c5c14f
+  - task: T-072
+    state: done-integrated
+    client_thread_id: client-new-thread:e4a39679-a28d-4b9b-8795-cb6c77815ef1
+    task_thread_id: 01a05c9d-4322-7f22-97dc-bb46803ecd6b
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\dd46\PB-W00-control'
+    base: d71a52b10e78be9ca6a91a3b1d5822a5ef199740
+    candidate: 16e8c2fe707f7bd96e4b6977dd6b7c441124c63f
+    head: 7aabaa0aafd6e591d50251965bde0a5ab9c5c14f
+    source_commit: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+    installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+    evidence_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
+    handoff: ops/tasks/T-072/HANDOFF.md
+  - task: T-073
+    state: blocked-retained-incomplete-missing-recovery-counter-window
+    client_thread_id: client-new-thread:7c499b5e-a3e5-4d9d-8f74-b4a4560850e1
+    task_thread_id: 01a05ca9-8270-7ed1-aa9a-652dce47db8c
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\a03c\PB-W00-control'
+    base: 7aabaa0aafd6e591d50251965bde0a5ab9c5c14f
+    tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+    installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+    evidence_root: 'D:\Codex-Labs\evidence\T-073\one-bot-autonomy-v4'
+    head: 3000b8b92fdb7e88a6196dd966c4420891c81953
+    verdict: INCOMPLETE-missing-recovery-window-brain-mover-counter-snapshots
+    evidence_receipt: ops/evidence/aaemu12-t073-one-bot-autonomy-v4.yaml
+    handoff: ops/tasks/T-073/HANDOFF.md
+    cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
+  - task: T-074
+    state: done-integrated
+    client_thread_id: client-new-thread:1468e799-5746-4d08-9a2f-b77de5b7e59c
+    task_thread_id: 01a05cc0-3f69-7151-9e8c-7a93ca6398bc
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\5e19\PB-W00-control'
+    base: 7261daa3a715213781c2c6a4e163ece69abddda8
+    source_commit: 3000b8b92fdb7e88a6196dd966c4420891c81953
+    head: d629f405618b0b0b83ca3c7ff1b2c2e2bbb54b9d
+    handoff: ops/tasks/T-074/HANDOFF.md
+    integrity: 382-of-382-payloads-length-and-sha256-green
+  - task: T-075
+    state: blocked-retained-incomplete-pre-addbot-observer-parser
+    client_thread_id: client-new-thread:18eac77e-1067-4eb7-955f-d1108cce9b2c
+    task_thread_id: 01a05cc7-e6bd-70c0-a554-4245ac292feb
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\11c9\PB-W00-control'
+    base: ac1d04a1add6e89bddfa67ed63e71f326541f6f0
+    tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+    installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+    evidence_root: 'D:\Codex-Labs\evidence\T-075\one-bot-autonomy-v5'
+    evidence_receipt: ops/evidence/aaemu12-t075-one-bot-autonomy-v5.yaml
+    handoff: ops/tasks/T-075/HANDOFF.md
+    head: f24f0f246adfdcf6ce2c692fc43eccd5b0c1d834
+    verdict: INCOMPLETE-observer-parser-absent-optional-obj-capture
+    cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login
+  - task: T-076
+    state: done-integrated
+    client_thread_id: client-new-thread:0ffedae2-c299-4adc-b868-3768ade91679
+    task_thread_id: 01a05cde-3eaf-7801-a6b4-9836f880dd72
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\5dee\PB-W00-control'
+    base: 91d4c5d2376771a8c3a170b1176d6d47396fc324
+    source_commit: f24f0f246adfdcf6ce2c692fc43eccd5b0c1d834
+    handoff: ops/tasks/T-076/HANDOFF.md
+    head: 48113c98661751cfbe0fc62a123e4941d1b34d8d
+    integrity: 34-of-34-payloads-length-and-sha256-green
+  - task: T-077
+    state: done-integrated
+    client_thread_id: client-new-thread:d21780cf-4a33-4588-bf27-046f2875c0bc
+    task_thread_id: 01a05ce4-e7c6-73f3-ab81-4b9f57c575e4
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c717\PB-W00-control'
+    base: 6b77e8e3c92c4c293bfb89454ac23f50ffe42ce1
+    retained_fixture: 'D:\Codex-Labs\evidence\T-075\one-bot-autonomy-v5\iteration-1\observer\raw\000000-botdebug.response.bin'
+    retained_fixture_sha256: f1d865e388eca68afd064d5bbc89fcad18577e97a806c2afb9e3a77e1646bf98
+    handoff: ops/tasks/T-077/HANDOFF.md
+    head: 0e48860649ca26a7148350ffdb103118c9e6aba0
+    proof: 64-deterministic-assertions-green
+  - task: T-078
+    state: done-integrated
+    client_thread_id: client-new-thread:1099e6b6-9c17-4666-9d52-bae68ae8607a
+    task_thread_id: 01a05cf5-d7ba-7d83-aa9e-e48ed090940e
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\3881\PB-W00-control'
+    base: 189e96c304d1e7b41517c764887ec5010b1a93b2
+    source_commit: 0e48860649ca26a7148350ffdb103118c9e6aba0
+    handoff: ops/tasks/T-078/HANDOFF.md
+    head: a406a3598213745ac3bead7dc5ba7ce009cf50e3
+    proof: 64-deterministic-assertions-green-zero-fixture-copies
+  - task: T-079
+    state: done-runtime-pass-integrated
+    client_thread_id: client-new-thread:aaa2aa85-cbf0-4f6b-9dcc-5ac9bdd5eacb
+    task_thread_id: 01a05cfc-1ebf-79a2-94d8-4d287c3990ab
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\3058\PB-W00-control'
+    base: f12d8b16c14c4eab4ac7afe2e1422e04e1953ec6
+    tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+    installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+    observer_integration: a406a3598213745ac3bead7dc5ba7ce009cf50e3
+    evidence_root: 'D:\Codex-Labs\evidence\T-079\one-bot-autonomy-v6'
+    evidence_receipt: ops/evidence/aaemu12-t079-one-bot-autonomy-v6.yaml
+    handoff: ops/tasks/T-079/HANDOFF.md
+    head: ad8c0cf2aa9eed46c936c835931ce344341f7d09
+    verdict: PASS-three-iterations-plus42xp-restart-persistence-cleanup
+    manifest_sha256: fe00f692aec54da1760ef6e99645f1d21a13bc902f7fc3c7cc81b6d3ae4c5a4e
+  - task: T-080
+    state: done-integrated
+    client_thread_id: client-new-thread:269a307f-4542-4f77-9161-dea979538a93
+    task_thread_id: 01a05d22-8db5-7d61-b563-b268dee9c290
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\8b10\PB-W00-control'
+    base: 6e53e2a3a92e416b4f6b55aafb6a3b6afd67886a
+    source_commit: ad8c0cf2aa9eed46c936c835931ce344341f7d09
+    handoff: ops/tasks/T-080/HANDOFF.md
+    head: a76ca2476e85f134aec94081f50ca4ba3c5112da
+    proof: 6490-of-6490-payloads-and-49-of-49-semantic-assertions-green
+  - task: T-081
+    state: blocked-rejected-start-stop-race
+    client_thread_id: client-new-thread:963fb064-2584-494d-925a-da542c1873cc
+    task_thread_id: 01a05d32-e0c1-76f0-8aba-f91070c448da
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c891\PB-W00-control'
+    base: 069960e3d977767a3738b729c8e9f83767a78e8e
+    handoff: ops/tasks/T-081/HANDOFF.md
+    head: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
+    proof: 131-unique-focused-tests-build-0-errors-patch-apply-and-sha-green
+  - task: T-082
+    state: blocked-rejected-handoff-integrated
+    client_thread_id: client-new-thread:c37a90bf-63e3-4155-ae31-148e873f2937
+    task_thread_id: 01a05d51-0b47-7b90-b202-9457829b6b24
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\e3d2\PB-W00-control'
+    base: aeaa51c7bf4a5ed1d54aecc07d234c9b399de04d
+    candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
+    candidate_parent: 069960e3d977767a3738b729c8e9f83767a78e8e
+    handoff: ops/tasks/T-082/HANDOFF.md
+    head: 4be88728f069cb03106b81c56a5499605683c0f4
+    result: REJECTED-before-replay-host-write-build-tests-or-full-suite
+  - task: T-083
+    state: done-integrated-by-T-084
+    client_thread_id: client-new-thread:f554b91d-0373-48c4-81ae-e08565340f39
+    task_thread_id: 01a05d5b-8036-7883-8ad6-89b80e334290
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\26e1\PB-W00-control'
+    base: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
+    rejected_candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
+    blocker_handoff: ops/tasks/T-082/HANDOFF.md
+    handoff: ops/tasks/T-083/HANDOFF.md
+    head: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
+    proof: 15-service-concurrency-and-154-focused-tests-build-0-errors-patch-sha-green
+  - task: T-084
+    state: done-integrated
+    client_thread_id: client-new-thread:55a250ad-f763-479b-b034-630fedd586b3
+    task_thread_id: 01a05d70-6f07-7b61-abad-eafc8d12a307
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\439d\PB-W00-control'
+    base: b19e6286f5a46c69095376a65e311b1286e2e453
+    candidate: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
+    candidate_parent: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
+    handoff: ops/tasks/T-084/HANDOFF.md
+    head: f42206c60df4955213eb6d26f3f093a76d4fe56f
+    tested_module_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+    installed_module_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+    evidence_receipt: ops/evidence/aaemu12-activity-director-integration-v1.yaml
+    proof: 154-unique-focused-1830-full-unit-4-intentional-skips-build-0-errors
+  - task: T-041
+    state: blocked-retained-fail-integrated-stacked-fixtures
+    client_thread_id: client-new-thread:0ae842b1-85c3-4b16-b0e0-987df65f75c0
+    task_thread_id: 01a05d8b-5c96-71c2-9e14-40959480d28f
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\3daa\PB-W00-control'
+    base: e32a96ac20adc83b41662a3cb39e638bf12aaaf1
+    configured_zone: 221
+    configured_ids: [20001, 20002, 20003]
+    configured_population: {minimum: 2, target: 3, maximum: 3}
+    evidence_root: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
+    contract: ops/tasks/T-041/CONTRACT.md
+    candidate_commit: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
+    verdict: FAIL-bot-20001-received-all-three-wave1-kill-credits
+    manifest_sha256: a141d75bffc87ef37e6a01f53d71261c2f5b441885522637a4a4adb190460a00
+    cleanup: graceful-game-then-login-zero-processes-listeners-live-logs-config-exactly-restored
+  - task: T-085
+    state: done-integrated
+    client_thread_id: client-new-thread:ac766ead-0d2a-41a9-8fdc-0f747b083462
+    task_thread_id: 01a05da4-8357-7463-94db-dfc407bacee6
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\84a2\PB-W00-control'
+    base: dba356bbadb63343b063a3a64036f762ca3e0df9
+    candidate: 9118d8a244d6ec89d742db7efa9ff5b43a201b5e
+    contract: ops/tasks/T-085/CONTRACT.md
+    head: c216c751e6a2f2d59adf444d907131ea72171048
+    replay_commit: 205aad0376290cb9b6fa47f38bdd6b8878269df6
+    evidence_receipt: ops/evidence/aaemu12-t041-fail-integration-v1.yaml
+    proof: 6271-of-6271-payloads-and-67-of-67-semantic-assertions-green
+  - task: T-086
+    state: done-candidate-pending-integration
+    client_thread_id: client-new-thread:9fc5ce6e-5bb2-43d6-bef3-65ad26d3df50
+    task_thread_id: 01a05db6-0a37-72c3-85e3-71599af8359c
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\e2ee\PB-W00-control'
+    base: 0da7166627f53118184687736132a88cdb668e1e
+    head: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
+    patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+    proof: 28-focused-passed-clean-build-0-errors-72-retained-warnings
+    blocker_receipt: ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
+    contract: ops/tasks/T-086/CONTRACT.md
+  - task: T-087
+    state: done-integrated
+    client_thread_id: client-new-thread:b707adcd-da74-4fef-9e66-b615a1ff6cf6
+    task_thread_id: 01a05ddf-2e99-72b2-8e54-76681b976592
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\3ace\PB-W00-control'
+    base: f5df7623d33587a8b0bc4737733e8cec8b00b2cf
+    candidate: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
+    candidate_parent: 0da7166627f53118184687736132a88cdb668e1e
+    contract: ops/tasks/T-087/CONTRACT.md
+    head: d2b3c80eaad6c75cfec8f35658b54e5a12f4e6c0
+    replay_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+    evidence_receipt: ops/evidence/aaemu12-passive-fixture-anchor-integration-v1.yaml
+    proof: 28-focused-1847-full-unit-4-intentional-skips-build-0-errors
+  - task: T-088
+    state: blocked-retained-incomplete-pre-login-client-sampler
+    client_thread_id: client-new-thread:6e47bdff-97cd-45cf-9d1d-5f439ce9943b
+    task_thread_id: 01a05df1-47a7-7b70-b851-dbea1c6a69f7
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\578d\PB-W00-control'
+    base: 4e89fff7b1ca89cf44fda28099c6ee657629bc95
+    source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+    evidence_root: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2'
+    contract: ops/tasks/T-088/CONTRACT.md
+    candidate_commit: 7919a43fc370ea5f59edd77112385366f4928a94
+    verdict: INCOMPLETE-client-sampler-exit-before-derived-ledger
+    manifest_sha256: d2447105376fd7bfcbc24d77183f38afa16dc10806b32b656c9c7fb3079763ae
+    cleanup: runtime-never-started-config-untouched-zero-processes-listeners-live-logs
+  - task: T-089
+    state: done-integrated
+    client_thread_id: client-new-thread:8e87e7b2-ae31-4c10-a3c9-83b22656b91a
+    task_thread_id: 01a05dfc-6107-74d0-ae13-9c46df5cd6d5
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c4fe\PB-W00-control'
+    base: 5308fe24ae64de7b9c080a4094dde6290e379e35
+    candidate: 7919a43fc370ea5f59edd77112385366f4928a94
+    candidate_parent: 8abf3f3fd714680bf354a4fd2c1a6259b8171b8d
+    contract: ops/tasks/T-089/CONTRACT.md
+    head: e7235fd7b2b3d2d10c4491b824f7ffe471bc0f15
+    replay_commit: f5f7897335b77fadb4b585aca179c1e3a94cba79
+    evidence_receipt: ops/evidence/aaemu12-t088-incomplete-integration-v1.yaml
+    proof: 18-of-18-payloads-and-68-of-68-semantic-assertions-green
+  - task: T-090
+    state: done-integrated-by-T-091
+    client_thread_id: client-new-thread:9137a173-88d6-4ca4-9773-70e37d83150f
+    task_thread_id: 01a05dfc-60e5-71a2-945f-8b938195c8ee
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\99a2\PB-W00-control'
+    base: 5308fe24ae64de7b9c080a4094dde6290e379e35
+    retained_sampler: 'D:\Codex-Labs\evidence\T-088\one-zone-autonomy-v2\client-sampler\client-process-sampler.ps1'
+    contract: ops/tasks/T-090/CONTRACT.md
+    head: e03ca62e623350cfd88e9f1abe09e6b810b8626a
+    proof: powershell-105-and-pwsh-105-assertions-green
+  - task: T-091
+    state: done-integrated
+    client_thread_id: client-new-thread:f3154b6d-6837-4d5b-8212-61d1b346b8af
+    task_thread_id: 01a05e0e-a085-7623-b86f-95cc25ebdc89
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\8db4\PB-W00-control'
+    base: 020c5cc1b4bfabb002a94af004ab78dfa2fb3922
+    candidate: e03ca62e623350cfd88e9f1abe09e6b810b8626a
+    candidate_parent: 13522612e1af23c7066bd7836da412d02f018fad
+    contract: ops/tasks/T-091/CONTRACT.md
+    head: fdb47f9dc2dc2ca82c8fb95e67171b05d6baf02a
+    replay_commit: bf386e981649ee609fb9a38b6ffb7a2218dc2f67
+    evidence_receipt: ops/evidence/aaemu12-client-process-observer-integration-v1.yaml
+    proof: powershell-105-and-pwsh-105-assertions-green
+  - task: T-092
+    state: blocked-retained-fail-observer-prearm-after-two-admissions
+    client_thread_id: client-new-thread:50955241-43de-4c78-ad98-794e7fdc7e2b
+    task_thread_id: 01a05e17-fb8b-7610-a0de-e8693dc0af91
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\86b9\PB-W00-control'
+    base: 38b6ca7518215521dc3bb34389de4c5a4d547368
+    source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+    evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
+    contract: ops/tasks/T-092/CONTRACT.md
+    candidate_commit: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
+    verdict: FAIL-observer-prearm-after-bots-20001-and-20002-admitted
+    manifest_sha256: 39f6c85e69faa78d87824632f0db168bcbc87db4fd26b8d350f7bea70370809c
+    cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login-config-restored
+  - task: T-093
+    state: done-integrated
+    client_thread_id: client-new-thread:a66b535b-c992-4eff-ac52-15181641b305
+    task_thread_id: 01a05e2d-c7ee-79a3-8329-023d34130f88
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\007f\PB-W00-control'
+    dispatch_base: cd84b322e91233d58c7294f24c80da4dcab42063
+    source_candidate: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
+    source_candidate_parent: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
+    evidence_root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
+    contract: ops/tasks/T-093/CONTRACT.md
+    replay_commit: e978a41b62f00493b22c96f436073eb4f8c42ba7
+    head: cb52f2c224bb4cfbbc1807fdfff0f8aff3517070
+    evidence_receipt: ops/evidence/aaemu12-t092-fail-integration-v1.yaml
+    proof: 1523-of-1523-payloads-866-of-866-client-chain-92-of-92-semantics-green
+  - task: T-094
+    state: blocked-retained-fail-runtime-clamped-180000-to-60000
+    client_thread_id: client-new-thread:339575d7-83e5-488c-abfb-7fe729feba00
+    task_thread_id: 01a05e46-6402-7da0-b59e-7c757b6d0c68
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\2ba4\PB-W00-control'
+    dispatch_base: e70eb8d195a209ccef1c753ac48c6cc01fa89b86
+    source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+    evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
+    initial_delay_ms: 180000
+    contract: ops/tasks/T-094/CONTRACT.md
+    candidate_commit: 453d0bd60cf1e72117b10579d40e549b0a24729f
+    verdict: FAIL-runtime-observed-60020.997ms-despite-deployed-180000ms
+    manifest_sha256: 46ce346de698964231a522b2e3646af7a7fc0b0fbd5a080959c9e78da7d57293
+    cleanup: zero-bots-runtimes-processes-clients-listeners-live-logs-graceful-game-then-login-config-restored
+  - task: T-095
+    state: done-integrated
+    client_thread_id: client-new-thread:56b43285-c933-4ebf-9bc9-7064fab3ff27
+    task_thread_id: 01a05e67-3355-7330-aea6-453cf311e49b
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\0c40\PB-W00-control'
+    dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
+    source_candidate: 453d0bd60cf1e72117b10579d40e549b0a24729f
+    source_candidate_parent: cc4f9fc6889abc17a149e6dad9d4ff92491a8dc0
+    evidence_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
+    contract: ops/tasks/T-095/CONTRACT.md
+    replay_commit: 65b6cec7e612f5d5d3945d8fee0a6cdfd463889e
+    head: 0030c1b534cdce3e312a8653a8dd21544e420143
+    evidence_receipt: ops/evidence/aaemu12-t094-fail-integration-v1.yaml
+    proof: 3244-of-3244-payloads-1001-of-1001-client-chain-semantics-green
+  - task: T-096
+    state: done-candidate-awaiting-independent-integration
+    client_thread_id: client-new-thread:021eef91-9b03-4ef2-a4bb-3621eceffb94
+    task_thread_id: 01a05e67-6053-7232-9328-22b789946651
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\661e\PB-W00-control'
+    dispatch_base: e298724c9940b11bef6ea5da359d8f6ea23fda8a
+    source_base: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    blocker_candidate: 453d0bd60cf1e72117b10579d40e549b0a24729f
+    contract: ops/tasks/T-096/CONTRACT.md
+    candidate_commit: 859e0daf64df482fcb17d83e16344387453a19b7
+    proof: 40-focused-build-0-errors-40-retained-warnings-patch-sha-unchanged-clean-apply
+    integration: integrated-by-T-097
+  - task: T-097
+    state: done-integrated-installed
+    client_thread_id: client-new-thread:0e011ddf-ffdc-4c8c-a595-aee28b756ec7
+    task_thread_id: 01a05e7a-7318-7611-aa5e-d6fc1a52ab84
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\ef38\PB-W00-control'
+    dispatch_base: 8515e189fd775e8a83853e6cca62d7f517cce48c
+    source_candidate: 859e0daf64df482fcb17d83e16344387453a19b7
+    source_candidate_parent: 1ebfd0ec47138ebf15268befde9ed1671aa05ef8
+    contract: ops/tasks/T-097/CONTRACT.md
+    replay_commit: 761ffa1e0bd76d06532688f34b45e192a493b239
+    head: 71d13ca70b7c6f530a48ece85ced7041adaa7e1b
+    installed_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+    evidence_receipt: ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
+    proof: 40-focused-build-0-errors-79-warnings-full-1851-pass-4-intentional-skips-once
+  - task: T-098
+    state: done-retained-fail-awaiting-independent-integration
+    client_thread_id: client-new-thread:1bb59774-6513-4413-ab92-af3e3d8253cb
+    task_thread_id: 01a05e8c-e6b0-7902-81b1-8dd7a6456dd3
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\4e59\PB-W00-control'
+    dispatch_base: bc6c8bd528e88d1bf2fe17b460336818cb58d85e
+    source: 761ffa1e0bd76d06532688f34b45e192a493b239
+    installed_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+    evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
+    initial_delay_ms: 180000
+    contract: ops/tasks/T-098/CONTRACT.md
+    candidate_commit: e7361e10c8c1d722c3f18481af07e6173030fb30
+    candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903
+    manifest_sha256: 1ab0074aad22af52abcef062982a10ad7c48146facabdde092e691c341127e42
+    result: FAIL-first-anchored-fixture-inconsistent-world-or-instance-boundary-after-delay-pass-180055.392ms
+  - task: T-099
+    state: done-integrated-retained-fail-receipt
+    client_thread_id: client-new-thread:f98964db-737c-4e57-81d2-22c6fb4b9bc0
+    task_thread_id: 01a05eae-177d-7161-a57e-4ed8719fd920
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\4c45\PB-W00-control'
+    dispatch_base: 5bc8e004b8df2bddf46bbac0e209768a7161644c
+    source_candidate: e7361e10c8c1d722c3f18481af07e6173030fb30
+    source_candidate_parent: 5d5919e56cd980d0db2ad1907178ba2a59868eb7
+    source_candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903
+    external_evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
+    contract: ops/tasks/T-099/CONTRACT.md
+    replay_commit: 84fbbb15cb9befe4dd78b26a57ce3cebd2d6d2ca
+    replay_tree: c6386496258ad4a4be08d636125f9ee3250a4093
+    integrated_head: 1ab6c2e80a4c7e209149a804cdff6ae209142501
+    integrated_tree: 9f592e9b77695f8a0486727bd5a5bdc1c72c6040
+    evidence_receipt: ops/evidence/aaemu12-t098-fail-integration-v1.yaml
+    result: PASS-receipt-integrity-subject-retained-FAIL
+  - task: T-100
+    state: done-source-pass-awaiting-integration
+    client_thread_id: client-new-thread:ab3a1f91-8c01-4547-9d8f-c2d4d86ea83b
+    task_thread_id: 01a05ec5-b802-7013-bfc5-8a126484eb60
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c413\PB-W00-control'
+    dispatch_base: c0d08ddd3c2db5e542f17ec8b25751814ae344f9
+    base: 1ab6c2e80a4c7e209149a804cdff6ae209142501
+    cause: SpawnPassiveNpcCommand-invalidly-rejects-valid-default-world-template-id-zero
+    contract: ops/tasks/T-100/CONTRACT.md
+    candidate_commit: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
+    candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
+    proof: 40-focused-0-fail-build-0-errors-72-warnings-patch-sha-unchanged-clean-apply
+  - task: T-101
+    state: done-integrated-installed
+    client_thread_id: client-new-thread:bca8601b-bcaf-4f63-9d54-0884679ece77
+    task_thread_id: 01a05ed6-653f-71d3-ac72-1d6a0db3a85c
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\18a8\PB-W00-control'
+    dispatch_base: a05e94fd8d7f58bce12a968aa1d5b09de78f4a14
+    source_candidate: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
+    source_candidate_parent: 96b8b5004a89a0dec6522753f64d03fd1d732c5b
+    source_candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
+    contract: ops/tasks/T-101/CONTRACT.md
+    replay_commit: e0af81eb43d244d69114f3e69fbf5efbdfdc9d96
+    replay_tree: 7afaac89eb0d5ef53475064134e69b7e7527eb58
+    integrated_head: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
+    integrated_tree: 14421e2ecfe9c557268552d359f6a32aea10e359
+    evidence_receipt: ops/evidence/aaemu12-passive-anchor-default-world-zero-integration-v1.yaml
+    proof: 40-focused-build-0-errors-79-warnings-full-1863-pass-4-intentional-skips-once
+  - task: T-102
+    state: done-integrated-by-t103
+    client_thread_id: client-new-thread:89f2a6d0-b593-4bbc-a387-9678a481e9a2
+    task_thread_id: 01a05eed-ea43-71b0-baf8-76b6b0ef7630
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\dbb1\PB-W00-control'
+    base: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd
+    dispatch_base: 968720578b8e1e85e925e63ac584e410bcc71635
+    contract: ops/tasks/T-102/CONTRACT.md
+    candidate_commit: 70b577861a5f8fef8df4be40c61af3ba66298ed3
+    candidate_parent: 9a94b21fd4f9855346109cfe7b5b941df13e6b4b
+    candidate_tree: 2476ff1be7040f028882d54ef44b5371e4ed9f14
+    evidence_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-v1.yaml
+    proof: 46-focused-0-fail-build-0-errors-72-warnings-patch-sha-unchanged-clean-apply
+  - task: T-103
+    state: done-integrated-installed
+    client_thread_id: client-new-thread:e747efcd-103d-472e-978c-d58eec8ed76d
+    task_thread_id: 01a05f03-6e3a-75a3-9235-bb44950b3dde
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\b1da\PB-W00-control'
+    dispatch_base: 14e6951f6e9c97243d7cc84502a2a25e9cedebec
+    candidate: 70b577861a5f8fef8df4be40c61af3ba66298ed3
+    candidate_parent: 9a94b21fd4f9855346109cfe7b5b941df13e6b4b
+    candidate_tree: 2476ff1be7040f028882d54ef44b5371e4ed9f14
+    contract: ops/tasks/T-103/CONTRACT.md
+    replay_commit: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+    replay_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
+    integrated_head: f63f3cd56586f968b92462e87948abc1a0d47596
+    integrated_tree: 4e98c9fbbb93aa5e21b8be474a185048f04cf976
+    evidence_receipt: ops/evidence/aaemu12-botdebug-transform-telemetry-integration-v1.yaml
+    proof: 46-focused-build-0-errors-79-warnings-full-1864-pass-4-intentional-skips-once
+  - task: T-104
+    state: done-retained-fail-integrated-by-t105
+    client_thread_id: client-new-thread:6981cb4b-860b-480e-9960-155c11bcacb9
+    task_thread_id: 01a05f1e-79b2-7cd1-beef-446c870c4f9a
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\7259\PB-W00-control'
+    dispatch_base: dc9a1f721e1cb1e972a3a1d8c58a51f3c5add056
+    source: bf0ae36fc65eea4f341b936c9f7a961e9d474580
+    installed_tree: 7f33545311c972d7a0ed31fa7f75a016df3571f7
+    evidence_root: 'D:\Codex-Labs\evidence\T-104\one-zone-autonomy-v6'
+    contract: ops/tasks/T-104/CONTRACT.md
+    candidate_commit: 3b0627f857c8e573cf67450b585e284f3f8ac0e9
+    candidate_parent: dde605d10912e8f282ce263680b70d1f02133249
+    candidate_tree: 41319cfb1568da0219d5a5d2445a8902c9e9eea7
+    manifest_sha256: cbe9026f8e27ac0503521370a84be286b01ca38935cc8e3da4552e40bc31f7a0
+    proof: FAIL-180042.318ms-delay-1331-tuples-87-separated-0-owned-best-margin-minus-1.2237695385452456m-zero-commands-clean-sealed
+  - task: T-105
+    state: done-integrated-retained-fail
+    client_thread_id: client-new-thread:a3aefb4b-97da-4f82-a729-7d9ec4a71c65
+    task_thread_id: 01a05f4e-0502-7a93-bf64-96b14156c2a3
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\d154\PB-W00-control'
+    dispatch_base: cac9064dac253be963d51642332c39dab6519d7a
+    candidate: 3b0627f857c8e573cf67450b585e284f3f8ac0e9
+    candidate_parent: dde605d10912e8f282ce263680b70d1f02133249
+    candidate_tree: 41319cfb1568da0219d5a5d2445a8902c9e9eea7
+    contract: ops/tasks/T-105/CONTRACT.md
+    replay_commit: 37e43842dd737d492c7bb54984083b520be4f359
+    replay_tree: 1aecc7181e99e00783ec685e6b042e1416080288
+    integrated_head: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
+    integrated_tree: 6853901fce746caa13384a784bd72cae7144dec4
+    evidence_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
+    proof: PASS-receipt-integrity-17528-of-17528-payloads-5357-autonomy-1345-client-1331-geometry-subject-retained-FAIL
+  - task: T-106
+    state: done-integrated-by-t107
+    client_thread_id: client-new-thread:cf15f37f-a09b-419d-a8b8-dad7ec57734c
+    task_thread_id: 01a05f65-58af-70f2-a138-1bcccdffaf03
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\4173\PB-W00-control'
+    dispatch_base: 41f2d35a9e20bd66fff80a4ae8394321785e172b
+    source_base: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
+    contract: ops/tasks/T-106/CONTRACT.md
+    retained_fail_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
+    deterministic_dry_run: 681472-tuples-2430-eligible-from-exact-t104-transform-bits
+    candidate_commit: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
+    candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+    candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+    candidate_patch_id: 1658582af94e18e4376ec0e8ffde12926d32fa0b
+    evidence_receipt: ops/evidence/aaemu12-passive-anchor-yaw-offset-v1.yaml
+    proof: PASS-46-focused-build-0-errors-72-warnings-patch-unchanged-clean-four-path-candidate
+  - task: T-107
+    state: done-integrated-installed
+    client_thread_id: client-new-thread:aa21dc2d-c74b-4201-9e60-39eda2d6b709
+    task_thread_id: 01a05f74-3d1b-7e03-9418-60148911d9a2
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\7da5\PB-W00-control'
+    dispatch_base: 0ebac76ed88a80b3a75c1f13478da269821b4e96
+    source_candidate: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
+    source_candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+    source_candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+    contract: ops/tasks/T-107/CONTRACT.md
+    replay_commit: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+    replay_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    integrated_head: fc26a8e9347880efa155bd4fd8ddc94913112b79
+    integrated_tree: aeed65ca98ae10f9bd461602f2fe32a998735e24
+    evidence_receipt: ops/evidence/aaemu12-passive-anchor-yaw-offset-integration-v1.yaml
+    proof: PASS-46-focused-build-0-errors-79-warnings-full-1870-pass-4-intentional-skips-once
+  - task: T-108
+    state: done-integrated-retained-incomplete-by-t109
+    client_thread_id: client-new-thread:fb735534-d444-4ee6-933c-fe69d503e388
+    task_thread_id: 01a05f89-2616-7f82-945d-a397a839f024
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\48c0\PB-W00-control'
+    dispatch_base: 6a4444cba7bb3e2e9452787afe4a85b24ee522f3
+    tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+    installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
+    contract: ops/tasks/T-108/CONTRACT.md
+    deterministic_planner: 11-distances-by-8-angles-per-bot-681472-tuples
+    candidate_commit: 9a9a84532f321fbe6755bcf4957c41c8503086e5
+    candidate_parent: 3c1329cf6e95a46998f889aa71cdd2673aa7ea4c
+    candidate_tree: 01079a441274e1f999307d2b978768fe1c23bf72
+    candidate_patch_id: 8268d979f201ad25ef2e531fff6e5a7d911d8af2
+    evidence_receipt: ops/evidence/aaemu12-t108-one-zone-autonomy-v7.yaml
+    proof: INCOMPLETE-row-oriented-0-eligible-column-oriented-2430-clean-pre-runtime-31-payload-root
+  - task: T-109
+    state: done-integrated-retained-t108-incomplete
+    client_thread_id: client-new-thread:4290d23d-1419-4ff3-9566-34793b51b939
+    task_thread_id: 01a05fa3-b4c5-73b1-b3cc-2d0db58dc2a7
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\19cc\PB-W00-control'
+    dispatch_base: fe5341e8eeba37f20a57bd1fbec7899db78be9f8
+    contract: ops/tasks/T-109/CONTRACT.md
+    source_candidate: 9a9a84532f321fbe6755bcf4957c41c8503086e5
+    evidence_root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
+    runtime_lease: null
+    replay_commit: 4a8fb0be83cda70113b683d00cd04c2772257a5e
+    replay_tree: 84cdb8bcc823dc59b721d7938464de0bf599f167
+    integrated_head: 5601ff40197ec2445f6b7a276429ed84aab6fe34
+    integrated_tree: 7ab79f96f8e0e3fde74d7aa1c98985e6daa1d0b7
+    evidence_receipt: ops/evidence/aaemu12-t108-incomplete-integration-v1.yaml
+    proof: PASS-receipt-integrity-31-of-31-payloads-row-142-0-column-4386-2430-subject-retained-INCOMPLETE
+  - task: T-110
+    state: done-integrated-retained-incomplete-by-t111
+    client_thread_id: client-new-thread:27b390c6-7b31-4d2e-b471-c63e85600ab4
+    task_thread_id: 01a05fb0-5d05-72b0-970f-cdd231a2fbe5
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\9aaa\PB-W00-control'
+    dispatch_base: 73129640a7b90a275dadbb6c63403f10aaa4b96e
+    contract: ops/tasks/T-110/CONTRACT.md
+    tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+    installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    evidence_root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
+    deterministic_selftest: 264-choices-per-bot-18399744-tuples-125-literal-row-eligible
+    candidate_commit: 1b914085d64b3957b3c394d9b9f75600c91e2a96
+    candidate_parent: 80bb3b9f3dc028e2b1830ef10421eed4dc13f4e1
+    candidate_tree: 03d3e8fcda1ae196023c9acd412e212770940261
+    candidate_patch_id: 211ac120413c1c483c1ad9892afa08eecc9af3a9
+    evidence_receipt: ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
+    proof: INCOMPLETE-planner-and-bootstrap-pass-grade-Weak-parser-rejection-autonomy-gap-clean-sealed-5918-payload-root
+  - task: T-111
+    state: done-integrated-retained-t110-incomplete
+    client_thread_id: client-new-thread:76cfa252-f51d-44ea-ab5f-3646117da15d
+    task_thread_id: 01a05fdd-0f55-75f3-8f95-a596588c6520
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c1ab\PB-W00-control'
+    dispatch_base: 8e1659331eba986f4c6742c3e77d29173a7f8fbe
+    contract: ops/tasks/T-111/CONTRACT.md
+    source_candidate: 1b914085d64b3957b3c394d9b9f75600c91e2a96
+    evidence_root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
+    runtime_lease: null
+    replay_commit: d4e1bede6647ea8d7d97fed14a4819042cb9c15e
+    replay_tree: 7d5b6b1c90da1ef79a237c3bf6e9d95e780c4fe5
+    integrated_head: bc7279be7a5d5fb0aff1d04474ddb1fc7480f66c
+    integrated_tree: 46225ff22f3c9a495de485a928df4860f3c64f29
+    evidence_receipt: ops/evidence/aaemu12-t110-incomplete-integration-v1.yaml
+    proof: PASS-receipt-integrity-5918-of-5918-payloads-subject-retained-INCOMPLETE
+  - task: T-112
+    state: done-integrated-retained-fail-by-t113
+    client_thread_id: client-new-thread:faa00f23-f232-468c-9914-bf62a81f03a9
+    task_thread_id: 01a05ff2-1c7b-7643-9e6a-764fe1594975
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\19b4\PB-W00-control'
+    dispatch_base: f3cb885141e7d91cfb05bdeca7bb9f0fc14406ec
+    contract: ops/tasks/T-112/CONTRACT.md
+    tested_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+    installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+    evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
+    runtime_lease: released-clean-fail
+    candidate_commit: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
+    candidate_parent: 4277111312b09d549b29b0e3af8c0e4ebcef2168
+    candidate_tree: 6059e88d2f58c9c1632f2ff2194f47618ef6fb75
+    candidate_patch_id: e58936f2c2016aa590e6825748558c37fdf302d2
+    evidence_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
+    proof: FAIL-wave-one-fixed-counter-recovery-and-shutdown-tail-observer-gaps-clean-sealed-8602-payload-root
+  - task: T-113
+    state: done-integrated-retained-t112-fail
+    client_thread_id: client-new-thread:1596f314-1e91-4d05-8074-0502d8fe85c9
+    task_thread_id: 01a06020-e7f8-7bc2-8d1e-d1b281ef764c
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\18b5\PB-W00-control'
+    dispatch_base: 03b2b84a3b047a86323ac722ca3718dfbf91c54c
+    contract: ops/tasks/T-113/CONTRACT.md
+    source_candidate: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
+    evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
+    runtime_lease: null
+    replay_commit: 94879030e015ab15bbfd5e896df6f9f6deb86476
+    replay_tree: b5f9383a8cd37c10415245ca65d83bc3c84f01fa
+    integrated_head: 5108bcedb6782a24b0095fab88b021a628c01f8b
+    integrated_tree: 432dbdb84234899886e5a8e01c613ff798f70441
+    evidence_receipt: ops/evidence/aaemu12-t112-fail-integration-v1.yaml
+    proof: PASS-receipt-integrity-8602-of-8602-payloads-subject-retained-FAIL
+  - task: T-114
+    state: done-integrated-by-t116
+    client_thread_id: client-new-thread:7145dd31-8b47-446e-a820-61dff9253848
+    task_thread_id: 01a0603d-80a4-7bf3-b70f-6ba0f0d139f5
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\dd89\PB-W00-control'
+    dispatch_base: d335ce053c58eaebbfda384412ef9be5c9d839da
+    source_base: 5108bcedb6782a24b0095fab88b021a628c01f8b
+    contract: ops/tasks/T-114/CONTRACT.md
+    runtime_lease: null
+    candidate_commit: 3b9824e5250caf90a6347cb286e31deda993a0cf
+    candidate_parent: d335ce053c58eaebbfda384412ef9be5c9d839da
+    candidate_tree: e342e61030ae78ab411fa7cb6a109839199ca610
+    candidate_patch_id: f2172268436a17d0642b837ed5e0696b81c316d6
+    evidence_receipt: ops/evidence/aaemu12-runtime-recovery-observability-v1.yaml
+    proof: PASS-91-observer-46-command-34-host-build-0-errors-source-focused
+  - task: T-115
+    state: blocked-retained-green-execution-count-contract-mismatch
+    client_thread_id: client-new-thread:4d5d7429-1e31-4234-b650-40d3ffee5906
+    task_thread_id: 01a0604f-ad55-70f2-a138-001a1b6fd92f
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\e53c\PB-W00-control'
+    dispatch_base: e47bcf03468bdeeee73877c95936a1a969e58eb5
+    accepted_head_before_preparation: d147bebce60ee79588e0e430f47969e9ba8662b9
+    saved_head: exact-binding-commit-reported-by-PB-000
+    contract: ops/tasks/T-115/CONTRACT.md
+    source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
+    runtime_lease: released-after-clean-stopped-count-mismatch
+    replay_commit: 5f544acffdbef48b83278978b68c3f62b1441808
+    replay_tree: 6bf7927fc28ca163ffa67da6a280fce4f22d4460
+    retained_handoff_blob: 01af6882c7143960bfa2b2fefb3a0ab05fff52c2
+    full_suite_log_sha256: bb8b3ed89578c304e3114b7885528b09c5bd6811ccd4a4208aaf91f6facccf08
+    proof: BLOCKED-contract-count-1872-versus-exact-green-1871-plus-4-skips-one-new-discovered-test
+  - task: T-116
+    state: done-integrated-corrected-count-green-receipt-reuse
+    client_thread_id: client-new-thread:d603189d-48ed-45a8-9ccc-6106b99e033a
+    task_thread_id: 01a0605e-2939-75e0-b6cc-1fbb1b617f40
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\c9da\PB-W00-control'
+    dispatch_base: 0ff36bf5a512602cd1f14e3685c1cbab98ac513b
+    contract: ops/tasks/T-116/CONTRACT.md
+    source_candidate: 3b9824e5250caf90a6347cb286e31deda993a0cf
+    retained_t115_replay: 5f544acffdbef48b83278978b68c3f62b1441808
+    runtime_lease: released-clean
+    replay_commit: 39f748fb3904584b50e1dabc0cfb0b3045793165
+    replay_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+    integrated_head: fc6a5b9044d7e7aef1c2b6a6d93590256f3f89a3
+    integrated_tree: 1e94a28810827c2666e1713a596644a8c0c925ce
+    evidence_receipt: ops/evidence/aaemu12-runtime-recovery-observability-integration-v1.yaml
+    proof: PASS-corrected-count-reused-1871-plus-4-observer-91-command-46-host-34-no-build-or-full-suite-rerun
+  - task: T-117
+    state: paused-clean-pre-runtime-user-supersession
+    client_thread_id: client-new-thread:72ca3f2d-8109-4df8-a49a-a270b6b56265
+    task_thread_id: 01a0606e-751b-79b2-b8ce-38ea2c604f7a
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\fbcd\PB-W00-control'
+    dispatch_base: a56217b27e3f51ad96099847ee6cb2d989c6677c
+    contract: ops/tasks/T-117/CONTRACT.md
+    tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
+    installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+    evidence_root: 'D:\Codex-Labs\evidence\T-117\one-zone-autonomy-v10'
+    runtime_lease: released-to-interactive-T-118
+    retained_root_state: exactly-config-original-bin-plus-empty-prepared-directories-no-runtime-evidence
+  - task: T-118
+    state: done-cleanup-complete
+    client_thread_id: client-new-thread:a9966d94-fda8-44b2-b01e-4c408b892742
+    task_thread_id: 01a06077-2a1b-7733-be91-e4bae28f2d55
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\1d32\PB-W00-control'
+    dispatch_base: 10f7dbafbb34876fb865c695b584ab3e1bf923a7
+    contract: ops/tasks/T-118/CONTRACT.md
+    tested_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
+    installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+    runtime_lease: released-to-T120
+    cleanup_commit: abe55bc4395ffe733e00628d0986f24bf4d98cc2
+    final_processes: zero-relevant
+    final_listeners: zero-on-1234-1237-1239-1250-1280
+    final_live_logs: empty
+    final_config: exact-original-restored-1772-bytes-sha256-7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+    preserved_config: 'D:\Codex-Labs\sessions\T-118\interactive-live-demo-v1\config\BotConfig.original.bin'
+  - task: T-119
+    state: done-source-ready-for-T120
+    owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    branch: codex/T-119-autonomous-quest-intake
+    worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\T-119-autonomous-quest-intake'
+    source_base: cb9232d23312f719a90dc2ca51e6f5a561402fde
+    dispatch_base: aa9d2957fa348b545615faa167f9c2f15d888e6d
+    contract: ops/tasks/T-119/CONTRACT.md
+    runtime_lease: null
+    validation_boundary: source-focused-only-no-live-runtime-or-deployed-host-writes
+    candidate_commit: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
+    candidate_tree: 1276326b17cabfb3dbe10010ddbcf65dea729417
+    candidate_patch_id: d525d7bc14e72ac0c5042bc6443044762e253084
+  - task: T-120
+    state: blocked-no-existing-eligible-level-one-nuian-runtime-retained
+    task_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    codex_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+    dispatch_base: d42236e77cfc8030b78eb9750db9f78a3df8d35d
+    contract: ops/tasks/T-120/CONTRACT.md
+    source_candidate: 2d1b8d7103d35c46ec1bc9f13df36e40f4ba2b15
+    preparation_commit: ca6acb96b11daaa862b609fcce19d0641406d869
+    cleanup_receipt_commit: a004780cf791bf614342bbe8a41c2b8d207252df
+    runtime_lease: aaemu12
+    result: BLOCKED-source-integrated-exploratory-high-level-intake-partial-no-level-one-or-objective-proof
+  - task: T-121
+    state: done-source-ready-for-T124
+    owner_thread_id: 01a0635b-a425-7611-b165-d93d455f69e5
+    branch: codex/T-121-bot-identities
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\8064\PB-W00-control'
+    source_base: 0bff81c350a216b7018099749fd64096fbffc098
+    contract: ops/tasks/T-121/CONTRACT.md
+    runtime_lease: null
+    candidate_commit: b48708522ebfc26a43124f6e43a9de7bed55af35
+    result: READY-server-owned-arbitrary-level-bot-identity-factory-50-focused-build-zero-errors
+  - task: T-122
+    state: done-source-ready-for-T124
+    owner_thread_id: 01a0635b-be45-7e41-95ec-571100c7d02d
+    branch: codex/T-122-autonomous-signpost-kill-quest
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\fcc6\PB-W00-control'
+    source_base: 0bff81c350a216b7018099749fd64096fbffc098
+    contract: ops/tasks/T-122/CONTRACT.md
+    runtime_lease: null
+    candidate_commit: 215dbbbd12464ec41eff87251eee2cd348a2c5f2
+    result: READY-doodad-kill-report-reward-and-nearby-quest-chaining-48-focused-build-zero-errors
+  - task: T-123
+    state: done-source-ready-for-T124
+    owner_thread_id: 01a0635b-d9b7-71c3-9b35-84cf9dd32dd7
+    branch: codex/T-123-transfer-road-navigation
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\67c9\PB-W00-control'
+    source_base: 0bff81c350a216b7018099749fd64096fbffc098
+    contract: ops/tasks/T-123/CONTRACT.md
+    runtime_lease: null
+    candidate_commit: 9340ceb8f58c0be8aa00e83e530bce442bfa5273
+    handoff_commit: 463924b7876585bd76763f533b8f63a929a76cc3
+    result: READY-transfer-road-world-navigation-graph-30-focused-build-zero-errors
+  - task: T-124
+    state: active-integration-tests
+    task_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+    codex_worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+    integration_base: af840ab8a90640f3e1ff964490a3e241ef5b999b
+    contract: ops/tasks/T-124/CONTRACT.md
+    runtime_lease: null
+    result: ACTIVE-one-merged-build-128-focused-tests-and-once-per-wave-full-suite
+  - task: T-038
+    client_thread_id: client-new-thread:495a8481-50ee-407d-8993-4640db67443f
+    task_thread_id: pending-task-list-resolution
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\46cf\PB-W00-control'
+    base: 4db079de50304dc63885111c6f05bcf205ce5a9b
+    head: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
+    handoff: integrated
+    integrated_commit: 413e3d39c9bde154ae62d51d97421d92cb350ba4
+  - task: T-039
+    client_thread_id: client-new-thread:39823200-fca2-4fea-85d1-18d38831d4ee
+    task_thread_id: pending-task-list-resolution
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\6e30\PB-W00-control'
+    base: 4db079de50304dc63885111c6f05bcf205ce5a9b
+    head: dcc27f42eb5e691d426235b86295a8106c9073b3
+    handoff: integrated
+    integrated_commit: 413e3d39c9bde154ae62d51d97421d92cb350ba4
+  - task: T-040
+    client_thread_id: client-new-thread:96ef486b-2a90-4bb6-8c8a-364f3d948c1f
+    task_thread_id: 01a059d1-06d6-7fe0-8972-c02c60d535d0
+    codex_worktree: 'C:\Users\jensh\.codex\worktrees\035a\PB-W00-control'
+    base: 4db079de50304dc63885111c6f05bcf205ce5a9b
+    head: a99663059db71afaa227bdce8f680b5196e36226
+    handoff: integrated
+    integrated_commit: 413e3d39c9bde154ae62d51d97421d92cb350ba4
+
+integration_wave:
+  task: T-042
+  title: Wave 1 review and AAEmu 1.2 integration
+  state: completed
+  client_thread_id: client-new-thread:f754affe-f4a6-4393-b155-64e7d8cf41b3
+  task_thread_id: pending-task-list-resolution
+  integrated_commit: 413e3d39c9bde154ae62d51d97421d92cb350ba4
+  tested_module_source: 60f574d70c35dce418dc8a9ca53a99bd775bf099
+  evidence_receipt: aaemu12-wave1-integration-v1
+  full_unit: 1786-passed-4-intentional-skips-0-failed
+  runtime: not-started
+  source_heads:
+    T-038: c89b77b6e6fa0e1f1d74369e78c2774f1f2b8de9
+    T-039: dcc27f42eb5e691d426235b86295a8106c9073b3
+    T-040: a99663059db71afaa227bdce8f680b5196e36226
+
+wave_2:
+  state: source-green-physical-gate-ready
+  base: e0350b3ee24352a1d96d81a60f34475fd8e56a45
+  lanes:
+    - task: T-007
+      outcome: deterministic-evidence-receipt-translator
+      client_thread_id: client-new-thread:ef7ac466-7e88-406d-afaa-ac9f65ffd000
+      task_thread_id: pending-task-list-resolution
+      worktree: 'C:\Users\jensh\.codex\worktrees\b9a4\PB-W00-control'
+      head: 43956fb9e6f1c3cc88cff0f8385f7dd7ef1ebb4e
+      handoff: integrated
+      integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
+    - task: T-043
+      outcome: isolated-public-alpha-database-runway
+      client_thread_id: client-new-thread:79f73bc9-6fb3-497f-8e13-1090909474c6
+      task_thread_id: pending-task-list-resolution
+      worktree: 'C:\Users\jensh\.codex\worktrees\cbbe\PB-W00-control'
+      head: e0e0825c35b5f0863e43b677a416c4f819419716
+      handoff: integrated
+      integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
+      database_identity: aaemu12_database_public_alpha_v1
+    - task: T-044
+      outcome: offline-combat-stealth-qualification-harness
+      client_thread_id: client-new-thread:eec3a1e8-c920-4a9c-b140-0b64c5f36a4c
+      task_thread_id: pending-task-list-resolution
+      worktree: 'C:\Users\jensh\.codex\worktrees\a9a5\PB-W00-control'
+      head: 9ba012805124e667185257449d7ec15ce147406f
+      handoff: integrated
+      integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
+  integration_task:
+    task: T-045
+    state: blocked-retained-red
+    client_thread_id: client-new-thread:9b37ca27-d9b9-4d74-b76e-005f813e7b76
+    task_thread_id: pending-task-list-resolution
+    retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+    retained_handoff_commit: 4d1a472
+    full_unit: 1788-passed-4-intentional-skips-1-failed-before-focused-green-correction
+  wave2_recovery_integration_task:
+    task: T-046
+    state: completed
+    client_thread_id: client-new-thread:6ff6c6dc-8216-4872-950e-cecb0d27547b
+    task_thread_id: pending-task-list-resolution
+    retained_candidate_head: 225595ebe45d5b0c08bfa0a1059cb8ba97669f86
+    tested_module_source: 9938495eb7f1904ac4575bc0db42fc28a7f35851
+    integrated_commit: 30d2b90955350918998f6e005d2fc8994e36f56b
+    evidence_receipt: aaemu12-wave2-integration-v1
+  physical_gate:
+    task: T-036
+    state: incomplete-startup-guard-blocked
+    client_thread_id: client-new-thread:a9f5a4a5-8adf-4765-a624-7673a9cb7559
+    task_thread_id: 01a05a64-9193-7c02-8f34-10219e4043a4
+    worktree: 'C:\Users\jensh\.codex\worktrees\36de\PB-W00-control'
+    contract_commit: f1c0563c71e85ae2cd32bf1209f001ae63151cf4
+    attempt_commit: e8c14e71906023e1df371cc6a24d4edcf7db7c46
+    evidence_receipt: aaemu12-t036-combat-stealth-v1
+    result: INCOMPLETE-startup-guard-before-game
+    cleanup: login-graceful-game-never-started-zero-processes-five-ports-free
+  selected_schema_recovery_source_task:
+    task: T-048
+    state: integrated
+    client_thread_id: client-new-thread:881e830f-eaed-46f2-abb5-ab300f7089d0
+    task_thread_id: pending-task-list-resolution
+    outcome: exact-selected-schema-startup-proof
+    worktree: 'C:\Users\jensh\.codex\worktrees\6038\PB-W00-control'
+    head: dc9340fc61d1090e61eda99e55f0cd993b2af898
+    integrated_commit: da570e3cc3936917c097ddd2302525f56125c916
+  selected_schema_recovery_integration_task:
+    task: T-049
+    state: completed
+    client_thread_id: client-new-thread:d720cd48-efde-46ec-81d1-d501386a8059
+    task_thread_id: pending-task-list-resolution
+    source_head: dc9340fc61d1090e61eda99e55f0cd993b2af898
+    tested_module_source: 78e75fc8995d871de56f761cc45fe4fd71b2ae3e
+    integrated_commit: da570e3cc3936917c097ddd2302525f56125c916
+    evidence_receipt: aaemu12-startup-schema-integration-v1
+  physical_retry:
+    task: T-050
+    state: incomplete-startup-predicate-conversion
+    client_thread_id: client-new-thread:2c67f163-bbb5-400d-b6e5-89a41e67071b
+    task_thread_id: 01a05a8e-3f30-7c81-996b-3eab7fe2e934
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\f4cd\\PB-W00-control'
+    attempt_commit: 19bd954098dfa1872bec10cc783b1bd9d0938d4e
+    evidence_receipt: aaemu12-t050-combat-stealth-v2
+    result: INCOMPLETE-startup-wrapper-before-command-api
+    cleanup: game-login-graceful-zero-processes-five-ports-free-runtime-logs-empty
+    external_evidence: 'D:\Codex-Labs\evidence\T-036\public-alpha-v2'
+    retained_predecessor: aaemu12-t036-combat-stealth-v1
+  startup_log_recovery_source_task:
+    task: T-051
+    state: integrated
+    client_thread_id: client-new-thread:d7e98349-adf1-4f47-8f52-b8c21b6cc68a
+    task_thread_id: 01a05a9f-d70b-7c70-b913-199fae63a0cd
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\ee21\\PB-W00-control'
+    head: 09dc81467805b6d857dd2f2e173080c863870e49
+    patch_sha256: b3ee8cfbe2aad1c7d4cf207f37c3ae4eb422bd21266e6d66320c5ca57ef01d91
+    integrated_source: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+    integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
+  retained_error_analysis_task:
+    task: T-052
+    state: completed-non-blocking
+    client_thread_id: client-new-thread:a7e7080c-7676-4ede-bda9-9c38ba919892
+    task_thread_id: 01a05a9f-d70c-7dd0-9bdb-7e9dd45b4c1f
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\0e7a\\PB-W00-control'
+    head: b1833eaaf09a19d27954ccc27d7452635a310a7a
+    result: native-aaemu12-post-readiness-shutdown-races
+    v3_observation: retain-and-classify-recurrence-against-readiness-shutdown-and-cleanup-markers
+  next_physical_retry:
+    task: T-054
+    state: incomplete-system-actor-parent-world
+    client_thread_id: client-new-thread:0f5a761f-4dee-4216-938a-9d0df433dbc7
+    task_thread_id: 01a05abe-7ea9-70c1-94c4-236f31392392
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\0721\\PB-W00-control'
+    external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v3'
+    attempt_commit: 3f037ed62ee0bb449c864234345644fdf5f3e4c8
+    evidence_receipt: aaemu12-t054-combat-stealth-v3
+    cleanup: game-login-graceful-zero-processes-five-ports-free-runtime-logs-empty
+    blocker: synthetic-system-actor-parent-world-null
+  system_actor_world_recovery_source_task:
+    task: T-055
+    state: integrated
+    outcome: assign-the-active-world-and-matching-spawn-position-to-fresh-system-actors
+    client_thread_id: client-new-thread:fb760fa2-cf61-400b-87c8-2f8cc691870c
+    task_thread_id: 01a05aeb-e957-7143-8656-e1f71514c74c
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\8fd0\\PB-W00-control'
+    head: 68cf32fbe3012364fb0e1dec2c8f6278015e35eb
+    patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+    integrated_commit: d26211711cb8597d00deab1be4ca7a731f428c71
+  system_actor_world_recovery_integration_task:
+    task: T-056
+    state: completed
+    client_thread_id: client-new-thread:08dbaead-1b07-4f00-89d6-e4d9ce4ba3bd
+    task_thread_id: 01a05af9-afa4-78a0-ad93-e8373d5d9aa4
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\cc3e\\PB-W00-control'
+    tested_module_source: 1d08632d303b35e7c2d5655de5b5e2b704896cc8
+    installed_module_tree: 1f3befa4dc3c01222b057c28279e82d25fcc176e
+    integrated_commit: d26211711cb8597d00deab1be4ca7a731f428c71
+    evidence_receipt: aaemu12-system-actor-integration-v1
+  live_headless_physical_v4:
+    task: T-057
+    state: incomplete-zone-zero-origin-no-casts-or-kills
+    external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v4'
+    archeage_client_allowed: false
+    client_thread_id: client-new-thread:53878ca2-3750-4d8d-9d68-ba764743c5d8
+    task_thread_id: 01a05b06-ee62-77e0-81fe-684c85116af2
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\e95a\\PB-W00-control'
+    attempt_commit: 3ca0edd67cf7eb4ab24886d798de7feb595572e0
+    evidence_receipt: aaemu12-t057-combat-stealth-v4
+    cleanup: game-login-graceful-zero-processes-zero-client-five-ports-free-empty-live-logs
+    blocker: system-actor-mainworld-template-origin-zone-zero
+  qualified_system_actor_anchor_source_task:
+    task: T-058
+    state: integrated
+    client_thread_id: client-new-thread:162b3705-4db6-4460-969f-2b43edd88f06
+    task_thread_id: 01a05b29-8864-78a0-8fe5-ac293959432d
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\4dee\\PB-W00-control'
+    head: 5bd425327367b72871aef2eae7e51655a53f7bbc
+    integrated_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+    integrated_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a
+  qualified_system_actor_anchor_integration_task:
+    task: T-059
+    state: completed
+    client_thread_id: client-new-thread:63a930ce-fc1c-41ca-97f7-ad8aab5d7bfe
+    task_thread_id: 01a05b39-e25a-7162-97c0-fb208699541e
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\04ce\\PB-W00-control'
+    tested_module_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+    installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+    integrated_commit: cc197aa452b05ad6149641dc2bd8ad465cdc127a
+    evidence_receipt: aaemu12-qualified-anchor-integration-v1
+  live_headless_physical_v5:
+    task: T-060
+    state: blocked-retained-incomplete-cohort25-fixture-observability
+    external_evidence: 'D:\\Codex-Labs\\evidence\\T-036\\public-alpha-v5'
+    archeage_client_allowed: false
+    client_thread_id: client-new-thread:a4beac22-f41f-4789-a907-5f40fee9f877
+    task_thread_id: 01a05b47-b0b7-71b3-90df-be5f07c6e81f
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\160a\\PB-W00-control'
+    tested_module_source: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+    installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+    attempt_commit: f81417898a2531f0dbca83af7ef4a104f6d6a907
+    evidence_receipt: aaemu12-t060-combat-stealth-v5
+    result: INCOMPLETE-cohorts-1-5-10-exact-kills-cohort25-fanout-target-despawn
+    blocker: shared-low-hp-fixture-fanout-and-dead-object-observability
+    cleanup: zero-bots-processes-clients-listeners-live-logs-graceful-game-then-login
+  single_bot_autonomy_v1:
+    task: T-061
+    state: blocked-retained-fail-missing-activity-activation
+    task_thread_id: 01a05bf9-cfbf-7942-853c-310035ae673a
+    worktree: 'C:\Users\jensh\.codex\worktrees\f81e\PB-W00-control'
+    attempt_commit: e07b88a3f090ddc4d0cbde48f3f55925a3e8bb8c
+    evidence_receipt: aaemu12-t061-one-bot-autonomy-v1
+    result: FAIL-zero-successful-autonomous-iterations
+    blocker: missing-production-single-bot-lifecycle-activity-selection-activation-and-autonomous-logout
+    cleanup: zero-bots-processes-clients-listeners-live-logs-graceful-game-then-login
+  startup_log_recovery_integration_task:
+    task: T-053
+    state: completed
+    client_thread_id: client-new-thread:1d47aee2-eca1-4548-aae1-50ae4f89ef08
+    task_thread_id: 01a05ab1-8b08-72f1-b0dd-d846709bb6c4
+    worktree: 'C:\\Users\\jensh\\.codex\\worktrees\\f9ea\\PB-W00-control'
+    tested_module_source: c0ae8898806ff3cc3e4a20107247a2b11ab9dcfe
+    installed_module_tree: 3db93b130aa80ff658a673a12ae36205d368cf8b
+    integrated_commit: a177607645cded9b318a6298ec5c44b0df2cc429
+    evidence_receipt: aaemu12-startup-log-integration-v2
+  runtime_lease: aaemu12-leased-to-T-120-quest-intake-integration-and-live-acceptance
+  runtime_database_identity: aaemu12_database_public_alpha_v1
+  runtime_start: authorized-only-for-exact-T-120-thread-worktree-after-install-build-config-gates

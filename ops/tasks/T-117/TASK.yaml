@@ -1,0 +1,49 @@
+schema_version: 1
+id: T-117
+title: Prove per-runtime two-wave one-zone autonomy v10
+track: AAEmu12
+status: paused
+integration: retained-pre-runtime-user-supersession
+outcome: Prove two complete three-bot native fixture lifecycle/refill waves and a clean distinct-PID restart using exact per-runtime recovery counters, the proven parser/planner/geometry gates, and cooperative autonomy-observer stop boundaries before each Game shutdown.
+depends_on: [T-116]
+runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\fbcd\PB-W00-control'
+owner_client_thread_id: client-new-thread:72ca3f2d-8109-4df8-a49a-a270b6b56265
+owner_thread_id: 01a0606e-751b-79b2-b8ce-38ea2c604f7a
+inputs:
+  dispatch_base: a56217b27e3f51ad96099847ee6cb2d989c6677c
+  installed_module_source: 39f748fb3904584b50e1dabc0cfb0b3045793165
+  installed_module_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: 0b770b543b167f7ae57fcb8eb9ad18357e75a5241b0b170a9b1fa4ac05f564f6
+  client_observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+  autonomy_observer_blob: 173a2de8f8844f16be463ab0779670f0fe264198
+  retained_named_grade_response_sha256: 32474d410485ba1fe987a80a0ed3b41b86f3729ee4fe3b30263f593e4de844d3
+  retained_planner_semantic_sha256: 38b871081b5c3dc4be700d33f9890c51e10aa3b1c80839b8b916584fa553bfc1
+  database_identity: aaemu12_database_public_alpha_v1
+  evidence_root: 'D:\Codex-Labs\evidence\T-117\one-zone-autonomy-v10'
+write_scope:
+  - ops/evidence/aaemu12-t117-one-zone-autonomy-v10.yaml
+  - ops/tasks/T-117/HANDOFF.md
+external_write_scope:
+  - aaemu12_t117_evidence_v10 fresh root only after exact committed lease
+  - deployed AAEmu 1.2 BotConfig.json exact contracted assignments with byte-exact restoration
+  - aaemu12_integration Login/Game runtime and accepted graceful control path under exact lease
+gates:
+  - exact-source-host-patch-assembly-config-observer-and-fresh-root-preflight
+  - exact-named-grade-and-schema-v2-runtime-metrics-parser-selftests
+  - retained-transform-literal-row-planner-selftest-18399744-tuples-125-eligible
+  - priority-isolated-cooperatively-yielding-dual-planner-observer-scheduling-rehearsal
+  - continuous-zero-client-process-observer-with-raw-chain-validation
+  - prearmed-three-bot-observers-and-180-second-ordered-director-bootstrap
+  - invariant-live-transform-post-plan-bit-exact-revalidation-and-row-valid-plan
+  - exact-six-one-shot-angular-fixtures-and-two-distinct-native-credits-per-identity
+  - two-complete-per-runtime-fixed-counter-recovery-logout-refill-waves
+  - cooperative-final-valid-observer-stop-before-each-game-shutdown
+  - graceful-distinct-pid-restart-ordered-rebootstrap-and-two-minute-dwell
+  - exact-config-restoration-zero-runtime-cleanup-and-sealed-manifest
+validation_boundary: Physical AAEmu 1.2 one-zone runtime proof only. Do not edit module source/tests/global ledgers/lease/workspace registry, registered reference, database, client, AAEmu 3.0, scale, soak, packaging, or predecessor evidence. No build/full suite, directed gameplay commands, fixture retries, runtime force-stop, destructive cleanup, or persisted exhaustive planner rows.
+contract: ops/tasks/T-117/CONTRACT.md
+handoff: ops/tasks/T-117/HANDOFF.md

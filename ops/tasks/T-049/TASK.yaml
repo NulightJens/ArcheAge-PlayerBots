@@ -1,0 +1,38 @@
+schema_version: 1
+id: T-049
+title: AAEmu 1.2 startup-proof integration
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Independently integrate T-048, apply its one new Login host hunk, and qualify the corrected AAEmu 1.2 candidate without starting a runtime.
+depends_on: [T-048]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:d720cd48-efde-46ec-81d1-d501386a8059
+
+inputs:
+  integration_branch: integration/aaemu12-world
+  source_commit: dc9340fc61d1090e61eda99e55f0cd993b2af898
+  source_handoff: ops/tasks/T-048/HANDOFF.md
+  host_reference: aaemu12_reference
+  validation_host: aaemu12_integration
+  prior_integration_receipt: ops/evidence/aaemu12-wave2-integration-v1.yaml
+
+write_scope:
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - compatibility/README.md
+  - playerbots.module.json
+  - scripts/scale/Start-ScaleGateRuntime.ps1
+  - scripts/scale/ScaleRuntimeStartupGuard.psm1
+  - scripts/scale/Test-ScaleRuntimeStartupGuard.ps1
+  - scripts/scale/README.md
+  - ops/tasks/T-048/HANDOFF.md
+  - ops/evidence/aaemu12-startup-schema-integration-v1.yaml
+  - ops/tasks/T-049/HANDOFF.md
+
+runtime:
+  required: false
+  lease: null
+gates: [deterministic-harness-tests, focused-aaemu12-tests, full-aaemu12-suite]
+validation_boundary: Install, incremental host-hunk application, build, and test only. Do not start Login/Game/client/MySQL, access databases, claim the lease, edit global ledgers, or touch AAEmu 3.0.
+handoff: ops/tasks/T-049/HANDOFF.md

@@ -1,0 +1,130 @@
+diff --git a/AAEmu.Game/GameData/TransferGameData.cs b/AAEmu.Game/GameData/TransferGameData.cs
+index 848e17da0..0d4308ac3 100644
+--- a/AAEmu.Game/GameData/TransferGameData.cs
++++ b/AAEmu.Game/GameData/TransferGameData.cs
+@@ -29,7 +29,12 @@ public class TransferGameData : Singleton<TransferGameData>, IGameDataLoader
+     /// <summary>
+     /// Lists of roads by world template (worldTemplateId, roads)
+     /// </summary>
+-    private Dictionary<byte, Dictionary<uint, List<TransferRoads>>> _transferRoads = [];
++    private long _transferRoadsRevision;
++    private TransferRoadStore _transferRoadStore = new(0, []);
++
++    private sealed record TransferRoadStore(
++        long Revision,
++        Dictionary<byte, Dictionary<uint, List<TransferRoads>>> Roads);
+ 
+     public void Load(SqliteConnection connection)
+     {
+@@ -140,7 +145,7 @@ public class TransferGameData : Singleton<TransferGameData>, IGameDataLoader
+         Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+ 
+         //                              worldId           key  transfer_path
+-        _transferRoads = [];
++        var transferRoadsByWorld = new Dictionary<byte, Dictionary<uint, List<TransferRoads>>>();
+         foreach (var (worldName, worldTemplate) in WorldManager.Instance.WorldTemplates)
+         {
+             var transferPaths = new Dictionary<uint, List<TransferRoads>>();
+@@ -216,10 +221,13 @@ public class TransferGameData : Singleton<TransferGameData>, IGameDataLoader
+                 transferPaths.Add(zoneId, transferPath);
+             }
+ 
+-            _transferRoads.Add((byte)worldTemplate.Id, transferPaths);
+-            GetOwnerPaths(worldTemplate.Id);
++            transferRoadsByWorld.Add((byte)worldTemplate.Id, transferPaths);
++            GetOwnerPaths(worldTemplate.Id, transferRoadsByWorld);
+         }
+ 
++        var revision = Interlocked.Increment(ref _transferRoadsRevision);
++        Volatile.Write(ref _transferRoadStore, new TransferRoadStore(revision, transferRoadsByWorld));
++
+         #endregion TransferPathXml
+     }
+ 
+@@ -227,19 +235,56 @@ public class TransferGameData : Singleton<TransferGameData>, IGameDataLoader
+     {
+         //
+     }
++
++    /// <summary>
++    /// Returns an immutable point-in-time copy of the already loaded transfer roads.
++    /// The source dictionaries and mutable transfer models are never exposed.
++    /// </summary>
++    public TransferRoadsSnapshot GetTransferRoadsSnapshot()
++    {
++        var store = Volatile.Read(ref _transferRoadStore);
++        var roads = store.Roads
++            .OrderBy(world => world.Key)
++            .SelectMany(world => world.Value
++                .OrderBy(zone => zone.Key)
++                .SelectMany(zone => zone.Value.Select(road => new TransferRoadPolylineSnapshot(
++                    world.Key,
++                    road.ZoneId,
++                    road.Name,
++                    road.Type,
++                    road.CellX,
++                    road.CellY,
++                    Array.AsReadOnly(road.Pos.Select(point => new TransferRoadPointSnapshot(
++                        point.WorldId,
++                        point.ZoneId,
++                        point.X,
++                        point.Y,
++                        point.Z)).ToArray())))))
++            .OrderBy(road => road.WorldId)
++            .ThenBy(road => road.ZoneId)
++            .ThenBy(road => road.Name, StringComparer.Ordinal)
++            .ThenBy(road => road.Type)
++            .ThenBy(road => road.CellX)
++            .ThenBy(road => road.CellY)
++            .ToArray();
++
++        return new TransferRoadsSnapshot(store.Revision, Array.AsReadOnly(roads));
++    }
+     
+     /// <summary>
+     /// Get a list of all parts of your path for transportation to populate the Template TransferRoads
+     /// </summary>
+     /// <param name="worldTemplateId"></param>
+     /// <returns></returns>
+-    private void GetOwnerPaths(uint worldTemplateId = 0)
++    private void GetOwnerPaths(
++        uint worldTemplateId,
++        IReadOnlyDictionary<byte, Dictionary<uint, List<TransferRoads>>> transferRoadsByWorld)
+     {
+         foreach (var (id, transferTemplate) in _templates)
+         {
+             foreach (var transferPaths in transferTemplate.TransferAllPaths)
+             {
+-                foreach (var (wid, transfers) in _transferRoads)
++                foreach (var (wid, transfers) in transferRoadsByWorld)
+                 {
+                     if (wid != worldTemplateId) { continue; }
+                     foreach (var (zid, transfer) in transfers)
+diff --git a/AAEmu.Game/Models/Game/Transfers/TransferRoads.cs b/AAEmu.Game/Models/Game/Transfers/TransferRoads.cs
+index b8d514111..1dc2948ec 100644
+--- a/AAEmu.Game/Models/Game/Transfers/TransferRoads.cs
++++ b/AAEmu.Game/Models/Game/Transfers/TransferRoads.cs
+@@ -11,3 +11,23 @@ public class TransferRoads
+     public int CellY { get; set; }
+     public List<WorldSpawnPosition> Pos { get; set; } = [];
+ }
++
++public sealed record TransferRoadPointSnapshot(
++    uint WorldId,
++    uint ZoneId,
++    float X,
++    float Y,
++    float Z);
++
++public sealed record TransferRoadPolylineSnapshot(
++    uint WorldId,
++    uint ZoneId,
++    string Name,
++    int Type,
++    int CellX,
++    int CellY,
++    IReadOnlyList<TransferRoadPointSnapshot> Points);
++
++public sealed record TransferRoadsSnapshot(
++    long Revision,
++    IReadOnlyList<TransferRoadPolylineSnapshot> Roads);

@@ -1,0 +1,202 @@
+diff --git a/AAEmu.Game/Models/Game/World/WorldInstance.cs b/AAEmu.Game/Models/Game/World/WorldInstance.cs
+index 6b3c5e1..1c7d718 100644
+--- a/AAEmu.Game/Models/Game/World/WorldInstance.cs
++++ b/AAEmu.Game/Models/Game/World/WorldInstance.cs
+@@ -677,6 +677,37 @@ public partial class WorldInstance(WorldTemplate template, uint channelId, bool
+         return _doodads.Values.ToList();
+     }
+ 
++    /// <summary>
++    /// Bounded, read-only doodad discovery surface for the PlayerBots module.
++    /// </summary>
++    public IReadOnlyList<Doodad> GetPlayerBotDoodadsNear(GameObject observer, float radius)
++    {
++        const float maximumRadius = 100f;
++        const int maximumResults = 256;
++        if (observer?.Transform?.World == null ||
++            !ReferenceEquals(observer.ParentWorld, this) ||
++            !float.IsFinite(radius) || radius <= 0)
++            return [];
++
++        var effectiveRadius = Math.Min(radius, maximumRadius);
++        var origin = observer.Transform.World.Position;
++        if (!float.IsFinite(origin.X) || !float.IsFinite(origin.Y) || !float.IsFinite(origin.Z))
++            return [];
++
++        return WorldManager.GetAround<Doodad>(observer, effectiveRadius)
++            .Where(doodad => doodad?.Transform?.World != null && doodad.Despawn <= DateTime.MinValue)
++            .Select(doodad => (Doodad: doodad, Position: doodad.Transform.World.Position))
++            .Where(candidate =>
++                float.IsFinite(candidate.Position.X) &&
++                float.IsFinite(candidate.Position.Y) &&
++                float.IsFinite(candidate.Position.Z))
++            .OrderBy(candidate => Vector3.DistanceSquared(origin, candidate.Position))
++            .ThenBy(candidate => candidate.Doodad.ObjId)
++            .Take(maximumResults)
++            .Select(candidate => candidate.Doodad)
++            .ToArray();
++    }
++
+     /// <summary>
+     /// Gets a list of all gimmicks in this instance
+     /// </summary>
+diff --git a/AAEmu.Game/Models/Game/DoodadObj/Doodad.cs b/AAEmu.Game/Models/Game/DoodadObj/Doodad.cs
+index d4c4b16..32aa831 100644
+--- a/AAEmu.Game/Models/Game/DoodadObj/Doodad.cs
++++ b/AAEmu.Game/Models/Game/DoodadObj/Doodad.cs
+@@ -366,6 +366,32 @@ public class Doodad : BaseUnit
+         CurrentToDTriggers = [];
+     }
+ 
++    /// <summary>
++    /// Resolves one unambiguous quest function from this doodad's current
++    /// phase. This is intentionally read-only and fails closed.
++    /// </summary>
++    public bool TryGetPlayerBotCurrentQuest(out uint questId)
++    {
++        questId = 0;
++        if (Despawn > DateTime.MinValue || CurrentFuncs == null)
++            return false;
++
++        var questIds = CurrentFuncs
++            .Where(func => func != null && func.FuncType == nameof(DoodadFuncQuest))
++            .Select(func => DoodadManager.Instance.GetFuncTemplate(func.FuncId, func.FuncType))
++            .OfType<DoodadFuncQuest>()
++            .Select(func => func.QuestId)
++            .Where(id => id != 0)
++            .Distinct()
++            .Take(2)
++            .ToArray();
++        if (questIds.Length != 1)
++            return false;
++
++        questId = questIds[0];
++        return true;
++    }
++
+     /// <summary>
+     /// Changes the Scale for this Doodad
+     /// </summary>
+diff --git a/AAEmu.Game/Models/Game/Quests/Quest.cs b/AAEmu.Game/Models/Game/Quests/Quest.cs
+index 3759d8c..b5e5f6d 100644
+--- a/AAEmu.Game/Models/Game/Quests/Quest.cs
++++ b/AAEmu.Game/Models/Game/Quests/Quest.cs
+@@ -460,6 +460,19 @@ public partial class Quest : PacketMarshaler
+         return Objectives;
+     }
+ 
++    /// <summary>
++    /// Read-only single-counter access for the PlayerBots quest adapter.
++    /// </summary>
++    public bool TryGetPlayerBotObjectiveCount(byte objectiveIndex, out int count)
++    {
++        count = 0;
++        if (Objectives == null || objectiveIndex >= Objectives.Length)
++            return false;
++
++        count = Objectives[objectiveIndex];
++        return count >= 0;
++    }
++
+     /// <summary>
+     /// Runs the QuestCleanup code of all the quest's acts
+     /// </summary>
+diff --git a/AAEmu.Game/Core/Managers/QuestManagerEvents.cs b/AAEmu.Game/Core/Managers/QuestManagerEvents.cs
+index f95f0dc..73cd87b 100644
+--- a/AAEmu.Game/Core/Managers/QuestManagerEvents.cs
++++ b/AAEmu.Game/Core/Managers/QuestManagerEvents.cs
+@@ -69,6 +69,94 @@ public partial class QuestManager
+         }
+     }
+ 
++    /// <summary>
++    /// Validates a PlayerBots report request against the authoritative active
++    /// quest, ready endpoint, live world object, and offered selective reward
++    /// before dispatching the normal report event lifecycle.
++    /// </summary>
++    public bool TryReportPlayerBotQuest(
++        Character owner,
++        uint questContextId,
++        uint npcObjId,
++        uint doodadObjId,
++        int selected)
++    {
++        if (owner?.Quests?.ActiveQuests == null || owner.ParentWorld == null ||
++            questContextId == 0 || npcObjId > 0 && doodadObjId > 0 || selected < 0 ||
++            !owner.Quests.ActiveQuests.TryGetValue(questContextId, out var quest) || quest == null ||
++            quest.Status != QuestStatus.Ready && quest.Step != QuestComponentKind.Ready ||
++            !quest.QuestSteps.TryGetValue(QuestComponentKind.Ready, out var readyStep))
++        {
++            return false;
++        }
++
++        var reportActs = readyStep.Components.Values
++            .Where(component => component.IsCurrentlyActive)
++            .SelectMany(component => component.Acts)
++            .Select(act => act.Template)
++            .ToArray();
++
++        var endpointValid = false;
++        if (npcObjId > 0)
++        {
++            var npc = owner.ParentWorld.GetNpc(npcObjId);
++            endpointValid = IsPlayerBotReportObjectInRange(owner, npc) && reportActs
++                .OfType<QuestActConReportNpc>()
++                .Any(act => act.NpcId == npc.TemplateId);
++        }
++        else if (doodadObjId > 0)
++        {
++            var doodad = owner.ParentWorld.GetDoodad(doodadObjId);
++            endpointValid = IsPlayerBotReportObjectInRange(owner, doodad) &&
++                doodad.TryGetPlayerBotCurrentQuest(out var currentQuestId) &&
++                currentQuestId == questContextId && reportActs
++                    .OfType<QuestActConReportDoodad>()
++                    .Any(act => act.DoodadId == doodad.TemplateId);
++        }
++        else
++        {
++            endpointValid = reportActs.OfType<QuestActConReportJournal>().Any();
++        }
++
++        if (!endpointValid)
++            return false;
++
++        if (!quest.QuestSteps.TryGetValue(QuestComponentKind.Reward, out var rewardStep))
++            return false;
++
++        var selectiveIndices = rewardStep.Components.Values
++            .Where(component => component.IsCurrentlyActive)
++            .SelectMany(component => component.Acts)
++            .Select(act => act.Template)
++            .OfType<QuestActSupplySelectiveItem>()
++            .Select(act => act.ThisSelectiveIndex)
++            .Where(index => index >= 0)
++            .Distinct()
++            .ToArray();
++        if (selectiveIndices.Length == 0 ? selected != 0 : !selectiveIndices.Contains(selected))
++            return false;
++
++        DoReportEvents(owner, questContextId, npcObjId, doodadObjId, selected);
++        return true;
++    }
++
++    private static bool IsPlayerBotReportObjectInRange(Character owner, BaseUnit target)
++    {
++        const float maximumInteractionRange = 10f;
++        if (owner?.Transform?.World == null || target?.Transform?.World == null)
++            return false;
++
++        var ownerPosition = owner.Transform.World.Position;
++        var targetPosition = target.Transform.World.Position;
++        if (!float.IsFinite(ownerPosition.X) || !float.IsFinite(ownerPosition.Y) ||
++            !float.IsFinite(ownerPosition.Z) || !float.IsFinite(targetPosition.X) ||
++            !float.IsFinite(targetPosition.Y) || !float.IsFinite(targetPosition.Z))
++            return false;
++
++        return Vector3.DistanceSquared(ownerPosition, targetPosition) <=
++               maximumInteractionRange * maximumInteractionRange;
++    }
++
+     /// <summary>
+     /// Trigger the quest events for handling the consumption or reduction of items
+     /// </summary>

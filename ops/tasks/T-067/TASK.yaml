@@ -1,0 +1,32 @@
+schema_version: 1
+id: T-067
+title: Expose lifecycle progression and resource deltas
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Add deterministic read-only progression, inventory, HP, and MP snapshots at autonomous activity activation and immediately before lifecycle logout so runtime evidence can prove exact native deltas after self-logout without database access or gameplay control.
+depends_on: [T-063, T-065]
+branch: codex-managed-detached-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\d453\PB-W00-control'
+owner_client_thread_id: client-new-thread:85417e89-8c24-49e9-84ed-8e2ad2753f6e
+owner_thread_id: 01a05c52-d3b2-7913-95d2-7f0f426bad22
+runtime:
+  required: false
+  lease: null
+inputs:
+  dispatch_base: 07e230ab959c4147318d3b5228dee492ff18c4fb
+  blocker_receipt: ops/evidence/aaemu12-t065-one-bot-autonomy-v2.yaml
+  tested_module_source: 401dd353ef37aa858763b41dc2e5c1663446ff57
+write_scope:
+  - src/AAEmu.Game/Bots/Life/BotLifeController.cs
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Life/BotLifeControllerTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/tasks/T-067/HANDOFF.md
+gates: [focused-aaemu12-tests]
+validation_boundary: Source-only read-only observability. Do not start/control AAEmu, MySQL, or clients; edit deployed hosts, databases, global ledgers/leases, lifecycle decisions, combat/loot/recovery behavior, retained evidence, AAEmu 3.0, or unrelated PlayerBots systems.
+handoff: ops/tasks/T-067/HANDOFF.md
+source_head: 4253d0875c5165095621e1e6ff4c672fa21a51d8
+verdict: PASS-source-ready-runtime-pending
+integrated_commit: a0b826c9864de56e8b0e5c40f45f60a64e743d88

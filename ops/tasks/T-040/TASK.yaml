@@ -1,0 +1,29 @@
+schema_version: 1
+id: T-040
+title: Persistent bot identity and roster
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Define stable bot identities and a versioned roster store that survives process restart without controlling live spawns.
+depends_on: [PB-W00]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:96ef486b-2a90-4bb6-8c8a-364f3d948c1f
+
+inputs:
+  module_source: current-worktree
+  host_reference: aaemu12_reference
+  validation_host: aaemu12_integration
+  client_fixture: aaemu12_client
+
+write_scope:
+  - src/AAEmu.Game/Bots/Population/Identity/**
+  - tests/AAEmu.UnitTests/Bots/Population/Identity/**
+  - sql/*bot_roster*.sql
+
+runtime:
+  required: false
+  lease: null
+gates: [focused-aaemu12-tests]
+validation_boundary: Pure source work needs no runtime; final integration proof must use the current aaemu12_integration receipt.
+handoff: ops/tasks/T-040/HANDOFF.md

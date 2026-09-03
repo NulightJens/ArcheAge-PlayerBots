@@ -55,7 +55,14 @@ public class BotCombatManagerTests
     {
         var manager = new BotCombatManager();
         var bot = BotTestFixture.MakeBot(2, default);
-        var state = new BotCombatState { IsActive = true };
+        var state = new BotCombatState
+        {
+            IsActive = true,
+            LostTarget = bot,
+            IsSearching = true,
+            SearchRadius = 12f,
+            SearchAngle = 1f
+        };
         BotTestFixture.GetDictionary<BotCombatState>(manager, "_combatStates").TryAdd(bot.Id, state);
 
         manager.DisableCombat(bot);
@@ -63,6 +70,9 @@ public class BotCombatManagerTests
         await Assert.That(manager.GetState(bot)).IsSameReferenceAs(state);
         await Assert.That(state.IsActive).IsFalse();
         await Assert.That(state.CurrentState).IsEqualTo(BotCombatStateType.Idle);
+        await Assert.That(state.LostTarget).IsNull();
+        await Assert.That(state.IsSearching).IsFalse();
+        await Assert.That(state.SearchRadius).IsEqualTo(0f);
     }
 
     [Test]
@@ -106,6 +116,29 @@ public class BotCombatManagerTests
         manager.StartListening(bot);
 
         await Assert.That(manager.IsTaskRunning(bot.Id)).IsTrue();
+        await Assert.That(BotHost.Instance.GetRuntime(bot.Id)).IsSameReferenceAs(runtime);
+
+        manager.StopListening(bot);
+    }
+
+    [Test]
+    public async Task StartListening_ReplacesBrainBoundToStaleCombatState()
+    {
+        var manager = new BotCombatManager();
+        var bot = BotTestFixture.MakeBot(32, default);
+
+        manager.StartListening(bot);
+        var runtime = BotHost.Instance.GetRuntime(bot.Id);
+        var originalBrain = (BotCombatTask)runtime.Brain;
+        var replacementState = new BotCombatState { BotId = bot.Id };
+        BotTestFixture.GetDictionary<BotCombatState>(manager, "_combatStates")[bot.Id] = replacementState;
+
+        manager.StartListening(bot);
+
+        var replacementBrain = (BotCombatTask)runtime.Brain;
+        await Assert.That(replacementBrain).IsNotSameReferenceAs(originalBrain);
+        await Assert.That(replacementBrain.State).IsSameReferenceAs(replacementState);
+        await Assert.That(originalBrain.Cancelled).IsTrue();
         await Assert.That(BotHost.Instance.GetRuntime(bot.Id)).IsSameReferenceAs(runtime);
 
         manager.StopListening(bot);

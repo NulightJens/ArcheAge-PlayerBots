@@ -1,0 +1,2885 @@
+diff --git a/AAEmu.Game/AAEmu.Game.csproj b/AAEmu.Game/AAEmu.Game.csproj
+index 942e08a62..a00165eba 100644
+--- a/AAEmu.Game/AAEmu.Game.csproj
++++ b/AAEmu.Game/AAEmu.Game.csproj
+@@ -99,4 +99,6 @@
+     <PackageReference Include="OSVersionExt.NetStd" />
+   </ItemGroup>
+  
++  <Import Project="..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Game.targets"
++          Condition="Exists('..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Game.targets')" />
+ </Project>
+diff --git a/AAEmu.Game/Configurations/AccessLevels.json b/AAEmu.Game/Configurations/AccessLevels.json
+index 06130ba25..011ed5d62 100644
+--- a/AAEmu.Game/Configurations/AccessLevels.json
++++ b/AAEmu.Game/Configurations/AccessLevels.json
+@@ -8,6 +8,10 @@
+         "online": 0,
+         "soloparty": 0,
+         "teleport": 0,
++        "botcontrol": 0,
++        "bot": 0,
++        "bots": 0,
++        "bothelp": 0,
+         
+         // Moderaters
+         "announce": 50,
+@@ -26,9 +30,16 @@
+         "revive": 50,
+         "showinv": 50,
+         "spawn": 50,
++        "spawnpassive": 100,
++        "passivenpc": 100,
++        "passiveboss": 100,
+         "coffer": 50,
+         
+         // Admin
++        "add_bot": 100,
++        "addbot": 100,
++        "create_bot": 100,
++        "createbot": 100,
+         "addbuff": 100,
+         "addgold": 100,
+         "additem": 100,
+@@ -37,13 +48,35 @@
+         "addxp": 100,
+         "around": 100,
+         "build": 100,
++        "botarchetype": 100,
++        "botbuff": 100,
++        "botclass": 100,
++        "botequip": 100,
++        "botgear": 100,
++        "botsetclass": 100,
++        "botdebug": 100,
++        "botmetrics": 100,
++        "botquest": 100,
++        "botduel": 100,
++    "botfollow": 100,
++    "botattackobject": 100,
++    "botattacknpc": 100,
++        "botjump": 100,
++        "botreset": 100,
++        "botstate": 100,
++        "botstrategy": 100,
++        "botvalues": 100,
++        "botactions": 100,
++        "botrotation": 100,
+         "clearcombat": 100,
+         "damage": 100,
+         "despawnall": 100,
+         "dummy": 100,
+         "echo": 100,
++        "exportworld": 100,
+         "housebindingmove": 100,
+         "move_all": 100,
++        "movebot": 100,
+         "moveto": 100,
+         "nloc": 100,
+         "nwrite": 100,
+@@ -51,11 +84,19 @@
+         "pingpos": 100,
+         "position": 100,
+         "proc": 100,
++        "rbc": 100,
++        "reloadarchetype": 100,
+         "reloadauction": 100,
++        "reloadbotarchetype": 100,
++        "reloadbotconfig": 100,
+         "reloadconfig": 100,
++        "remove_bot": 100,
++        "removebot": 100,
+         "rotate": 100,
+         "scripts": 100,
+         "setfaction": 100,
++        "setarchetype": 100,
++        "setclass": 100,
+         "setlevel": 100,
+         "settitle": 100,
+         "snow": 100,
+@@ -72,10 +113,11 @@
+         "tickdoodad": 100,
+         "tower_def": 100,
+         "useskill": 100,
++        "walkbot": 100,
+         "wipeauctionhouse": 100,
+         "zonestate": 100,
+         
+         // Disabled
+         "testtransfer": 999
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/AAEmu.Game/Core/Managers/AccountManager.cs b/AAEmu.Game/Core/Managers/AccountManager.cs
+index ce6e353ee..6bcc8d0e1 100644
+--- a/AAEmu.Game/Core/Managers/AccountManager.cs
++++ b/AAEmu.Game/Core/Managers/AccountManager.cs
+@@ -150,6 +150,48 @@ public class AccountManager(ITickManager tickManager, ITimedRewardsManager timed
+         }
+     }
+ 
++    /// <summary>
++    /// Reads an existing game account without creating a row as a side effect.
++    /// Server-owned identities must be bound to an account provisioned by an
++    /// operator, never to an implicit account created by character creation.
++    /// </summary>
++    public bool TryGetExistingAccountDetails(uint accountId, out AccountDetails accountDetails)
++    {
++        accountDetails = new AccountDetails();
++        if (accountId == 0 || accountId > int.MaxValue)
++            return false;
++
++        try
++        {
++            using var connection = MySQL.CreateConnection();
++            using var command = connection.CreateCommand();
++            command.CommandText = "SELECT * FROM accounts WHERE account_id = @acc_id";
++            command.Parameters.AddWithValue("@acc_id", accountId);
++            command.Prepare();
++            using var reader = command.ExecuteReader();
++            if (!reader.Read())
++                return false;
++
++            accountDetails.AccountId = reader.GetInt32("account_id");
++            accountDetails.AccessLevel = reader.GetInt32("access_level");
++            accountDetails.Labor = reader.GetInt16("labor");
++            accountDetails.Credits = reader.GetInt32("credits");
++            accountDetails.Loyalty = reader.GetInt32("loyalty");
++            accountDetails.LastUpdated = reader.GetDateTime("last_updated");
++            accountDetails.LastLogin = reader.GetDateTime("last_login");
++            accountDetails.LastLaborTick = reader.GetDateTime("last_labor_tick");
++            accountDetails.LastCreditsTick = reader.GetDateTime("last_credits_tick");
++            accountDetails.LastLoyaltyTick = reader.GetDateTime("last_loyalty_tick");
++            return accountDetails.AccountId == (int)accountId;
++        }
++        catch (Exception exception)
++        {
++            Logger.Error(exception, $"Failed to read existing account {accountId}");
++            accountDetails = new AccountDetails();
++            return false;
++        }
++    }
++
+     public bool AddCredits(uint accountId, int creditsAmount)
+     {
+         object accLock;
+diff --git a/AAEmu.Game/Core/Managers/DuelManager.cs b/AAEmu.Game/Core/Managers/DuelManager.cs
+index f462ce0ca..4c7f00ffa 100644
+--- a/AAEmu.Game/Core/Managers/DuelManager.cs
++++ b/AAEmu.Game/Core/Managers/DuelManager.cs
+@@ -1,5 +1,6 @@
+ ﻿using System.Collections.Concurrent;
+ using AAEmu.Commons.Utils;
++using AAEmu.Game.Core.Managers.Bots;
+ using AAEmu.Game.Core.Managers.World;
+ using AAEmu.Game.Core.Packets.G2C;
+ using AAEmu.Game.Models.Game;
+@@ -47,12 +48,27 @@ public class DuelManager : Singleton<DuelManager>, IDuelManager
+         _duels.TryRemove(duel.Challenged.Id, out _);
+     }
+ 
++    internal bool TryGetDuel(uint characterId, out Duel duel)
++    {
++        return _duels.TryGetValue(characterId, out duel);
++    }
++
+     public void DuelRequest(Character challenger, uint challengedId)
+     {
+         // приходит ID того, кого вызвали на дуэль
+         var challenged = WorldManager.Instance.GetCharacterById(challengedId);
++        ArgumentNullException.ThrowIfNull(challenged);
+         var duel = new Duel(challenger, challenged);
+         DuelAdd(duel);
++
++        // --- BOT HOOK ---
++        if (BotCombatManager.Instance.OnDuelRequested(challenged, challenger))
++        {
++            Logger.Info($"Duel request from {challenger.Name} to bot {challenged.Name} routed to BotCombatManager.");
++            return;
++        }
++
++        // For real players, send the challenge packet
+         challenged.SendPacket(new SCDuelChallengedPacket(challenger.Id)); // we send only to the enemy
+         Logger.Warn($"DuelRequest: challenger={challenger.Id}:{challenger.ObjId}, challenged={challengedId}:{challenged.Id}:{challenged.ObjId}");
+     }
+@@ -87,6 +103,8 @@ public class DuelManager : Singleton<DuelManager>, IDuelManager
+                 SetFaction(duel.Challenger, FactionsEnum.RedTeam);
+                 SetFaction(duel.Challenged, FactionsEnum.BlueTeam);
+ 
++                BotCombatManager.Instance.OnDuelStarted(duel);
++
+                 //Schedule duel start task.
+                 duel.DuelStartTask = new DuelStartTask(duel.Challenger.Id);
+                 TaskManager.Instance.Schedule(duel.DuelStartTask, TimeSpan.FromSeconds(3));
+@@ -248,6 +266,8 @@ public class DuelManager : Singleton<DuelManager>, IDuelManager
+             RestoreFaction(duel.Challenger);
+             RestoreFaction(duel.Challenged);
+ 
++            BotCombatManager.Instance.OnDuelEnded(duel);
++
+             // Player cannot be attacked
+             duel.Challenger.IsInBattle = false;
+             duel.Challenged.IsInBattle = false;
+diff --git a/AAEmu.Game/Core/Managers/ExpeditionManager.cs b/AAEmu.Game/Core/Managers/ExpeditionManager.cs
+index 70ae67456..d60da993c 100644
+--- a/AAEmu.Game/Core/Managers/ExpeditionManager.cs
++++ b/AAEmu.Game/Core/Managers/ExpeditionManager.cs
+@@ -384,7 +384,11 @@ public class ExpeditionManager(IExpeditionIdManager expeditionIdManager, ITeamMa
+ 
+     public void Kick(GameConnection connection, uint kickedId)
+     {
+-        var character = connection.ActiveChar;
++        Kick(connection.ActiveChar, kickedId);
++    }
++
++    public void Kick(Character character, uint kickedId)
++    {
+         var expedition = character.Expedition;
+ 
+         var characterMember = expedition?.GetMember(character);
+diff --git a/AAEmu.Game/Core/Managers/IAccountManager.cs b/AAEmu.Game/Core/Managers/IAccountManager.cs
+index 76f9b497b..32064d1b2 100644
+--- a/AAEmu.Game/Core/Managers/IAccountManager.cs
++++ b/AAEmu.Game/Core/Managers/IAccountManager.cs
+@@ -10,6 +10,7 @@ public interface IAccountManager : IInitializable
+     bool Contains(uint id);
+     int Count();
+     AccountDetails GetAccountDetails(uint accountId);
++    bool TryGetExistingAccountDetails(uint accountId, out AccountDetails accountDetails);
+     bool AddCredits(uint accountId, int creditsAmount);
+     bool RemoveCredits(uint accountId, int credits);
+     bool AddLoyalty(uint accountId, int loyaltyAmount);
+diff --git a/AAEmu.Game/Core/Managers/ITeamManager.cs b/AAEmu.Game/Core/Managers/ITeamManager.cs
+index 4ca2f1c6a..ad08f8415 100644
+--- a/AAEmu.Game/Core/Managers/ITeamManager.cs
++++ b/AAEmu.Game/Core/Managers/ITeamManager.cs
+@@ -8,5 +8,6 @@ public interface ITeamManager : ILoadable
+     Team GetActiveTeamByUnit(uint unitId);
+     Team GetTeamByObjId(uint objId);
+     Team GetActiveTeam(uint teamId);
++    void SetTeamMemberRole(Character unit, uint teamId, uint memberId, MemberRole role);
+     void MemberRemoveFromTeam(Character unit, Character source, RiskyAction leaveType);
+ }
+diff --git a/AAEmu.Game/Core/Managers/ITickManager.cs b/AAEmu.Game/Core/Managers/ITickManager.cs
+index 2e10b30fd..7de689262 100644
+--- a/AAEmu.Game/Core/Managers/ITickManager.cs
++++ b/AAEmu.Game/Core/Managers/ITickManager.cs
+@@ -3,5 +3,6 @@ namespace AAEmu.Game.Core.Managers;
+ public interface ITickManager : IInitializable
+ {
+     TickManager.TickEventHandler OnTick { get; }
++    ServerTickMetrics Metrics { get; }
+     void Stop();
+ }
+diff --git a/AAEmu.Game/Core/Managers/QuestManagerEvents.cs b/AAEmu.Game/Core/Managers/QuestManagerEvents.cs
+index 5a0ba7c8d..e1635c718 100644
+--- a/AAEmu.Game/Core/Managers/QuestManagerEvents.cs
++++ b/AAEmu.Game/Core/Managers/QuestManagerEvents.cs
+@@ -69,6 +69,94 @@ public partial class QuestManager
+         }
+     }
+ 
++    /// <summary>
++    /// Validates a PlayerBots report request against the authoritative active
++    /// quest, ready endpoint, live world object, and offered selective reward
++    /// before dispatching the normal report event lifecycle.
++    /// </summary>
++    public bool TryReportPlayerBotQuest(
++        Character owner,
++        uint questContextId,
++        uint npcObjId,
++        uint doodadObjId,
++        int selected)
++    {
++        if (owner?.Quests?.ActiveQuests == null || owner.ParentWorld == null ||
++            questContextId == 0 || npcObjId > 0 && doodadObjId > 0 || selected < 0 ||
++            !owner.Quests.ActiveQuests.TryGetValue(questContextId, out var quest) || quest == null ||
++            quest.Status != QuestStatus.Ready && quest.Step != QuestComponentKind.Ready ||
++            !quest.QuestSteps.TryGetValue(QuestComponentKind.Ready, out var readyStep))
++        {
++            return false;
++        }
++
++        var reportActs = readyStep.Components.Values
++            .Where(component => component.IsCurrentlyActive)
++            .SelectMany(component => component.Acts)
++            .Select(act => act.Template)
++            .ToArray();
++
++        var endpointValid = false;
++        if (npcObjId > 0)
++        {
++            var npc = owner.ParentWorld.GetNpc(npcObjId);
++            endpointValid = IsPlayerBotReportObjectInRange(owner, npc) && reportActs
++                .OfType<QuestActConReportNpc>()
++                .Any(act => act.NpcId == npc.TemplateId);
++        }
++        else if (doodadObjId > 0)
++        {
++            var doodad = owner.ParentWorld.GetDoodad(doodadObjId);
++            endpointValid = IsPlayerBotReportObjectInRange(owner, doodad) &&
++                doodad.TryGetPlayerBotCurrentQuest(out var currentQuestId) &&
++                currentQuestId == questContextId && reportActs
++                    .OfType<QuestActConReportDoodad>()
++                    .Any(act => act.DoodadId == doodad.TemplateId);
++        }
++        else
++        {
++            endpointValid = reportActs.OfType<QuestActConReportJournal>().Any();
++        }
++
++        if (!endpointValid)
++            return false;
++
++        if (!quest.QuestSteps.TryGetValue(QuestComponentKind.Reward, out var rewardStep))
++            return false;
++
++        var selectiveIndices = rewardStep.Components.Values
++            .Where(component => component.IsCurrentlyActive)
++            .SelectMany(component => component.Acts)
++            .Select(act => act.Template)
++            .OfType<QuestActSupplySelectiveItem>()
++            .Select(act => act.ThisSelectiveIndex)
++            .Where(index => index >= 0)
++            .Distinct()
++            .ToArray();
++        if (selectiveIndices.Length == 0 ? selected != 0 : !selectiveIndices.Contains(selected))
++            return false;
++
++        DoReportEvents(owner, questContextId, npcObjId, doodadObjId, selected);
++        return true;
++    }
++
++    private static bool IsPlayerBotReportObjectInRange(Character owner, BaseUnit target)
++    {
++        const float maximumInteractionRange = 10f;
++        if (owner?.Transform?.World == null || target?.Transform?.World == null)
++            return false;
++
++        var ownerPosition = owner.Transform.World.Position;
++        var targetPosition = target.Transform.World.Position;
++        if (!float.IsFinite(ownerPosition.X) || !float.IsFinite(ownerPosition.Y) ||
++            !float.IsFinite(ownerPosition.Z) || !float.IsFinite(targetPosition.X) ||
++            !float.IsFinite(targetPosition.Y) || !float.IsFinite(targetPosition.Z))
++            return false;
++
++        return Vector3.DistanceSquared(ownerPosition, targetPosition) <=
++               maximumInteractionRange * maximumInteractionRange;
++    }
++
+     /// <summary>
+     /// Trigger the quest events for handling the consumption or reduction of items
+     /// </summary>
+diff --git a/AAEmu.Game/Core/Managers/TeamManager.cs b/AAEmu.Game/Core/Managers/TeamManager.cs
+index 5f4b56076..61168fb9d 100644
+--- a/AAEmu.Game/Core/Managers/TeamManager.cs
++++ b/AAEmu.Game/Core/Managers/TeamManager.cs
+@@ -119,6 +119,8 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+     {
+         var target = targetObj ?? worldManager.GetCharacter(targetName);
+         if (target == null) return;
++        if (target.InParty || GetActiveTeamByUnit(target.Id) != null)
++            return;
+         // TODO - CONFIG INVITE DISABLED
+ 
+         // Only hostile players cannot be invited (friendly and neutral are allowed, supports custom nations)
+@@ -163,7 +165,21 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+             Time = DateTime.UtcNow,
+             TeamId = activeTeam?.Id ?? 0u,
+         });
+-        target.SendPacket(new SCAskToJoinTeamPacket(activeTeam?.Id ?? 0u, owner.Id, owner.Name, isParty));
++        if (target.IsBot)
++        {
++            ReplyToJoinTeam(
++                target,
++                activeTeam?.Id ?? 0u,
++                activeTeam?.IsParty ?? isParty,
++                owner.Id,
++                false,
++                target.Name,
++                false);
++        }
++        else
++        {
++            target.SendPacket(new SCAskToJoinTeamPacket(activeTeam?.Id ?? 0u, owner.Id, owner.Name, isParty));
++        }
+     }
+ 
+     public void ReplyToJoinTeam(Character target, uint teamId, bool isParty, uint ownerId, bool isReject, string charName, bool isArea)
+@@ -205,6 +221,19 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+         }
+         else
+         {
++            if (GetActiveTeamByUnit(target.Id) != null)
++            {
++                _activeInvitations.Remove(target.Id);
++                return;
++            }
++            var inviterAllowed = activeTeam.OwnerId == activeInvitation.Owner.Id ||
++                                 !activeTeam.IsParty && activeTeam.IsMarked(activeInvitation.Owner.Id);
++            if (!inviterAllowed)
++            {
++                _activeInvitations.Remove(target.Id);
++                return;
++            }
++
+             if (activeTeam.MembersCount() >= (activeTeam.IsParty ? 5 : 50)) // TODO - NEED TESTS
+             {
+                 // ERROR TEAM IS FULL
+@@ -221,6 +250,9 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+                 target.SendPacket(new SCTeamPingPosPacket(true, activeTeam.PingPosition, 0));
+                 activeTeam.BroadcastPacket(new SCTeamMemberJoinedPacket(activeTeam.Id, newTeamMember, party), target.Id);
+ 
++                target.Events?.OnTeamJoin(target, new OnTeamJoinArgs { Team = activeTeam, Player = target });
++                NotifyTeamChanged(activeTeam);
++
+                 // Make sure team-mates outside render distance learn each other's ObjId
+                 RefreshTeamMemberObjIds(activeTeam, target);
+             }
+@@ -248,6 +280,7 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+                 chatManager.GetPartyChat(activeTeam, t1).JoinChannel(t1);
+             if (t2 != null)
+                 chatManager.GetPartyChat(activeTeam, t2).JoinChannel(t2);
++            NotifyTeamChanged(activeTeam);
+         }
+     }
+ 
+@@ -321,6 +354,7 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+         // Trigger events
+         activeInvitation.Owner.Events?.OnTeamJoin(activeInvitation, new OnTeamJoinArgs { Team = newTeam, Player = activeInvitation.Owner });
+         activeInvitation.Target.Events?.OnTeamJoin(activeInvitation, new OnTeamJoinArgs { Team = newTeam, Player = activeInvitation.Target });
++        NotifyTeamChanged(newTeam);
+ 
+         // Owner and target may be out of each other's render distance — make sure
+         // both clients know each other's ObjId.
+@@ -354,6 +388,7 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+         chatManager.GetPartyChat(newTeam, character).JoinChannel(character);
+         // Trigger events
+         character.Events?.OnTeamJoin(character, new OnTeamJoinArgs { Team = newTeam, Player = character });
++        NotifyTeamChanged(newTeam);
+     }
+ 
+     public void AskRiskyTeam(Character unit, uint teamId, uint targetId, RiskyAction riskyAction)
+@@ -367,10 +402,13 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+         if (riskyAction == RiskyAction.Kick && activeTeam.OwnerId != unit.Id ||
+             riskyAction == RiskyAction.Leave && unit.Id != targetId) return;
+ 
+-        // Remove from ChatManager channels
++        var targetMember = activeTeam.Members.FirstOrDefault(member => member?.Character?.Id == targetId)?.Character;
++
++        // Remove the departing member from ChatManager channels.
++        var departingMember = targetMember ?? unit;
+         if (!activeTeam.IsParty)
+-            chatManager.GetRaidChat(activeTeam).LeaveChannel(unit);
+-        chatManager.GetPartyChat(activeTeam, unit).LeaveChannel(unit);
++            chatManager.GetRaidChat(activeTeam).LeaveChannel(departingMember);
++        chatManager.GetPartyChat(activeTeam, departingMember).LeaveChannel(departingMember);
+ 
+         if ((riskyAction == RiskyAction.Leave || riskyAction == RiskyAction.Kick) && activeTeam.RemoveMember(targetId))
+         {
+@@ -394,7 +432,7 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+             // Send Leave info the team
+             activeTeam.BroadcastPacket(new SCTeamMemberLeavedPacket(teamId, targetId, riskyAction == RiskyAction.Kick));
+             // Find the target, and send its leave info
+-            var target = worldManager.GetCharacterById(targetId);
++            var target = worldManager.GetCharacterById(targetId) ?? targetMember;
+             if (target != null)
+             {
+                 target.InParty = false;
+@@ -404,6 +442,7 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+ 
+             // Drop cached remote-sync state for the leaver
+             ClearSyncState(targetId);
++            NotifyTeamChanged(activeTeam);
+         }
+ 
+         // Disband if only one member left in Party (not raid)
+@@ -432,10 +471,11 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+                     {
+                         member.Character.SendPacket(new SCLeavedTeamPacket(teamId, false, true));
+                         member.Character.InParty = false;
+-                        // trigger event
+-                        member.Character.Events?.OnTeamLeave(member.Character, new OnTeamLeaveArgs { Id = activeTeam.Id, Team = activeTeam, Player = member.Character });
+                     }
+ 
++                    // Lifecycle cleanup must also run for clientless/offline members.
++                    member.Character.Events?.OnTeamLeave(member.Character, new OnTeamLeaveArgs { Id = activeTeam.Id, Team = activeTeam, Player = member.Character });
++
+                     // Drop cached remote-sync state per disbanded member
+                     ClearSyncState(member.Character.Id);
+                 }
+@@ -454,6 +494,7 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+ 
+         if (activeTeam.IsMember(memberId)) activeTeam.OwnerId = memberId;
+         activeTeam.BroadcastPacket(new SCTeamOwnerChangedPacket(activeTeam.Id, activeTeam.OwnerId));
++        NotifyTeamChanged(activeTeam);
+     }
+ 
+     public void ConvertToRaid(Character owner, uint teamId)
+@@ -489,6 +530,7 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+         if (activeTeam.ChangeRole(memberId, role))
+         {
+             activeTeam.BroadcastPacket(new SCTeamMemberRoleChangedPacket(activeTeam.Id, memberId, role));
++            NotifyTeamChanged(activeTeam);
+         }
+     }
+ 
+@@ -597,6 +639,7 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+         // (which used to be the only path that hit AskRiskyTeam's auto-disband).
+         if (activeTeam.MembersOnlineCount() <= 0)
+             activeTeam.AllOfflineSince = DateTime.UtcNow;
++        NotifyTeamChanged(activeTeam);
+     }
+ 
+     public void MemberRemoveFromTeam(Character unit, Character source, RiskyAction leaveType)
+@@ -694,6 +737,18 @@ public class TeamManager(IWorldManager worldManager, IChatManager chatManager, I
+         if (!activeTeam.IsParty)
+             chatManager.GetRaidChat(activeTeam).JoinChannel(unit);
+         chatManager.GetPartyChat(activeTeam, unit).JoinChannel(unit);
++        NotifyTeamChanged(activeTeam);
++    }
++
++    private static void NotifyTeamChanged(Team team)
++    {
++        if (team == null)
++            return;
++        foreach (var member in team.Members)
++        {
++            var player = member?.Character;
++            player?.Events?.OnTeamChanged(team, new OnTeamChangedArgs { Team = team, Player = player });
++        }
+     }
+ 
+     public void Load()
+diff --git a/AAEmu.Game/Core/Managers/TickManager.cs b/AAEmu.Game/Core/Managers/TickManager.cs
+index f62666fcc..7252fcdfb 100644
+--- a/AAEmu.Game/Core/Managers/TickManager.cs
++++ b/AAEmu.Game/Core/Managers/TickManager.cs
+@@ -7,9 +7,11 @@ namespace AAEmu.Game.Core.Managers;
+ 
+ public class TickManager : Singleton<TickManager>, ITickManager
+ {
++    internal const int TickSleepMilliseconds = 20;
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+     public delegate void OnTickEvent(TimeSpan delta);
+     public TickEventHandler OnTick { get; } = new();
++    public ServerTickMetrics Metrics { get; } = new();
+     private bool DoTickLoop = true;
+     private Thread TickThread;
+ 
+@@ -17,14 +19,21 @@ public class TickManager : Singleton<TickManager>, ITickManager
+     {
+         var sw = new Stopwatch();
+         sw.Start();
++        var previousTickStarted = 0L;
+         while (DoTickLoop)
+         {
++            var tickStarted = Stopwatch.GetTimestamp();
++            var intervalMs = previousTickStarted == 0
++                ? TickSleepMilliseconds
++                : Stopwatch.GetElapsedTime(previousTickStarted, tickStarted).TotalMilliseconds;
++            previousTickStarted = tickStarted;
+             var before = sw.Elapsed;
+             OnTick.Invoke();
+             var time = sw.Elapsed - before;
++            Metrics.RecordTick(time.TotalMilliseconds, intervalMs);
+             if (time > TimeSpan.FromMilliseconds(100))
+                 Logger.Warn("Tick took {0}ms to finish", time.TotalMilliseconds);
+-            Thread.Sleep(20);
++            Thread.Sleep(TickSleepMilliseconds);
+         }
+         sw.Stop();
+     }
+diff --git a/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs b/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
+index 2629f79fb..d4dd7b04c 100644
+--- a/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
++++ b/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
+@@ -3,11 +3,13 @@ using AAEmu.Commons.IO;
+ using AAEmu.Commons.Models;
+ using AAEmu.Commons.Utils;
+ using AAEmu.Commons.Utils.DB;
++using AAEmu.Game.Bots.Population.Identity;
+ using AAEmu.Game.Core.Managers.Id;
+ using AAEmu.Game.Core.Managers.World;
+ using AAEmu.Game.Core.Network.Connections;
+ using AAEmu.Game.Core.Packets.G2C;
+ using AAEmu.Game.Models;
++using AAEmu.Game.Models.Account;
+ using AAEmu.Game.Models.Game;
+ using AAEmu.Game.Models.Game.Char;
+ using AAEmu.Game.Models.Game.Char.Templates;
+@@ -16,6 +18,7 @@ using AAEmu.Game.Models.Game.Items;
+ using AAEmu.Game.Models.Game.Items.Actions;
+ using AAEmu.Game.Models.Game.Skills;
+ using AAEmu.Game.Models.Game.Units;
++using AAEmu.Game.Models.Game.World.Transform;
+ using AAEmu.Game.Models.StaticValues;
+ using AAEmu.Game.Models.Tasks.Characters;
+ using AAEmu.Game.Utils;
+@@ -38,7 +41,7 @@ public class CharacterManager(
+     IHousingManager housingManager,
+     IFamilyManager familyManager,
+     IMailManager mailManager,
+-    ITaskManager taskManager) : Singleton<CharacterManager>, ICharacterManager
++    ITaskManager taskManager) : Singleton<CharacterManager>, ICharacterManager, IBotIdentityAuthority
+ {
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+ 
+@@ -50,6 +53,8 @@ public class CharacterManager(
+     private readonly Dictionary<uint, ActabilityCategoriesTemplate> _actabilitiesCategories = [];
+     private readonly Dictionary<int, ExpertLimit> _expertLimits = [];
+     private readonly Dictionary<int, ExpandExpertLimit> _expandExpertLimits = [];
++    private readonly object _serverOwnedCreationGate = new();
++    private readonly Dictionary<uint, uint> _rollbackEligibleServerOwnedBots = [];
+ 
+     public CharacterTemplate GetTemplate(Race race, Gender gender)
+     {
+@@ -445,6 +450,9 @@ public class CharacterManager(
+ 
+     public int GetEffectiveAccessLevel(Character character)
+     {
++        if (character is AAEmu.Game.Bots.Ops.SystemActor)
++            return character.AccessLevel;
++
+         var accountDetails = accountManager.GetAccountDetails(character.AccountId);
+         return Math.Max(character.AccessLevel, accountDetails.AccessLevel);
+     }
+@@ -606,6 +614,469 @@ public class CharacterManager(
+         }
+     }
+ 
++    public byte MaxPlayerLevel => ExperienceManager.Instance.MaxPlayerLevel;
++
++    public bool CharacterExists(uint characterId)
++    {
++        if (characterId == 0)
++            return false;
++
++        try
++        {
++            using var connection = MySQL.CreateConnection();
++            using var command = connection.CreateCommand();
++            command.CommandText = "SELECT 1 FROM characters WHERE id = @id AND deleted = 0 LIMIT 1";
++            command.Parameters.AddWithValue("@id", characterId);
++            command.Prepare();
++            return command.ExecuteScalar() != null;
++        }
++        catch (Exception exception)
++        {
++            Logger.Error(exception, $"Unable to verify bot identity {characterId}");
++            return false;
++        }
++    }
++
++    /// <summary>
++    /// Creates a native persistent character without a GameConnection, character
++    /// selection slot, or client packet. All validation and allocation remain
++    /// owned by the server; PlayerBots supplies only the bounded creation request.
++    /// </summary>
++    public BotIdentityAuthorityResult CreateServerOwnedBot(BotIdentityAuthorityRequest request)
++    {
++        if (request == null || request.ServerOwnedAccountId == 0 ||
++            request.ServerOwnedAccountId > int.MaxValue)
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.AccountUnavailable,
++                "server_owned_account_invalid");
++        }
++        if (string.IsNullOrWhiteSpace(request.Name))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.InvalidName,
++                "name_missing");
++        }
++        if (accountManager.Contains(request.ServerOwnedAccountId))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.AccountOnline,
++                "server_owned_account_online");
++        }
++        if (!accountManager.TryGetExistingAccountDetails(request.ServerOwnedAccountId, out var accountDetails))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.AccountUnavailable,
++                "server_owned_account_missing");
++        }
++        if (request.Level == 0 || MaxPlayerLevel == 0 || request.Level > MaxPlayerLevel)
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.Failed,
++                "level_out_of_range");
++        }
++        if (!Enum.IsDefined(request.Race) || request.Race == Race.None ||
++            !Enum.IsDefined(request.Gender))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.TemplateUnavailable,
++                "race_or_gender_unsupported");
++        }
++        if (!IsPlayableAbility(request.Ability1) ||
++            !IsOptionalPlayableAbility(request.Ability2) ||
++            !IsOptionalPlayableAbility(request.Ability3) ||
++            new[] { request.Ability1, request.Ability2, request.Ability3 }
++                .Where(IsPlayableAbility)
++                .Distinct()
++                .Count() != new[] { request.Ability1, request.Ability2, request.Ability3 }
++                .Count(IsPlayableAbility))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.TemplateUnavailable,
++                "ability_plan_invalid");
++        }
++        if (!request.Placement.IsValid || !TryResolveBotPlacement(request.Placement, out var placement))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.PlacementUnavailable,
++                "placement_unavailable");
++        }
++
++        var templateKey = (byte)(16 * (byte)request.Gender + (byte)request.Race);
++        if (!_templates.TryGetValue(templateKey, out var template) ||
++            !_abilityItems.TryGetValue((byte)request.Ability1, out var startingItems) ||
++            startingItems?.Items == null)
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.TemplateUnavailable,
++                "character_template_unavailable");
++        }
++
++        lock (_serverOwnedCreationGate)
++        {
++            if (accountManager.Contains(request.ServerOwnedAccountId))
++            {
++                return BotIdentityAuthorityResult.Failure(
++                    BotIdentityAuthorityStatus.AccountOnline,
++                    "server_owned_account_online");
++            }
++
++            var name = request.Name.NormalizeName();
++            var nameValidation = nameManager.ValidateCharacterName(name);
++            if (nameValidation != CharacterCreateError.Ok)
++            {
++                var status = nameValidation is CharacterCreateError.NameAlreadyExists or CharacterCreateError.Failed
++                    ? BotIdentityAuthorityStatus.NameUnavailable
++                    : BotIdentityAuthorityStatus.InvalidName;
++                return BotIdentityAuthorityResult.Failure(status, $"name_{nameValidation.ToString().ToLowerInvariant()}");
++            }
++
++            uint characterId;
++            try
++            {
++                characterId = characterIdManager.GetNextId();
++            }
++            catch (Exception exception)
++            {
++                Logger.Error(exception, "Unable to allocate a server-owned bot character id");
++                return BotIdentityAuthorityResult.Failure(
++                    BotIdentityAuthorityStatus.IdUnavailable,
++                    "character_id_unavailable");
++            }
++
++            Character character = null;
++            var nameRegistered = false;
++            try
++            {
++                nameManager.AddCharacter(characterId, name, request.ServerOwnedAccountId);
++                nameRegistered = true;
++                character = InitializeServerOwnedBot(
++                    characterId,
++                    request,
++                    name,
++                    accountDetails,
++                    template,
++                    startingItems,
++                    placement);
++
++                if (!character.SaveDirectlyToDatabase())
++                {
++                    RollbackUncommittedBot(characterId, nameRegistered);
++                    return BotIdentityAuthorityResult.Failure(
++                        BotIdentityAuthorityStatus.PersistenceFailed,
++                        "character_persistence_failed");
++                }
++
++                _rollbackEligibleServerOwnedBots[characterId] = request.ServerOwnedAccountId;
++                return BotIdentityAuthorityResult.Created(character);
++            }
++            catch (Exception exception)
++            {
++                Logger.Error(exception,
++                    $"Unable to initialize server-owned bot {name} ({characterId})");
++                RollbackUncommittedBot(characterId, nameRegistered);
++                return BotIdentityAuthorityResult.Failure(
++                    BotIdentityAuthorityStatus.Failed,
++                    $"character_initialization_failed_{exception.GetType().Name}");
++            }
++        }
++    }
++
++    /// <summary>
++    /// Compensates a creation that was persisted but never returned as admitted.
++    /// The retained row is soft-tombstoned for auditability; no public deletion
++    /// command is exposed and an arbitrary character cannot enter this path.
++    /// </summary>
++    public bool RollbackServerOwnedBot(uint serverOwnedAccountId, uint characterId)
++    {
++        if (serverOwnedAccountId == 0 || characterId == 0)
++            return false;
++
++        lock (_serverOwnedCreationGate)
++        {
++            if (!_rollbackEligibleServerOwnedBots.TryGetValue(characterId, out var expectedAccountId) ||
++                expectedAccountId != serverOwnedAccountId)
++            {
++                return false;
++            }
++
++            try
++            {
++                using var connection = MySQL.CreateConnection();
++                using var command = connection.CreateCommand();
++                command.CommandText =
++                    "UPDATE characters SET deleted = 1, delete_request_time = @deleted_at, " +
++                    "delete_time = @delete_time, name = @tombstone_name " +
++                    "WHERE id = @id AND account_id = @account_id AND deleted = 0";
++                command.Parameters.AddWithValue("@deleted_at", DateTime.UtcNow);
++                command.Parameters.AddWithValue("@delete_time", DateTime.MinValue);
++                command.Parameters.AddWithValue("@tombstone_name", $"!bot_rollback_{characterId}");
++                command.Parameters.AddWithValue("@id", characterId);
++                command.Parameters.AddWithValue("@account_id", serverOwnedAccountId);
++                command.Prepare();
++                if (command.ExecuteNonQuery() != 1)
++                    return false;
++
++                _rollbackEligibleServerOwnedBots.Remove(characterId);
++                nameManager.RemoveCharacterId(characterId);
++                Logger.Warn(
++                    $"Soft-tombstoned unadmitted server-owned bot {characterId} on account {serverOwnedAccountId}");
++                return true;
++            }
++            catch (Exception exception)
++            {
++                Logger.Error(exception,
++                    $"Unable to compensate server-owned bot creation {characterId}");
++                return false;
++            }
++        }
++    }
++
++    public void CompleteServerOwnedBotCreation(uint serverOwnedAccountId, uint characterId)
++    {
++        if (serverOwnedAccountId == 0 || characterId == 0)
++            return;
++
++        lock (_serverOwnedCreationGate)
++        {
++            if (_rollbackEligibleServerOwnedBots.TryGetValue(characterId, out var expectedAccountId) &&
++                expectedAccountId == serverOwnedAccountId)
++            {
++                _rollbackEligibleServerOwnedBots.Remove(characterId);
++            }
++        }
++    }
++
++    private bool TryResolveBotPlacement(
++        BotIdentityPlacement requested,
++        out WorldSpawnPosition placement)
++    {
++        placement = null;
++        if (requested.Mode == BotIdentityPlacementMode.RaceSpawn)
++            return true;
++        if (requested.Mode != BotIdentityPlacementMode.Here ||
++            requested.InstanceId != WorldManager.DefaultInstanceId)
++        {
++            return false;
++        }
++
++        var world = worldManager.GetWorld(requested.InstanceId);
++        var zoneKeys = worldManager.GetZoneKeysByWorldId(requested.WorldId);
++        if (world?.Template?.Id != requested.WorldId ||
++            zoneKeys == null || !zoneKeys.Contains(requested.ZoneId))
++        {
++            return false;
++        }
++
++        placement = new WorldSpawnPosition
++        {
++            WorldId = requested.WorldId,
++            ZoneId = requested.ZoneId,
++            X = requested.X,
++            Y = requested.Y,
++            Z = requested.Z,
++            Roll = requested.Roll,
++            Pitch = requested.Pitch,
++            Yaw = requested.Yaw
++        };
++        return true;
++    }
++
++    private Character InitializeServerOwnedBot(
++        uint characterId,
++        BotIdentityAuthorityRequest request,
++        string name,
++        AccountDetails accountDetails,
++        CharacterTemplate template,
++        AbilityItems startingItems,
++        WorldSpawnPosition placement)
++    {
++        var modelParams = CreateServerOwnedBotModel(template, out var hairItemId);
++        var character = new Character(modelParams)
++        {
++            Id = characterId,
++            TemplateId = characterId,
++            ModelId = template.ModelId,
++            AccountId = request.ServerOwnedAccountId,
++            Name = name,
++            Race = request.Race,
++            Gender = request.Gender,
++            Level = request.Level,
++            Faction = factionManager.GetFaction(template.FactionId),
++            FactionName = "",
++            AccessLevel = AppConfiguration.Instance.Account.AccessLevelDefault,
++            NumInventorySlots = template.NumInventorySlot,
++            NumBankSlots = template.NumBankSlot,
++            Inventory = null,
++            Created = DateTime.UtcNow,
++            Updated = DateTime.UtcNow,
++            Ability1 = request.Ability1,
++            Ability2 = request.Ability2,
++            Ability3 = request.Ability3,
++            ReturnDistrictId = template.ReturnDistrictId,
++            ResurrectionDistrictId = template.ResurrectionDistrictId,
++            Slots = new ActionSlot[Character.MaxActionSlots]
++        };
++        character.Inventory = new Inventory(character);
++        character.InitializeLaborCache(accountDetails.Labor, accountDetails.LastUpdated);
++
++        var spawn = placement ?? template.SpawnPosition;
++        character.ServerId = spawn.WorldId;
++        character.Transform.ApplyWorldSpawnPosition(spawn);
++        for (var index = 0; index < character.Slots.Length; index++)
++            character.Slots[index] = new ActionSlot();
++
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Headgear, EquipmentItemSlot.Head, startingItems.Items.HeadgearGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Necklace, EquipmentItemSlot.Neck, startingItems.Items.NecklaceGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Shirt, EquipmentItemSlot.Chest, startingItems.Items.ShirtGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Belt, EquipmentItemSlot.Waist, startingItems.Items.BeltGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Pants, EquipmentItemSlot.Legs, startingItems.Items.PantsGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Gloves, EquipmentItemSlot.Hands, startingItems.Items.GlovesGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Shoes, EquipmentItemSlot.Feet, startingItems.Items.ShoesGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Bracelet, EquipmentItemSlot.Arms, startingItems.Items.BraceletGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Back, EquipmentItemSlot.Back, startingItems.Items.BackGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Undershirts, EquipmentItemSlot.Undershirt, startingItems.Items.UndershirtsGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Underpants, EquipmentItemSlot.Underpants, startingItems.Items.UnderpantsGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Mainhand, EquipmentItemSlot.Mainhand, startingItems.Items.MainhandGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Offhand, EquipmentItemSlot.Offhand, startingItems.Items.OffhandGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Ranged, EquipmentItemSlot.Ranged, startingItems.Items.RangedGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Musical, EquipmentItemSlot.Musical, startingItems.Items.MusicalGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Cosplay, EquipmentItemSlot.Cosplay, startingItems.Items.CosplayGrade);
++        for (var index = 0; index < Math.Min(7, template.Items.Length); index++)
++        {
++            var bodyItemId = index == 1 && hairItemId != 0
++                ? hairItemId
++                : template.Items[index];
++            SetEquipItemTemplate(
++                character.Inventory,
++                bodyItemId,
++                (EquipmentItemSlot)(index + 19),
++                0);
++        }
++
++        byte slot = 10;
++        AddCreationSupplies(character, startingItems, ref slot);
++        if (_abilityItems.TryGetValue((byte)AbilityType.General, out var generalItems) && generalItems != null)
++            AddCreationSupplies(character, generalItems, ref slot);
++
++        character.Abilities = new CharacterAbilities(character);
++        character.Abilities.SetAbility(character.Ability1, 0);
++        if (IsPlayableAbility(character.Ability2))
++            character.Abilities.SetAbility(character.Ability2, 1);
++        if (IsPlayableAbility(character.Ability3))
++            character.Abilities.SetAbility(character.Ability3, 2);
++        character.InitializeCreationProgression(
++            request.Level,
++            ExperienceManager.Instance.GetExpForLevel(request.Level));
++
++        character.Actability = new CharacterActability(character);
++        foreach (var (id, actabilityTemplate) in _actabilities)
++            character.Actability.Actabilities.Add(id, new Actability(actabilityTemplate));
++
++        character.Skills = new CharacterSkills(character);
++        foreach (var skill in skillManager.GetDefaultSkills())
++        {
++            if (skill.AddToSlot)
++                character.SetAction(skill.Slot, ActionSlotType.Spell, skill.Template.Id);
++        }
++        slot = 1;
++        while (slot < character.Slots.Length && character.Slots[slot].Type != ActionSlotType.None)
++            slot++;
++        foreach (var skill in skillManager.GetStartAbilitySkills(character.Ability1))
++        {
++            character.Skills.AddSkill(skill, 1, false);
++            if (slot < character.Slots.Length)
++                character.SetAction(slot++, ActionSlotType.Spell, skill.Id);
++        }
++
++        character.Appellations = new CharacterAppellations(character);
++        character.Quests = new CharacterQuests(character);
++        character.Mails = new CharacterMails(character);
++        character.Portals = new CharacterPortals(character);
++        character.Friends = new CharacterFriends(character);
++        character.Hp = character.MaxHp;
++        character.Mp = character.MaxMp;
++        character.RestoreSavedHpMp();
++        return character;
++    }
++
++    private static UnitCustomModelParams CreateServerOwnedBotModel(
++        CharacterTemplate template,
++        out uint hairItemId)
++    {
++        hairItemId = 0;
++        using var connection = SQLite.CreateConnection();
++        using var command = connection.CreateCommand();
++        command.CommandText =
++            "SELECT * FROM total_character_customs " +
++            "WHERE model_id = @model_id " +
++            "AND lower(CAST(npcOnly AS TEXT)) IN ('0', 'f', 'false') ORDER BY id LIMIT 1";
++        command.Parameters.AddWithValue("@model_id", template.ModelId);
++        command.Prepare();
++        using var reader = new SQLiteWrapperReader(command.ExecuteReader());
++        if (!reader.Read())
++        {
++            return new UnitCustomModelParams(UnitCustomModelType.Skin)
++                .SetModelId(template.ModelId);
++        }
++
++        hairItemId = reader.GetUInt32("hair_id");
++        var model = new UnitCustomModelParams(UnitCustomModelType.Face)
++            .SetModelId(template.ModelId)
++            .SetHairColorId(reader.GetUInt32("hair_color_id"))
++            .SetSkinColorId(reader.GetUInt32("skin_color_id"));
++        var face = model.Face;
++        face.MovableDecalAssetId = reader.GetUInt32("face_movable_decal_asset_id");
++        face.MovableDecalWeight = reader.GetFloat("face_movable_decal_weight");
++        face.MovableDecalScale = reader.GetFloat("face_movable_decal_scale");
++        face.MovableDecalRotate = reader.GetFloat("face_movable_decal_rotate");
++        face.MovableDecalMoveX = reader.GetInt16("face_movable_decal_move_x");
++        face.MovableDecalMoveY = reader.GetInt16("face_movable_decal_move_y");
++        face.SetFixedDecalAsset(0, reader.GetUInt32("face_fixed_decal_asset_0_id"),
++            reader.GetFloat("face_fixed_decal_asset_0_weight"));
++        face.SetFixedDecalAsset(1, reader.GetUInt32("face_fixed_decal_asset_1_id"),
++            reader.GetFloat("face_fixed_decal_asset_1_weight"));
++        face.SetFixedDecalAsset(2, reader.GetUInt32("face_fixed_decal_asset_2_id"),
++            reader.GetFloat("face_fixed_decal_asset_2_weight"));
++        face.SetFixedDecalAsset(3, reader.GetUInt32("face_fixed_decal_asset_3_id"),
++            reader.GetFloat("face_fixed_decal_asset_3_weight"));
++        face.DiffuseMapId = reader.GetUInt32("face_diffuse_map_id");
++        face.NormalMapId = reader.GetUInt32("face_normal_map_id");
++        face.EyelashMapId = reader.GetUInt32("face_eyelash_map_id");
++        face.NormalMapWeight = reader.GetFloat("face_normal_map_weight");
++        face.LipColor = reader.GetUInt32("lip_color");
++        face.LeftPupilColor = reader.GetUInt32("left_pupil_color");
++        face.RightPupilColor = reader.GetUInt32("right_pupil_color");
++        face.EyebrowColor = reader.GetUInt32("eyebrow_color");
++        face.DecoColor = reader.GetUInt32("deco_color");
++        if (reader.GetValue("modifier") is byte[] modifier && modifier.Length == 128)
++            face.Modifier = modifier;
++        return model;
++    }
++
++    private static bool IsPlayableAbility(AbilityType ability) =>
++        ability > AbilityType.General && ability < AbilityType.None;
++
++    private static bool IsOptionalPlayableAbility(AbilityType ability) =>
++        ability == AbilityType.None || IsPlayableAbility(ability);
++
++    private static void AddCreationSupplies(Character character, AbilityItems items, ref byte slot)
++    {
++        foreach (var item in items.Supplies)
++        {
++            character.Inventory.Bag.AcquireDefaultItem(ItemTaskType.Invalid, item.Id, item.Amount, item.Grade);
++            if (slot < character.Slots.Length)
++                character.SetAction(slot++, ActionSlotType.ItemType, item.Id);
++        }
++    }
++
++    private void RollbackUncommittedBot(uint characterId, bool nameRegistered)
++    {
++        characterIdManager.ReleaseId(characterId);
++        if (nameRegistered)
++            nameManager.RemoveCharacterId(characterId);
++    }
++
+     /// <summary>
+     /// Removed all items and assets this character currently owns
+     /// </summary>
+diff --git a/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs b/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs
+index 7634b1edc..bb18e5b3c 100644
+--- a/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs
++++ b/AAEmu.Game/Core/Managers/World/AreaTriggerManager.cs
+@@ -15,6 +15,18 @@ public class AreaTriggerManager : Singleton<AreaTriggerManager>, IAreaTriggerMan
+     private readonly object _addLock = new();
+     private readonly object _remLock = new();
+ 
++    internal IReadOnlyCollection<AreaTrigger> Active
++    {
++        get
++        {
++            lock (_addLock)
++            lock (_remLock)
++            {
++                return _areaTriggers.ToArray();
++            }
++        }
++    }
++
+     public void Initialize()
+     {
+         TickManager.Instance.OnTick.Subscribe(Tick, TimeSpan.FromMilliseconds(200), true);
+diff --git a/AAEmu.Game/Core/Managers/World/ZoneManager.cs b/AAEmu.Game/Core/Managers/World/ZoneManager.cs
+index 173721385..c39485ddf 100644
+--- a/AAEmu.Game/Core/Managers/World/ZoneManager.cs
++++ b/AAEmu.Game/Core/Managers/World/ZoneManager.cs
+@@ -38,6 +38,16 @@ public class ZoneManager(IWorldManager worldManager) : Singleton<ZoneManager>, I
+         return _groups.TryGetValue(zoneId, out var group) ? group : null;
+     }
+ 
++    public Zone[] GetAllZones()
++    {
++        return _zones?.Values.ToArray() ?? [];
++    }
++
++    public ZoneGroup[] GetAllZoneGroups()
++    {
++        return _groups?.Values.ToArray() ?? [];
++    }
++
+     public List<uint> GetZoneKeysInZoneGroupById(uint zoneGroupId)
+     {
+         var res = new List<uint>();
+diff --git a/AAEmu.Game/GameData/TransferGameData.cs b/AAEmu.Game/GameData/TransferGameData.cs
+index 848e17da0..0d4308ac3 100644
+--- a/AAEmu.Game/GameData/TransferGameData.cs
++++ b/AAEmu.Game/GameData/TransferGameData.cs
+@@ -29,7 +29,12 @@ public class TransferGameData : Singleton<TransferGameData>, IGameDataLoader
+     /// <summary>
+     /// Lists of roads by world template (worldTemplateId, roads)
+     /// </summary>
+-    private Dictionary<byte, Dictionary<uint, List<TransferRoads>>> _transferRoads = [];
++    private long _transferRoadsRevision;
++    private TransferRoadStore _transferRoadStore = new(0, []);
++
++    private sealed record TransferRoadStore(
++        long Revision,
++        Dictionary<byte, Dictionary<uint, List<TransferRoads>>> Roads);
+ 
+     public void Load(SqliteConnection connection)
+     {
+@@ -140,7 +145,7 @@ public class TransferGameData : Singleton<TransferGameData>, IGameDataLoader
+         Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+ 
+         //                              worldId           key  transfer_path
+-        _transferRoads = [];
++        var transferRoadsByWorld = new Dictionary<byte, Dictionary<uint, List<TransferRoads>>>();
+         foreach (var (worldName, worldTemplate) in WorldManager.Instance.WorldTemplates)
+         {
+             var transferPaths = new Dictionary<uint, List<TransferRoads>>();
+@@ -216,10 +221,13 @@ public class TransferGameData : Singleton<TransferGameData>, IGameDataLoader
+                 transferPaths.Add(zoneId, transferPath);
+             }
+ 
+-            _transferRoads.Add((byte)worldTemplate.Id, transferPaths);
+-            GetOwnerPaths(worldTemplate.Id);
++            transferRoadsByWorld.Add((byte)worldTemplate.Id, transferPaths);
++            GetOwnerPaths(worldTemplate.Id, transferRoadsByWorld);
+         }
+ 
++        var revision = Interlocked.Increment(ref _transferRoadsRevision);
++        Volatile.Write(ref _transferRoadStore, new TransferRoadStore(revision, transferRoadsByWorld));
++
+         #endregion TransferPathXml
+     }
+ 
+@@ -227,19 +235,56 @@ public class TransferGameData : Singleton<TransferGameData>, IGameDataLoader
+     {
+         //
+     }
++
++    /// <summary>
++    /// Returns an immutable point-in-time copy of the already loaded transfer roads.
++    /// The source dictionaries and mutable transfer models are never exposed.
++    /// </summary>
++    public TransferRoadsSnapshot GetTransferRoadsSnapshot()
++    {
++        var store = Volatile.Read(ref _transferRoadStore);
++        var roads = store.Roads
++            .OrderBy(world => world.Key)
++            .SelectMany(world => world.Value
++                .OrderBy(zone => zone.Key)
++                .SelectMany(zone => zone.Value.Select(road => new TransferRoadPolylineSnapshot(
++                    world.Key,
++                    road.ZoneId,
++                    road.Name,
++                    road.Type,
++                    road.CellX,
++                    road.CellY,
++                    Array.AsReadOnly(road.Pos.Select(point => new TransferRoadPointSnapshot(
++                        point.WorldId,
++                        point.ZoneId,
++                        point.X,
++                        point.Y,
++                        point.Z)).ToArray())))))
++            .OrderBy(road => road.WorldId)
++            .ThenBy(road => road.ZoneId)
++            .ThenBy(road => road.Name, StringComparer.Ordinal)
++            .ThenBy(road => road.Type)
++            .ThenBy(road => road.CellX)
++            .ThenBy(road => road.CellY)
++            .ToArray();
++
++        return new TransferRoadsSnapshot(store.Revision, Array.AsReadOnly(roads));
++    }
+     
+     /// <summary>
+     /// Get a list of all parts of your path for transportation to populate the Template TransferRoads
+     /// </summary>
+     /// <param name="worldTemplateId"></param>
+     /// <returns></returns>
+-    private void GetOwnerPaths(uint worldTemplateId = 0)
++    private void GetOwnerPaths(
++        uint worldTemplateId,
++        IReadOnlyDictionary<byte, Dictionary<uint, List<TransferRoads>>> transferRoadsByWorld)
+     {
+         foreach (var (id, transferTemplate) in _templates)
+         {
+             foreach (var transferPaths in transferTemplate.TransferAllPaths)
+             {
+-                foreach (var (wid, transfers) in _transferRoads)
++                foreach (var (wid, transfers) in transferRoadsByWorld)
+                 {
+                     if (wid != worldTemplateId) { continue; }
+                     foreach (var (zid, transfer) in transfers)
+diff --git a/AAEmu.Game/GameService.cs b/AAEmu.Game/GameService.cs
+index c25a30ca6..57a123573 100644
+--- a/AAEmu.Game/GameService.cs
++++ b/AAEmu.Game/GameService.cs
+@@ -3,7 +3,10 @@ using System.Diagnostics;
+ using AAEmu.Commons.Utils;
+ using AAEmu.Commons.Utils.DB;
+ using AAEmu.Commons.Utils.Updater;
++using AAEmu.Game.Bots.Ops;
+ using AAEmu.Game.Core.Managers;
++using AAEmu.Game.Core.Managers.Bots;
++using AAEmu.Game.Models.Game.Bots;
+ using AAEmu.Game.Core.Managers.Id;
+ using AAEmu.Game.Core.Managers.Stream;
+ using AAEmu.Game.Core.Managers.UnitManagers;
+@@ -25,24 +28,78 @@ namespace AAEmu.Game;
+ 
+ public sealed class GameService : IHostedService, IDisposable
+ {
++    private enum ActivityDirectorLifecycleState
++    {
++        Ready,
++        Starting,
++        Running,
++        Rejected,
++        Stopping,
++        Stopped
++    }
++
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+     private static TimeProvider s_timeProvider = TimeProvider.System;
+     public static DateTime StartTime { get; private set; } = DateTime.UtcNow;
+     public static TimeSpan TimeSinceStart => s_timeProvider.GetUtcNow().UtcDateTime.Subtract(StartTime);
+ 
+     private readonly ManagerOrchestrator _orchestrator;
++    private readonly IBotManager _botManager;
++    private readonly ITaskManager? _taskManager;
++    private readonly BotConfig _botConfig;
++    // Lock order is service lifecycle, scheduler, then Director execution/state.
++    // A Director tick never acquires this service lock, so shutdown may wait for
++    // a running tick without creating a lock cycle.
++    private readonly object _activityDirectorLifecycleLock = new();
++    private readonly Func<BotActivityDirectorTask> _activityDirectorFactory;
++    private readonly Func<BotActivityDirectorTask, bool> _tryStartActivityDirector;
++    private readonly Action<BotActivityDirectorTask> _stopActivityDirector;
++    private readonly Action _beforeActivityDirectorStartLock;
++    private readonly Action _beforeBotSubsystemStopLock;
++    private BotActivityDirectorTask _activityDirector;
++    private ActivityDirectorLifecycleState _activityDirectorState;
++    private bool _activityDirectorScheduled;
++    private bool _botManagerStopped;
+ 
+     public GameService(IServiceProvider serviceProvider, ManagerOrchestrator orchestrator, TimeProvider timeProvider)
++        : this(serviceProvider, orchestrator, timeProvider, null, null, null)
++    {
++    }
++
++    internal GameService(
++        IServiceProvider serviceProvider,
++        ManagerOrchestrator orchestrator,
++        TimeProvider timeProvider,
++        Func<BotActivityDirectorTask> activityDirectorFactory,
++        Func<BotActivityDirectorTask, bool> tryStartActivityDirector,
++        Action<BotActivityDirectorTask> stopActivityDirector,
++        Action beforeActivityDirectorStartLock = null,
++        Action beforeBotSubsystemStopLock = null)
+     {
+         SingletonContainer.ServiceProvider = serviceProvider;
+         _orchestrator = orchestrator;
++        _botManager = serviceProvider.GetService(typeof(IBotManager)) as IBotManager ?? BotManager.Instance;
++        _taskManager = serviceProvider.GetService(typeof(ITaskManager)) as ITaskManager;
++        _botConfig = serviceProvider.GetService(typeof(BotConfig)) as BotConfig ?? BotConfig.Instance;
++        _activityDirectorFactory = activityDirectorFactory ??
++                                   (() => new BotActivityDirectorTask(_botConfig, _botManager, timeProvider));
++        _tryStartActivityDirector = tryStartActivityDirector ?? (director => director.TryStart());
++        _stopActivityDirector = stopActivityDirector ?? (director => director.Stop());
++        _beforeActivityDirectorStartLock = beforeActivityDirectorStartLock;
++        _beforeBotSubsystemStopLock = beforeBotSubsystemStopLock;
+         s_timeProvider = timeProvider;
+         StartTime = timeProvider.GetUtcNow().UtcDateTime;
+     }
+ 
++    internal static void LogSelectedGameDatabaseSchema(string database)
++    {
++        Logger.Info($"Selected Game database schema: {database}");
++    }
++
+     public async Task StartAsync(CancellationToken cancellationToken)
+     {
+         Logger.Info("Starting daemon: AAEmu.Game");
++        LogSelectedGameDatabaseSchema(AppConfiguration.Instance.Connections.MySQLProvider.Database);
+ 
+         // Check for updates
+         using (var connection = MySQL.CreateConnection())
+@@ -78,6 +135,7 @@ public sealed class GameService : IHostedService, IDisposable
+         FormulaManager.Instance.Load();
+         ItemManager.Instance.Load();
+         ItemManager.Instance.LoadUserItems();
++        BotArchetypeManager.Instance.EnsureSchema();
+ 
+         // --- Stage 2: Orchestrated parallel Load() ---
+         // Managers implementing ILoadable are sorted by constructor dep graph and run in parallel batches.
+@@ -118,13 +176,90 @@ public sealed class GameService : IHostedService, IDisposable
+         LoginNetwork.Instance.Start();
+ 
+         stopWatch.Stop();
+-        Logger.Info($"Server started! Took {stopWatch.Elapsed}");
++        CompleteStartup(stopWatch.Elapsed);
++    }
++
++    internal void CompleteStartup(TimeSpan elapsed)
++    {
++        Logger.Info($"Server started! Took {elapsed}");
++        StartActivityDirector();
++    }
++
++    internal void StartActivityDirector()
++    {
++        _beforeActivityDirectorStartLock?.Invoke();
++        lock (_activityDirectorLifecycleLock)
++        {
++            if (_activityDirectorState != ActivityDirectorLifecycleState.Ready)
++                return;
++
++            _activityDirectorState = ActivityDirectorLifecycleState.Starting;
++            var director = _activityDirectorFactory();
++            _activityDirector = director;
++            if (!_tryStartActivityDirector(director))
++            {
++                _activityDirector = null;
++                _activityDirectorState = ActivityDirectorLifecycleState.Rejected;
++                return;
++            }
++
++            var scheduler = _taskManager ?? TaskManager.Instance;
++            if (scheduler.Schedule(director, director.InitialDelay, director.ReconciliationInterval, -1))
++            {
++                _activityDirectorScheduled = true;
++                _activityDirectorState = ActivityDirectorLifecycleState.Running;
++                return;
++            }
++
++            _stopActivityDirector(director);
++            _activityDirector = null;
++            _activityDirectorState = ActivityDirectorLifecycleState.Rejected;
++            Logger.Error("BOT director ev=start result=schedule_rejected");
++        }
++    }
++
++    internal void StopBotSubsystem()
++    {
++        _beforeBotSubsystemStopLock?.Invoke();
++        lock (_activityDirectorLifecycleLock)
++        {
++            StopActivityDirectorLocked();
++            if (_botManagerStopped)
++                return;
++
++            _botManagerStopped = true;
++            _botManager.Stop();
++        }
++    }
++
++    internal void StopActivityDirector()
++    {
++        lock (_activityDirectorLifecycleLock)
++            StopActivityDirectorLocked();
++    }
++
++    private void StopActivityDirectorLocked()
++    {
++        if (_activityDirectorState is ActivityDirectorLifecycleState.Stopping or ActivityDirectorLifecycleState.Stopped)
++            return;
++
++        _activityDirectorState = ActivityDirectorLifecycleState.Stopping;
++        var director = _activityDirector;
++        if (director != null && _activityDirectorScheduled)
++            (_taskManager ?? TaskManager.Instance).Cancel(director);
++        if (director != null)
++            _stopActivityDirector(director);
++
++        _activityDirector = null;
++        _activityDirectorScheduled = false;
++        _activityDirectorState = ActivityDirectorLifecycleState.Stopped;
+     }
+ 
+     public async Task StopAsync(CancellationToken cancellationToken)
+     {
+         Logger.Info("Stopping daemon...");
+ 
++        StopBotSubsystem();
+         await SaveManager.Instance.StopAsync();
+ 
+         // SpawnManager.Instance.Stop(); Moved to World Instance
+diff --git a/AAEmu.Game/Models/Game/Char/Character.cs b/AAEmu.Game/Models/Game/Char/Character.cs
+index 1c3f40cc7..364a7cad0 100644
+--- a/AAEmu.Game/Models/Game/Char/Character.cs
++++ b/AAEmu.Game/Models/Game/Char/Character.cs
+@@ -1466,10 +1466,26 @@ public partial class Character : Unit, ICharacter
+         //Quests.OnLevelUp(); // TODO added for quest Id=5967
+         // инициируем событие
+         //Task.Run(() => QuestManager.Instance.DoOnLevelUpEvents(Connection.ActiveChar));
+-        if (Connection != null)
+-        {
+-            QuestManager.Instance.DoOnLevelUpEvents(Connection.ActiveChar);
+-        }
++        QuestManager.Instance.DoOnLevelUpEvents(this);
++    }
++
++    /// <summary>
++    /// Initializes a newly-created character at an exact level without firing
++    /// gameplay packets, quest hooks, experience-rate multipliers, or level-up
++    /// side effects. This is only used before the character is first persisted.
++    /// </summary>
++    internal void InitializeCreationProgression(byte level, int experience)
++    {
++        Level = level;
++        Experience = experience;
++
++        if (Abilities == null)
++            return;
++
++        foreach (var ability in Abilities.Values)
++            ability.Exp = 0;
++        foreach (var abilityType in Abilities.GetActiveAbilities())
++            Abilities.Abilities[abilityType].Exp = experience;
+     }
+ 
+     private void ValidateAndFixExpAndLevel()
+@@ -1641,7 +1657,7 @@ public partial class Character : Unit, ICharacter
+         HousingManager.Instance.UpdateOwnedHousingFaction(Id, Faction.Id);
+         if (Expedition != null && Expedition.MotherId != factionId)
+         {
+-            ExpeditionManager.Instance.Kick(this.Connection, this.Id);
++            ExpeditionManager.Instance.Kick(this, Id);
+         }
+         if (InParty)
+         {
+@@ -1794,11 +1810,11 @@ public partial class Character : Unit, ICharacter
+                 ForceDismount();
+                 ParentWorld.MateManager.RemoveAndDespawnAllActiveOwnedMates(this);
+                 await Task.Delay(200);
+-                var portal = PortalManager.Instance.GetClosestReturnPortal(Connection.ActiveChar);
++                var portal = PortalManager.Instance.GetClosestReturnPortal(this);
+                 // force transported out
+-                Connection.ActiveChar.BroadcastPacket(
++                BroadcastPacket(
+                     new SCCharacterResurrectedPacket(
+-                        Connection.ActiveChar.ObjId,
++                        ObjId,
+                         portal.X,
+                         portal.Y,
+                         portal.Z,
+@@ -2123,10 +2139,10 @@ public partial class Character : Unit, ICharacter
+         }
+ 
+         // If they are still sitting down, detach them first
+-        var chairDoodad = Connection.ActiveChar.Bonding?.GetOwner();
++        var chairDoodad = Bonding?.GetOwner();
+         if (chairDoodad != null)
+         {
+-            chairDoodad.Seat.UnLoadPassenger(Connection.ActiveChar, chairDoodad.ObjId);
++            chairDoodad.Seat.UnLoadPassenger(this, chairDoodad.ObjId);
+             Bonding.SetOwner(null);
+             Bonding = null;
+             BroadcastPacket(new SCUnbondDoodadPacket(ObjId, Id, chairDoodad.ObjId), true);
+@@ -2140,7 +2156,7 @@ public partial class Character : Unit, ICharacter
+     {
+         var res = ForceDismount();
+ 
+-        var mySlave = ParentWorld.SlaveManager.GetActiveSlaveByOwnerObjId(Connection.ActiveChar.ObjId);
++        var mySlave = ParentWorld.SlaveManager.GetActiveSlaveByOwnerObjId(ObjId);
+         if (mySlave != null)
+         {
+             // run the task to turn off the transport after timeToDespawn minutes
+@@ -3008,6 +3024,8 @@ public partial class Character : Unit, ICharacter
+     /// <param name="delta"></param>
+     private void CheckPlayerInactivity(TimeSpan delta)
+     {
++        if (IsBot) return;
++
+         var maxAllowedInactivityTime = TimeSpan.FromMinutes(2);
+         if (DateTime.UtcNow.Subtract(delta) - LastPacketActivityTime > maxAllowedInactivityTime)
+         {
+diff --git a/AAEmu.Game/Models/Game/Char/CharacterEvents.cs b/AAEmu.Game/Models/Game/Char/CharacterEvents.cs
+index af10a760a..4fd6c8ee1 100644
+--- a/AAEmu.Game/Models/Game/Char/CharacterEvents.cs
++++ b/AAEmu.Game/Models/Game/Char/CharacterEvents.cs
+@@ -8,6 +8,7 @@ public class CharacterEvents : UnitEvents
+     public EventHandler<OnTeamLeaveArgs> OnTeamLeave = delegate { };
+     public EventHandler<OnDungeonLeaveArgs> OnDungeonLeave = delegate { };
+     public EventHandler<OnTeamLeaveArgs> OnTeamKick = delegate { };
++    public EventHandler<OnTeamChangedArgs> OnTeamChanged = delegate { };
+     public EventHandler<OnDisconnectArgs> OnDisconnect = delegate { };
+ }
+ 
+@@ -24,6 +25,12 @@ public class OnTeamLeaveArgs : EventArgs
+     public Team.Team Team { get; set; }
+ }
+ 
++public class OnTeamChangedArgs : EventArgs
++{
++    public Character Player { get; set; }
++    public Team.Team Team { get; set; }
++}
++
+ public class OnDungeonLeaveArgs : EventArgs
+ {
+     public Character Player { get; set; }
+diff --git a/AAEmu.Game/Models/Game/DoodadObj/Doodad.cs b/AAEmu.Game/Models/Game/DoodadObj/Doodad.cs
+index 9a99fa4ce..4ee794aa8 100644
+--- a/AAEmu.Game/Models/Game/DoodadObj/Doodad.cs
++++ b/AAEmu.Game/Models/Game/DoodadObj/Doodad.cs
+@@ -366,6 +366,32 @@ public class Doodad : BaseUnit
+         CurrentToDTriggers = [];
+     }
+ 
++    /// <summary>
++    /// Resolves one unambiguous quest function from this doodad's current
++    /// phase. This is intentionally read-only and fails closed.
++    /// </summary>
++    public bool TryGetPlayerBotCurrentQuest(out uint questId)
++    {
++        questId = 0;
++        if (Despawn > DateTime.MinValue || CurrentFuncs == null)
++            return false;
++
++        var questIds = CurrentFuncs
++            .Where(func => func != null && func.FuncType == nameof(DoodadFuncQuest))
++            .Select(func => DoodadManager.Instance.GetFuncTemplate(func.FuncId, func.FuncType))
++            .OfType<DoodadFuncQuest>()
++            .Select(func => func.QuestId)
++            .Where(id => id != 0)
++            .Distinct()
++            .Take(2)
++            .ToArray();
++        if (questIds.Length != 1)
++            return false;
++
++        questId = questIds[0];
++        return true;
++    }
++
+     /// <summary>
+     /// Changes the Scale for this Doodad
+     /// </summary>
+diff --git a/AAEmu.Game/Models/Game/NPChar/Npc.cs b/AAEmu.Game/Models/Game/NPChar/Npc.cs
+index 7e306b064..b55e77a39 100644
+--- a/AAEmu.Game/Models/Game/NPChar/Npc.cs
++++ b/AAEmu.Game/Models/Game/NPChar/Npc.cs
+@@ -33,6 +33,8 @@ public partial class Npc : Unit
+     //public Item[] Equip { get; set; }
+     public NpcSpawner Spawner { get; set; }
+     public DateTime DeadTime { get; set; } = DateTime.MinValue;
++    /// <summary>Per-instance override used by stationary test targets; does not mutate the shared NPC template.</summary>
++    public bool SuppressActorDisplacement { get; set; }
+ 
+     /// <summary>
+     /// This is the "Idle Animation Id" that is used in UnitModelChangePosture, it can change depending on the time of the day
+diff --git a/AAEmu.Game/Models/Game/Quests/Quest.cs b/AAEmu.Game/Models/Game/Quests/Quest.cs
+index 8ca90e804..09708cdc4 100644
+--- a/AAEmu.Game/Models/Game/Quests/Quest.cs
++++ b/AAEmu.Game/Models/Game/Quests/Quest.cs
+@@ -460,6 +460,19 @@ public partial class Quest : PacketMarshaler
+         return Objectives;
+     }
+ 
++    /// <summary>
++    /// Read-only single-counter access for the PlayerBots quest adapter.
++    /// </summary>
++    public bool TryGetPlayerBotObjectiveCount(byte objectiveIndex, out int count)
++    {
++        count = 0;
++        if (Objectives == null || objectiveIndex >= Objectives.Length)
++            return false;
++
++        count = Objectives[objectiveIndex];
++        return count >= 0;
++    }
++
+     /// <summary>
+     /// Runs the QuestCleanup code of all the quest's acts
+     /// </summary>
+diff --git a/AAEmu.Game/Models/Game/Skills/Effects/ImpulseEffect.cs b/AAEmu.Game/Models/Game/Skills/Effects/ImpulseEffect.cs
+index b91cca892..2345940ee 100644
+--- a/AAEmu.Game/Models/Game/Skills/Effects/ImpulseEffect.cs
++++ b/AAEmu.Game/Models/Game/Skills/Effects/ImpulseEffect.cs
+@@ -42,7 +42,7 @@ public class ImpulseEffect : EffectTemplate
+         if (target?.Buffs.HasEffectsMatchingCondition(e => e.Template.KnockbackImmune || e.Template.NonPushable) == true)
+             return;
+ 
+-        if (target is Npc npcTarget && npcTarget.Template.NonPushableByActor)
++        if (target is Npc npcTarget && (npcTarget.SuppressActorDisplacement || npcTarget.Template.NonPushableByActor))
+             return;
+ 
+         var impulse = new Vector3(ImpulseX + VelImpulseX, ImpulseY + VelImpulseY, ImpulseZ + VelImpulseZ);
+diff --git a/AAEmu.Game/Models/Game/Skills/Effects/PhysicalExplosionEffect.cs b/AAEmu.Game/Models/Game/Skills/Effects/PhysicalExplosionEffect.cs
+index 20d686d50..da0e13c5d 100644
+--- a/AAEmu.Game/Models/Game/Skills/Effects/PhysicalExplosionEffect.cs
++++ b/AAEmu.Game/Models/Game/Skills/Effects/PhysicalExplosionEffect.cs
+@@ -31,7 +31,7 @@ public class PhysicalExplosionEffect : EffectTemplate
+         if (target.Buffs.HasEffectsMatchingCondition(e => e.Template.KnockbackImmune || e.Template.NonPushable))
+             return;
+ 
+-        if (target is Npc npcTarget && npcTarget.Template.NonPushableByActor)
++        if (target is Npc npcTarget && (npcTarget.SuppressActorDisplacement || npcTarget.Template.NonPushableByActor))
+             return;
+ 
+         var casterPos = caster.Transform.World.Position;
+diff --git a/AAEmu.Game/Models/Game/Skills/Effects/SpecialEffects/KnockBack.cs b/AAEmu.Game/Models/Game/Skills/Effects/SpecialEffects/KnockBack.cs
+index 31110c637..f3a5b67cb 100644
+--- a/AAEmu.Game/Models/Game/Skills/Effects/SpecialEffects/KnockBack.cs
++++ b/AAEmu.Game/Models/Game/Skills/Effects/SpecialEffects/KnockBack.cs
+@@ -33,7 +33,7 @@ public class KnockBack : SpecialEffectAction
+         if (target.Buffs.HasEffectsMatchingCondition(e => e.Template.KnockbackImmune || e.Template.NonPushable))
+             return;
+ 
+-        if (target is Npc npcTarget && npcTarget.Template.NonPushableByActor)
++        if (target is Npc npcTarget && (npcTarget.SuppressActorDisplacement || npcTarget.Template.NonPushableByActor))
+             return;
+ 
+         var knockDistMeters = value1 / 1000f;
+diff --git a/AAEmu.Game/Models/Game/Skills/Skill.cs b/AAEmu.Game/Models/Game/Skills/Skill.cs
+index 5057a5b47..f00e1517d 100644
+--- a/AAEmu.Game/Models/Game/Skills/Skill.cs
++++ b/AAEmu.Game/Models/Game/Skills/Skill.cs
+@@ -934,8 +934,7 @@ public class Skill
+         if (Template.TargetAreaRadius > 0)
+         {
+             var units = WorldManager.GetAround<BaseUnit>(targetSelf, Template.TargetAreaRadius, true);
+-            if (Template.TargetSelection == SkillTargetSelection.Source)
+-                units.Add(targetSelf); // Add main target as well
++            IncludePrimaryAreaTarget(units, targetSelf);
+             units = FilterAoeUnits(caster, units).ToList();
+ 
+             possibleTargets.AddRange(units);
+@@ -1376,6 +1375,17 @@ public class Skill
+         }
+     }
+ 
++    internal static void IncludePrimaryAreaTarget(List<BaseUnit> targets, BaseUnit primaryTarget)
++    {
++        if (targets == null || primaryTarget == null || targets.Contains(primaryTarget))
++            return;
++
++        // WorldManager.GetAround deliberately excludes the object at the query
++        // center. Target-centered area skills still need to affect their selected
++        // primary target, even when no other units are inside the radius.
++        targets.Add(primaryTarget);
++    }
++
+     /// <summary>
+     /// End skill in a normal way
+     /// </summary>
+diff --git a/AAEmu.Game/Models/Game/Transfers/TransferRoads.cs b/AAEmu.Game/Models/Game/Transfers/TransferRoads.cs
+index b8d514111..1dc2948ec 100644
+--- a/AAEmu.Game/Models/Game/Transfers/TransferRoads.cs
++++ b/AAEmu.Game/Models/Game/Transfers/TransferRoads.cs
+@@ -11,3 +11,23 @@ public class TransferRoads
+     public int CellY { get; set; }
+     public List<WorldSpawnPosition> Pos { get; set; } = [];
+ }
++
++public sealed record TransferRoadPointSnapshot(
++    uint WorldId,
++    uint ZoneId,
++    float X,
++    float Y,
++    float Z);
++
++public sealed record TransferRoadPolylineSnapshot(
++    uint WorldId,
++    uint ZoneId,
++    string Name,
++    int Type,
++    int CellX,
++    int CellY,
++    IReadOnlyList<TransferRoadPointSnapshot> Points);
++
++public sealed record TransferRoadsSnapshot(
++    long Revision,
++    IReadOnlyList<TransferRoadPolylineSnapshot> Roads);
+diff --git a/AAEmu.Game/Models/Game/World/GameObject.cs b/AAEmu.Game/Models/Game/World/GameObject.cs
+index 27d1bea70..31467a869 100644
+--- a/AAEmu.Game/Models/Game/World/GameObject.cs
++++ b/AAEmu.Game/Models/Game/World/GameObject.cs
+@@ -48,6 +48,10 @@ public class GameObject : IGameObject
+     public DateTime Respawn { get; set; }
+     public DateTime Despawn { get; set; }
+     public virtual bool IsVisible { get; set; }
++    /// <summary>
++    /// Temporarily suppresses packets emitted while an object is being prepared before it is visible.
++    /// </summary>
++    public bool SuppressBroadcastPackets { get; set; }
+     public GameObject ParentObj { get; set; }
+     public virtual float ModelSize { get; set; } = 0f;
+ 
+@@ -132,6 +136,9 @@ public class GameObject : IGameObject
+     /// <param name="self">Include sending to self (only for if called from Character)</param>
+     public virtual void BroadcastPacket(GamePacket packet, bool self)
+     {
++        if (SuppressBroadcastPackets)
++            return;
++
+         foreach (var character in WorldManager.GetAround<Character>(this))
+             character.SendPacket(packet);
+         if (self && this is Character chr)
+diff --git a/AAEmu.Game/Models/Game/World/WorldInstance.cs b/AAEmu.Game/Models/Game/World/WorldInstance.cs
+index 867131a43..160cbfb83 100644
+--- a/AAEmu.Game/Models/Game/World/WorldInstance.cs
++++ b/AAEmu.Game/Models/Game/World/WorldInstance.cs
+@@ -676,6 +676,37 @@ public partial class WorldInstance(WorldTemplate template, uint channelId, bool
+         return _doodads.Values.ToList();
+     }
+ 
++    /// <summary>
++    /// Bounded, read-only doodad discovery surface for the PlayerBots module.
++    /// </summary>
++    public IReadOnlyList<Doodad> GetPlayerBotDoodadsNear(GameObject observer, float radius)
++    {
++        const float maximumRadius = 100f;
++        const int maximumResults = 256;
++        if (observer?.Transform?.World == null ||
++            !ReferenceEquals(observer.ParentWorld, this) ||
++            !float.IsFinite(radius) || radius <= 0)
++            return [];
++
++        var effectiveRadius = Math.Min(radius, maximumRadius);
++        var origin = observer.Transform.World.Position;
++        if (!float.IsFinite(origin.X) || !float.IsFinite(origin.Y) || !float.IsFinite(origin.Z))
++            return [];
++
++        return WorldManager.GetAround<Doodad>(observer, effectiveRadius)
++            .Where(doodad => doodad?.Transform?.World != null && doodad.Despawn <= DateTime.MinValue)
++            .Select(doodad => (Doodad: doodad, Position: doodad.Transform.World.Position))
++            .Where(candidate =>
++                float.IsFinite(candidate.Position.X) &&
++                float.IsFinite(candidate.Position.Y) &&
++                float.IsFinite(candidate.Position.Z))
++            .OrderBy(candidate => Vector3.DistanceSquared(origin, candidate.Position))
++            .ThenBy(candidate => candidate.Doodad.ObjId)
++            .Take(maximumResults)
++            .Select(candidate => candidate.Doodad)
++            .ToArray();
++    }
++
+     /// <summary>
+     /// Gets a list of all gimmicks in this instance
+     /// </summary>
+diff --git a/AAEmu.Game/Program.cs b/AAEmu.Game/Program.cs
+index d01aa6edd..f67fa5e82 100644
+--- a/AAEmu.Game/Program.cs
++++ b/AAEmu.Game/Program.cs
+@@ -1,7 +1,13 @@
+ using System.Reflection;
++using AAEmu.Game.Bots.Content;
++using AAEmu.Game.Bots.Kernel;
+ using AAEmu.Commons.IO;
+ using AAEmu.Commons.Utils.DB;
++using AAEmu.Game.Bots.Host;
++using AAEmu.Game.Bots.Social;
+ using AAEmu.Game.Core.Managers;
++using AAEmu.Game.Core.Managers.Bots;
++using AAEmu.Game.Models.Game.Bots;
+ using AAEmu.Game.Core.Managers.Id;
+ using AAEmu.Game.Core.Managers.Stream;
+ using AAEmu.Game.Core.Managers.UnitManagers;
+@@ -40,6 +46,8 @@ public static class Program
+     {
+         _launchArgs = args;
+         Initialization();
++        LegacyContent.Register();
++        BotContentRegistry.Freeze();
+ 
+         if (args.Length > 0 && args[0] == "compiler-check")
+         {
+@@ -69,6 +77,8 @@ public static class Program
+         {
+             // Test the DB connection
+             var connection = MySQL.CreateConnection();
++            Logger.Info("MySQL connection established successfully to {0}. Server version {1}", connection.DataSource,
++                connection.ServerVersion);
+             connection.Close();
+             connection.Dispose();
+         }
+@@ -151,6 +161,16 @@ public static class Program
+                 services.AddSingleton<DuelManager>();
+                 services.AddSingleton<IDuelManager>(sp => sp.GetRequiredService<DuelManager>());
+ 
++                services.AddSingleton<BotHost>();
++                services.AddSingleton<IBotHost>(sp => sp.GetRequiredService<BotHost>());
++                services.AddSingleton<BotConfig>();
++                services.AddSingleton<BotArchetypeManager>();
++                services.AddSingleton<IBotArchetypeManager>(sp => sp.GetRequiredService<BotArchetypeManager>());
++                services.AddSingleton<BotCombatManager>();
++                services.AddSingleton<IBotCombatManager>(sp => sp.GetRequiredService<BotCombatManager>());
++                services.AddSingleton<BotManager>();
++                services.AddSingleton<IBotManager>(sp => sp.GetRequiredService<BotManager>());
++
+                 services.AddSingleton<EffectTaskManager>();
+                 services.AddSingleton<IEffectTaskManager>(sp => sp.GetRequiredService<EffectTaskManager>());
+ 
+@@ -249,6 +269,7 @@ public static class Program
+ 
+                 services.AddSingleton<TeamManager>();
+                 services.AddSingleton<ITeamManager>(sp => sp.GetRequiredService<TeamManager>());
++                services.AddSingleton<BotControlDispatcher>();
+ 
+                 services.AddSingleton<TickManager>();
+                 services.AddSingleton<ITickManager>(sp => sp.GetRequiredService<TickManager>());
+@@ -403,6 +424,7 @@ public static class Program
+                 services.AddSingleton(sp => new Lazy<ICharacterManager>(sp.GetRequiredService<ICharacterManager>));
+                 // HousingManager ↔ MailManager circular dep: MailManager takes Lazy<IHousingManager>.
+                 services.AddSingleton(sp => new Lazy<IHousingManager>(sp.GetRequiredService<IHousingManager>));
++                services.AddSingleton(sp => new Lazy<IBotManager>(sp.GetRequiredService<IBotManager>));
+ 
+                 // -- Orchestrator --
+                 // Expose the ServiceCollection itself so ManagerOrchestrator can inspect registrations.
+diff --git a/AAEmu.Game/Scripts/Commands/Kit.cs b/AAEmu.Game/Scripts/Commands/Kit.cs
+index e5034ef58..c0fb913bd 100644
+--- a/AAEmu.Game/Scripts/Commands/Kit.cs
++++ b/AAEmu.Game/Scripts/Commands/Kit.cs
+@@ -1,6 +1,7 @@
+ ﻿using System.Drawing;
+ using AAEmu.Commons.IO;
+ using AAEmu.Game.Core.Managers;
++using AAEmu.Game.Core.Managers.Bots;
+ using AAEmu.Game.Models.Game;
+ using AAEmu.Game.Models.Game.Char;
+ using AAEmu.Game.Models.Game.Items.Actions;
+@@ -147,6 +148,24 @@ public class AddKit : ICommand
+ 
+         if (itemsAdded > 0)
+         {
++            var targetBot = BotManager.Instance.GetBot(targetPlayer.Id);
++            if (targetBot != null)
++            {
++                var archetypeState = BotArchetypeManager.Instance.GetState(targetBot);
++                if (archetypeState is { IsInitialized: true })
++                {
++                    BotArchetypeManager.Instance.ForceReevaluate(targetBot);
++                    targetBot.SaveDirectlyToDatabase();
++                    CommandManager.SendNormalText(this, messageOutput,
++                        $"Bot '{targetBot.Name}' automatically evaluated and equipped the best compatible items from kit '{kitName}'.");
++                }
++                else
++                {
++                    CommandManager.SendErrorText(this, messageOutput,
++                        $"Kit items were added, but bot '{targetBot.Name}' has no initialized archetype. Run /setclass {targetBot.Id} <archetype>, then /botgear {targetBot.Id} equip.");
++                }
++            }
++
+             if (character.Id != targetPlayer.Id)
+             {
+                 character.SendMessage($"[Items] added {itemsAdded} items to {targetPlayer.Name}'s inventory");
+diff --git a/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs b/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs
+index 4c4817541..9327094e4 100644
+--- a/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs
++++ b/AAEmu.Game/Services/WebApi/Controllers/CommandController.cs
+@@ -1,4 +1,5 @@
+-﻿using AAEmu.Game.Core.Managers;
++﻿using AAEmu.Game.Bots.Ops;
++using AAEmu.Game.Core.Managers;
+ using System.Text.Json;
+ using System.Text.RegularExpressions;
+ using AAEmu.Game.Core.Managers.World;
+@@ -27,7 +28,9 @@ internal class CommandController : BaseController
+ 
+         var commandLine = $"{commandName} {commandArguments}";
+ 
+-        var character = WorldManager.Instance.GetCharacter(commandCharacter);
++        var character = commandCharacter == SystemActor.ActorName
++            ? SystemActor.Create()
++            : WorldManager.Instance.GetCharacter(commandCharacter);
+         if (character == null)
+             return BadRequestJson(new ErrorModel($"Character \"{commandCharacter}\" not found"));
+ 
+diff --git a/AAEmu.Login/LoginService.cs b/AAEmu.Login/LoginService.cs
+index c106ab755..5b65cc7f8 100644
+--- a/AAEmu.Login/LoginService.cs
++++ b/AAEmu.Login/LoginService.cs
+@@ -18,6 +18,8 @@ public sealed class LoginService(
+     public async Task StartAsync(CancellationToken cancellationToken)
+     {
+         logger.LogInformation("Starting daemon: AAEmu.Login");
++        logger.LogInformation("Selected Login database schema: {Database}",
++            dbConnectionsConfig.Value.MySQLProvider.Database);
+ 
+         // Check for updates
+         await using (var connection = connectionFactory.CreateConnection())
+diff --git a/AAEmu.UnitTests/AAEmu.UnitTests.csproj b/AAEmu.UnitTests/AAEmu.UnitTests.csproj
+index cfd84120a..fcbfb6914 100644
+--- a/AAEmu.UnitTests/AAEmu.UnitTests.csproj
++++ b/AAEmu.UnitTests/AAEmu.UnitTests.csproj
+@@ -19,4 +19,6 @@
+     <PackageReference Include="TUnit" />
+     <PackageReference Include="TUnit.Mocks" />
+   </ItemGroup>
++  <Import Project="..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Tests.targets"
++          Condition="Exists('..\modules\archeage-playerbots\build\AAEmu.PlayerBots.Tests.targets')" />
+ </Project>
+diff --git a/AAEmu.UnitTests/Game/Core/Managers/ManagerOrchestratorTests.cs b/AAEmu.UnitTests/Game/Core/Managers/ManagerOrchestratorTests.cs
+index 7ed2fe37f..b57465f6c 100644
+--- a/AAEmu.UnitTests/Game/Core/Managers/ManagerOrchestratorTests.cs
++++ b/AAEmu.UnitTests/Game/Core/Managers/ManagerOrchestratorTests.cs
+@@ -1,4 +1,6 @@
+ using AAEmu.Game.Core.Managers;
++using AAEmu.Game.Core.Managers.Bots;
++using AAEmu.Game.Models.Game.Bots;
+ 
+ using Microsoft.Extensions.DependencyInjection;
+ 
+@@ -156,6 +158,23 @@ public class ManagerOrchestratorTests
+         await Assert.That(batches).IsEmpty();
+     }
+ 
++    [Test]
++    public async Task BuildBatches_ILoadable_NoCycle()
++    {
++        var (orchestrator, _) = Build(services =>
++        {
++            services.AddSingleton<BotConfig>();
++            services.AddSingleton<BotArchetypeManager>();
++            services.AddSingleton<ISkillManager>(_ => Mock.Of<ISkillManager>().Object);
++            services.AddSingleton<IExperienceManager>(_ => Mock.Of<IExperienceManager>().Object);
++        });
++
++        var batches = orchestrator.BuildBatches<ILoadable>();
++
++        await Assert.That(batches).HasSingleItem();
++        await Assert.That(batches[0].Count).IsEqualTo(2);
++    }
++
+     [Test]
+     public async Task BuildBatches_ExcludesFactoryRegistrations()
+     {
+@@ -196,4 +215,4 @@ public class ManagerOrchestratorTests
+     {
+         public void Load() => log.Add("A");
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/AAEmu.UnitTests/Game/Core/Managers/TeamManagerTests.cs b/AAEmu.UnitTests/Game/Core/Managers/TeamManagerTests.cs
+index 7704b6b9b..75ced3f87 100644
+--- a/AAEmu.UnitTests/Game/Core/Managers/TeamManagerTests.cs
++++ b/AAEmu.UnitTests/Game/Core/Managers/TeamManagerTests.cs
+@@ -1,9 +1,12 @@
+ using AAEmu.Game.Core.Managers;
+ using AAEmu.Game.Core.Managers.Id;
+ using AAEmu.Game.Core.Managers.World;
++using AAEmu.Game.Models.Game.Chat;
++using AAEmu.UnitTests.Utils.Mocks;
+ 
+ namespace AAEmu.UnitTests.Game.Core.Managers;
+ 
++[NotInParallel]
+ public class TeamManagerTests
+ {
+     [Test]
+@@ -19,4 +22,112 @@ public class TeamManagerTests
+         Mock.VerifyNoOtherCalls(mockChat);
+         Mock.VerifyNoOtherCalls(mockTeamId);
+     }
+-}
+\ No newline at end of file
++
++    [Test]
++    public async Task AskToJoin_ClientlessBot_AutoAcceptsThroughTeamLifecycle()
++    {
++        var mockWorld = Mock.Of<IWorldManager>();
++        var mockChat = Mock.Of<IChatManager>();
++        var mockTeamId = Mock.Of<ITeamIdManager>();
++        var channel = new ChatChannel();
++        mockChat.GetPartyChat(Any<AAEmu.Game.Models.Game.Team.Team>(), Any<AAEmu.Game.Models.Game.Char.Character>())
++            .Returns(channel);
++        mockChat.GetRaidChat(Any<AAEmu.Game.Models.Game.Team.Team>()).Returns(channel);
++        mockTeamId.GetNextId().Returns(77u);
++        var manager = new TeamManager(mockWorld.Object, mockChat.Object, mockTeamId.Object);
++        BotTestFixture.SetPrivateField(
++            FriendMananger.Instance,
++            "_allFriends",
++            new Dictionary<uint, FriendTemplate>());
++        var owner = BotTestFixture.MakeBot(1, System.Numerics.Vector3.Zero);
++        var bot = BotTestFixture.MakeBot(2, System.Numerics.Vector3.Zero);
++        bot.IsBot = true;
++        var joined = 0;
++        bot.Events.OnTeamJoin += (_, args) =>
++        {
++            if (args.Team?.Id == 77 && args.Player == bot)
++                joined++;
++        };
++
++        manager.AskToJoin(owner, bot.Name, 0, true, bot);
++
++        var team = manager.GetActiveTeamByUnit(bot.Id);
++        await Assert.That(team).IsNotNull();
++        await Assert.That(team.OwnerId).IsEqualTo(owner.Id);
++        await Assert.That(team.IsMember(owner.Id)).IsTrue();
++        await Assert.That(team.IsMember(bot.Id)).IsTrue();
++        await Assert.That(joined).IsEqualTo(1);
++    }
++
++    [Test]
++    public async Task AskToJoin_ExistingTeam_ClientlessBotGetsJoinLifecycleEvent()
++    {
++        var mockWorld = Mock.Of<IWorldManager>();
++        var mockChat = Mock.Of<IChatManager>();
++        var mockTeamId = Mock.Of<ITeamIdManager>();
++        var channel = new ChatChannel();
++        mockChat.GetPartyChat(Any<AAEmu.Game.Models.Game.Team.Team>(), Any<AAEmu.Game.Models.Game.Char.Character>())
++            .Returns(channel);
++        mockChat.GetRaidChat(Any<AAEmu.Game.Models.Game.Team.Team>()).Returns(channel);
++        mockTeamId.GetNextId().Returns(77u);
++        var manager = new TeamManager(mockWorld.Object, mockChat.Object, mockTeamId.Object);
++        BotTestFixture.SetPrivateField(
++            FriendMananger.Instance,
++            "_allFriends",
++            new Dictionary<uint, FriendTemplate>());
++        var owner = BotTestFixture.MakeBot(1, System.Numerics.Vector3.Zero);
++        var firstBot = BotTestFixture.MakeBot(2, System.Numerics.Vector3.Zero);
++        var secondBot = BotTestFixture.MakeBot(3, System.Numerics.Vector3.Zero);
++        firstBot.IsBot = true;
++        secondBot.IsBot = true;
++        manager.AskToJoin(owner, firstBot.Name, 0, true, firstBot);
++        var team = manager.GetActiveTeamByUnit(firstBot.Id);
++        var joined = 0;
++        secondBot.Events.OnTeamJoin += (_, args) =>
++        {
++            if (args.Team == team && args.Player == secondBot)
++                joined++;
++        };
++
++        manager.AskToJoin(owner, secondBot.Name, team.Id, true, secondBot);
++
++        await Assert.That(team.IsMember(secondBot.Id)).IsTrue();
++        await Assert.That(team.MembersCount()).IsEqualTo(3);
++        await Assert.That(joined).IsEqualTo(1);
++    }
++
++    [Test]
++    public async Task SetTeamMemberRole_UsesNativeTeamRoleAndRaisesLifecycleRefresh()
++    {
++        var mockWorld = Mock.Of<IWorldManager>();
++        var mockChat = Mock.Of<IChatManager>();
++        var mockTeamId = Mock.Of<ITeamIdManager>();
++        var channel = new ChatChannel();
++        mockChat.GetPartyChat(Any<AAEmu.Game.Models.Game.Team.Team>(), Any<AAEmu.Game.Models.Game.Char.Character>())
++            .Returns(channel);
++        mockChat.GetRaidChat(Any<AAEmu.Game.Models.Game.Team.Team>()).Returns(channel);
++        mockTeamId.GetNextId().Returns(77u);
++        var manager = new TeamManager(mockWorld.Object, mockChat.Object, mockTeamId.Object);
++        BotTestFixture.SetPrivateField(
++            FriendMananger.Instance,
++            "_allFriends",
++            new Dictionary<uint, FriendTemplate>());
++        var owner = BotTestFixture.MakeBot(1, System.Numerics.Vector3.Zero);
++        var bot = BotTestFixture.MakeBot(2, System.Numerics.Vector3.Zero);
++        bot.IsBot = true;
++        manager.AskToJoin(owner, bot.Name, 0, true, bot);
++        var team = manager.GetActiveTeamByUnit(bot.Id);
++        var changed = 0;
++        bot.Events.OnTeamChanged += (_, args) =>
++        {
++            if (args.Team == team)
++                changed++;
++        };
++
++        manager.SetTeamMemberRole(bot, team.Id, bot.Id, AAEmu.Game.Models.Game.Team.MemberRole.Tank);
++
++        await Assert.That(team.Members[team.GetIndex(bot.Id)].Role)
++            .IsEqualTo(AAEmu.Game.Models.Game.Team.MemberRole.Tank);
++        await Assert.That(changed).IsEqualTo(1);
++    }
++}
+diff --git a/AAEmu.UnitTests/Game/Core/Managers/UnitManagers/CharacterManagerTests.cs b/AAEmu.UnitTests/Game/Core/Managers/UnitManagers/CharacterManagerTests.cs
+index f04033b5f..b149dda32 100644
+--- a/AAEmu.UnitTests/Game/Core/Managers/UnitManagers/CharacterManagerTests.cs
++++ b/AAEmu.UnitTests/Game/Core/Managers/UnitManagers/CharacterManagerTests.cs
+@@ -462,6 +462,38 @@ public class CharacterManagerTests
+         await Assert.That(result).IsEqualTo(50);
+     }
+ 
++    [Test]
++    public async Task GetEffectiveAccessLevel_SyntheticSystemActor_DoesNotLookupAccount()
++    {
++        var mockAccountManager = Mock.Of<IAccountManager>();
++        var manager = CreateCharacterManager(mockAccountManager: mockAccountManager);
++        var character = AAEmu.Game.Bots.Ops.SystemActor.Create();
++
++        var result = manager.GetEffectiveAccessLevel(character);
++
++        await Assert.That(result).IsEqualTo(100);
++        mockAccountManager.GetAccountDetails(Any<uint>()).WasCalled(Times.Never);
++    }
++
++    [Test]
++    public async Task GetEffectiveAccessLevel_RealCharacterNamedSystemActorLooksUpAccount()
++    {
++        var mockAccountManager = Mock.Of<IAccountManager>();
++        var manager = CreateCharacterManager(mockAccountManager: mockAccountManager);
++        var character = new Character(new UnitCustomModelParams())
++        {
++            Name = AAEmu.Game.Bots.Ops.SystemActor.ActorName,
++            AccountId = 1,
++            AccessLevel = 10
++        };
++        mockAccountManager.GetAccountDetails(1).Returns(new AccountDetails { AccountId = 1, AccessLevel = 50 });
++
++        var result = manager.GetEffectiveAccessLevel(character);
++
++        await Assert.That(result).IsEqualTo(50);
++        mockAccountManager.GetAccountDetails(1).WasCalled(Times.Once);
++    }
++
+     #endregion
+ 
+     #region PlayerRoll Tests
+diff --git a/AAEmu.UnitTests/Game/Models/Game/Skills/SkillTests.cs b/AAEmu.UnitTests/Game/Models/Game/Skills/SkillTests.cs
+index e4bd82689..f65a23634 100644
+--- a/AAEmu.UnitTests/Game/Models/Game/Skills/SkillTests.cs
++++ b/AAEmu.UnitTests/Game/Models/Game/Skills/SkillTests.cs
+@@ -241,6 +241,24 @@ public class SkillTests
+ 
+     #endregion
+ 
++    #region Area Target Tests
++
++    [Test]
++    public async Task IncludePrimaryAreaTarget_AddsExcludedTargetExactlyOnce()
++    {
++        var neighbor = new BaseUnit();
++        var primaryTarget = new BaseUnit();
++        var targets = new List<BaseUnit> { neighbor };
++
++        Skill.IncludePrimaryAreaTarget(targets, primaryTarget);
++        Skill.IncludePrimaryAreaTarget(targets, primaryTarget);
++
++        await Assert.That(targets).Count().IsEqualTo(2);
++        await Assert.That(targets).Contains(primaryTarget);
++    }
++
++    #endregion
++
+     private sealed class StubUnit : Unit
+     {
+         private readonly AbilityType _abilityType;
+diff --git a/AAEmu.UnitTests/Services/GameServiceTests.cs b/AAEmu.UnitTests/Services/GameServiceTests.cs
+index c7919db94..b55d592c8 100644
+--- a/AAEmu.UnitTests/Services/GameServiceTests.cs
++++ b/AAEmu.UnitTests/Services/GameServiceTests.cs
+@@ -1,8 +1,16 @@
++using System.Collections.Concurrent;
++using AAEmu.Game.Bots.Ops;
+ using AAEmu.Game;
+ using AAEmu.Game.Core.Managers;
++using AAEmu.Game.Core.Managers.Bots;
++using AAEmu.Game.Models.Game.Bots;
+ using Microsoft.Extensions.DependencyInjection;
+ using Microsoft.Extensions.Hosting;
+ using Microsoft.Extensions.Time.Testing;
++using NLog;
++using NLog.Config;
++using NLog.Targets;
++using AAEmu.UnitTests.Utils.Mocks;
+ namespace AAEmu.UnitTests.Services;
+ 
+ /// <summary>
+@@ -65,4 +73,653 @@ public class GameServiceTests
+         service.Dispose();
+         await Task.CompletedTask; // Suppress warning
+     }
++
++    [Test]
++    public async Task StartActivityDirector_ValidConfigurationSchedulesOneRecurringTaskIdempotently()
++    {
++        var config = new BotConfig
++        {
++            ActivityDirectorEnabled = true,
++            ActivityDirectorZoneId = 137,
++            ActivityDirectorCharacterIds = [2, 3, 4],
++            ActivityDirectorMinimumPopulation = 1,
++            ActivityDirectorTargetPopulation = 2,
++            ActivityDirectorMaximumPopulation = 3,
++            ActivityDirectorInitialDelayMs = 2000,
++            ActivityDirectorReconciliationIntervalMs = 5000
++        };
++        var taskManager = new RecordingTaskManager();
++        var services = new ServiceCollection();
++        services.AddSingleton<BotConfig>(config);
++        services.AddSingleton<ITaskManager>(taskManager);
++        services.AddSingleton<IBotManager>(Mock.Of<IBotManager>().Object);
++        using var serviceProvider = services.BuildServiceProvider();
++        var orchestrator = new ManagerOrchestrator(serviceProvider, services);
++        using var service = new GameService(serviceProvider, orchestrator, new FakeTimeProvider());
++
++        service.StartActivityDirector();
++        service.StartActivityDirector();
++
++        await Assert.That(taskManager.ScheduledTasks).HasSingleItem();
++        await Assert.That(taskManager.ScheduledTasks.Single().Task).IsTypeOf<BotActivityDirectorTask>();
++        await Assert.That(taskManager.ScheduledTasks.Single().StartDelay).IsEqualTo(TimeSpan.FromSeconds(2));
++        await Assert.That(taskManager.ScheduledTasks.Single().RepeatInterval).IsEqualTo(TimeSpan.FromSeconds(5));
++        await Assert.That(taskManager.ScheduledTasks.Single().Count).IsEqualTo(-1);
++        await Assert.That(BotActivityDirectorTask.CurrentSnapshot.StartedAt).IsNotNull();
++    }
++
++    [Test]
++    public async Task StartActivityDirector_DisabledAndInvalidConfigurationsFailClosedWithoutScheduling()
++    {
++        foreach (var config in new[]
++                 {
++                     new BotConfig(),
++                     new BotConfig
++                     {
++                         ActivityDirectorEnabled = true,
++                         ActivityDirectorZoneId = 0,
++                         ActivityDirectorCharacterIds = [2],
++                         ActivityDirectorMinimumPopulation = 1,
++                         ActivityDirectorTargetPopulation = 1,
++                         ActivityDirectorMaximumPopulation = 1
++                     }
++                 })
++        {
++            var taskManager = new RecordingTaskManager();
++            var services = new ServiceCollection();
++            services.AddSingleton<BotConfig>(config);
++            services.AddSingleton<ITaskManager>(taskManager);
++            services.AddSingleton<IBotManager>(Mock.Of<IBotManager>().Object);
++            using var serviceProvider = services.BuildServiceProvider();
++            var orchestrator = new ManagerOrchestrator(serviceProvider, services);
++            using var service = new GameService(serviceProvider, orchestrator, new FakeTimeProvider());
++
++            service.StartActivityDirector();
++
++            await Assert.That(taskManager.ScheduledTasks).IsEmpty();
++            await Assert.That(BotActivityDirectorTask.CurrentSnapshot.LastResult).IsEqualTo("start_rejected");
++        }
++    }
++
++    [Test]
++    public async Task StopBotSubsystem_ConstructionBlockedBeforePublication_CancelsCompletedStartBeforeReturning()
++    {
++        var events = new ConcurrentQueue<string>();
++        using var constructionEntered = new ManualResetEventSlim();
++        using var allowConstruction = new ManualResetEventSlim();
++        using var stopInvoked = new ManualResetEventSlim();
++        var config = CreateValidDirectorConfig();
++        var fakeTime = new FakeTimeProvider();
++        var taskManager = new RecordingTaskManager(events: events);
++        var botManager = Mock.Of<IBotManager>();
++        var botStopCount = 0;
++        botManager.Stop().Callback(() =>
++        {
++            Interlocked.Increment(ref botStopCount);
++            events.Enqueue("bot-stop");
++        });
++        var factoryCount = 0;
++        var directorStopCount = 0;
++        var services = new ServiceCollection();
++        services.AddSingleton<BotConfig>(config);
++        services.AddSingleton<ITaskManager>(taskManager);
++        services.AddSingleton<IBotManager>(botManager.Object);
++        using var serviceProvider = services.BuildServiceProvider();
++        var orchestrator = new ManagerOrchestrator(serviceProvider, services);
++        using var service = new GameService(
++            serviceProvider,
++            orchestrator,
++            fakeTime,
++            () =>
++            {
++                Interlocked.Increment(ref factoryCount);
++                constructionEntered.Set();
++                WaitForSignal(allowConstruction, "construction release");
++                return new BotActivityDirectorTask(config, botManager.Object, fakeTime);
++            },
++            director => director.TryStart(),
++            director =>
++            {
++                Interlocked.Increment(ref directorStopCount);
++                events.Enqueue("director-stop");
++                director.Stop();
++            },
++            null,
++            () => stopInvoked.Set());
++
++        var startTask = Task.Run(service.StartActivityDirector);
++        WaitForSignal(constructionEntered, "construction entry");
++        var stopTask = Task.Run(service.StopBotSubsystem);
++        WaitForSignal(stopInvoked, "stop lifecycle entry");
++
++        allowConstruction.Set();
++        await Task.WhenAll(startTask, stopTask).WaitAsync(TimeSpan.FromSeconds(10));
++        service.StartActivityDirector();
++
++        await Assert.That(factoryCount).IsEqualTo(1);
++        await Assert.That(taskManager.ScheduleCount).IsEqualTo(1);
++        await Assert.That(taskManager.ScheduleSuccessCount).IsEqualTo(1);
++        await Assert.That(taskManager.CancelCount).IsEqualTo(1);
++        await Assert.That(directorStopCount).IsEqualTo(1);
++        await Assert.That(botStopCount).IsEqualTo(1);
++        await Assert.That(taskManager.ActiveCount).IsEqualTo(0);
++        await Assert.That(taskManager.ScheduledTasks.Single().Task.Cancelled).IsTrue();
++        await Assert.That(string.Join(",", events)).IsEqualTo("director-schedule,director-cancel,director-stop,bot-stop");
++    }
++
++    [Test]
++    public async Task StopBotSubsystem_SchedulingBlockedBeforeSuccessPublication_CancelsExactRecurringTask()
++    {
++        var events = new ConcurrentQueue<string>();
++        using var scheduleEntered = new ManualResetEventSlim();
++        using var allowSchedule = new ManualResetEventSlim();
++        using var stopInvoked = new ManualResetEventSlim();
++        var config = CreateValidDirectorConfig();
++        var fakeTime = new FakeTimeProvider();
++        var taskManager = new RecordingTaskManager(
++            events: events,
++            scheduleEntered: scheduleEntered,
++            allowSchedule: allowSchedule);
++        var botManager = Mock.Of<IBotManager>();
++        var botStopCount = 0;
++        botManager.Stop().Callback(() =>
++        {
++            Interlocked.Increment(ref botStopCount);
++            events.Enqueue("bot-stop");
++        });
++        var directorStopCount = 0;
++        var services = new ServiceCollection();
++        services.AddSingleton<BotConfig>(config);
++        services.AddSingleton<ITaskManager>(taskManager);
++        services.AddSingleton<IBotManager>(botManager.Object);
++        using var serviceProvider = services.BuildServiceProvider();
++        var orchestrator = new ManagerOrchestrator(serviceProvider, services);
++        using var service = new GameService(
++            serviceProvider,
++            orchestrator,
++            fakeTime,
++            () => new BotActivityDirectorTask(config, botManager.Object, fakeTime),
++            director => director.TryStart(),
++            director =>
++            {
++                Interlocked.Increment(ref directorStopCount);
++                events.Enqueue("director-stop");
++                director.Stop();
++            },
++            null,
++            () => stopInvoked.Set());
++
++        var startTask = Task.Run(service.StartActivityDirector);
++        WaitForSignal(scheduleEntered, "schedule entry");
++        var stopTask = Task.Run(service.StopBotSubsystem);
++        WaitForSignal(stopInvoked, "stop lifecycle entry");
++
++        allowSchedule.Set();
++        await Task.WhenAll(startTask, stopTask).WaitAsync(TimeSpan.FromSeconds(10));
++        service.StartActivityDirector();
++
++        await Assert.That(taskManager.ScheduleCount).IsEqualTo(1);
++        await Assert.That(taskManager.ScheduleSuccessCount).IsEqualTo(1);
++        await Assert.That(taskManager.CancelCount).IsEqualTo(1);
++        await Assert.That(directorStopCount).IsEqualTo(1);
++        await Assert.That(botStopCount).IsEqualTo(1);
++        await Assert.That(taskManager.ActiveCount).IsEqualTo(0);
++        await Assert.That(taskManager.ScheduledTasks.Single().Task.Cancelled).IsTrue();
++        await Assert.That(string.Join(",", events)).IsEqualTo("director-schedule,director-cancel,director-stop,bot-stop");
++    }
++
++    [Test]
++    public async Task StopBotSubsystem_SchedulerRejectionConcurrentWithStop_StopsOnceWithoutCancellation()
++    {
++        var events = new ConcurrentQueue<string>();
++        using var scheduleEntered = new ManualResetEventSlim();
++        using var allowSchedule = new ManualResetEventSlim();
++        using var stopInvoked = new ManualResetEventSlim();
++        var config = CreateValidDirectorConfig();
++        var fakeTime = new FakeTimeProvider();
++        var taskManager = new RecordingTaskManager(
++            events: events,
++            scheduleEntered: scheduleEntered,
++            allowSchedule: allowSchedule,
++            scheduleResult: false);
++        var botManager = Mock.Of<IBotManager>();
++        var botStopCount = 0;
++        botManager.Stop().Callback(() =>
++        {
++            Interlocked.Increment(ref botStopCount);
++            events.Enqueue("bot-stop");
++        });
++        var directorStopCount = 0;
++        var services = new ServiceCollection();
++        services.AddSingleton<BotConfig>(config);
++        services.AddSingleton<ITaskManager>(taskManager);
++        services.AddSingleton<IBotManager>(botManager.Object);
++        using var serviceProvider = services.BuildServiceProvider();
++        var orchestrator = new ManagerOrchestrator(serviceProvider, services);
++        using var service = new GameService(
++            serviceProvider,
++            orchestrator,
++            fakeTime,
++            () => new BotActivityDirectorTask(config, botManager.Object, fakeTime),
++            director => director.TryStart(),
++            director =>
++            {
++                Interlocked.Increment(ref directorStopCount);
++                events.Enqueue("director-stop");
++                director.Stop();
++            },
++            null,
++            () => stopInvoked.Set());
++
++        var startTask = Task.Run(service.StartActivityDirector);
++        WaitForSignal(scheduleEntered, "schedule entry");
++        var stopTask = Task.Run(service.StopBotSubsystem);
++        WaitForSignal(stopInvoked, "stop lifecycle entry");
++
++        allowSchedule.Set();
++        await Task.WhenAll(startTask, stopTask).WaitAsync(TimeSpan.FromSeconds(10));
++        service.StartActivityDirector();
++
++        await Assert.That(taskManager.ScheduleCount).IsEqualTo(1);
++        await Assert.That(taskManager.ScheduleSuccessCount).IsEqualTo(0);
++        await Assert.That(taskManager.CancelCount).IsEqualTo(0);
++        await Assert.That(directorStopCount).IsEqualTo(1);
++        await Assert.That(botStopCount).IsEqualTo(1);
++        await Assert.That(taskManager.ActiveCount).IsEqualTo(0);
++        await Assert.That(taskManager.ScheduledTasks).IsEmpty();
++        await Assert.That(string.Join(",", events)).IsEqualTo("director-schedule-rejected,director-stop,bot-stop");
++    }
++
++    [Test]
++    public async Task StartActivityDirector_RepeatedConcurrentStarts_ConstructAndScheduleExactlyOnce()
++    {
++        const int callerCount = 6;
++        var events = new ConcurrentQueue<string>();
++        using var callersReady = new CountdownEvent(callerCount);
++        using var releaseCallers = new ManualResetEventSlim();
++        using var allStartsEntered = new ManualResetEventSlim();
++        using var constructionEntered = new ManualResetEventSlim();
++        using var allowConstruction = new ManualResetEventSlim();
++        var config = CreateValidDirectorConfig();
++        var fakeTime = new FakeTimeProvider();
++        var taskManager = new RecordingTaskManager(events: events);
++        var botManager = Mock.Of<IBotManager>();
++        var botStopCount = 0;
++        botManager.Stop().Callback(() =>
++        {
++            Interlocked.Increment(ref botStopCount);
++            events.Enqueue("bot-stop");
++        });
++        var startEntryCount = 0;
++        var factoryCount = 0;
++        var directorStopCount = 0;
++        var services = new ServiceCollection();
++        services.AddSingleton<BotConfig>(config);
++        services.AddSingleton<ITaskManager>(taskManager);
++        services.AddSingleton<IBotManager>(botManager.Object);
++        using var serviceProvider = services.BuildServiceProvider();
++        var orchestrator = new ManagerOrchestrator(serviceProvider, services);
++        using var service = new GameService(
++            serviceProvider,
++            orchestrator,
++            fakeTime,
++            () =>
++            {
++                Interlocked.Increment(ref factoryCount);
++                constructionEntered.Set();
++                WaitForSignal(allowConstruction, "construction release");
++                return new BotActivityDirectorTask(config, botManager.Object, fakeTime);
++            },
++            director => director.TryStart(),
++            director =>
++            {
++                Interlocked.Increment(ref directorStopCount);
++                events.Enqueue("director-stop");
++                director.Stop();
++            },
++            () =>
++            {
++                if (Interlocked.Increment(ref startEntryCount) == callerCount)
++                    allStartsEntered.Set();
++            });
++        var startTasks = Enumerable.Range(0, callerCount)
++            .Select(_ => Task.Run(() =>
++            {
++                callersReady.Signal();
++                WaitForSignal(releaseCallers, "concurrent start release");
++                service.StartActivityDirector();
++            }))
++            .ToArray();
++
++        WaitForSignal(callersReady, "concurrent start readiness");
++        releaseCallers.Set();
++        WaitForSignal(constructionEntered, "construction entry");
++        WaitForSignal(allStartsEntered, "all concurrent start lifecycle entries");
++        allowConstruction.Set();
++        await Task.WhenAll(startTasks).WaitAsync(TimeSpan.FromSeconds(10));
++
++        await Assert.That(startEntryCount).IsEqualTo(callerCount);
++        await Assert.That(factoryCount).IsEqualTo(1);
++        await Assert.That(taskManager.ScheduleCount).IsEqualTo(1);
++        await Assert.That(taskManager.ScheduleSuccessCount).IsEqualTo(1);
++        await Assert.That(taskManager.ActiveCount).IsEqualTo(1);
++
++        service.StopBotSubsystem();
++        service.StartActivityDirector();
++        await Assert.That(taskManager.CancelCount).IsEqualTo(1);
++        await Assert.That(directorStopCount).IsEqualTo(1);
++        await Assert.That(botStopCount).IsEqualTo(1);
++        await Assert.That(taskManager.ActiveCount).IsEqualTo(0);
++        await Assert.That(string.Join(",", events)).IsEqualTo("director-schedule,director-cancel,director-stop,bot-stop");
++    }
++
++    [Test]
++    public async Task StopBotSubsystem_RepeatedConcurrentStops_CancelStopAndCleanUpExactlyOnce()
++    {
++        const int callerCount = 6;
++        var events = new ConcurrentQueue<string>();
++        using var callersReady = new CountdownEvent(callerCount);
++        using var releaseCallers = new ManualResetEventSlim();
++        using var allStopsEntered = new ManualResetEventSlim();
++        using var directorStopEntered = new ManualResetEventSlim();
++        using var allowDirectorStop = new ManualResetEventSlim();
++        var config = CreateValidDirectorConfig();
++        var fakeTime = new FakeTimeProvider();
++        var taskManager = new RecordingTaskManager(events: events);
++        var botManager = Mock.Of<IBotManager>();
++        var botStopCount = 0;
++        botManager.Stop().Callback(() =>
++        {
++            Interlocked.Increment(ref botStopCount);
++            events.Enqueue("bot-stop");
++        });
++        var stopEntryCount = 0;
++        var directorStopCount = 0;
++        var services = new ServiceCollection();
++        services.AddSingleton<BotConfig>(config);
++        services.AddSingleton<ITaskManager>(taskManager);
++        services.AddSingleton<IBotManager>(botManager.Object);
++        using var serviceProvider = services.BuildServiceProvider();
++        var orchestrator = new ManagerOrchestrator(serviceProvider, services);
++        using var service = new GameService(
++            serviceProvider,
++            orchestrator,
++            fakeTime,
++            () => new BotActivityDirectorTask(config, botManager.Object, fakeTime),
++            director => director.TryStart(),
++            director =>
++            {
++                Interlocked.Increment(ref directorStopCount);
++                directorStopEntered.Set();
++                WaitForSignal(allowDirectorStop, "Director stop release");
++                events.Enqueue("director-stop");
++                director.Stop();
++            },
++            null,
++            () =>
++            {
++                if (Interlocked.Increment(ref stopEntryCount) == callerCount)
++                    allStopsEntered.Set();
++            });
++        service.StartActivityDirector();
++        var stopTasks = Enumerable.Range(0, callerCount)
++            .Select(_ => Task.Run(() =>
++            {
++                callersReady.Signal();
++                WaitForSignal(releaseCallers, "concurrent stop release");
++                service.StopBotSubsystem();
++            }))
++            .ToArray();
++
++        WaitForSignal(callersReady, "concurrent stop readiness");
++        releaseCallers.Set();
++        WaitForSignal(directorStopEntered, "Director stop entry");
++        WaitForSignal(allStopsEntered, "all concurrent stop lifecycle entries");
++        allowDirectorStop.Set();
++        await Task.WhenAll(stopTasks).WaitAsync(TimeSpan.FromSeconds(10));
++        await Assert.That(stopEntryCount).IsEqualTo(callerCount);
++        service.StopBotSubsystem();
++        service.StopActivityDirector();
++        service.StartActivityDirector();
++
++        await Assert.That(taskManager.ScheduleCount).IsEqualTo(1);
++        await Assert.That(taskManager.ScheduleSuccessCount).IsEqualTo(1);
++        await Assert.That(taskManager.CancelCount).IsEqualTo(1);
++        await Assert.That(directorStopCount).IsEqualTo(1);
++        await Assert.That(botStopCount).IsEqualTo(1);
++        await Assert.That(taskManager.ActiveCount).IsEqualTo(0);
++        await Assert.That(string.Join(",", events)).IsEqualTo("director-schedule,director-cancel,director-stop,bot-stop");
++    }
++
++    [Test]
++    public async Task CompleteStartup_LogsBeforeSchedulingAutoSpawn()
++    {
++        var config = new BotConfig
++        {
++            ActivityDirectorEnabled = true,
++            ActivityDirectorZoneId = 137,
++            ActivityDirectorCharacterIds = [2],
++            ActivityDirectorMinimumPopulation = 1,
++            ActivityDirectorTargetPopulation = 1,
++            ActivityDirectorMaximumPopulation = 1,
++            ActivityDirectorInitialDelayMs = 2000,
++            ActivityDirectorReconciliationIntervalMs = 5000
++        };
++        var logTarget = new MemoryTarget { Layout = "${message}" };
++        var loggingConfiguration = new LoggingConfiguration();
++        loggingConfiguration.AddRuleForOneLevel(LogLevel.Info, logTarget, "AAEmu.Game.GameService");
++        var previousConfiguration = LogManager.Configuration;
++        LogManager.Configuration = loggingConfiguration;
++
++        try
++        {
++            var taskManager = new RecordingTaskManager(() =>
++                logTarget.Logs.Any(message => message.Contains("Server started!", StringComparison.Ordinal)));
++            var services = new ServiceCollection();
++            services.AddSingleton<BotConfig>(config);
++            services.AddSingleton<ITaskManager>(taskManager);
++            services.AddSingleton<IBotManager>(Mock.Of<IBotManager>().Object);
++            using var serviceProvider = services.BuildServiceProvider();
++            var orchestrator = new ManagerOrchestrator(serviceProvider, services);
++            using var service = new GameService(serviceProvider, orchestrator, new FakeTimeProvider());
++
++            service.CompleteStartup(TimeSpan.FromSeconds(1.25));
++
++            await Assert.That(taskManager.ScheduledAfterServerStarted).IsTrue();
++            await Assert.That(taskManager.ScheduledTasks).HasSingleItem();
++            await Assert.That(taskManager.ScheduledTasks.Single().Task).IsTypeOf<BotActivityDirectorTask>();
++            await Assert.That(logTarget.Logs.Any(message => message.Contains("Server started! Took 00:00:01.2500000", StringComparison.Ordinal))).IsTrue();
++        }
++        finally
++        {
++            LogManager.Configuration = previousConfiguration;
++        }
++    }
++
++    [Test]
++    public async Task StopBotSubsystem_CancelsDirectorBeforeNormalBotCleanup()
++    {
++        var events = new ConcurrentQueue<string>();
++        var config = new BotConfig
++        {
++            ActivityDirectorEnabled = true,
++            ActivityDirectorZoneId = 137,
++            ActivityDirectorCharacterIds = [2],
++            ActivityDirectorMinimumPopulation = 1,
++            ActivityDirectorTargetPopulation = 1,
++            ActivityDirectorMaximumPopulation = 1
++        };
++        var taskManager = new RecordingTaskManager(events: events);
++        var botManager = Mock.Of<IBotManager>();
++        var botStopCount = 0;
++        botManager.Stop().Callback(() =>
++        {
++            Interlocked.Increment(ref botStopCount);
++            events.Enqueue("bot-stop");
++        });
++        var directorStopCount = 0;
++        var fakeTime = new FakeTimeProvider();
++        var services = new ServiceCollection();
++        services.AddSingleton<BotConfig>(config);
++        services.AddSingleton<ITaskManager>(taskManager);
++        services.AddSingleton<IBotManager>(botManager.Object);
++        using var serviceProvider = services.BuildServiceProvider();
++        var orchestrator = new ManagerOrchestrator(serviceProvider, services);
++        using var service = new GameService(
++            serviceProvider,
++            orchestrator,
++            fakeTime,
++            () => new BotActivityDirectorTask(config, botManager.Object, fakeTime),
++            director => director.TryStart(),
++            director =>
++            {
++                Interlocked.Increment(ref directorStopCount);
++                events.Enqueue("director-stop");
++                director.Stop();
++            });
++        service.StartActivityDirector();
++
++        service.StopBotSubsystem();
++        service.StopBotSubsystem();
++        service.StopActivityDirector();
++        service.StartActivityDirector();
++
++        await Assert.That(string.Join(",", events)).IsEqualTo("director-schedule,director-cancel,director-stop,bot-stop");
++        await Assert.That(taskManager.ScheduleCount).IsEqualTo(1);
++        await Assert.That(taskManager.ScheduleSuccessCount).IsEqualTo(1);
++        await Assert.That(taskManager.CancelCount).IsEqualTo(1);
++        await Assert.That(directorStopCount).IsEqualTo(1);
++        await Assert.That(botStopCount).IsEqualTo(1);
++        await Assert.That(taskManager.ActiveCount).IsEqualTo(0);
++        await Assert.That(BotActivityDirectorTask.CurrentSnapshot.StoppedAt).IsNotNull();
++    }
++
++    [Test]
++    public async Task LogSelectedGameDatabaseSchema_LogsOnlyExactSchemaName()
++    {
++        const string schema = "aaemu.playerbots+game[retry](v1)?^$|exact";
++        using var logTarget = new MemoryTarget { Layout = "${message}" };
++        var loggingConfiguration = new LoggingConfiguration();
++        loggingConfiguration.AddRuleForOneLevel(LogLevel.Info, logTarget, "AAEmu.Game.GameService");
++        var previousConfiguration = LogManager.Configuration;
++        LogManager.Configuration = loggingConfiguration;
++
++        try
++        {
++            GameService.LogSelectedGameDatabaseSchema(schema);
++
++            await Assert.That(logTarget.Logs).HasSingleItem();
++            await Assert.That(logTarget.Logs.Single()).IsEqualTo($"Selected Game database schema: {schema}");
++        }
++        finally
++        {
++            LogManager.Configuration = previousConfiguration;
++        }
++    }
++
++    private static BotConfig CreateValidDirectorConfig() => new()
++    {
++        ActivityDirectorEnabled = true,
++        ActivityDirectorZoneId = 137,
++        ActivityDirectorCharacterIds = [2, 3, 4],
++        ActivityDirectorMinimumPopulation = 1,
++        ActivityDirectorTargetPopulation = 2,
++        ActivityDirectorMaximumPopulation = 3,
++        ActivityDirectorInitialDelayMs = 2000,
++        ActivityDirectorReconciliationIntervalMs = 5000
++    };
++
++    private static void WaitForSignal(ManualResetEventSlim signal, string description)
++    {
++        if (!signal.Wait(TimeSpan.FromSeconds(10)))
++            throw new TimeoutException($"Timed out waiting for {description}.");
++    }
++
++    private static void WaitForSignal(CountdownEvent signal, string description)
++    {
++        if (!signal.Wait(TimeSpan.FromSeconds(10)))
++            throw new TimeoutException($"Timed out waiting for {description}.");
++    }
++
++    private sealed class RecordingTaskManager : ITaskManager
++    {
++        private readonly Func<bool> _serverStartedLogged;
++        private readonly ConcurrentQueue<string> _events;
++        private readonly ManualResetEventSlim _scheduleEntered;
++        private readonly ManualResetEventSlim _allowSchedule;
++        private readonly bool _scheduleResult;
++        private readonly object _syncRoot = new();
++        private readonly HashSet<AAEmu.Game.Models.Tasks.Task> _activeTasks = [];
++        private int _scheduleCount;
++        private int _scheduleSuccessCount;
++        private int _cancelCount;
++
++        public RecordingTaskManager(
++            Func<bool> serverStartedLogged = null,
++            ConcurrentQueue<string> events = null,
++            ManualResetEventSlim scheduleEntered = null,
++            ManualResetEventSlim allowSchedule = null,
++            bool scheduleResult = true)
++        {
++            _serverStartedLogged = serverStartedLogged;
++            _events = events;
++            _scheduleEntered = scheduleEntered;
++            _allowSchedule = allowSchedule;
++            _scheduleResult = scheduleResult;
++        }
++
++        public List<(AAEmu.Game.Models.Tasks.Task Task, TimeSpan? StartDelay, TimeSpan? RepeatInterval, int Count)> ScheduledTasks { get; } = [];
++        public bool ScheduledAfterServerStarted { get; private set; }
++        public int ScheduleCount => Volatile.Read(ref _scheduleCount);
++        public int ScheduleSuccessCount => Volatile.Read(ref _scheduleSuccessCount);
++        public int CancelCount => Volatile.Read(ref _cancelCount);
++        public int ActiveCount
++        {
++            get
++            {
++                lock (_syncRoot)
++                    return _activeTasks.Count;
++            }
++        }
++
++        public void Initialize() { }
++        public void Start() { }
++        public void Stop() { }
++        public bool Cancel(AAEmu.Game.Models.Tasks.Task task)
++        {
++            Interlocked.Increment(ref _cancelCount);
++            _events?.Enqueue("director-cancel");
++            lock (_syncRoot)
++                return _activeTasks.Remove(task);
++        }
++
++        public bool Schedule(AAEmu.Game.Models.Tasks.Task task, TimeSpan? startTime = null,
++            TimeSpan? repeatInterval = null, int count = -1)
++        {
++            Interlocked.Increment(ref _scheduleCount);
++            ScheduledAfterServerStarted = _serverStartedLogged?.Invoke() ?? false;
++            _scheduleEntered?.Set();
++            if (_allowSchedule != null)
++                WaitForSignal(_allowSchedule, "schedule release");
++
++            if (!_scheduleResult)
++            {
++                _events?.Enqueue("director-schedule-rejected");
++                return false;
++            }
++
++            lock (_syncRoot)
++            {
++                ScheduledTasks.Add((task, startTime, repeatInterval, count));
++                _activeTasks.Add(task);
++            }
++            Interlocked.Increment(ref _scheduleSuccessCount);
++            _events?.Enqueue("director-schedule");
++            return true;
++        }
++
++        public bool CronSchedule(AAEmu.Game.Models.Tasks.Task task, string cronExpression,
++            TimeSpan? startDelay = null, int count = -1) => false;
++    }
++
+ }

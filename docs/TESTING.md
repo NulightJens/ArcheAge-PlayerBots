@@ -11,6 +11,30 @@ dotnet test AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-build
 
 Also run `scripts/Install-PlayerBots.ps1 -CheckOnly` after installation to verify idempotent compatibility detection.
 
+## Deterministic client observation
+
+Use the read-only loopback client driver for repeatable process, window, and client-log lifecycle assertions:
+
+```powershell
+.\scripts\Test-ClientDriver.ps1
+dotnet run --project tools\AAEmu.ClientDriver -- status --log "$env:USERPROFILE\Documents\AAClassic\ArcheAge.log"
+```
+
+The staged architecture and the boundary between the client driver and Computer Use are documented in [CLIENT-TEST-DRIVER.md](CLIENT-TEST-DRIVER.md).
+
+To prove an already authenticated native character can enter a gameplay world, use the fail-closed Stage 4 runner. It requires an exact PID/HWND and corroborates the pre-existing character-server authorization plus fresh world-loading markers with the loopback Web API's offline-to-online character transition:
+
+```powershell
+.\scripts\Test-RealClientWorld.ps1 `
+  -LauncherProfile <profile.json> `
+  -EvidenceDirectory <new-evidence-directory> `
+  -GameplayAssertionSpec <exact-gameplay-assertions.json> `
+  -ProcessId <exact-pid> `
+  -WindowHandle <exact-decimal-handle> `
+  -ExpectedCharacterName <native-character> `
+  -HostRoot <retained-aaemu-host>
+```
+
 ## One-bot smoke test
 
 1. Start Login and Game and log in one GM character.
@@ -19,6 +43,33 @@ Also run `scripts/Install-PlayerBots.ps1 -CheckOnly` after installation to verif
 4. Run one-kill grinding with `/botstate <id> grind 1`.
 5. Confirm acquisition, movement, facing, legal casts, kill credit, target release, and Idle recovery.
 6. Run `/removebot <id>` and confirm normal logout with no retained runtime.
+
+## Selected native hunt gate
+
+Use a fresh or still-completable quest with exactly one active `QuestActObjMonsterHunt`. Never reset or repeat a completed nonrepeatable quest just to reuse a fixture.
+
+1. Inspect the quest and status, stage the bot within the isolated test runtime, and accept through the exact live starter. Use `/movebot ... teleport` only when fixture staging—not autonomous travel—is under test.
+2. Verify `/botquest status` shows the native Progress step, one exact monster-hunt act, and its current objective count.
+3. Use `/botquest nearby <id> <npcTemplateId>` and require at least one living, attackable candidate within the configured bounded radius and on the bot's navigation-height surface.
+4. Reset metrics and run `/botquest hunt <id> <questId>`. Do not issue manual attack or quest-progress commands during the sample.
+5. Require the live objective to advance through normal kill credit, a new exact target to be selected after each incomplete kill, and the executor to stop at its derived remaining goal.
+6. Require `/botstate` to return to automatic `Idle` with no target and `/botmetrics snapshot` to show observed kills equal credited kills with zero skipped ticks, runtime overlaps, and tick errors.
+7. Report at the exact live reporter and require the quest lifecycle to become completed.
+
+Also retain one fail-closed vertical case when available. A cave or stacked-world NPC that is close in planar distance but disagrees with the bot's navigation-height surface must be rejected before combat; do not count that rejection as route completion.
+
+## Selected native sphere-travel gate
+
+Use a fresh or still-completable quest with exactly one active static `QuestActObjSphere`. Never reset or repeat a completed nonrepeatable quest just to reuse a fixture.
+
+1. Inspect and accept the quest through its exact native starter, then require `/botquest status` to show one active sphere act at `0/1` and exactly one same-world destination.
+2. Stage the bot only for fixture setup, outside the sphere but no more than 100 meters from its heightmap-projected center. Keep a real player within the configured activity radius so AAEmu evaluates the region normally.
+3. Run `/botquest travel <id> <questId>` once. Require the command to report the exact component, sphere, radius, true 3D distance, surface offset, and destination.
+4. Do not issue movement or quest-progress commands while it runs. Require ordinary bot movement to enter the sphere and `/botquest status` to show native progress, Ready, or completed lifecycle.
+5. Retain the server's `QuestActObjSphere.FinalizeAction` and queued evaluation sequence. For an auto-complete quest, also require native auto-complete finalization and normal quest removal.
+6. Retain fail-closed tests for mixed/multi-act steps, completed objectives, NPC-centered spheres, zero/multiple same-world destinations, non-finite geometry, destination distance above 100 meters, and a projected surface outside the sphere.
+
+This gate proves one local static destination, not obstacle-aware routing. A long-range, dynamic, ambiguous, or vertically unsafe destination must fail before movement and is not a route-completion result.
 
 ## Four-role party
 
@@ -96,6 +147,10 @@ Use a verified stealth buff ID from the active client data; never assume a templ
 7. Stop both bots in Idle and verify that target, movement destination, and retained runtime work are cleared.
 
 An automated trigger/search/metrics pass is necessary but does not substitute for client-visible loss and reacquisition evidence.
+
+## Deterministic client image assertions
+
+Use `AAEmu.ClientDriver assert-image` for stable screenshot anchors. The command compares exact top-down RGB region hashes and exact BMP templates from a strict JSON spec; it deliberately has no fuzzy tolerance or OCR fallback. A mismatch returns structured evidence with exit code `3`, while an invalid or ambiguous spec fails closed. See `docs/CLIENT-TEST-DRIVER.md` for the schema and safety bounds.
 
 ## Population/resource gate
 

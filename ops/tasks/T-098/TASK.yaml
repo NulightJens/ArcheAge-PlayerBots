@@ -1,0 +1,43 @@
+schema_version: 1
+id: T-098
+title: Reprove one-zone autonomy after Director delay correction
+track: AAEmu12
+status: done
+integration: integrated-by-T-099
+outcome: Produce a fresh immutable live AAEmu 1.2 proof that honors the 180-second Director delay, pre-arms all three observers, gives all three bots two independently credited autonomous lifecycles with refills, and preserves target population across a distinct-PID restart.
+depends_on: [T-097]
+runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\4e59\PB-W00-control'
+owner_client_thread_id: client-new-thread:1bb59774-6513-4413-ab92-af3e3d8253cb
+owner_thread_id: 01a05e8c-e6b0-7902-81b1-8dd7a6456dd3
+inputs:
+  dispatch_base: bc6c8bd528e88d1bf2fe17b460336818cb58d85e
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  installed_module_source: 761ffa1e0bd76d06532688f34b45e192a493b239
+  installed_module_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: c1b3bd922c900c31c76a5748359b8363ea7c56ba34d27daed9c90fd1ddbd51ef
+  observer_script_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+  retained_predecessor_root: 'D:\Codex-Labs\evidence\T-094\one-zone-autonomy-v4'
+  evidence_root: 'D:\Codex-Labs\evidence\T-098\one-zone-autonomy-v5'
+write_scope:
+  - ops/evidence/aaemu12-t098-one-zone-autonomy-v5.yaml
+  - ops/tasks/T-098/HANDOFF.md
+external_write_scope:
+  - aaemu12_t098_evidence_v5
+  - deployed BotConfig.json exact contracted edit and byte restoration
+gates:
+  - exact-lease-source-config-observer-and-fresh-root-preflight
+  - continuous-zero-client-observation
+  - three-bot-prearm-and-no-admission-before-180000ms
+  - two-separated-three-bot-autonomy-waves-and-refills
+  - distinct-pid-restart-rebootstrap-and-two-minute-dwell
+  - graceful-cleanup-config-restoration-and-sealed-manifest
+validation_boundary: Runtime evidence only. Do not edit source/tests/tools/scripts/manifests/patches, global ledgers/lease, predecessor evidence, client files, database state, scale, soak, packaging, or AAEmu 3.0. Never start/control/query MySQL/database or ArcheAge client. Never issue directed bot gameplay commands.
+contract: ops/tasks/T-098/CONTRACT.md
+handoff: ops/tasks/T-098/HANDOFF.md
+candidate_commit: e7361e10c8c1d722c3f18481af07e6173030fb30
+candidate_tree: b428927a3d428721d6a5e8ce0651b5013bee6903
+result: FAIL-first-anchored-fixture-inconsistent-world-or-instance-boundary
+integrated_commit: 1ab6c2e80a4c7e209149a804cdff6ae209142501

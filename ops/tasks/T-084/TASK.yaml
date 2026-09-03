@@ -1,0 +1,55 @@
+schema_version: 1
+id: T-084
+title: Integrate the serialized one-zone Activity Director
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Independently review, replay, install, build, full-suite qualify, and saved-branch integrate the exact T-083 serialized Activity Director replacement without starting a runtime or changing its product boundary.
+depends_on: [T-082, T-083]
+runtime:
+  required: false
+  lease: aaemu12-build-only
+  archeage_client_allowed: false
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\439d\PB-W00-control'
+owner_client_thread_id: client-new-thread:55a250ad-f763-479b-b034-630fedd586b3
+owner_thread_id: 01a05d70-6f07-7b61-abad-eafc8d12a307
+inputs:
+  integration_head_before_dispatch: 3502c673de66585068c8644acee705f3a3d45624
+  source_candidate: b1ffc8006aaa4a4eb4da54a4993057eb8969df96
+  source_parent: dd09b2d6b655f92cd5afa36cd70e7d08b9efd877
+  rejected_candidate: 370a2ee0cff17ea7b56c9a06dc069ad789245de0
+  rejection_handoff: ops/tasks/T-082/HANDOFF.md
+  compatibility_patch_sha256: 395a83ab5bf6a4f4f1c0d56289590d6a36ad36b3ab5f87e1701d6aa17ffbefcd
+  runtime_workspace: aaemu12_integration
+  reference_workspace: aaemu12_reference
+write_scope:
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - playerbots.module.json
+  - src/AAEmu.Game/Bots/Ops/BotActivityDirectorTask.cs
+  - src/AAEmu.Game/Bots/Host/BotHostTask.cs
+  - src/AAEmu.Game/Bots/Life/BotLifeController.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+  - src/AAEmu.Game/Configurations/BotConfig.json
+  - src/AAEmu.Game/Scripts/Commands/BotMetricsCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Ops/BotActivityDirectorTaskTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/tasks/T-081/HANDOFF.md
+  - ops/tasks/T-083/HANDOFF.md
+  - ops/evidence/aaemu12-activity-director-integration-v1.yaml
+  - ops/tasks/T-084/HANDOFF.md
+gates:
+  - replacement-scope-and-semantics-review
+  - t082-concurrency-defect-closure-review
+  - registered-host-install-and-build
+  - focused-aaemu12-activity-director-tests
+  - exactly-one-full-aaemu12-suite
+  - saved-integration-branch-fast-forward
+validation_boundary: Integration/install/build/test only under the exact committed build-only lease. Do not start or control Login, GameServer, MySQL, database, or client; edit global ledgers/lease, repair product source, reinterpret T-083, touch retained runtime evidence, scale, soak, packaging, or AAEmu 3.0.
+handoff: ops/tasks/T-084/HANDOFF.md
+integrated_commit: f42206c60df4955213eb6d26f3f093a76d4fe56f
+tested_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+installed_tree: 731314bf03169ffcc08a383a9652afd9281c75fa
+result: PASS-154-focused-1830-unit-4-intentional-skips-build-0-errors

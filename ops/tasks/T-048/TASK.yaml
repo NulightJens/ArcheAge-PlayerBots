@@ -1,0 +1,35 @@
+schema_version: 1
+id: T-048
+title: Exact AAEmu 1.2 selected-schema startup proof
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Make the pinned Login host emit and the runtime guard validate the exact selected isolated schema without exposing credentials.
+depends_on: [T-036]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:881e830f-eaed-46f2-abb5-ab300f7089d0
+
+inputs:
+  incomplete_receipt: ops/evidence/aaemu12-t036-combat-stealth-v1.yaml
+  incomplete_handoff: ops/tasks/T-036/HANDOFF.md
+  host_reference: aaemu12_reference
+  host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  active_patch: compatibility/aaemu-1.2-r208022-v3.patch
+
+write_scope:
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - compatibility/README.md
+  - playerbots.module.json
+  - scripts/scale/Start-ScaleGateRuntime.ps1
+  - scripts/scale/ScaleRuntimeStartupGuard.psm1
+  - scripts/scale/Test-ScaleRuntimeStartupGuard.ps1
+  - scripts/scale/README.md
+  - ops/tasks/T-048/HANDOFF.md
+
+runtime:
+  required: false
+  lease: null
+gates: [deterministic-harness-tests, focused-aaemu12-tests]
+validation_boundary: Source and patch proof only. Do not edit/deploy to AAEmu hosts, start runtime processes, access databases, alter the lease/global ledgers, or edit client/AAEmu 3.0 files.
+handoff: ops/tasks/T-048/HANDOFF.md

@@ -1,0 +1,37 @@
+schema_version: 1
+id: T-100
+title: Accept valid default-world bot anchors
+track: AAEmu12
+status: done
+integration: integrated-by-T-101
+outcome: Correct the anchored passive-fixture guard so pinned AAEmu's valid default world-template ID 0 is accepted while missing templates and every real world/instance/zone/staleness inconsistency still fail closed, with focused regression proof and an isolated build.
+depends_on: [T-099]
+runtime: {required: false, lease: null}
+branch: task/T-100-default-world-anchor
+worktree: 'C:\Users\jensh\.codex\worktrees\c413\PB-W00-control'
+owner_client_thread_id: client-new-thread:ab3a1f91-8c01-4547-9d8f-c2d4d86ea83b
+owner_thread_id: 01a05ec5-b802-7013-bfc5-8a126484eb60
+inputs:
+  dispatch_base: c0d08ddd3c2db5e542f17ec8b25751814ae344f9
+  source_base: 1ab6c2e80a4c7e209149a804cdff6ae209142501
+  retained_fail_receipt: ops/evidence/aaemu12-t098-fail-integration-v1.yaml
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/evidence/aaemu12-passive-anchor-default-world-zero-v1.yaml
+  - ops/tasks/T-100/HANDOFF.md
+gates:
+  - valid-default-world-template-zero-anchor-succeeds
+  - null-template-real-instance-world-zone-and-staleness-guards-remain-fail-closed
+  - zero-world-id-propagates-to-spawn-position-without-transform-or-target-mutation
+  - focused-command-tests-green
+  - isolated-aaemu12-build-zero-errors
+  - compatibility-patch-sha-unchanged-and-clean-apply
+validation_boundary: Module source, focused tests, isolated AAEmu 1.2 build, receipt, and handoff only. Do not edit global ledgers/lease, installed/reference host, deployed config, external runtime evidence, database, client, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite.
+contract: ops/tasks/T-100/CONTRACT.md
+handoff: ops/tasks/T-100/HANDOFF.md
+candidate_commit: 043bf7aff4619808a050538c6763f0c6ab2e2ee8
+candidate_tree: 5e5a1795466f8d24f2adef4640a47f1f01e75880
+result: PASS-40-focused-build-0-errors-72-retained-warnings-patch-unchanged
+integrated_commit: 909c6db03b196ff7a706e68eb3cc2de1f0bfcabd

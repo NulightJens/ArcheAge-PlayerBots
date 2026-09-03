@@ -1,0 +1,53 @@
+schema_version: 1
+id: T-112
+title: Prove parser- and scheduler-safe row-valid one-zone autonomy v9
+track: AAEmu12
+status: done
+integration: integrated-by-T-113
+outcome: Prove the existing installed AAEmu 1.2 PlayerBots module through two complete three-bot native fixture lifecycle/refill waves and a clean distinct-PID restart, using the proven literal-row angular plan with an authoritative named-grade parser and observer-safe exhaustive planning.
+depends_on: [T-111]
+runtime: {required: true, lease: aaemu12, archeage_client_allowed: false}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\19b4\PB-W00-control'
+owner_client_thread_id: client-new-thread:faa00f23-f232-468c-9914-bf62a81f03a9
+owner_thread_id: 01a05ff2-1c7b-7643-9e6a-764fe1594975
+inputs:
+  dispatch_base: f3cb885141e7d91cfb05bdeca7bb9f0fc14406ec
+  installed_module_source: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: 2385d16554b1fc9df1c77d45612b39c8fdac20721f20eac31ec9d0c32cc71696
+  client_observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+  autonomy_observer_blob: 94b82fb18a39e2356d43796b54e3eeea5ad7ee12
+  retained_named_grade_response_sha256: 32474d410485ba1fe987a80a0ed3b41b86f3729ee4fe3b30263f593e4de844d3
+  retained_planner_semantic_sha256: 38b871081b5c3dc4be700d33f9890c51e10aa3b1c80839b8b916584fa553bfc1
+  database_identity: aaemu12_database_public_alpha_v1
+  evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
+write_scope:
+  - ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
+  - ops/tasks/T-112/HANDOFF.md
+external_write_scope:
+  - aaemu12_t112_evidence_v9 fresh root only after exact committed lease
+  - deployed AAEmu 1.2 BotConfig.json exact contracted assignments with byte-exact restoration
+  - aaemu12_integration Login/Game runtime and accepted graceful control path under exact lease
+gates:
+  - exact-source-host-patch-assembly-config-observer-and-fresh-root-preflight
+  - exact-named-grade-response-parser-selftest-and-negative-cases
+  - retained-transform-literal-row-planner-selftest-18399744-tuples-125-eligible
+  - priority-isolated-cooperatively-yielding-dual-planner-observer-scheduling-rehearsal
+  - continuous-zero-client-process-observer-with-raw-chain-validation
+  - prearmed-three-bot-observers-and-180-second-ordered-director-bootstrap
+  - invariant-live-transform-parser-post-plan-bit-exact-revalidation-and-complete-row-plan
+  - predicted-pairwise-at-least-20m-and-each-bot-own-fixture-at-least-3m-nearer
+  - exact-six-one-shot-angular-fixtures-and-two-distinct-native-credits-per-identity
+  - two-complete-lifecycle-recovery-logout-refill-waves
+  - graceful-distinct-pid-restart-ordered-rebootstrap-and-two-minute-dwell
+  - exact-config-restoration-zero-runtime-cleanup-and-sealed-manifest
+validation_boundary: Physical AAEmu 1.2 one-zone runtime proof only. Do not edit module source, tests, global ledgers/lease/workspace registry, registered reference, database, client, AAEmu 3.0, scale, soak, packaging, or predecessor evidence. No build/full suite, directed gameplay commands, fixture retries, runtime force-stop, destructive cleanup, or persistence of the full 18,399,744-row enumeration.
+contract: ops/tasks/T-112/CONTRACT.md
+handoff: ops/tasks/T-112/HANDOFF.md
+candidate_commit: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
+candidate_tree: 6059e88d2f58c9c1632f2ff2194f47618ef6fb75
+evidence_receipt: ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
+result: FAIL-wave-one-fixed-counter-recovery-and-shutdown-tail-observer-gaps

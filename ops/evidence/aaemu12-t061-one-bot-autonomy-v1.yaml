@@ -1,0 +1,160 @@
+schema_version: 1
+id: aaemu12-t061-one-bot-autonomy-v1
+recorded_at: 2026-09-01
+verdict: FAIL
+
+fingerprint:
+  lease_control_commit: 739a48f44e0ce1b2344082b582008daf74b607b8
+  task_thread_id: 01a05bf9-cfbf-7942-853c-310035ae673a
+  task_worktree_head: 10fb2de0038ecb43d3f2e6cf15f5789e2b5926dd
+  module_source_commit: cf57b11474b9e7f3e9ece588dc3aea0a56c02ef9
+  installed_module_tree: 1e15fa38ef2f91c62f9a5a72709703d3acd1505a
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  database_identity: aaemu12_database_public_alpha_v1
+  game_executable_sha256: c10fcd802124406f349253cfafd9413e1768605b90f36110d40c248a85fbc79e
+  game_assembly_sha256: 8326bc9502752491cdcbd53417237659e7277a5c94fc0ad85bcdf9501241c521
+  login_executable_sha256: 96ef53555b53e532608eb0352ab993e30968eaae55d6d3e2ae9c83ba7c8c389e
+  game_config_sha256: d87acc71056021abe64aaeca29d37fa6cb60015109cbd81df92c9fef4b98ca1c
+  login_config_sha256: 2b18234b5306f7cd3a44138e94520ec27b3462aa8553f2fcdadad176d3fd58e1
+
+preflight:
+  exact_lease_assignment_proved: true
+  task_worktree_clean: true
+  reference_head_exact_and_clean: true
+  installed_module_head_tree_exact_and_clean: true
+  integration_host_status_entry_count: 30
+  game_database: aaemu_playerbots_game_public_alpha_v1
+  login_database: aaemu_playerbots_login_public_alpha_v1
+  required_loopback_ports: [1234, 1237, 1239, 1250, 1280]
+  aaemu_game_login_process_count: 0
+  archeage_client_process_count: 0
+  occupied_required_port_count: 0
+  runtime_log_entry_count: 0
+  mysql_observed_process_ids: [6308, 8076]
+  direct_database_access: false
+  preflight_sha256: 03eddcdda8996a10a7a1e7704b989f1a17332308023cd1e378be869252d6b585
+
+runtime_start:
+  runner: scripts/scale/Start-ScaleGateRuntime.ps1
+  exact_schemas_emitted: true
+  exact_five_loopback_listeners_present: true
+  login_process_id: 117784
+  game_process_id: 122728
+  initial_runtime_count: 0
+  initial_bot_count: 0
+
+bounded_attempt:
+  retained_bot_id: 20001
+  retained_bot_name: ScaleBot000
+  retained_bot_object_id: 26185
+  staged_fixture_template_id: 10004
+  staged_fixture_object_id: 44960
+  staged_fixture_distance_meters: 12
+  permitted_transition: botstate 20001 free
+  observation_window_seconds: 35
+  observation_sample_count: 7
+  synthetic_gameplay_command_count: 0
+  successful_autonomous_iterations: 0
+  required_autonomous_iterations: 3
+  observed_state_all_samples: Idle
+  observed_forced_state_all_samples: none-auto
+  observed_combat_is_active_all_samples: false
+  observed_target_all_samples: null
+  observed_destination_all_samples: null
+  self_selected_activity: false
+  travel_entered: false
+  mortal_combat_entered: false
+  exact_kill_credit_observed: false
+  progression_delta_observed: false
+  recovery_entered: false
+  autonomous_normal_logout_observed: false
+  clean_restart_persistence_executed: false
+
+metrics_after_observation:
+  runtime_count: 1
+  bot_count: 1
+  governor_active_bot_count: 1
+  semantic_note: governor_active_bot_count is the scheduling window, while botstate proved combat IsActive false.
+  brain_steps: 17
+  idle_brain_steps: 16
+  combat_brain_steps: 0
+  path_requests: 0
+  cast_attempts: 0
+  cast_successes: 0
+  credited_kills: 0
+  stuck_nudges: 0
+  stuck_teleports: 0
+  tick_errors: 0
+
+verified_blocker:
+  category: missing-autonomous-activity-selection-and-activation
+  finding: >-
+    After managed login, a staged mortal opportunity, and the sole permitted
+    free transition, bot 20001 remained Idle, inactive, targetless, and
+    stationary for every bounded observation. The live runtime never selected
+    an activity, so no autonomous iteration could begin.
+  source_boundary:
+    - A freshly spawned BotCombatState defaults IsActive to false.
+    - Idle enters Grinding or Questing only when IsActive is already true.
+    - The free command only releases ForcedState; it does not select or activate an activity.
+    - The deterministic BotLifeStateMachine has no production caller in the installed source.
+    - DespawnBot supplies normal persisted logout, but no autonomous lifecycle caller requests it.
+  smallest_follow_up_boundary: >-
+    Dispatch a bounded source task that wires a minimal single-bot live
+    lifecycle/activity controller. A free Idle bot must select and activate its
+    own activity with a decision reason and later request its own normal
+    DespawnBot logout. Integrate and build that correction before dispatching a
+    new immutable runtime proof version.
+
+cleanup:
+  cleanup_removebot_was_acceptance_evidence: false
+  final_runtime_count: 0
+  final_bot_count: 0
+  spawn_count: 1
+  spawn_failures: 0
+  despawn_count: 1
+  despawn_failures: 0
+  game_stopped_before_login: true
+  game_stop: graceful-ctrl-c-exited
+  login_stop: graceful-ctrl-c-exited
+  forced_termination: false
+  shutdown_cleanup_marker: BOT ev=shutdown_cleanup remaining_bots=0 remaining_runtimes=0
+  final_aaemu_game_login_process_count: 0
+  final_archeage_client_process_count: 0
+  final_occupied_required_port_count: 0
+  final_runtime_log_entry_count: 0
+  mysql_process_ids_unchanged: [6308, 8076]
+  direct_database_queries_or_mutations: 0
+  shutdown_only_disposed_physics_occurrences: 1
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-061\one-bot-autonomy-v1'
+  diagnosis_sha256: 1b96295f3a71b5846f8ea1f750398e730e9147708ae2306b63f569bbdb752243
+  attempt_summary_sha256: d413c6daaa280afabf04720ffd6f4c187a06c2612377d6f9da2319d3628d89f9
+  attempt_log_segment_sha256: d57751f1c5843acf2ae4650b5b711c9ad22536e6451813ba4b7fbaaac1e107bb
+  manifest_payload_file_count: 34
+  manifest_sha256: 8df04259caca8621b3a9e6ce54cab7cee164e47e00b394163fc65cb4d0255305
+  game_server_log_sha256: 31c95d0bf7ba6c55513d59a738c3a9679e9baa0b381dc0ce1288cf8f26da5fe8
+  game_error_log_sha256: 155a9ffc6b4f1c41237c47552e56f811007a89d2005f38d5cb5c654739112f1d
+  login_server_log_sha256: 63f00186cea7269c0f2cf2d857eee3513bd226da34a40e56a4a168597cf4ab48
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_boundaries:
+  - No autonomous iteration, travel, combat, kill, progression, recovery, logout, restart, persistence, or PASS is claimed.
+  - No source, deployment, database, client, AAEmu 3.0, global-ledger, or lease file was changed.
+  - No direct database command, ArcheAge client control, destructive cleanup, or forced termination occurred.
+  - The passive fixture was retained until graceful world shutdown because a post-logout system actor intentionally has no active-bot world anchor.
+
+control_actions:
+  integrator: Integrate this commit as a truthful FAIL runtime receipt only; do not mark T-061 passed.
+  pb_000_release: >-
+    After accepting this committed zero-bot, graceful Game-then-Login stop,
+    zero-process, free-listener, empty-live-log, and zero-client proof, commit
+    ops/RUNTIME-LEASE.yaml with aaemu12 released-after-T-061-fail-cleanup,
+    owner_task null, owner_thread_id null, released_at 2026-09-01, and
+    cleanup_receipt ops/evidence/aaemu12-t061-one-bot-autonomy-v1.yaml.
+  next_source_task: >-
+    Dispatch the minimal single-bot live lifecycle/activity activation and
+    autonomous logout wiring task described by verified_blocker; keep T-041
+    and T-037 blocked.

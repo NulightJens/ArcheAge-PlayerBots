@@ -1,0 +1,41 @@
+schema_version: 1
+id: T-086
+title: Add per-bot anchors to passive runtime fixtures
+track: AAEmu12
+status: done
+integration: pending
+outcome: Extend the inert passive-NPC operator fixture with an optional, fail-closed active-bot anchor so simultaneous one-zone opportunities can be spatially isolated without selecting or directing bot gameplay, while preserving all legacy syntax and behavior.
+depends_on: [T-041, T-085]
+runtime:
+  required: false
+  lease: null
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\e2ee\PB-W00-control'
+owner_client_thread_id: client-new-thread:9fc5ce6e-5bb2-43d6-bef3-65ad26d3df50
+owner_thread_id: 01a05db6-0a37-72c3-85e3-71599af8359c
+inputs:
+  dispatch_base: 0da7166627f53118184687736132a88cdb668e1e
+  integration_head: c216c751e6a2f2d59adf444d907131ea72171048
+  installed_module_source: 2243b53dcbda7a65ab66123c4bce4864d4c743dd
+  blocker_receipt: ops/evidence/aaemu12-t041-one-zone-autonomy-v1.yaml
+  blocker_integration_receipt: ops/evidence/aaemu12-t041-fail-integration-v1.yaml
+  retained_raw_failure: 'D:\Codex-Labs\evidence\T-041\one-zone-autonomy-v1'
+write_scope:
+  - compatibility/aaemu-1.2-r208022-v3.patch
+  - playerbots.module.json
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/tasks/T-086/HANDOFF.md
+gates:
+  - exact-t041-stacked-fixture-diagnosis
+  - backward-compatible-legacy-command-tests
+  - fail-closed-optional-active-bot-anchor-tests
+  - focused-aaemu12-command-tests
+  - isolated-aaemu12-build
+  - compatibility-patch-hash-consistency
+validation_boundary: Source and focused tests only in this task worktree and isolated build copy. Do not write the registered host/module, start/control runtime/MySQL/database/client, edit global ledgers/lease or retained evidence, alter autonomous selection/combat/lifecycle/Director behavior, run a full suite, perform scale/soak/packaging, or touch AAEmu 3.0.
+contract: ops/tasks/T-086/CONTRACT.md
+handoff: ops/tasks/T-086/HANDOFF.md
+source_head: 5c5d61c1f05c9419ba38e1cd247d35b6e8e92439
+source_parent: 0da7166627f53118184687736132a88cdb668e1e
+result: PASS-28-focused-clean-build-0-errors-patch-sha-green

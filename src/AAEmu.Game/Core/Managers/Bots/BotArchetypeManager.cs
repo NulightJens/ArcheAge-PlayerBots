@@ -7,6 +7,7 @@ using System.Threading;
 using AAEmu.Commons.IO;
 using AAEmu.Commons.Utils;
 using AAEmu.Commons.Utils.DB;
+using AAEmu.Game.Bots.Population.Identity;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Core.Packets.G2C;
@@ -17,13 +18,15 @@ using AAEmu.Game.Models.Game.Items.Actions;
 using AAEmu.Game.Models.Game.Items.Containers;
 using AAEmu.Game.Models.Game.Items.Templates;
 using AAEmu.Game.Models.Game.Skills;
+using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
 using Newtonsoft.Json;
 using NLog;
 
 namespace AAEmu.Game.Core.Managers.Bots
 {
-    public class BotArchetypeManager : Singleton<BotArchetypeManager>, IBotArchetypeManager, ILoadable
+    public class BotArchetypeManager : Singleton<BotArchetypeManager>, IBotArchetypeManager,
+        IBotArchetypeCreationPlanStore, ILoadable
     {
         private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
@@ -429,6 +432,65 @@ namespace AAEmu.Game.Core.Managers.Bots
                 .ToArray();
         }
 
+        public bool TryResolveCreationPlan(string archetypeName, byte level, out BotArchetypeCreationPlan plan)
+        {
+            plan = null;
+            if (string.IsNullOrWhiteSpace(archetypeName) || level == 0)
+                return false;
+
+            var definition = GetDefinitionsSnapshot().Values.FirstOrDefault(candidate =>
+                string.Equals(candidate.Name, archetypeName, StringComparison.OrdinalIgnoreCase));
+            if (definition?.RequiredAbilities == null || definition.RequiredAbilities.Count != 3 ||
+                definition.RequiredAbilities.Any(IsEmptyAbility) ||
+                definition.RequiredAbilities.Distinct().Count() != 3)
+                return false;
+
+            var ability1 = definition.StartingAbility;
+            if (IsEmptyAbility(ability1) || !definition.RequiredAbilities.Contains(ability1))
+                return false;
+
+            var ability2 = level >= definition.LevelToUnlockSecond
+                ? definition.RequiredAbilities[1]
+                : AbilityType.None;
+            var ability3 = level >= definition.LevelToUnlockThird
+                ? definition.RequiredAbilities[2]
+                : AbilityType.None;
+            plan = new BotArchetypeCreationPlan(
+                definition.Name,
+                ability1,
+                ability2,
+                ability3,
+                !IsEmptyAbility(ability2) && !IsEmptyAbility(ability3));
+            return true;
+        }
+
+        public void RegisterCreationPlan(uint characterId, BotArchetypeCreationPlan plan)
+        {
+            if (characterId == 0)
+                throw new ArgumentOutOfRangeException(nameof(characterId));
+            ArgumentNullException.ThrowIfNull(plan);
+
+            var definition = GetDefinitionsSnapshot().Values.FirstOrDefault(candidate =>
+                string.Equals(candidate.Name, plan.Name, StringComparison.OrdinalIgnoreCase));
+            if (definition == null)
+                throw new InvalidOperationException($"Unknown bot archetype '{plan.Name}'.");
+
+            var state = _archetypeStates.GetOrAdd(characterId, _ => new BotArchetypeState());
+            state.ArchetypeName = plan.IsFinal ? definition.Name : null;
+            state.PlannedArchetype = plan.IsFinal ? null : definition.Name;
+            state.IsInitialized = true;
+            SaveArchetype(characterId, definition.Name, plan.IsFinal);
+        }
+
+        public void RollbackCreationPlan(uint characterId)
+        {
+            if (characterId == 0)
+                return;
+
+            DeleteArchetype(characterId);
+            RemoveState(characterId);
+        }
+
         // ---- Database helpers ----
         private (string archetypeName, bool isFinal) GetArchetypeFromDb(uint characterId)
         {
@@ -512,7 +574,11 @@ namespace AAEmu.Game.Core.Managers.Bots
         private void ReapplyArchetype(Character bot, BotArchetypeState state)
         {
             SynchronizeAbilityExp(bot);
-            ClearArchetypeSkills(bot);
+            // Planned low-level classes retain the native starter skills granted
+            // at character creation. Rebuilding from an archetype list can replace
+            // a visible starter with a hidden/internal chain variant.
+            if (!string.IsNullOrEmpty(state.ArchetypeName))
+                ClearArchetypeSkills(bot);
             LearnSkills(bot, state);
             EquipBestGear(bot, state);
         }
@@ -827,6 +893,11 @@ namespace AAEmu.Game.Core.Managers.Bots
                     Logger.Warn($"Skill ID {skillId} does not exist, skipping.");
                     continue;
                 }
+                if (!IsPlayerLearnableActiveSkill(skillTemplate))
+                {
+                    Logger.Debug($"Skill ID {skillId} is hidden or not player-learnable, skipping.");
+                    continue;
+                }
 
                 var abilityType = (AbilityType)skillTemplate.AbilityId;
                 if (!IsAbilityActive(bot, abilityType))
@@ -873,6 +944,9 @@ namespace AAEmu.Game.Core.Managers.Bots
         {
             return ability == bot.Ability1 || ability == bot.Ability2 || ability == bot.Ability3;
         }
+
+        internal static bool IsPlayerLearnableActiveSkill(SkillTemplate template) =>
+            template is { Show: true, NeedLearn: true };
 
         // ---- Gear methods ----
         private class WeaponConfiguration

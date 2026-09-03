@@ -356,6 +356,60 @@ public class LegacyBridgeTests
     }
 
     [Test]
+    public async Task UseEngine_ContainedCombatFloorStopsBeforeRotationAction()
+    {
+        var config = BotConfig.Instance;
+        var previousUseEngine = config.UseEngine;
+        var previousPercent = config.ActivityPercent;
+        var sim = new BotSim();
+        try
+        {
+            config.UseEngine = true;
+            config.ActivityPercent = 100;
+            var bot = sim.AddBot(1, BotCombatStateType.Combat, runLegacyBrain: true);
+            var target = new FixedHealthCharacterMock
+            {
+                ObjId = 2001,
+                Hp = 79,
+                FixedMaxHp = 100
+            };
+            target.Transform.Local.SetPosition(Vector3.One);
+            bot.Runtime.CombatState.IsActive = true;
+            bot.Runtime.CombatState.PreviousState = BotCombatStateType.Idle;
+            bot.Runtime.CombatState.ForcedState = BotCombatStateType.Idle;
+            bot.Runtime.CombatState.Target = target;
+            bot.Runtime.CombatState.StopAtTargetHpPercent = 80;
+            bot.Bot.CurrentTarget = target;
+
+            var actionCalls = 0;
+            var engine = bot.Runtime.Engines[(int)BotEngineKind.Combat];
+            engine.RegisterAction(new EngineTestAction("floor bypass probe", execute: _ =>
+            {
+                actionCalls++;
+                return BotActionResult.Success;
+            }));
+            engine.AddStrategy(new TestStrategy(
+                "floor bypass probe",
+                [new BotNextAction("floor bypass probe", BotRelevance.High)]));
+            bot.Runtime.Schedule.NextBrainAt = sim.Time.GetUtcNow().UtcDateTime;
+
+            sim.Tick();
+
+            await Assert.That(actionCalls).IsEqualTo(0);
+            await Assert.That(bot.Runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Idle);
+            await Assert.That(bot.Runtime.CombatState.Target).IsNull();
+            await Assert.That(bot.Bot.CurrentTarget).IsNull();
+            await Assert.That(bot.Runtime.CombatState.StopAtTargetHpPercent).IsNull();
+        }
+        finally
+        {
+            sim.Reset();
+            config.UseEngine = previousUseEngine;
+            config.ActivityPercent = previousPercent;
+        }
+    }
+
+    [Test]
     public async Task UseEngine_InactiveTickRunsMinimalLegacyBrainBeforeEngine()
     {
         var config = BotConfig.Instance;

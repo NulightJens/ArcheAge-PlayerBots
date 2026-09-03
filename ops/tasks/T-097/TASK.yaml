@@ -1,0 +1,48 @@
+schema_version: 1
+id: T-097
+title: Integrate and install widened Director delay support
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Independently replay T-096 onto the saved lineage, install the exact corrected module into the registered AAEmu 1.2 integration checkout, rerun focused tests and clean build, consume exactly one full-suite gate, and fast-forward the saved branch with a durable integration receipt.
+depends_on: [T-095, T-096]
+runtime:
+  required: false
+  lease: aaemu12-build-only
+  archeage_client_allowed: false
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\ef38\PB-W00-control'
+owner_client_thread_id: client-new-thread:0e011ddf-ffdc-4c8c-a595-aee28b756ec7
+owner_thread_id: 01a05e7a-7318-7611-aa5e-d6fc1a52ab84
+inputs:
+  dispatch_base: 8515e189fd775e8a83853e6cca62d7f517cce48c
+  candidate_commit: 859e0daf64df482fcb17d83e16344387453a19b7
+  candidate_parent: 1ebfd0ec47138ebf15268befde9ed1671aa05ef8
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  predecessor_source: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+  predecessor_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+write_scope:
+  - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+  - ops/evidence/aaemu12-activity-director-delay-range-v1.yaml
+  - ops/tasks/T-096/HANDOFF.md
+  - ops/evidence/aaemu12-activity-director-delay-range-integration-v1.yaml
+  - ops/tasks/T-097/HANDOFF.md
+external_write_scope:
+  - aaemu12_integration host/module install and build outputs under exact build-only lease
+gates:
+  - exact-four-file-candidate-scope-and-replay
+  - installed-module-source-and-tree-match
+  - unchanged-clean-applying-host-patch
+  - 40-focused-tests-green
+  - clean-build-zero-errors
+  - exactly-one-complete-aaemu12-suite-green
+  - saved-integration-branch-fast-forward
+validation_boundary: Source integration/install/build only. Never start Login/Game, runtime observers, MySQL/database, or client. Do not edit global ledgers/lease, runtime config, external evidence, reference checkout, AAEmu 3.0, scale, soak, or packaging.
+contract: ops/tasks/T-097/CONTRACT.md
+handoff: ops/tasks/T-097/HANDOFF.md
+replay_commit: 761ffa1e0bd76d06532688f34b45e192a493b239
+integrated_commit: 71d13ca70b7c6f530a48ece85ced7041adaa7e1b
+installed_tree: c36b1255cccb3a782e44e87a56bc9e867a946048
+result: PASS-40-focused-build-0-errors-79-warnings-full-1851-pass-4-intentional-skips-once

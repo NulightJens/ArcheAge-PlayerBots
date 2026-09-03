@@ -1,12 +1,26 @@
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Bots.Life;
+using AAEmu.Game.Bots.Questing;
+using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Bots.Kernel;
+using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Models.Game.Bots;
+using AAEmu.Game.Models.Game.Char;
+using AAEmu.Game.Models.Game.Quests;
+using AAEmu.Game.Models.Game.Quests.Templates;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Units;
+using AAEmu.Game.Models.Game.NPChar;
+using AAEmu.Game.Models.Game.World;
+using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Models.Tasks.Bots;
 using AAEmu.UnitTests.Bots.Sim;
 using AAEmu.UnitTests.Utils.Mocks;
+using Microsoft.Extensions.Time.Testing;
 
 namespace AAEmu.UnitTests.Bots.Host;
 
@@ -565,6 +579,538 @@ public class BotHostBehaviorTests
     }
 
     [Test]
+    public async Task DefaultLifeController_RemainsResidentWithoutOneKillActivity()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 11, 59, 0, TimeSpan.Zero));
+        var host = MakeLifecycleHost(time, _ => false);
+        var runtime = MakeLifecycleRuntime(6300, time, new BotLifeController());
+
+        host.Register(runtime);
+        try
+        {
+            host.HostTask.Execute();
+
+            var life = runtime.LifeController.Inspect();
+            await Assert.That(life.ProfileId).IsEqualTo("resident");
+            await Assert.That(life.Life.State).IsEqualTo(BotLifeState.Idle);
+            await Assert.That(life.Activity).IsNull();
+            await Assert.That(runtime.CombatState.KillGoal).IsNull();
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
+    public async Task OneKillLifecycle_UsesAuthoritativeCreditAndInvokesLogoutOutsideIterationAndLock()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 0, 0, TimeSpan.Zero));
+        BotRuntime runtime = null;
+        var callbackCount = 0;
+        var callbackState = BotLifeState.Offline;
+        var callbackHeldRuntimeLock = true;
+        var callbackRunning = -1;
+        var callbackHadCompletion = false;
+        var callbackHadDelta = false;
+        var host = MakeLifecycleHost(time, _ =>
+        {
+            callbackCount++;
+            var callbackView = runtime.LifeController.Inspect();
+            callbackState = callbackView.Life.State;
+            callbackHadCompletion = callbackView.ProgressionCompletion.HasValue;
+            callbackHadDelta = callbackView.ProgressionDelta.HasValue;
+            callbackHeldRuntimeLock = Monitor.IsEntered(runtime.SyncRoot);
+            callbackRunning = Volatile.Read(ref runtime.Running);
+            return true;
+        });
+        runtime = MakeLifecycleRuntime(6301, time);
+
+        host.Register(runtime);
+        try
+        {
+            host.HostTask.Execute();
+
+            await Assert.That(runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Grinding);
+            await Assert.That(runtime.CombatState.KillGoal).IsEqualTo(1);
+            await Assert.That(runtime.CombatState.Target).IsNull();
+            await Assert.That(runtime.Bot.CurrentTarget).IsNull();
+            await Assert.That(runtime.MovementState.Destination).IsNull();
+
+            var victim = new Npc { ObjId = 9901, TemplateId = 42, Hp = 0, MaxHp = 100 };
+            runtime.Bot.Events.OnKill(victim, new OnKillArgs { Killer = runtime.Bot, Victim = victim });
+            runtime.CombatState.KillGoal = null;
+            runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+            time.Advance(TimeSpan.FromMilliseconds(100));
+
+            host.HostTask.Execute();
+            host.HostTask.Execute();
+
+            var life = runtime.LifeController.Inspect();
+            await Assert.That(runtime.CombatState.KillCount).IsEqualTo(1);
+            await Assert.That(callbackCount).IsEqualTo(1);
+            await Assert.That(callbackState).IsEqualTo(BotLifeState.Despawning);
+            await Assert.That(callbackHadCompletion).IsTrue();
+            await Assert.That(callbackHadDelta).IsTrue();
+            await Assert.That(callbackHeldRuntimeLock).IsFalse();
+            await Assert.That(callbackRunning).IsEqualTo(0);
+            await Assert.That(life.Life.State).IsEqualTo(BotLifeState.Offline);
+            await Assert.That(life.LogoutSucceeded).IsTrue();
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
+    public async Task QuestIntake_ClaimsTheHostTickBeforeTheOneKillGrindSelector()
+    {
+        var config = BotConfig.Instance;
+        var previousEnabled = config.QuestIntakeEnabled;
+        var previousSearchRadius = config.SearchRadius;
+        var previousScanRadius = config.QuestIntakeScanRadius;
+        var previousInteractionRadius = config.QuestIntakeInteractionRadius;
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 2, 12, 0, 0, TimeSpan.Zero));
+        var quest = new QuestTemplate { Id = 7001, ChapterIdx = 1, QuestIdx = 1 };
+        var accepted = new List<uint>();
+        var controller = new BotQuestIntakeController(
+            npcTemplateId => npcTemplateId == 5500 ? [quest] : [],
+            (bot, questId, _) =>
+            {
+                accepted.Add(questId);
+                bot.Quests.ActiveQuests[questId] =
+                    (Quest)RuntimeHelpers.GetUninitializedObject(typeof(Quest));
+                return true;
+            },
+            (_, _, _) => throw new InvalidOperationException("nearby quest giver must not request movement"),
+            _ => { },
+            (_, position) => position.Z,
+            null);
+        var host = MakeLifecycleHost(time, _ => false);
+        var runtime = MakeLifecycleRuntime(6501, time, questIntakeController: controller);
+        var questNpc = runtime.Bot.ParentWorld.GetNpc(9901);
+        questNpc.TemplateId = 5500;
+        questNpc.Transform.Local.SetPosition(new Vector3(2, 0, 0));
+        BotTestFixture.SetPrivateField(questNpc, "_parentWorld", runtime.Bot.ParentWorld);
+        runtime.Blackboard.Register(BotValues.NearbyNpcIds, new ManualValue<List<uint>>([questNpc.ObjId]));
+        runtime.Brain = new NoopBrain(runtime.Bot, runtime.CombatState, runtime.Broadcaster);
+
+        try
+        {
+            config.QuestIntakeEnabled = true;
+            config.SearchRadius = 60;
+            config.QuestIntakeScanRadius = 60;
+            config.QuestIntakeInteractionRadius = 6;
+            host.Register(runtime);
+
+            host.HostTask.Execute();
+
+            var intake = runtime.QuestIntakeController.Inspect();
+            await Assert.That(accepted).IsEquivalentTo(new uint[] { 7001 });
+            await Assert.That(runtime.Bot.Quests.HasQuest(7001)).IsTrue();
+            await Assert.That(intake.AcceptedCount).IsEqualTo(1);
+            await Assert.That(runtime.LifeController.Inspect().Activity).IsNull();
+            await Assert.That(runtime.CombatState.KillGoal).IsNull();
+            await Assert.That(runtime.CombatState.CurrentState).IsEqualTo(BotCombatStateType.Idle);
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+            config.QuestIntakeEnabled = previousEnabled;
+            config.SearchRadius = previousSearchRadius;
+            config.QuestIntakeScanRadius = previousScanRadius;
+            config.QuestIntakeInteractionRadius = previousInteractionRadius;
+        }
+    }
+
+    [Test]
+    public async Task QuestLifecycle_ClaimsTheHostTickBeforeIntakeAndOneKillGrind()
+    {
+        var config = BotConfig.Instance;
+        var previousCompletionEnabled = config.QuestCompletionEnabled;
+        var previousIntakeEnabled = config.QuestIntakeEnabled;
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 2, 12, 0, 0, TimeSpan.Zero));
+        var quest = new QuestTemplate { Id = 7002, ChapterIdx = 1, QuestIdx = 2 };
+        var accepted = new List<uint>();
+        var intake = new BotQuestIntakeController(
+            npcTemplateId => npcTemplateId == 5500 ? [quest] : [],
+            (bot, questId, _) =>
+            {
+                accepted.Add(questId);
+                return true;
+            },
+            (_, _, _) => { },
+            _ => { },
+            (_, position) => position.Z,
+            null);
+        var authority = new HostQuestAuthority
+        {
+            Snapshots =
+            [
+                new BotQuestSnapshot(
+                    7001,
+                    true,
+                    false,
+                    BotQuestObjectiveShape.Unsupported,
+                    null,
+                    null,
+                    [],
+                    [],
+                    "unsupported_fixture")
+            ]
+        };
+        var lifecycle = new BotQuestLifecycleController(authority);
+        var host = MakeLifecycleHost(time, _ => false);
+        var runtime = MakeLifecycleRuntime(
+            6502,
+            time,
+            questIntakeController: intake,
+            questLifecycleController: lifecycle);
+        var questNpc = runtime.Bot.ParentWorld.GetNpc(9901);
+        questNpc.TemplateId = 5500;
+        questNpc.Transform.Local.SetPosition(new Vector3(2, 0, 0));
+        BotTestFixture.SetPrivateField(questNpc, "_parentWorld", runtime.Bot.ParentWorld);
+        runtime.Blackboard.Register(BotValues.NearbyNpcIds, new ManualValue<List<uint>>([questNpc.ObjId]));
+        runtime.Brain = new NoopBrain(runtime.Bot, runtime.CombatState, runtime.Broadcaster);
+
+        try
+        {
+            config.QuestCompletionEnabled = true;
+            config.QuestIntakeEnabled = true;
+            host.Register(runtime);
+
+            host.HostTask.Execute();
+
+            await Assert.That(lifecycle.Inspect().State).IsEqualTo(BotQuestLifecycleState.Suspended);
+            await Assert.That(accepted).IsEmpty();
+            await Assert.That(runtime.LifeController.Inspect().Activity).IsNull();
+            await Assert.That(runtime.CombatState.KillGoal).IsNull();
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+            config.QuestCompletionEnabled = previousCompletionEnabled;
+            config.QuestIntakeEnabled = previousIntakeEnabled;
+        }
+    }
+
+    [Test]
+    public async Task NaturalRecoveryWait_SuspendsMoverAndBrainUntilWorldResourcesAreFull()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 2, 0, TimeSpan.Zero));
+        var callbackCount = 0;
+        var host = MakeLifecycleHost(time, _ =>
+        {
+            callbackCount++;
+            return true;
+        });
+        var runtime = MakeLifecycleRuntime(6304, time);
+        var mover = (BotSim.SimMover)runtime.Mover;
+
+        host.Register(runtime);
+        try
+        {
+            host.HostTask.Execute();
+            var moverStepsBeforeRecovery = mover.StepCount;
+            var brainStepsBeforeRecovery = host.Metrics.BrainStepsTotal;
+            runtime.CombatState.KillCount = 1;
+            runtime.CombatState.KillGoal = null;
+            runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+            runtime.Bot.Mp = 60;
+            time.Advance(TimeSpan.FromSeconds(1));
+
+            host.HostTask.Execute();
+            host.HostTask.Execute();
+
+            var pending = runtime.LifeController.Inspect();
+            await Assert.That(callbackCount).IsEqualTo(0);
+            await Assert.That(pending.Recovery.State).IsEqualTo(BotLifeRecoveryState.Pending);
+            await Assert.That(pending.ProgressionCompletion).IsNull();
+            await Assert.That(runtime.LifeController.ShouldSuspendRuntime).IsTrue();
+            await Assert.That(mover.StepCount).IsEqualTo(moverStepsBeforeRecovery);
+            await Assert.That(host.Metrics.BrainStepsTotal).IsEqualTo(brainStepsBeforeRecovery);
+
+            runtime.Bot.Mp = 100;
+            time.Advance(TimeSpan.FromSeconds(1));
+            host.HostTask.Execute();
+
+            var completed = runtime.LifeController.Inspect();
+            await Assert.That(callbackCount).IsEqualTo(1);
+            await Assert.That(completed.Recovery.State).IsEqualTo(BotLifeRecoveryState.Completed);
+            await Assert.That(completed.ProgressionCompletion?.Mp).IsEqualTo(100L);
+            await Assert.That(completed.Life.State).IsEqualTo(BotLifeState.Offline);
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
+    public async Task MultipleRuntimes_PendingRecoveryCountersStayFixedWhilePeerAndHostAdvance()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 4, 0, TimeSpan.Zero));
+        var logoutIds = new List<uint>();
+        var host = MakeLifecycleHost(time, id =>
+        {
+            logoutIds.Add(id);
+            return true;
+        });
+        var pending = MakeLifecycleRuntime(6305, time, directorZone: 137);
+        var advancing = MakeLifecycleRuntime(6306, time, directorZone: 137);
+        var director = new BotActivityDirectorTask(
+            new BotConfig
+            {
+                ActivityDirectorEnabled = true,
+                ActivityDirectorZoneId = 137,
+                ActivityDirectorCharacterIds = [pending.Bot.Id, advancing.Bot.Id],
+                ActivityDirectorMinimumPopulation = 1,
+                ActivityDirectorTargetPopulation = 2,
+                ActivityDirectorMaximumPopulation = 2
+            },
+            Mock.Of<IBotManager>().Object,
+            time);
+
+        try
+        {
+            await Assert.That(director.TryStart()).IsTrue();
+            host.Register(pending);
+            host.Register(advancing);
+            host.HostTask.Execute();
+
+            await Assert.That(pending.LifeController.Inspect().Activity).IsEqualTo("grind");
+            await Assert.That(advancing.LifeController.Inspect().Activity).IsEqualTo("grind");
+
+            advancing.Brain = new NoopBrain(
+                advancing.Bot,
+                advancing.CombatState,
+                advancing.Broadcaster);
+            pending.CombatState.KillCount = 1;
+            pending.CombatState.KillGoal = null;
+            pending.CombatState.TransitionTo(BotCombatStateType.Idle);
+            pending.Bot.Mp = 60;
+            advancing.MovementState.Destination = Vector3.One;
+            time.Advance(TimeSpan.FromSeconds(1));
+            advancing.Schedule.NextBrainAt = time.GetUtcNow().UtcDateTime;
+            host.HostTask.Execute();
+
+            var recovery = pending.LifeController.Inspect();
+            await Assert.That(recovery.Recovery.State).IsEqualTo(BotLifeRecoveryState.Pending);
+            await Assert.That(pending.LifeController.ShouldSuspendRuntime).IsTrue();
+            await Assert.That(logoutIds).IsEmpty();
+
+            var pendingBrainBefore = pending.Metrics.BrainSteps;
+            var pendingMoverBefore = pending.Metrics.MoverSteps;
+            var advancingBrainBefore = advancing.Metrics.BrainSteps;
+            var advancingMoverBefore = advancing.Metrics.MoverSteps;
+            var hostBrainBefore = host.Metrics.BrainStepsTotal;
+            var hostMoverBefore = host.Metrics.MoverStepsTotal;
+
+            for (var tick = 0; tick < 3; tick++)
+            {
+                time.Advance(TimeSpan.FromSeconds(1));
+                advancing.Schedule.NextBrainAt = time.GetUtcNow().UtcDateTime;
+                host.HostTask.Execute();
+            }
+
+            var advancingBrainDelta = advancing.Metrics.BrainSteps - advancingBrainBefore;
+            var advancingMoverDelta = advancing.Metrics.MoverSteps - advancingMoverBefore;
+            var hostBrainDelta = host.Metrics.BrainStepsTotal - hostBrainBefore;
+            var hostMoverDelta = host.Metrics.MoverStepsTotal - hostMoverBefore;
+            await Assert.That(pending.LifeController.ShouldSuspendRuntime).IsTrue();
+            await Assert.That(pending.Metrics.BrainSteps).IsEqualTo(pendingBrainBefore);
+            await Assert.That(pending.Metrics.MoverSteps).IsEqualTo(pendingMoverBefore);
+            await Assert.That(advancingBrainDelta).IsGreaterThan(0L);
+            await Assert.That(advancingMoverDelta).IsGreaterThan(0L);
+            await Assert.That(hostBrainDelta).IsEqualTo(advancingBrainDelta);
+            await Assert.That(hostMoverDelta).IsEqualTo(advancingMoverDelta);
+            await Assert.That(logoutIds).IsEmpty();
+
+            pending.Bot.Mp = 100;
+            time.Advance(TimeSpan.FromSeconds(1));
+            host.HostTask.Execute();
+            host.HostTask.Execute();
+
+            var completed = pending.LifeController.Inspect();
+            await Assert.That(logoutIds.Count(id => id == pending.Bot.Id)).IsEqualTo(1);
+            await Assert.That(logoutIds).DoesNotContain(advancing.Bot.Id);
+            await Assert.That(completed.Recovery.State).IsEqualTo(BotLifeRecoveryState.Completed);
+            await Assert.That(completed.ProgressionCompletion?.Mp).IsEqualTo(100L);
+            await Assert.That(completed.Life.State).IsEqualTo(BotLifeState.Offline);
+        }
+        finally
+        {
+            director.Stop();
+            host.Unregister(pending.Bot.Id);
+            host.Unregister(advancing.Bot.Id);
+        }
+    }
+
+    [Test]
+    public async Task LogoutCallbackFailure_IsRecordedAndNeverRetried()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 5, 0, TimeSpan.Zero));
+        var callbackCount = 0;
+        var host = MakeLifecycleHost(time, _ =>
+        {
+            callbackCount++;
+            throw new InvalidOperationException("simulated logout failure");
+        });
+        var runtime = MakeLifecycleRuntime(6302, time);
+        var mover = (BotSim.SimMover)runtime.Mover;
+
+        host.Register(runtime);
+        try
+        {
+            host.HostTask.Execute();
+            runtime.CombatState.KillCount = 1;
+            runtime.CombatState.KillGoal = null;
+            runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+
+            host.HostTask.Execute();
+            time.Advance(TimeSpan.FromMilliseconds(100));
+            host.HostTask.Execute();
+
+            var life = runtime.LifeController.Inspect();
+            var completion = life.ProgressionCompletion;
+            runtime.Bot.Hp = 64;
+            host.HostTask.Execute();
+            var afterDuplicateTick = runtime.LifeController.Inspect();
+            await Assert.That(callbackCount).IsEqualTo(1);
+            await Assert.That(life.Life.State).IsEqualTo(BotLifeState.Despawning);
+            await Assert.That(life.LogoutSucceeded).IsFalse();
+            await Assert.That(life.LastTransition?.Event.Kind).IsEqualTo(BotLifeEventKind.LogoutRequested);
+            await Assert.That(completion.HasValue).IsTrue();
+            await Assert.That(completion.Value.Hp).IsEqualTo(100L);
+            await Assert.That(afterDuplicateTick.ProgressionCompletion).IsEqualTo(completion);
+            await Assert.That(afterDuplicateTick.ProgressionDelta).IsEqualTo(life.ProgressionDelta);
+            await Assert.That(mover.StepCount).IsEqualTo(1);
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
+    public async Task ReaddingPersistentIdentity_ResetsControllerAndPermitsFreshIteration()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 10, 0, TimeSpan.Zero));
+        var host = MakeLifecycleHost(time, _ => false);
+        var controller = MakeSingleBotOneKillController();
+        var first = MakeLifecycleRuntime(6303, time, controller);
+        host.Register(first);
+        host.HostTask.Execute();
+        first.CombatState.KillCount = 1;
+        first.CombatState.KillGoal = null;
+        first.CombatState.TransitionTo(BotCombatStateType.Idle);
+        host.HostTask.Execute();
+        host.Unregister(first.Bot.Id);
+
+        time.Advance(TimeSpan.FromSeconds(1));
+        var second = MakeLifecycleRuntime(6303, time, controller);
+        host.Register(second);
+        try
+        {
+            var fresh = controller.Inspect();
+            await Assert.That(fresh.Life.State).IsEqualTo(BotLifeState.Idle);
+            await Assert.That(fresh.Activity).IsNull();
+            await Assert.That(fresh.DecisionAt).IsNull();
+            await Assert.That(fresh.Recovery.State).IsEqualTo(BotLifeRecoveryState.NotRequired);
+            await Assert.That(fresh.Recovery.StartedAt).IsNull();
+            await Assert.That(fresh.Recovery.ObservedAt).IsNull();
+            await Assert.That(fresh.LogoutRequestedAt).IsNull();
+            await Assert.That(fresh.LogoutSucceeded).IsNull();
+            await Assert.That(fresh.ProgressionBaseline).IsNull();
+            await Assert.That(fresh.ProgressionCompletion).IsNull();
+            await Assert.That(fresh.ProgressionDelta).IsNull();
+
+            host.HostTask.Execute();
+
+            var restarted = controller.Inspect();
+            await Assert.That(restarted.Life.State).IsEqualTo(BotLifeState.Active);
+            await Assert.That(restarted.Activity).IsEqualTo("grind");
+            await Assert.That(restarted.ProgressionBaseline.HasValue).IsTrue();
+            await Assert.That(restarted.ProgressionCompletion).IsNull();
+            await Assert.That(restarted.ProgressionDelta).IsNull();
+            await Assert.That(second.CombatState.KillGoal).IsEqualTo(1);
+        }
+        finally
+        {
+            host.Unregister(second.Bot.Id);
+        }
+    }
+
+    [Test]
+    public async Task MultipleRuntimes_OnlyQualifiedDirectorIdentitiesRunIndependentLifecycle()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 20, 0, TimeSpan.Zero));
+        var logoutIds = new List<uint>();
+        var host = MakeLifecycleHost(time, id =>
+        {
+            logoutIds.Add(id);
+            return true;
+        });
+        var qualifiedOne = MakeLifecycleRuntime(6401, time, directorZone: 137);
+        var qualifiedTwo = MakeLifecycleRuntime(6402, time, directorZone: 137);
+        var configuredWrongZone = MakeLifecycleRuntime(6403, time, directorZone: 999);
+        var manual = MakeLifecycleRuntime(6404, time, directorZone: 137);
+        var director = new BotActivityDirectorTask(
+            new BotConfig
+            {
+                ActivityDirectorEnabled = true,
+                ActivityDirectorZoneId = 137,
+                ActivityDirectorCharacterIds = [6401, 6402, 6403],
+                ActivityDirectorMinimumPopulation = 1,
+                ActivityDirectorTargetPopulation = 2,
+                ActivityDirectorMaximumPopulation = 3
+            },
+            Mock.Of<IBotManager>().Object,
+            time);
+        var runtimes = new[] { qualifiedOne, qualifiedTwo, configuredWrongZone, manual };
+
+        try
+        {
+            await Assert.That(director.TryStart()).IsTrue();
+            foreach (var runtime in runtimes)
+                host.Register(runtime);
+
+            host.HostTask.Execute();
+
+            await Assert.That(qualifiedOne.LifeController.Inspect().Activity).IsEqualTo("grind");
+            await Assert.That(qualifiedTwo.LifeController.Inspect().Activity).IsEqualTo("grind");
+            await Assert.That(configuredWrongZone.LifeController.Inspect().Activity).IsNull();
+            await Assert.That(manual.LifeController.Inspect().Activity).IsNull();
+            await Assert.That(qualifiedOne.CombatState.ForcedState).IsNull();
+            await Assert.That(qualifiedTwo.CombatState.ForcedState).IsNull();
+            await Assert.That(qualifiedOne.CombatState.Target).IsNull();
+            await Assert.That(qualifiedTwo.CombatState.Target).IsNull();
+
+            foreach (var runtime in new[] { qualifiedOne, qualifiedTwo })
+            {
+                runtime.CombatState.KillCount = 1;
+                runtime.CombatState.KillGoal = null;
+                runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
+            }
+            time.Advance(TimeSpan.FromSeconds(1));
+            host.HostTask.Execute();
+
+            await Assert.That(string.Join(",", logoutIds.OrderBy(id => id))).IsEqualTo("6401,6402");
+            await Assert.That(qualifiedOne.LifeController.Inspect().LogoutSucceeded).IsTrue();
+            await Assert.That(qualifiedTwo.LifeController.Inspect().LogoutSucceeded).IsTrue();
+            await Assert.That(configuredWrongZone.LifeController.Inspect().LogoutRequestedAt).IsNull();
+            await Assert.That(manual.LifeController.Inspect().LogoutRequestedAt).IsNull();
+        }
+        finally
+        {
+            director.Stop();
+            foreach (var runtime in runtimes)
+                host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
     public async Task TickMetrics_TickMsEmaMovesForSlowBrain()
     {
         var sim = new BotSim();
@@ -758,6 +1304,145 @@ public class BotHostBehaviorTests
         internal override void Step() => throw new InvalidOperationException("simulated mover failure");
     }
 
+    private static BotHost MakeLifecycleHost(FakeTimeProvider time, Func<uint, bool> logout)
+    {
+        var taskManager = Mock.Of<ITaskManager>();
+        taskManager.Schedule(Any<AAEmu.Game.Models.Tasks.Task>(), Any<TimeSpan?>(), Any<TimeSpan?>(), Any<int>())
+            .Returns(true);
+        return new BotHost(taskManager.Object, time, logoutBot: logout);
+    }
+
+    private static BotRuntime MakeLifecycleRuntime(
+        uint id,
+        FakeTimeProvider time,
+        BotLifeController controller = null,
+        uint? directorZone = null,
+        BotQuestIntakeController questIntakeController = null,
+        BotQuestLifecycleController questLifecycleController = null)
+    {
+        controller ??= MakeSingleBotOneKillController();
+        var bot = new LifecycleCharacterMock
+        {
+            Id = id,
+            ObjId = 1000 + id,
+            Name = $"bot{id}",
+            Hp = 100,
+            Mp = 100
+        };
+        bot.Quests = new CharacterQuests(bot);
+        bot.Transform.Local.SetPosition(Vector3.Zero);
+        var instanceId = directorZone.HasValue ? WorldManager.DefaultInstanceId : 1u;
+        var templateId = directorZone.HasValue ? WorldManager.DefaultWorldTemplateId : 1u;
+        var world = new WorldInstance(
+            new WorldTemplate { Id = templateId, Name = $"world{instanceId}" },
+            0,
+            true,
+            instanceId);
+        BotTestFixture.SetPrivateField(bot, "_parentWorld", world);
+        if (directorZone.HasValue)
+        {
+            BotTestFixture.SetPrivateField(bot.Transform, "_instanceId", instanceId);
+            BotTestFixture.SetPrivateField(bot.Transform, "_zoneId", directorZone.Value);
+        }
+        var movement = new BotMovementState();
+        var combat = new BotCombatState();
+        var blackboard = new BotBlackboard();
+        blackboard.Register(BotValues.NearbyHostileNpcIds, new ManualValue<List<uint>>([9901u]));
+        world.AddObject(new Npc { ObjId = 9901, Hp = 100, MaxHp = 100 });
+        var broadcaster = new BotMovementBroadcaster(bot, time);
+        var mover = new BotSim.SimMover(bot, movement, broadcaster);
+        var brain = new BotCombatTask(
+            bot,
+            combat,
+            broadcaster,
+            onCancel: null,
+            blackboard: blackboard,
+            timeProvider: time);
+        return new BotRuntime(
+            bot,
+            movement,
+            combat,
+            broadcaster,
+            mover,
+            brain,
+            blackboard,
+            new BotConfig { UseEngine = false },
+            controller,
+            questIntakeController,
+            questLifecycleController);
+    }
+
+    private static BotLifeController MakeSingleBotOneKillController() =>
+        new(new BotBehaviorProfile(
+            "single-bot-one-kill-test",
+            TimeSpan.Zero,
+            TimeSpan.MaxValue,
+            TimeSpan.Zero,
+            TimeSpan.MaxValue),
+            singleBotOneKillEnabled: true);
+
+    private sealed class HostQuestAuthority : IBotQuestAuthority
+    {
+        public IReadOnlyList<BotQuestSnapshot> Snapshots { get; set; } = [];
+
+        public IReadOnlyList<BotQuestStartCandidate> FindDoodadQuestStarts(
+            BotRuntime runtime,
+            float radius,
+            DateTimeOffset now) => [];
+
+        public bool AcceptQuest(
+            Character bot,
+            BotQuestGiverKind kind,
+            uint questId,
+            uint giverObjectId) => false;
+
+        public IReadOnlyList<BotQuestSnapshot> ReadActiveQuests(Character bot) => Snapshots;
+
+        public IReadOnlyList<Npc> FindMonsterTargets(
+            BotRuntime runtime,
+            uint npcTemplateId,
+            float radius,
+            DateTimeOffset now) => [];
+
+        public IReadOnlyList<BotQuestWorldObject> FindReportObjects(
+            BotRuntime runtime,
+            BotQuestReportEndpoint endpoint,
+            float radius,
+            DateTimeOffset now) => [];
+
+        public IReadOnlyList<Npc> FindItemGatherTargets(
+            BotRuntime runtime,
+            uint questId,
+            uint itemId,
+            float radius,
+            DateTimeOffset now) => [];
+
+        public BotQuestLootAttempt TryLootGatherItem(
+            Character bot,
+            uint questId,
+            uint itemId,
+            Npc corpse,
+            float interactionRadius) => new(false, "not_configured", 0, 0);
+
+        public IReadOnlyList<BotQuestStaticReportDestination> FindStaticReportDestinations(
+            BotRuntime runtime,
+            BotQuestReportEndpoint endpoint,
+            float maximumDistance) => [];
+
+        public bool ReportQuest(
+            Character bot,
+            uint questId,
+            BotQuestReportKind kind,
+            uint worldObjectId,
+            int rewardIndex) => false;
+    }
+
+    private sealed class LifecycleCharacterMock : CharacterMock
+    {
+        public override int MaxHp { get; set; } = 100;
+        public override int MaxMp => 100;
+    }
+
     private sealed class BlockingBrain(AAEmu.Game.Models.Game.Char.Character bot, BotCombatState state, BotMovementBroadcaster broadcaster)
         : BotCombatTask(bot, state, broadcaster)
     {
@@ -768,6 +1453,18 @@ public class BotHostBehaviorTests
         {
             Entered.Set();
             Release.Wait();
+        }
+    }
+
+    private sealed class NoopBrain(AAEmu.Game.Models.Game.Char.Character bot, BotCombatState state, BotMovementBroadcaster broadcaster)
+        : BotCombatTask(bot, state, broadcaster)
+    {
+        internal override void Step()
+        {
+        }
+
+        internal override void StepMinimal()
+        {
         }
     }
 }

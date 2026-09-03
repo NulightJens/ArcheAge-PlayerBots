@@ -1,0 +1,7 @@
+{
+  "schema_version": "playerbots.evidence-input.v1",
+  "checks": [
+    { "id": "zeta", "verdict": "PASS" },
+    { "id": "alpha", "verdict": "PASS" }
+  ]
+}

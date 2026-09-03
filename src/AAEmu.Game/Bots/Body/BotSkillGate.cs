@@ -10,6 +10,7 @@ public enum GateReason
 {
     Ok,
     NoTemplate,
+    Unlearned,
     Dead,
     TargetDead,
     Casting,

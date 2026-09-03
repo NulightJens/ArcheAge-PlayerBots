@@ -1,0 +1,353 @@
+schema_version: 1
+id: aaemu12-t112-one-zone-autonomy-v9
+recorded_at: '2026-09-02T03:09:04Z'
+verdict: FAIL
+
+failure:
+  first_material_invalid_gate: wave-one-fixed-brain-mover-recovery-window
+  classification: authoritative-runtime-behavior-failure
+  original_validator_error: 'fixed-counter-window-invalid:20001:16'
+  reason: >-
+    The first one-shot three-fixture wave passed parsing, live planning,
+    placement, command, native logout-readiness, and Director refill readiness,
+    but the required fixed brain/mover recovery window did not. Bot 20001's
+    16 raw-verified recovery-pending samples advanced brain steps 177/178/179
+    and mover steps 433/434/435/436. Independent terminal replay also found
+    bot 20003 advancing 178/179 and 435/436 across 13 pending samples. Bot
+    20002 alone remained fixed at 179/436 across 11 samples. The contract
+    forbade a fixture retry, so wave two and restart were not attempted.
+  failed_bot_ids: [20001, 20003]
+  fixture_command_count: 3
+  fixture_retry_count: 0
+  wave_two_attempted: false
+  restart_attempted: false
+  directed_gameplay_command_count: 0
+
+fingerprint:
+  task: T-112
+  binding_commit: 4277111312b09d549b29b0e3af8c0e4ebcef2168
+  binding_tree: 91dcbd8edfc8a496698ac652d646439c3f6234a9
+  dispatch_parent: f3cb885141e7d91cfb05bdeca7bb9f0fc14406ec
+  task_thread_id: 01a05ff2-1c7b-7643-9e6a-764fe1594975
+  owner_client_thread_id: client-new-thread:faa00f23-f232-468c-9914-bf62a81f03a9
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\19b4\PB-W00-control'
+  runtime_lease: aaemu12
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  module_source_commit: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: 2385d16554b1fc9df1c77d45612b39c8fdac20721f20eac31ec9d0c32cc71696
+  client_observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+  autonomy_observer_blob: 94b82fb18a39e2356d43796b54e3eeea5ad7ee12
+
+preflight:
+  verdict: PASS
+  receipt_sha256: 22802208900e4d0d65a97e6e1840a813e267d8e8bcdcaeba170354cbd466ab20
+  reference_exact_clean_detached: true
+  installed_module_exact_clean_detached: true
+  accepted_host_overlay_entry_count: 30
+  complete_reverse_patch_check: true
+  initial_runtime_process_count: 0
+  initial_client_process_count: 0
+  initial_observer_process_count: 0
+  occupied_required_port_count: 0
+  initial_live_log_entry_count: 0
+  mysql_os_observed_process_ids: [6308, 8076]
+  direct_database_access: false
+  fresh_root_created_once: true
+
+configuration:
+  original_length: 1772
+  original_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  configured_length: 1795
+  configured_sha256: 5177e67c818d04ebf9c6b0164afc833e431cf4f687e660cffe02d5ef202de47c
+  contracted_assignment_count: 9
+  values:
+    enabled: true
+    zone_id: 221
+    character_ids: [20001, 20002, 20003]
+    minimum_population: 2
+    target_population: 3
+    maximum_population: 3
+    initial_delay_ms: 180000
+    reconciliation_interval_ms: 15000
+    retry_backoff_ms: 30000
+    search_radius: 60
+  final_length: 1772
+  final_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  final_exact_original_bytes: true
+
+parser_selftests:
+  verdict: PASS
+  result_sha256: 8256bc62995b889eb01045bf0e041ed413658c984d8e8fc163d670df784739f6
+  fixture_grade_grammar: '[A-Za-z][A-Za-z0-9_]*'
+  retained_response_length: 359
+  retained_response_sha256: 32474d410485ba1fe987a80a0ed3b41b86f3729ee4fe3b30263f593e4de844d3
+  retained_response:
+    object_id: 44979
+    anchor_bot_id: 20001
+    zone: 221
+    instance: 0
+    xyz: [13616.7, 13298.1, 28.5]
+    grade: Weak
+    error_count: 0
+  fixture_negative_families_rejected:
+    - numeric-only
+    - empty
+    - localized
+    - duplicate
+    - missing
+    - wrong-anchor
+    - wrong-zone
+    - wrong-instance
+    - zero-object
+    - non-finite
+    - trailing-error
+  transform_positive_and_all_contracted_negatives: PASS
+
+planner_selftest:
+  verdict: PASS
+  ownership: literal-bot-row-own-diagonal-versus-foreign-columns
+  enumeration_count: 18399744
+  eligible_count: 125
+  semantic_sha256: 38b871081b5c3dc4be700d33f9890c51e10aa3b1c80839b8b916584fa553bfc1
+  independent_repeat_matched: true
+  selected_choice_orders: [28, 68, 56]
+  selected_distances: [10, 15, 15]
+  selected_angles: [60, -60, 120]
+  selected_fixture_xy_bits: [[1179959989, 1179633778], [1179951580, 1179656575], [1179985828, 1179652438]]
+  minimum_pairwise_m: 23.728951412717223
+  minimum_row_margin_m: 3.820467349324412
+  yield_interval: 8192
+  persisted_enumeration_rows: 0
+
+scheduling_rehearsal:
+  verdict: PASS
+  primary_process_id: 40628
+  repeat_process_id: 42740
+  planner_priority: BelowNormal
+  sentinel_process_id: 130472
+  sentinel_priority: AboveNormal
+  sentinel_sample_count: 68
+  sentinel_maximum_adjacent_gap_ms: 533.132
+  planner_results_match_selftest: true
+
+run_one:
+  login_process_id: 128924
+  game_process_id: 130968
+  runtime_start_evidence_at_utc: '2026-09-02T02:54:48.3200766Z'
+  autonomy_observers:
+    process_ids: {20001: 116812, 20002: 130472, 20003: 114256}
+    priority: AboveNormal
+    relaunch_count: 0
+    first_sample_elapsed_from_runtime_start_ms: {20001: 8939.242, 20002: 8940.936, 20003: 8937.226}
+    all_first_two_offline_and_raw_verified: true
+    all_prearmed_before_admission: true
+  director:
+    started_at_utc: '2026-09-02T02:54:30.6627118Z'
+    first_admission_at_utc: '2026-09-02T02:57:30.7315731Z'
+    first_admission_elapsed_ms: 180068.861
+    contracted_window_ms: [180000, 195000]
+    delay_gate: PASS
+    admission_order: [20001, 20002, 20003]
+    inter_admission_gaps_ms: [15021.616, 15044.714]
+    maximum_live_qualified: 3
+    failures: 0
+    wrong_zone: 0
+    overlap: 0
+
+wave_one:
+  fixture_batch_verdict: PASS
+  result_sha256: d4564ac56a7d99daf4194473d240459597dd3c33dc26f46cf739ab8ca7e81d83
+  preplan_transform_span_ms: 648.483
+  preplan_latest_age_ms: 375.413
+  command_transform_span_ms: 682.017
+  command_latest_age_ms: 217.587
+  transform_world_instance_zone: [0, 0, 221]
+  stable_transform_bits:
+    20001: [1179957453, 1179643699, 1105690834, -1065611208]
+    20002: [1179961651, 1179638682, 1105702316, -1067572590]
+    20003: [1179966669, 1179647693, 1105645640, -1067065750]
+  postplan_bit_state_identity_revalidation: PASS
+  observer_maximum_gap_through_command_ms: 591.089
+  live_planner:
+    enumeration_count: 18399744
+    eligible_count: 4491
+    semantic_sha256: a20d960918bae85143bf81d9387049b17214238bb4708005f94ffb49315aa222
+    independent_repeat_matched: true
+    primary_process_id: 130520
+    repeat_process_id: 129404
+    primary_ms: 21054.512
+    repeat_ms: 17942.386
+    priority: BelowNormal
+    yield_interval: 8192
+    persisted_enumeration_rows: 0
+    selected_choice_orders: [259, 242, 250]
+    selected_distances: [55, 55, 55]
+    selected_angles: [-75, 30, 150]
+    predicted_pairwise_m: [106.77777647688175, 102.02125919142284, 101.77632138550061]
+    predicted_anchor_to_fixture_m:
+      - [55.00040977498772, 60.67701334369426, 64.6614174121528]
+      - [61.06225189189815, 55.00010903087559, 64.15929877928966]
+      - [61.27073692859829, 63.02481684009368, 54.99965710966557]
+    minimum_row_margin_m: 5.67660356870654
+  command_batch:
+    start_lag_ms: 928.269
+    response_span_ms: 184.973
+    issued_once_in_order: [20001, 20002, 20003]
+    fixture_object_ids: [33901, 37936, 37938]
+    parsed_grades: [Weak, Weak, Weak]
+    actual_pairwise_m: [106.74974550042647, 102.0266513132784, 101.80161122262996]
+    actual_anchor_to_fixture_m:
+      - [54.966094307997245, 60.70615058732904, 64.66278996678187]
+      - [61.0268073196046, 55.030649843685495, 64.15783151348664]
+      - [61.24099264282246, 63.057970910811854, 55.000216266900466]
+    minimum_actual_row_margin_m: 5.740056279331796
+    parser_or_geometry_errors: 0
+    retry_count: 0
+  lifecycle:
+    verdict: FAIL
+    failure_sha256: c3c364b44fd39b7ce81fdd48dc4a97104fd61a52466a4cfb8bd909c2bc9bec89
+    original_validator_error: 'fixed-counter-window-invalid:20001:16'
+    pending_windows:
+      20001: {sample_count: 16, brain_steps: [177, 178, 179], mover_steps: [433, 434, 435, 436], fixed: false}
+      20002: {sample_count: 11, brain_steps: [179], mover_steps: [436], fixed: true}
+      20003: {sample_count: 13, brain_steps: [178, 179], mover_steps: [435, 436], fixed: false}
+    all_first_offline_samples_index: 520
+    all_first_offline_raw_verified: true
+    validator_ready_gate_exact_one_logout_each: true
+    director_refill_order: [20001, 20002, 20003]
+    director_refill_times_utc:
+      - '2026-09-02T02:59:31.0957874Z'
+      - '2026-09-02T02:59:46.1165109Z'
+      - '2026-09-02T03:00:01.1751644Z'
+    final_live_qualified: 3
+    refill_failures: 0
+
+observers:
+  client:
+    process_id: 129400
+    relaunched: false
+    sample_count: 1315
+    raw_hashes_validated: 1315
+    row_chain_links_validated: 1315
+    first_sample_at_utc: '2026-09-02T02:51:03.2609011Z'
+    last_sample_at_utc: '2026-09-02T03:03:46.6632885Z'
+    first_before_login: true
+    last_after_cleanup: true
+    maximum_adjacent_gap_ms: 728.458
+    nonzero_client_samples: 0
+    error_samples: 0
+    terminal_chain_hash: 99b33ba8083c20e42913b2437836ba729b2795c982cea6da19ac1d9f2f1095bb
+    cooperative_stop: true
+  run_one_autonomy:
+    retained_raw_and_independent_derivation_verdict: PASS
+    observer_audit_sha256: 83caa371289603799d5f63d79454fcf6e08a28a69df219c8d60450538d394596
+    raw_validated: {20001: 778, 20002: 779, 20003: 779}
+    sample_count: {20001: 790, 20002: 791, 20003: 792}
+    malformed_count: {20001: 0, 20002: 0, 20003: 0}
+    transport_errors_are_final_tail: true
+    complete_ledger_gap_verdict: FAIL
+    maximum_adjacent_gap_ms: {20001: 2582.087, 20002: 2597.298, 20003: 2569.992}
+    contracted_maximum_ms: 2000
+    gap_context: graceful-shutdown-transport-error-tail
+
+cleanup:
+  verdict: PASS
+  shutdown_order: [Game, Login]
+  graceful_game_stop: true
+  graceful_login_stop: true
+  forced_termination: false
+  director_stop_count: 1
+  director_stop_reason: graceful_shutdown
+  despawn_count: 6
+  shutdown_cleanup_zero_count: 1
+  autonomy_observers_stopped_cooperatively: true
+  client_observer_stopped_cooperatively: true
+  logs_moved_losslessly: true
+  run_one_game_log_length: 22547866
+  run_one_game_log_sha256: a3167c2859a59090e4987a9197f83d3f02f59e5fffb3b626024b1c6444dc50c7
+  run_one_login_log_length: 3122
+  run_one_login_log_sha256: ef6b3826376886d13308caf144a3d7b9ac2b93b3c8af2f27822eb23535c4c7f8
+  final_game_login_client_observer_process_count: 0
+  final_required_listener_count: 0
+  final_live_log_entry_count: 0
+  mysql_process_ids_unchanged: [6308, 8076]
+  database_access: false
+  client_launches: 0
+  reference_module_and_host_overlay_exact: true
+  config_exact_original_bytes: true
+  final_cleanup_sha256: 4e7bb077287c7606becffd2f437406d3672267774ed688cc62acacc5962f5925
+
+retained_anomalies:
+  - category: pre-runtime-versioned-wrapper-corrections
+    finding: >-
+      A zero-length scheduling signal was rejected before planner launch; a
+      corrected rehearsal then passed, but its caller inspected unset
+      LASTEXITCODE. The finalizer revalidated the retained parser fixtures and
+      successful rehearsal without rerunning either planner. A superseded
+      finalizer shorthand defect was also corrected in a new sealed version.
+  - category: continuous-client-observer-share-read
+    finding: >-
+      The first wrapper read used incompatible file sharing after PID 129400
+      was already running. The same process was recovered and validated; it
+      was never relaunched.
+  - category: terminal-audit-wrapper-shorthand
+    finding: >-
+      Prepared final and observer audit wrappers contained PowerShell shorthand
+      predicates that failed before output. Their exact logic was evaluated
+      in memory with explicit predicates; the original scripts remain sealed.
+  - category: runtime-stop-first-call-arguments
+    finding: >-
+      A first shutdown-wrapper invocation omitted two mandatory arguments and
+      performed no mutation. The accepted invocation then stopped Game and
+      Login once, in order, through graceful Ctrl+C.
+  - category: autonomy-shutdown-tail-gap
+    finding: >-
+      Independent full-ledger replay retained and rejected 2.57-2.60 second
+      transport-error-tail gaps. No anomaly caused a retry, observer relaunch,
+      fixture substitution, force-stop, client access, database access, or
+      evidence overwrite.
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
+  terminal_result_path: final/terminal-result.json
+  terminal_result_length: 28646
+  terminal_result_sha256: a6374a1be0338341681f00ae8c5f58c201e3397d59d6f2479dc05408e87935ef
+  manifest_path: final/manifest.json
+  manifest_schema: t112.canonical-terminal-manifest.v1
+  manifest_verdict: PASS
+  terminal_verdict: FAIL
+  manifest_entry_count: 8602
+  manifest_total_bytes: 29445543
+  manifest_length: 1753792
+  manifest_sha256: b9a11a357e108a05f203ab5a43cd9f3ea9c83f1573748e20b1209b1352699b01
+  manifest_validation: 8602-of-8602-length-and-sha256-green
+  missing_paths: 0
+  length_or_sha256_mismatches: 0
+  duplicate_paths: 0
+  unsafe_paths: 0
+  unlisted_payloads: 0
+  reparse_points: 0
+  manifest_self_exclusion: final/manifest.json
+
+unproven_boundaries:
+  - Wave-one contracted lifecycle PASS beyond the terminal fixed-counter gate.
+  - Wave two fixture, lifecycle, logout, and refill proof.
+  - Six-command, six-unique-object, and two-native-credit-per-identity aggregate.
+  - Distinct-PID restart, second delay measurement, ordered rebootstrap, and two-minute target dwell.
+  - Run-two autonomy observer audit.
+  - AAEmu 3.0, client gameplay, database behavior, scale, soak, and packaging.
+
+control_actions:
+  integrator: >-
+    Independently verify the sealed v9 root and integrate this commit only as
+    retained T-112 FAIL evidence. Do not reinterpret it as autonomy acceptance
+    and do not mutate or reuse the root.
+  pb_000_release: >-
+    PB-000 alone releases or reassigns the aaemu12 lease after accepting the
+    graceful cleanup, exact config restoration, unchanged MySQL identities,
+    and sealed evidence boundary.
+  downstream: >-
+    Keep T-037 blocked. Any successor requires a new task, exact binding and
+    lease, and a fresh versioned evidence root; never retry or extend v9.

@@ -1,0 +1,310 @@
+schema_version: 1
+id: aaemu12-t104-fail-integration-v1
+recorded_at: '2026-09-01T17:45:32.7444527-06:00'
+verdict: PASS-receipt-integrity
+subject_verdict: FAIL-no-eligible-ownership-tuple
+
+integration_identity:
+  task: T-105
+  task_thread_id: 01a05f4e-0502-7a93-bf64-96b14156c2a3
+  owner_client_thread_id: client-new-thread:a3aefb4b-97da-4f82-a729-7d9ec4a71c65
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\d154\PB-W00-control'
+  dispatch_base: cac9064dac253be963d51642332c39dab6519d7a
+  binding_commit: 8ae84e0e5ad769022f898c8a7b62b1623b1fca89
+  binding_tree: b9357ccc540a034aa090356b8b3157595d6934f1
+  saved_branch: integration/aaemu12-world
+  saved_branch_head_before: 8ae84e0e5ad769022f898c8a7b62b1623b1fca89
+
+candidate:
+  commit: 3b0627f857c8e573cf67450b585e284f3f8ac0e9
+  parent: dde605d10912e8f282ce263680b70d1f02133249
+  tree: 41319cfb1568da0219d5a5d2445a8902c9e9eea7
+  stable_patch_id: 0ee155feca30e139f0325bdb29c0f9e926504302
+  exact_path_count: 2
+  replay_commit: 37e43842dd737d492c7bb54984083b520be4f359
+  replay_parent: 8ae84e0e5ad769022f898c8a7b62b1623b1fca89
+  replay_tree: 1aecc7181e99e00783ec685e6b042e1416080288
+  replay_stable_patch_id: 0ee155feca30e139f0325bdb29c0f9e926504302
+  stable_patch_id_match: true
+  exact_paths:
+    - path: ops/evidence/aaemu12-t104-one-zone-autonomy-v6.yaml
+      candidate_blob: e4eb9ac4350ebfb55ea4fd306fc02d681e7f58cf
+      replay_blob: e4eb9ac4350ebfb55ea4fd306fc02d681e7f58cf
+      byte_identical: true
+    - path: ops/tasks/T-104/HANDOFF.md
+      candidate_blob: 8151817918c4b60ca567d0767e8cb029cfba59fa
+      replay_blob: 8151817918c4b60ca567d0767e8cb029cfba59fa
+      byte_identical: true
+  rejected_scope_changes: 0
+
+immutable_evidence:
+  root: 'D:\Codex-Labs\evidence\T-104\one-zone-autonomy-v6'
+  access: read-only-no-audit-output-written
+  manifest_path: manifest.json
+  manifest_schema: t104.evidence-manifest.v1
+  manifest_verdict: FAIL
+  manifest_length: 2753724
+  manifest_sha256: cbe9026f8e27ac0503521370a84be286b01ca38935cc8e3da4552e40bc31f7a0
+  declared_payload_file_count: 17528
+  manifest_entry_count: 17528
+  actual_payload_file_count: 17528
+  verified_payload_file_count: 17528
+  declared_payload_total_bytes: 40239358
+  verified_payload_total_bytes: 40239358
+  duplicate_paths: 0
+  unsafe_paths: 0
+  missing_paths: 0
+  length_mismatches: 0
+  sha256_mismatches: 0
+  unlisted_payloads: 0
+  reparse_points: 0
+  result: 17528-of-17528-length-and-sha256-green-zero-missing-mismatched-duplicate-unsafe-unlisted-or-reparse
+
+client_process_observer_replay:
+  result: PASS
+  launcher_process_id: 117976
+  launch_environment: Windows-PowerShell
+  relaunch_count: 0
+  intended_interval_ms: 500
+  raw_sample_count: 1345
+  ledger_row_count: 1345
+  raw_length_sha256_validated: 1345
+  chain_rows_recomputed: 1345
+  sequence_mismatches: 0
+  snapshot_mismatches: 0
+  duplicate_raw_references: 0
+  unreferenced_raw_samples: 0
+  nonzero_sample_count: 0
+  error_count: 0
+  first_sample_at_utc: '2026-09-01T22:55:58.3786962Z'
+  last_sample_at_utc: '2026-09-01T23:08:33.7223742Z'
+  first_sample_precedes_runtime: true
+  last_sample_follows_config_restoration: true
+  maximum_adjacent_gap_ms: 802.382
+  terminal_chain_hash: 6ad451b3e43d52a18f684e94862b4c13fa07482edee599addd2fead6dd826a64
+  ready_first_row_matches: true
+  exit: cooperative-sentinel
+  sentinel_length: 0
+
+autonomy_observer_replay:
+  result: PASS
+  total_raw_samples: 5357
+  raw_length_sha256_json_validated: 5357
+  duplicate_raw_references: 0
+  unreferenced_raw_samples: 0
+  error_messages: 0
+  latest_second_offline_at_utc: '2026-09-01T22:58:57.9934530Z'
+  first_admission_at_utc: '2026-09-01T23:00:16.1370210Z'
+  all_two_offline_before_admission: true
+  bot_20001:
+    process_id: 117840
+    derived_samples: 1794
+    transport_samples: 1794
+    raw_samples: 1786
+    classification_counts: {offline: 298, online: 1488, transport_error: 8}
+    object_ids: [44939]
+    first_sample_at_utc: '2026-09-01T22:58:57.5850669Z'
+    last_sample_at_utc: '2026-09-01T23:07:07.9906768Z'
+    first_sample_elapsed_from_runtime_start_ms: 91609.648
+    maximum_adjacent_gap_ms: 2348.048
+    armed_and_live_boundaries_exact: true
+  bot_20002:
+    process_id: 121500
+    derived_samples: 1794
+    transport_samples: 1794
+    raw_samples: 1786
+    classification_counts: {offline: 355, online: 1431, transport_error: 8}
+    object_ids: [7797]
+    first_sample_at_utc: '2026-09-01T22:58:57.6220499Z'
+    last_sample_at_utc: '2026-09-01T23:07:08.0215381Z'
+    first_sample_elapsed_from_runtime_start_ms: 91646.631
+    maximum_adjacent_gap_ms: 2331.864
+    armed_and_live_boundaries_exact: true
+  bot_20003:
+    process_id: 116032
+    derived_samples: 1793
+    transport_samples: 1793
+    raw_samples: 1785
+    classification_counts: {offline: 412, online: 1373, transport_error: 8}
+    object_ids: [37939]
+    first_sample_at_utc: '2026-09-01T22:58:57.6024938Z'
+    last_sample_at_utc: '2026-09-01T23:07:08.0378429Z'
+    first_sample_elapsed_from_runtime_start_ms: 91627.075
+    maximum_adjacent_gap_ms: 2348.013
+    armed_and_live_boundaries_exact: true
+
+director_replay:
+  result: PASS
+  started_at_utc: '2026-09-01T22:57:16.0947035Z'
+  first_admission_at_utc: '2026-09-01T23:00:16.1370210Z'
+  independently_recomputed_delay_ms: 180042.318
+  scheduler_tolerant_window_ms: [180000, 195000]
+  admission_order: [20001, 20002, 20003]
+  inter_admission_gaps_ms: [15021.655, 15051.770]
+  attempts: 3
+  successes: 3
+  failures: 0
+  maximum_live_qualified: 3
+  maximum_wrong_zone: 0
+  maximum_in_flight: 0
+  overlap: 0
+
+transform_replay:
+  result: PASS
+  qualifying_raw_sample_count: 6
+  sample_span_ms: 530.307
+  recorded_second_clock_latest_age_ms: 183.176
+  selected_at_to_latest_lower_bound_ms: 180.756
+  world: 0
+  instance: 0
+  zone: 221
+  all_finite: true
+  all_roundtrip_bits_exact: true
+  latest_samples:
+    - bot_id: 20001
+      object_id: 44939
+      sample_index: 1684
+      raw_sha256: cd340f80a292c78271185a75abe5f4daad4552819b85d88accdbe3549ed92336
+      bits: [1179957453, 1179643699, 1105690834, -1065611208]
+    - bot_id: 20002
+      object_id: 7797
+      sample_index: 1685
+      raw_sha256: 183589014af89ed5f1b0b907186d6653aca01810a8f7ef8da5bfe7593107427a
+      bits: [1179966362, 1179652403, 1105666297, -1065603658]
+    - bot_id: 20003
+      object_id: 37939
+      sample_index: 1684
+      raw_sha256: cf321108df9d1ec5d080180b54a0e0a41d0cd94d2d55748ecf4582e5cbbc0cf5
+      bits: [1179971072, 1179656704, 1105654501, -1065577192]
+  other_qualifying_raw_sha256:
+    - f20b04443906d94fd5fc57aec935040a34c9e5f28a44dabd68b8caf4db08552e
+    - 119f043555ee004d043257e99dd1b67765e33c76f0bfb6d05bd365bb7be157a6
+    - 7ae5c6c1a2419d437ce75a8f79c5ec98bd00e3a3f0cc77b18892f00f88011bbd
+
+geometry_replay:
+  result: FAIL-no-eligible-tuple
+  implementation: independent-single-precision-front-offset-mirror
+  complete_enumeration_length: 826258
+  complete_enumeration_sha256: 42e65f21c8d5dce3980f0dd55bc9c98b10405bdfc4ce81b994aaa358b7b7d788
+  independently_enumerated_count: 1331
+  retained_candidate_rows_cross_checked: 1331
+  candidate_mismatches: 0
+  finite_candidate_count: 1331
+  own_within_60m_candidate_count: 1331
+  pairwise_at_least_20m_candidate_count: 87
+  ownership_margin_at_least_3m_candidate_count: 0
+  eligible_count: 0
+  best_ownership_margin_m: -1.2237695385452456
+  best_ownership_margin_offsets: [5, 5, 10]
+  maximum_minimum_pairwise_m: 32.16448164882895
+  best_pairwise_offsets: [55, 35, 5]
+  selected_tuple: null
+  selected_plan_sha256: null
+
+mutation_and_continuation:
+  command_payload_count: 5
+  fixture_request_file_count: 0
+  fixture_response_file_count: 0
+  fixture_command_count: 0
+  fixture_spawn_count: 0
+  directed_gameplay_command_count: 0
+  world_mutation: false
+  retry_attempted: false
+  later_command_attempted: false
+  wave_one_lifecycle_attempted: false
+  wave_two_attempted: false
+  run_two_payload_count: 0
+  run_two_attempted: false
+  restart_attempted: false
+
+configuration_and_cleanup:
+  original_config: {length: 1772, sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202}
+  configured_config: {length: 1795, sha256: 5177e67c818d04ebf9c6b0164afc833e431cf4f687e660cffe02d5ef202de47c}
+  contracted_assignments: 9
+  restored_exact_original_bytes: true
+  shutdown_order: [Game, Login]
+  graceful_game_stop: true
+  graceful_login_stop: true
+  forced_termination: false
+  director_stop_count: 1
+  despawn_count: 3
+  shutdown_cleanup_zero_count: 1
+  final_runtime_or_client_process_count: 0
+  final_known_task_process_id_count: 0
+  final_observer_command_line_count: 0
+  final_required_listener_count: 0
+  final_live_log_file_count: 0
+  mysql_process_identities: ['6308|08/28/2026 11:51:11', '8076|08/28/2026 11:51:11']
+  mysql_unchanged: true
+  database_access: false
+  reference_module_and_host_overlay_unchanged: true
+  autonomy_observers_stopped_cooperatively: true
+  client_observer_stopped_cooperatively: true
+  lossless_log_count: 3
+  lossless_log_mismatches: 0
+  run_one_game_log_sha256: 1b73bde90a6e964e0ac9dbcb15827405851bb943f2ec8b551d025b8d094081aa
+  run_one_game_error_log_sha256: 79c03949697cbf2c2886d3d765fa5b394daeba22880f22843b857b45421bf2a8
+  run_one_login_log_sha256: 8294678eb4bd2efa32cc722b20a3908277c90738fdf7f945d1f16988a401d343
+  retained_native_shutdown_warning: PhysicsManager-disposed-IServiceProvider
+
+retained_candidate_anomalies:
+  - The first evidence-root creation probe used the reserved PowerShell Host variable and stopped before write.
+  - Two inline background observer launch attempts were rejected by shell policy before execution; each exact observer subsequently launched once in a first-class PTY.
+  - The initial evidence-local snapshot wrapper parsers did not preserve the nested BotDebug payload shape. Superseded versions and the zero-command first runner attempt remain retained; corrected v5 parsed live data before the only enumeration.
+  - The corrected nested snapshot wrapper was created after runtime start, while the core invariant transform parser and complete planner had passed pre-runtime self-tests. No fixture command was issued.
+  - An initial config-restoration assertion used an incorrectly transcribed hash suffix after exact original bytes were already restored. The contracted full hash was then re-read and byte equality independently proved without a second write.
+  - Read-only final audit probes retained reserved-variable, boolean-literal, and git untracked-mode corrections before successful create-new audit outputs.
+  - Game Error.log retains the native PhysicsManager disposed-IServiceProvider warning after graceful shutdown.
+
+integrator_verifier_anomalies:
+  - category: startup-output-window
+    finding: >-
+      The first combined required-startup read exceeded the output window.
+      CURRENT.yaml and BOARD.yaml were then reread completely in contiguous
+      bounded chunks before task evidence was accessed.
+  - category: unavailable-python-alias
+    finding: >-
+      The first planned in-memory manifest verifier could not start because the
+      system Python alias was unavailable. A PowerShell/.NET verifier then
+      completed all checks without creating a file or changing evidence.
+  - category: powershell-json-timestamp-coercion
+    finding: >-
+      The first read-only client-chain replay allowed ConvertFrom-Json to coerce
+      exact UTC strings, producing false chain mismatches and a 1000 ms gap.
+      Disabling date coercion restored the exact 802.382 ms result and all 1345
+      row hashes. No evidence, Git, runtime, or external state changed.
+  - category: powershell-token-spacing
+    finding: >-
+      The first transform verifier invocation omitted required whitespace after
+      a return token and stopped before transform or geometry validation. The
+      corrected read-only invocation passed all six transforms and 1331 tuples.
+
+integration:
+  candidate_replayed_byte_identically: true
+  integrator_authored_paths:
+    - ops/evidence/aaemu12-t104-fail-integration-v1.yaml
+    - ops/tasks/T-105/HANDOFF.md
+  saved_branch_update: fast-forward-only-through-replay-and-artifact-commits
+  history_rewritten: false
+  runtime_started_or_controlled: false
+  external_evidence_mutated: false
+  runtime_host_module_config_reference_mutated: false
+  global_ledgers_lease_or_workspace_registry_mutated: false
+  database_or_client_accessed: false
+  source_tests_or_tooling_mutated: false
+  builds_or_tests_consumed: false
+
+retained_boundaries:
+  - T-104 remains FAIL because no forward-distance tuple met the 3 m unique-ownership margin.
+  - No selected tuple, selected-plan hash, fixture request, fixture response, fixture spawn, actual fixture geometry, or world mutation exists.
+  - Wave-one selection, navigation, combat, credit, progression, recovery, logout, and refill were not attempted or proven.
+  - Wave two, second refill, distinct-PID restart, second delay measurement, rebootstrap, and two-minute dwell were not attempted or proven.
+  - Scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+  - T-037 remains blocked behind an angular-placement correction, fresh versioned runtime PASS, and independent integration.
+
+control_action: >-
+  PB-000 may accept this independently verified retained T-104 FAIL receipt and
+  prepare a bounded source-only angular fixture-placement correction that keeps
+  forward-only behavior as the default. Never reinterpret T-104 as PASS, never
+  reuse or overwrite the v6 evidence root, and keep T-037 blocked until a fresh
+  successor runtime passes and is independently integrated.

@@ -1,0 +1,222 @@
+schema_version: 1
+id: aaemu12-t092-fail-integration-v1
+recorded_at: '2026-09-01T12:33:57-06:00'
+verdict: PASS-receipt-integrity
+subject_verdict: FAIL-observer-prearm-after-bots-20001-and-20002-admitted
+
+integration_identity:
+  task: T-093
+  task_thread_id: 01a05e2d-c7ee-79a3-8329-023d34130f88
+  owner_client_thread_id: client-new-thread:a66b535b-c992-4eff-ac52-15181641b305
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\007f\PB-W00-control'
+  dispatch_base: cd84b322e91233d58c7294f24c80da4dcab42063
+  binding_commit: 9fbf5db146d29b9c99b6eea3bf86a7656c53b484
+  saved_branch: integration/aaemu12-world
+  saved_branch_head_before: 9fbf5db146d29b9c99b6eea3bf86a7656c53b484
+
+candidate:
+  commit: 885a6858e97ae073f86eed1aeef1c45bee3bb2ac
+  parent: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
+  replay_commit: e978a41b62f00493b22c96f436073eb4f8c42ba7
+  replay_parent: 9fbf5db146d29b9c99b6eea3bf86a7656c53b484
+  candidate_stable_patch_id: 67e1adb88f3d55c74106b0aa497ffb7cc2f3127e
+  replay_stable_patch_id: 67e1adb88f3d55c74106b0aa497ffb7cc2f3127e
+  stable_patch_id_match: true
+  exact_path_count: 2
+  exact_paths:
+    - path: ops/evidence/aaemu12-t092-one-zone-autonomy-v3.yaml
+      candidate_blob: 80d1da542ca2e8db0e4ac861b50b8c6882c1debf
+      replay_blob: 80d1da542ca2e8db0e4ac861b50b8c6882c1debf
+      byte_identical: true
+    - path: ops/tasks/T-092/HANDOFF.md
+      candidate_blob: e7eba7d756f93a4284806d13149f9e4ce1c70673
+      replay_blob: e7eba7d756f93a4284806d13149f9e4ce1c70673
+      byte_identical: true
+  rejected_scope_changes: 0
+
+immutable_evidence:
+  root: 'D:\Codex-Labs\evidence\T-092\one-zone-autonomy-v3'
+  manifest_path: manifest.json
+  manifest_sha256: 39f6c85e69faa78d87824632f0db168bcbc87db4fd26b8d350f7bea70370809c
+  manifest_schema: playerbots.evidence-manifest.v1
+  manifest_task: T-092
+  manifest_verdict: FAIL
+  declared_payload_file_count: 1523
+  actual_payload_file_count: 1523
+  verified_payload_file_count: 1523
+  declared_payload_total_bytes: 22604049
+  manifest_entry_total_bytes: 22604049
+  verified_payload_total_bytes: 22604049
+  duplicate_paths: 0
+  unsafe_paths: 0
+  missing_paths: 0
+  length_mismatches: 0
+  sha256_mismatches: 0
+  unlisted_payloads: 0
+  reparse_points: 0
+  result: 1523-of-1523-length-and-sha256-green-zero-missing-mismatched-duplicate-unsafe-unlisted-or-reparse
+  fresh_root:
+    candidate_declared_absent_before_creation: true
+    candidate_declared_created_once: true
+    filesystem_creation_time_utc: '2026-09-01T17:56:47.9557312Z'
+    preflight_capture_time_utc: '2026-09-01T17:56:47.6993261Z'
+    single_layout_creation_corroborated: true
+    run_2_payload_file_count: 0
+
+semantic_verification:
+  assertion_result: 92-of-92-green
+  fingerprint:
+    t092_binding_commit: dea1c660a076b2db1fbd5586214cfa2b9cde1d7b
+    t092_dispatch_base: 38b6ca7518215521dc3bb34389de4c5a4d547368
+    t092_thread_id: 01a05e17-fb8b-7610-a0de-e8693dc0af91
+    t092_owner_client_thread_id: client-new-thread:50955241-43de-4c78-ad98-794e7fdc7e2b
+    t092_worktree: 'C:\Users\jensh\.codex\worktrees\86b9\PB-W00-control'
+    aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+    host_overlay_entry_count: 30
+    module_source_commit: e284c739ae168fc95fb77a91bf0f23bd5dd2f6a4
+    installed_module_tree: 4b3f96aaedb96ec40c1dc5eef4256efe02cd99f2
+    compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+    game_assembly_sha256: a4508402e8564a6c6807471c9cd6c9e9bc5950e279ea1a9e7841d35a61d35075
+    client_observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+    client_observer_sha256: a5e3e84eb01948061a9b08ff55c08b6f04d782b4bb8aa2420094fd96295a6523
+    game_database_schema: aaemu_playerbots_game_public_alpha_v1
+    login_database_schema: aaemu_playerbots_login_public_alpha_v1
+  configuration:
+    original_length: 1772
+    original_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+    configured_sha256: 8704a503d2beadb7e5e6a241ed8a61ffe7b72d14fc0e0fcebf4ae1f46a19021d
+    restored_length: 1772
+    restored_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+    restored_exact_original_bytes: true
+    contracted_fields_assigned: 9
+    differing_leaf_values: 8
+    unchanged_assigned_field: ActivityDirectorRetryBackoffMs-already-30000
+    unexpected_property_changes: 0
+  client_process_observer:
+    launcher_process_id: 123292
+    launch_environment: Windows-PowerShell
+    relaunch_count: 0
+    intended_interval_ms: 500
+    raw_sample_count: 866
+    ledger_row_count: 866
+    fully_recomputed_raw_hashes: 866
+    fully_recomputed_chain_rows: 866
+    first_sample_at_utc: '2026-09-01T17:57:40.3443432Z'
+    last_sample_at_utc: '2026-09-01T18:05:43.6525726Z'
+    first_sample_precedes_runtime_start: true
+    last_sample_follows_cleanup: true
+    maximum_adjacent_gap_ms: 653.19
+    nonzero_sample_count: 0
+    error_count: 0
+    terminal_chain_hash: d65dcd4204332615de276dc8f0ea67f117f1b2012e732ef946c46db32439c664
+    exit: cooperative-sentinel
+    sentinel_length: 0
+    result: 866-of-866-raw-length-sha256-and-ledger-chain-green
+  observer_prearm_failure:
+    admission_order: [20001, 20002, 20003]
+    admission_times_utc:
+      20001: '2026-09-01T18:02:07.7555867Z'
+      20002: '2026-09-01T18:02:22.7661669Z'
+      20003: '2026-09-01T18:02:37.7786292Z'
+    bot_20001_first_two_samples: [online, online]
+    bot_20001_first_sample_at_utc: '2026-09-01T18:02:32.2245039Z'
+    bot_20001_object_id: 7797
+    bot_20001_boundary_file_count: 0
+    bot_20002_first_two_samples: [online, online]
+    bot_20002_first_sample_at_utc: '2026-09-01T18:02:32.2426751Z'
+    bot_20002_object_id: 37952
+    bot_20002_boundary_file_count: 0
+    bot_20003_first_two_samples: [offline, offline]
+    bot_20003_first_sample_at_utc: '2026-09-01T18:02:32.2429693Z'
+    bot_20003_boundary_files: [armed.json, live.json]
+    complete_three_bot_prearm_before_admission: false
+    first_material_invalid_gate: observer-prearmed-zero-to-three-director-bootstrap
+    result: FAIL
+  stopped_boundaries:
+    autonomy_observer_relaunch_count: 0
+    fixture_command_file_count: 0
+    directed_gameplay_command_count: 0
+    metrics_query_count: 0
+    roster_query_count: 0
+    wave_1_attempted: false
+    wave_2_attempted: false
+    refill_count: 0
+    restart_attempted: false
+    run_2_payload_file_count: 0
+
+cleanup:
+  game_then_login_graceful: true
+  game_stop_exit_code: 0
+  login_stop_exit_code: 0
+  forced_termination: false
+  director_start_count: 1
+  director_spawn_count: 3
+  director_stop_count: 1
+  shutdown_cleanup_count: 1
+  shutdown_cleanup_marker: BOT-remaining_bots-0-remaining_runtimes-0
+  final_runtime_process_count: 0
+  final_autonomy_observer_process_count: 0
+  final_client_observer_process_count: 0
+  final_archeage_client_process_count: 0
+  final_required_listener_count: 0
+  final_runtime_log_count: 0
+  mysql_process_ids_before_and_after: [6308, 8076]
+  direct_integrator_database_access: false
+  reference_and_module_clean_exact: true
+  host_overlay_unchanged: true
+  config_exact_original_bytes: true
+  retained_native_shutdown_warning: PhysicsManager-disposed-IServiceProvider
+  retained_native_shutdown_warning_sha256: 12be8531665da26d1be331f76a34366b28ebfdc13fc35aeafd6292990ac84a92
+
+retained_candidate_anomalies:
+  count: 6
+  categories:
+    - detached-branch-formatting-probe
+    - apphost-versus-managed-assembly-probe
+    - client-observer-validation-probes
+    - autonomy-observer-launch-delay
+    - client-observer-cooperative-exit
+    - native-shutdown-warning
+
+integrator_validator_anomalies:
+  - category: powershell-json-timestamp-coercion
+    finding: >-
+      The first read-only client-chain validator allowed ConvertFrom-Json to
+      coerce exact UTC strings through local DateTime formatting, discarding
+      fractional seconds and falsely reporting a 1000 ms maximum gap. The
+      corrected replay parsed exact JSON string bytes and proved 653.19 ms;
+      hashes, evidence, Git state, runtime, and external state were unchanged.
+  - category: precreated-empty-boundary-directories
+    finding: >-
+      The first semantic validator assumed failed bots would lack boundary
+      directories. All three directories were precreated; file-level replay
+      proved zero boundary files for 20001 and 20002 and exactly armed.json and
+      live.json for 20003. Evidence and external state were unchanged.
+
+integration:
+  candidate_replayed_byte_identically: true
+  integrator_authored_paths:
+    - ops/evidence/aaemu12-t092-fail-integration-v1.yaml
+    - ops/tasks/T-093/HANDOFF.md
+  saved_branch_update: fast-forward-only-through-the-commit-containing-this-receipt
+  history_rewritten: false
+  runtime_or_registered_host_used: false
+  external_evidence_mutated: false
+  global_ledgers_or_runtime_lease_mutated: false
+  source_tooling_or_config_mutated: false
+  database_or_client_accessed: false
+  full_suite_consumed: false
+
+retained_boundaries:
+  - T-092 remains FAIL because bots 20001 and 20002 were admitted before their first autonomy-observer samples, so complete all-three two-offline-sample pre-arm was not proven.
+  - No fixture coordinate or separation proof, lifecycle credit, progression, recovery, normal logout, or refill was attempted or proven.
+  - Wave one, wave two, second refill, distinct-PID restart, rebootstrap, and two-minute dwell were not attempted or proven.
+  - Scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+  - T-037 remains blocked behind the fresh successor T-094 runtime proof and its independent integration.
+
+control_action: >-
+  PB-000 may accept this independently verified retained FAIL receipt and bind
+  T-094 under a new exact task/thread/worktree/lease commit and its fresh v4
+  evidence root. Never reinterpret T-092 as a PASS, never reuse or overwrite
+  its v3 root, and keep T-037 blocked until the successor proof passes and is
+  independently integrated.

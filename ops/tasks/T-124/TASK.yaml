@@ -1,0 +1,62 @@
+schema_version: 1
+id: T-124
+title: Integrate and immediately test bot intelligence wave
+track: AAEmu12
+status: active
+integration: in-progress
+outcome: Integrate the exact T-121, T-122, and T-123 candidates once, assemble their AAEmu 1.2 host seams in one fresh build checkout, run all three focused test gates immediately against the merged tree, and run the once-per-wave full suite only after focused proof is green.
+depends_on: [T-121, T-122, T-123]
+runtime: {required: false, lease: null}
+branch: integration/aaemu12-world
+worktree: 'C:\Users\jensh\Documents\Codex\playerbots-worktrees\PB-W00-control'
+owner_thread_id: 01a05bb6-9d9c-7502-9e2d-534073c0501b
+inputs:
+  integration_base: af840ab8a90640f3e1ff964490a3e241ef5b999b
+  identity_candidate: b48708522ebfc26a43124f6e43a9de7bed55af35
+  quest_candidate: 215dbbbd12464ec41eff87251eee2cd348a2c5f2
+  navigation_candidate: 9340ceb8f58c0be8aa00e83e530bce442bfa5273
+  navigation_handoff: 463924b7876585bd76763f533b8f63a929a76cc3
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+write_scope:
+  - compatibility/aaemu-1.2-r208022-bot-identity-factory.patch
+  - compatibility/aaemu-1.2-r208022-doodad-quest-adapter.patch
+  - compatibility/aaemu-1.2-r208022-transfer-road-adapter.patch
+  - docs/BOT-IDENTITIES.md
+  - docs/QUEST-AUTONOMY.md
+  - docs/WORLD-NAVIGATION.md
+  - src/AAEmu.Game/Bots/Population/Identity/
+  - src/AAEmu.Game/Bots/Questing/
+  - src/AAEmu.Game/Bots/Navigation/
+  - src/AAEmu.Game/Bots/Host/BotRuntime.cs
+  - src/AAEmu.Game/Bots/Host/BotHostTask.cs
+  - src/AAEmu.Game/Core/Managers/Bots/BotArchetypeManager.cs
+  - src/AAEmu.Game/Core/Managers/Bots/BotManager.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotConfig.cs
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/CreateBotCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Population/Identity/
+  - tests/AAEmu.UnitTests/Bots/Questing/
+  - tests/AAEmu.UnitTests/Bots/Navigation/
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotConfigTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotIdentityFactoryTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotQuestAutonomyTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/CreateBotCommandTests.cs
+  - ops/tasks/T-121/HANDOFF.md
+  - ops/tasks/T-122/HANDOFF.md
+  - ops/tasks/T-123/HANDOFF.md
+  - ops/evidence/aaemu12-bot-intelligence-wave-integration-v1.yaml
+  - ops/tasks/T-124/HANDOFF.md
+external_write_scope:
+  - new retained build-only checkout at D:\Codex-Labs\aaemu-1.2-r208022-t124-integration-v1
+gates:
+  - exact-candidate-parent-tree-and-path-review
+  - conflict-free-integration-with-stable-patch-identities
+  - sequential-base-identity-quest-navigation-host-patch-assembly
+  - merged-identity-quest-navigation-focused-tests-green
+  - merged-aaemu12-no-incremental-solution-build-zero-errors
+  - exactly-one-integration-wave-full-suite-green
+  - registered-runtime-and-database-untouched
+validation_boundary: Exact candidate integration, one fresh combined build-only AAEmu 1.2 checkout, focused tests, once-per-wave full suite, receipt, and handoff. Do not deploy to or stop the retained T-120 runtime, query or write a database, edit the registered reference/client fixture, change the runtime lease, force a process, delete prior build trees, or touch AAEmu 3.0.
+contract: ops/tasks/T-124/CONTRACT.md
+handoff: ops/tasks/T-124/HANDOFF.md

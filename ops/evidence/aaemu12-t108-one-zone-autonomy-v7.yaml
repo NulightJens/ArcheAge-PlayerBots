@@ -1,0 +1,211 @@
+schema_version: 1
+id: aaemu12-t108-one-zone-autonomy-v7
+recorded_at: '2026-09-02T00:53:06Z'
+verdict: INCOMPLETE
+
+fingerprint:
+  task: T-108
+  binding_commit: 3c1329cf6e95a46998f889aa71cdd2673aa7ea4c
+  binding_tree: afe7815bf265219e842f5081316243459f3eec66
+  dispatch_base: 6a4444cba7bb3e2e9452787afe4a85b24ee522f3
+  task_thread_id: 01a05f89-2616-7f82-945d-a397a839f024
+  owner_client_thread_id: client-new-thread:fb735534-d444-4ee6-933c-fe69d503e388
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\48c0\PB-W00-control'
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  module_source_commit: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  installed_module_tree: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  game_assembly_sha256: 2385d16554b1fc9df1c77d45612b39c8fdac20721f20eac31ec9d0c32cc71696
+  client_observer_blob: 0f8b5e2b3a811877648020b715e4737777d4947a
+  autonomy_observer_blob: 94b82fb18a39e2356d43796b54e3eeea5ad7ee12
+  database_identity: aaemu12_database_public_alpha_v1
+
+preflight:
+  exact_committed_task_thread_worktree_and_lease_binding: true
+  reference_head_exact_clean_and_detached: true
+  installed_module_head_tree_exact_clean_and_detached: true
+  integration_host_status_entry_count: 30
+  complete_reverse_patch_check: true
+  fresh_evidence_root_was_absent: true
+  evidence_root_created_once: true
+  required_ports: [1234, 1237, 1239, 1250, 1280]
+  occupied_required_port_count: 0
+  aaemu_game_login_process_count: 0
+  archeage_client_process_count: 0
+  observer_process_count: 0
+  runtime_log_entry_count: 0
+  mysql_observed_process_ids: [6308, 8076]
+  direct_database_access: false
+
+configuration:
+  deployed_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.Game\bin\Debug\net10.0\Configurations\BotConfig.json'
+  original_length: 1772
+  original_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  search_radius: 60
+  edited: false
+  edit_reason: The mandatory planner self-test failed before configuration or runtime mutation.
+  restoration_required: false
+  final_length: 1772
+  final_sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202
+  final_exact_original_bytes: true
+
+planner_selftest:
+  first_material_invalid_gate: pre-runtime-retained-transform-planner-self-test
+  stop_reason: >-
+    The literal row-oriented own-versus-foreign-fixture margin enumerated all
+    681472 tuples but produced 0 eligible instead of the exact contracted 2430.
+    The contract required stopping before configuration, observers, runtime,
+    or commands.
+  transform_operations:
+    deg_to_rad: 'float offset = MathF.PI / 180f * (float)angle'
+    rotation: 'for nonzero angle only, heading = sourceYaw + offset'
+    placement: 'fx = sourceX + (-(distance * MathF.Sin(heading))); fy = sourceY + (distance * MathF.Cos(heading))'
+  total_tuple_count: 681472
+  finite_tuple_count: 681472
+  within_60_tuple_count: 681472
+  pairwise_at_least_20_tuple_count: 427142
+  row_oriented_ownership_at_least_3_tuple_count: 142
+  row_oriented_eligible_tuple_count: 0
+  expected_eligible_tuple_count: 2430
+  result_json_present: false
+  failure_sha256: b712536f991794768c738bcdffa4b13f7cfc200f36b246fc421df2fc04009194
+  diagnostics_sha256: d8d32ccc30b04d3ce073f227131551046b5968aa8b14d22595c5f56d159932b3
+  orientation_comparison_sha256: d101e57795404587de7c69105c360cdac4e7e9ad9068f21f9204bd47a84c2b99
+  conclusion_sha256: 44ac0645d55cbbd005b707f7cb49f8e5a1d6802477afae9ece872cf97709477e
+  decoded_t104_transforms:
+    - {bot_id: 20001, x: 13614.2, y: 13307.8, z: 28.9379, yaw: -3.93849, x_bits: 1179957453, y_bits: 1179643699, z_bits: 1105690834, yaw_bits: -1065611208}
+    - {bot_id: 20002, x: 13622.9, y: 13316.3, z: 28.8911, yaw: -3.94029, x_bits: 1179966362, y_bits: 1179652403, z_bits: 1105666297, yaw_bits: -1065603658}
+    - {bot_id: 20003, x: 13627.5, y: 13320.5, z: 28.8686, yaw: -3.9466, x_bits: 1179971072, y_bits: 1179656704, z_bits: 1105654501, yaw_bits: -1065577192}
+  extrema:
+    best_row_ownership_overall:
+      choice_orders: [1, 7, 3]
+      distances: [5, 5, 5]
+      angles: [45, -45, 135]
+      pairwise: [14.077234576620343, 25.432429415170734, 15.146301465187493]
+      minimum_ownership_margin: 4.331053860687011
+      rejection: pairwise-below-20
+    best_row_ownership_with_pairwise_gate:
+      choice_orders: [40, 57, 59]
+      distances: [30, 40, 40]
+      angles: [0, 45, 135]
+      pairwise: [31.4392794642013, 81.66158273468739, 62.61620182967833]
+      minimum_ownership_margin: 2.1637271317828493
+      rejection: ownership-margin-below-3
+    maximum_minimum_pairwise:
+      choice_orders: [87, 74, 85]
+      distances: [55, 50, 55]
+      angles: [-45, 90, -135]
+      pairwise: [102.4652776382833, 96.48496349078026, 99.39872357280005]
+      minimum_pairwise: 96.48496349078026
+      minimum_row_ownership_margin: -4.8120719752989345
+  orientation_diagnostic:
+    matrix_meaning: 'anchorToFixture[anchorIndex][fixtureIndex]'
+    row_criterion: foreign fixture distance minus own fixture distance for each anchor row
+    column_criterion: foreign anchor distance minus owning anchor distance for each fixture column
+    row_ownership_at_least_3: 142
+    row_eligible: 0
+    column_ownership_at_least_3: 4386
+    column_eligible: 2430
+    disposition: >-
+      The exact contracted 2430 appears only under the independent
+      column-oriented fixture-ownership comparison. This diagnostic identifies
+      the interpretation ambiguity but does not reopen or weaken the failed gate.
+
+retained_tooling:
+  transform_parser: {sha256: 770fa652ddf33f35fa3ed748608cd6d86c4cb31c3c10913f0cce4d3fc3bdcbd4, git_blob: c73ef20bc664c6a4f5c4cee5ae175a096e7c1c60}
+  planner: {sha256: 2ba390cd5a94a5b66287496f5282c6366a62d71af723fea41f8f67649fd41225, git_blob: 5cc4db05dfe798c63e42b928f8dbf40f775131f1}
+  selftest: {sha256: d4f03f9afee100065433f7814a6a19ff9b9c4e5cfac70e4317506f95894fef75, git_blob: e9181d77908fb54888ca7a4f89cf94f73063c6d2}
+  diagnostics: {sha256: ff4e2f7c2fc54eac5a9c35842c61d693bde4060db9f6c1e74f959d555d4d0256, git_blob: 3545bbcb8ba6003f74ad430f0d96e0921db7ed0d}
+  installed_command: {sha256: 2932a75a3498f5064b893bed3e254c9053558e632f04099923c633408256c6e3, git_blob: 893f7d639477bd8cbc4fc9911f63cb642733a8cf}
+
+runtime:
+  config_deployed: false
+  client_observer_started: false
+  autonomy_observer_count: 0
+  login_started: false
+  game_started: false
+  fixture_command_count: 0
+  fixture_spawn_count: 0
+  directed_gameplay_command_count: 0
+  database_access: false
+  client_access: false
+  forced_termination: false
+  wave_1_attempted: false
+  wave_2_attempted: false
+  restart_attempted: false
+
+cleanup:
+  verdict: PASS-CLEAN-PRE-RUNTIME-BLOCKER
+  shutdown_required: false
+  final_game_login_process_count: 0
+  final_observer_process_count: 0
+  final_archeage_client_process_count: 0
+  final_required_listener_count: 0
+  final_runtime_log_entry_count: 0
+  mysql_process_ids_unchanged: [6308, 8076]
+  database_queries_or_mutations: 0
+  reference_clean_detached_and_exact: true
+  installed_module_clean_detached_and_exact: true
+  host_overlay_unchanged: true
+  bot_config_exact_original_bytes: true
+
+retained_anomalies:
+  - category: mandatory-selftest-stop
+    finding: >-
+      The mandatory self-test stopped on eligible count 0 before creating
+      selftest/result.json; immutable negative fixtures and failure.json retain
+      the attempt.
+  - category: read-only-diagnostic-argument
+    finding: >-
+      One follow-up diagnostic command passed its argument incorrectly and
+      produced no durable output or external state change.
+  - category: margin-comparison-source-v1
+    finding: >-
+      The first comparison source had a compile-time parenthesis error and
+      produced no comparison output. The retained create-new v2 source
+      independently produced the exact row and column counts.
+  - category: manifest-script-v1
+    finding: >-
+      The first manifest script failed before manifest creation while
+      aggregating ordered-dictionary lengths. The retained create-new v2 script
+      sealed and validated the root without overwriting any evidence payload.
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-108\one-zone-autonomy-v7'
+  terminal_result_path: terminal-result.json
+  terminal_result_sha256: 3bba737efc1f047ec80e63e99f158cd823028c60170a20ee9b940173c2e6144c
+  manifest_path: manifest.json
+  manifest_schema: t108.manifest.v1
+  manifest_payload_file_count: 31
+  manifest_payload_total_bytes: 86107
+  manifest_length: 4408
+  manifest_sha256: ba96e8171f58bf1c0c4b600d5ae5d1c981aadb865d8e05ccf260e02f2e8a3430
+  manifest_validation: 31-of-31-length-and-sha256-green
+  duplicate_paths: 0
+  unsafe_paths: 0
+  missing_paths: 0
+  length_mismatches: 0
+  sha256_mismatches: 0
+  unlisted_payloads: 0
+  reparse_points: 0
+  raw_logs_committed: false
+  credentials_recorded: false
+
+retained_boundaries:
+  - No live transform plan, selected tuple, fixture object, response geometry, lifecycle wave, refill, restart, second delay, rebootstrap, or dwell was attempted or proven.
+  - No continuous client observer or autonomy observer evidence exists because the pre-runtime blocker preceded observer launch.
+  - Runtime source behavior, scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+
+control_actions:
+  integrator: >-
+    Independently verify the sealed root and integrate this task commit only as
+    the retained T-108 INCOMPLETE receipt. Do not reinterpret it as autonomy
+    acceptance and do not mutate the immutable v7 root.
+  pb_000_release: >-
+    PB-000 alone may release or reassign the aaemu12 lease after accepting the
+    zero-runtime, unchanged-MySQL-identity, exact-config, and sealed-evidence
+    boundaries.
+  downstream: >-
+    Keep T-037 blocked. Any successor requires a new task, exact binding and
+    lease, and a fresh versioned evidence root with the row-versus-column
+    ownership ambiguity resolved before a new mandatory self-test.

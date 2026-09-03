@@ -56,7 +56,10 @@ public sealed class UnstickAction : IBotAction
         var side = new Vector3(-direction.Y, direction.X, 0f);
         var sign = attempt % 2 == 1 ? 1f : -1f;
         var nudge = current + side * sign * (float)Math.Max(0, _config.StuckNudgeMeters);
-        mover.SetDestination(context.Bot, nudge, true, 0.5f);
+        // A recovery sidestep is part of the current route, not a new behavior
+        // destination. Preserve its final destination and remaining waypoints so
+        // quest ownership remains valid after the nudge.
+        mover.SetRecoveryDestination(context.Bot, nudge, true, 0.5f);
         state.Attempts = attempt;
         context.Runtime.HostMetrics?.RecordStuckRecovery(teleport: false);
         BotStuckWatch.LogUnstick(context.Bot, attempt, "nudge");

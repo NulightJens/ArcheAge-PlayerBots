@@ -1,0 +1,41 @@
+schema_version: 1
+id: T-106
+title: Add bounded relative-yaw passive fixture placement
+track: AAEmu12
+status: done
+integration: pending
+outcome: Extend the anchored passive-fixture command with an optional finite invariant relative-yaw offset so deterministic preflight can place uniquely owned fixtures around clustered live bots, while keeping every existing argument form, zero-offset result, anchor guard, and no-mutation boundary intact.
+depends_on: [T-105]
+runtime: {required: false, lease: null}
+branch: task/T-106-passive-yaw-offset
+worktree: 'C:\Users\jensh\.codex\worktrees\4173\PB-W00-control'
+owner_client_thread_id: client-new-thread:cf15f37f-a09b-419d-a8b8-dad7ec57734c
+owner_thread_id: 01a05f65-58af-70f2-a138-1bcccdffaf03
+inputs:
+  dispatch_base: 41f2d35a9e20bd66fff80a4ae8394321785e172b
+  source_base: fd3c70e5b24a6952c24be2b882de26ce918ce0ca
+  retained_fail_receipt: ops/evidence/aaemu12-t104-fail-integration-v1.yaml
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  deterministic_dry_run: 681472-tuples-2430-eligible-from-exact-t104-transform-bits
+write_scope:
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/evidence/aaemu12-passive-anchor-yaw-offset-v1.yaml
+  - ops/tasks/T-106/HANDOFF.md
+gates:
+  - optional-fourth-argument-invariant-finite-inclusive-minus180-through-180-degrees
+  - existing-one-two-three-argument-and-zero-offset-results-remain-exact
+  - detached-relative-yaw-geometry-matches-pinned-single-precision-front-offset
+  - anchor-world-instance-zone-finiteness-resolver-and-staleness-guards-remain-fail-closed
+  - no-source-anchor-transform-target-combat-movement-or-runtime-mutation
+  - complete-focused-spawn-passive-command-tests-green
+  - isolated-aaemu12-build-zero-errors
+  - compatibility-patch-sha-unchanged-and-clean-apply
+validation_boundary: Module source, focused SpawnPassiveNpcCommandTests, isolated AAEmu 1.2 build, receipt, and handoff only. Do not edit global ledgers/lease, installed/reference host, deployed config, external runtime evidence, database, client, AAEmu 3.0, scale, soak, or packaging. Do not run the full suite.
+contract: ops/tasks/T-106/CONTRACT.md
+handoff: ops/tasks/T-106/HANDOFF.md
+candidate_commit: 8e091a7c45ea3ad4403dc0926d071b4156c8949a
+candidate_parent: 8b7a10101910c704b5f2d08129d7468cf36b8796
+candidate_tree: 5fd50e919afab1caeac909fbaf88637ca943cab6
+candidate_patch_id: 1658582af94e18e4376ec0e8ffde12926d32fa0b
+result: PASS-46-focused-build-0-errors-72-warnings-patch-unchanged

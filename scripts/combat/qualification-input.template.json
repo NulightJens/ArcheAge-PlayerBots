@@ -1,0 +1,55 @@
+{
+  "runId": "REPLACE-WITH-IMMUTABLE-RUN-ID",
+  "provenance": "physical-aaemu12",
+  "identity": {
+    "moduleSourceCommit": "REPLACE-40-HEX",
+    "aaemuHostBaseCommit": "62e3eb1d87da01194802ac886cd500134facad28",
+    "executableSha256": "REPLACE-64-HEX",
+    "configurationSha256": "REPLACE-64-HEX",
+    "sourceDirty": true,
+    "processId": 0,
+    "processStartUtc": "REPLACE-UTC-TIMESTAMP"
+  },
+  "database": {
+    "name": "REPLACE-WITH-aaemu_playerbots_NAME_vN",
+    "isolated": false,
+    "provenanceSha256": "REPLACE-64-HEX"
+  },
+  "botIds": [
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  ],
+  "targets": {
+    "combat": [
+      { "cohortSize": 1, "objectId": 0, "templateId": 0, "identitySource": "replace-before-use" },
+      { "cohortSize": 5, "objectId": 0, "templateId": 0, "identitySource": "replace-before-use" },
+      { "cohortSize": 10, "objectId": 0, "templateId": 0, "identitySource": "replace-before-use" },
+      { "cohortSize": 25, "objectId": 0, "templateId": 0, "identitySource": "replace-before-use" },
+      { "cohortSize": 50, "objectId": 0, "templateId": 0, "identitySource": "replace-before-use" },
+      { "cohortSize": 100, "objectId": 0, "templateId": 0, "identitySource": "replace-before-use" }
+    ],
+    "stealthReacquire": { "objectId": 0, "templateId": 0, "identitySource": "replace-before-use" },
+    "stealthRelease": { "objectId": 0, "templateId": 0, "identitySource": "replace-before-use" }
+  },
+  "timeouts": {
+    "controlSeconds": 30,
+    "combatSeconds": 120,
+    "cleanupSeconds": 60
+  },
+  "stealth": {
+    "attackerBotId": 0,
+    "buffId": 0,
+    "buffTemplateVerified": false,
+    "buffIsStealth": false,
+    "maximumSearchRadiusMeters": 30,
+    "searchTimeoutSeconds": 55
+  }
+}

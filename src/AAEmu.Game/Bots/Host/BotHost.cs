@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using AAEmu.Commons.Utils;
 using AAEmu.Game.Core.Managers;
+using AAEmu.Game.Core.Managers.Bots;
 using NLog;
 
 namespace AAEmu.Game.Bots.Host;
@@ -14,6 +15,7 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
     private readonly ITaskManager _taskManager;
     private readonly TimeProvider _timeProvider;
     private readonly Func<int> _roll;
+    private readonly Func<uint, bool> _logoutBot;
     private readonly ServerTickMetrics _serverMetrics;
     private readonly BotHostTask _hostTask;
     private BotRuntime[] _runtimeSnapshot = [];
@@ -24,15 +26,22 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
         _taskManager = null;
         _timeProvider = TimeProvider.System;
         _roll = Random.Shared.Next;
+        _logoutBot = botId => BotManager.Instance.DespawnBot(botId);
         _serverMetrics = null;
         _hostTask = new BotHostTask(this);
     }
 
-    public BotHost(ITaskManager taskManager, TimeProvider timeProvider, Func<int> roll = null, ITickManager tickManager = null)
+    public BotHost(
+        ITaskManager taskManager,
+        TimeProvider timeProvider,
+        Func<int> roll = null,
+        ITickManager tickManager = null,
+        Func<uint, bool> logoutBot = null)
     {
         _taskManager = taskManager ?? throw new ArgumentNullException(nameof(taskManager));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _roll = roll ?? Random.Shared.Next;
+        _logoutBot = logoutBot ?? (botId => BotManager.Instance.DespawnBot(botId));
         _serverMetrics = tickManager?.Metrics;
         _hostTask = new BotHostTask(this);
     }
@@ -61,6 +70,7 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
         lock (runtime.SyncRoot)
         {
             runtime.Retired = false;
+            runtime.LifeController.ResetPostSpawn(runtime.Bot.Id, _timeProvider.GetUtcNow());
             runtime.HostMetrics = Metrics;
             if (runtime.Brain != null)
                 runtime.Brain.HostMetrics = Metrics;
@@ -159,6 +169,8 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
     }
 
     internal bool IsStarted => Volatile.Read(ref _started) != 0;
+
+    internal bool LogoutBot(uint botId) => _logoutBot(botId);
 
     private void Retire(BotRuntime runtime)
     {

@@ -1,0 +1,114 @@
+schema_version: 1
+id: aaemu12-g001-nuian-five-quest-v1
+recorded_at: '2026-09-03T17:58:34Z'
+verdict: INCOMPLETE
+
+outcome:
+  live_slice: PASS
+  release_source: SOURCE_GREEN
+  product_acceptance: INCOMPLETE
+  summary: >-
+    Fresh level-one Nuian bot Freshnav14 autonomously completed seven native
+    starter quests with an active client witness, exceeding the requested five.
+    Source 10b014f adds the two route-ownership corrections discovered during
+    that run and passes the fresh release gate, but that exact source has not
+    yet been deployed and repeated.
+
+fingerprint:
+  task: T-127
+  task_thread_id: 01a06457-8a64-73a1-941d-21e09eec4a5a
+  branch: codex/t-127-g001-live-fix
+  source_commit: 10b014f8bc26bd20abdc896ec9d49661365cd1b1
+  source_tree: a2362d4fbff313b76ae785d647d6c772f7c8bf3f
+  release_version: 0.2.0-alpha.6
+  aaemu_host_base_commit: 62e3eb1d87da01194802ac886cd500134facad28
+  compatibility_patch: compatibility/aaemu-1.2-r208022-v4.patch
+  compatibility_patch_sha256: 8e33ed82dcbfc6e9e7aaec46624610b542ea3a113ee834d2450fb2f818b56e14
+  deployed_candidate_relation: predates-final-route-ownership-hardening
+  deployed_game_assembly_sha256_observed_before_post_run_compile: c10fcd802124406f349253cfafd9413e1768605b90f36110d40c248a85fbc79e
+
+live_run:
+  bot: {id: 14, name: Freshnav14, race: Nuian, starting_level: 1}
+  autonomous_start_count: 1
+  directed_gameplay_command_count_after_start: 0
+  native_quest_completions:
+    - {quest: 330, completed_at_local: '11:23:17', kind: starter}
+    - {quest: 250, completed_at_local: '11:24:39', kind: signpost-fox-auto-complete, native_progress: '3/3'}
+    - {quest: 6198, completed_at_local: '11:26:00', kind: starter}
+    - {quest: 2531, completed_at_local: '11:26:03', kind: main-story}
+    - {quest: 251, completed_at_local: '11:28:04', kind: owned-corpse-item-gather, native_progress: '3/3'}
+    - {quest: 324, completed_at_local: '11:28:31', kind: starter}
+    - {quest: 325, completed_at_local: '11:31:03', kind: starter}
+  native_completion_count: 7
+  controller_completion_count: 6
+  count_difference_reason: deployed-controller-did-not-count-native-auto-complete-removal
+  active_client_human_witness: true
+  normal_bot_logout_after_capture: true
+  synthetic_progress: false
+  teleport_recovery: false
+  console_metrics_observed_before_logout:
+    credited_kills: 6
+    tick_errors: 0
+    runtime_overlaps: 0
+    stuck_nudges: 2
+    stuck_teleports: 0
+    runtime_count: 1
+
+retained_findings:
+  - >-
+    Quest 250 was delayed rather than skipped. Three exact fox kills advanced
+    native progress 1/3, 2/3, and 3/3; QuestActConAutoComplete then finalized
+    and removed the quest without a report trip.
+  - >-
+    A lifecycle/intake handoff could expose transient unowned movement and
+    suspend the active quest for 30 seconds while intake selected another giver.
+  - >-
+    An unstick nudge used the normal destination setter, erasing the logical
+    report route and causing report_movement_ownership_lost.
+  - >-
+    Source 10b014f holds lifecycle ownership for one tick after intake release,
+    counts native auto-completion when the quest disappears, and preserves the
+    logical route while steering through recovery nudges.
+
+release_gate:
+  root: 'D:\Codex-Labs\evidence\T-127\g001-nuian-five-quest-v1\release-alpha6-gate-v1'
+  fresh_pinned_host: true
+  v4_apply_check: PASS
+  installer_check_only: PASS
+  full_non_incremental_build: {verdict: PASS, warnings: 88, errors: 0}
+  unit_tests: {verdict: PASS, total: 2004, passed: 2000, skipped: 4, failed: 0}
+  command_script_compiler: {verdict: PASS, warnings: 0, errors: 0}
+  vulnerable_package_audit_after_optional_host_baseline: {verdict: PASS, findings: 0}
+  powershell_parse: PASS
+  bash_parse: PASS
+  retained_corrections:
+    - initial-full-suite-exposed-ten-stale-default-one-kill-expectations
+    - second-full-suite-exposed-six-host-fixtures-missing-explicit-one-kill-opt-in
+    - final-policy-makes-resident-default-disabled-and-test-lifecycle-explicit
+
+external_evidence:
+  root: 'D:\Codex-Labs\evidence\T-127\g001-nuian-five-quest-v1\ownership-fix-v1'
+  server_log:
+    path: five-quest-live-Server.log
+    sha256: 988f4ee0c69567ca8b2377b365e7cd0c5edaed88c72c3393acd10333e4ce8b8b
+  decision_board:
+    path: fresh-bot-14-decision-board.log
+    sha256: edf7b0bc623e9d9598a65a341462e8bf26431958923d16ff2d703b9aff16112c
+  pre_restart_server_log:
+    path: pre-restart-Server.log
+    sha256: 2375931f1124ea81ec737ea2bbb52417e48b13a9276b422de77e460ac606e5d1
+  final_test_report:
+    path: 'release-alpha6-gate-v1/aaemu/AAEmu.UnitTests/bin/Debug/net10.0/TestResults/AAEmu.UnitTests-windows-net10.0-report.html'
+    length: 678526
+    sha256: 92ed70bec7fee5448ca09beb7d8a06a9744d7efa305561bcbba8eb459ae4b46c
+
+unproven_boundaries:
+  - Exact source 10b014f has not been installed into the retained runtime.
+  - The seven-quest client run has not been repeated on the exact release source.
+  - Graceful distinct-PID persistence is not bound to the exact release source.
+  - Smooth human-like road navigation, scale, soak, and AAEmu 3.0 are outside this gate.
+
+next_action: >-
+  At the next agreed runtime window, gracefully stop Game then Login, install
+  exact source 10b014f and v4, repeat one fresh Nuian five-quest run with an
+  active client, then verify normal logout and distinct-PID restart persistence.

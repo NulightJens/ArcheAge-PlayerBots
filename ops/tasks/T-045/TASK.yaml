@@ -1,0 +1,51 @@
+schema_version: 1
+id: T-045
+title: Wave 2 source and database-runway integration
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Independently review and integrate T-007, T-043, and T-044, then prove the complete AAEmu 1.2 source candidate without starting a runtime.
+depends_on: [T-007, T-043, T-044]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:9b37ca27-d9b9-4d74-b76e-005f813e7b76
+
+inputs:
+  integration_branch: integration/aaemu12-world
+  minimum_integration_base: ee57fdd2d14f4ef5c6da72faa9cb98110a9abae0
+  T-007: 43956fb9e6f1c3cc88cff0f8385f7dd7ef1ebb4e
+  T-043: e0e0825c35b5f0863e43b677a416c4f819419716
+  T-044: 9ba012805124e667185257449d7ec15ce147406f
+  host_reference: aaemu12_reference
+  validation_host: aaemu12_integration
+  database_receipt: aaemu12-database-public-alpha-v1
+
+write_scope:
+  - scripts/evidence/**
+  - scripts/combat/**
+  - src/AAEmu.Game/Core/Managers/Bots/BotCombatManager.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotCombatState.cs
+  - src/AAEmu.Game/Models/Game/Bots/BotDiagnostics.cs
+  - src/AAEmu.Game/Models/Tasks/Bots/BotCombatTask.cs
+  - src/AAEmu.Game/Scripts/Commands/BotAttackObjectCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/BotBuffCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/BotMetricsCommand.cs
+  - src/AAEmu.Game/Scripts/Commands/SpawnPassiveNpcCommand.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotCombatManagerTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotCombatStateTests.cs
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotCombatTaskTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/SpawnPassiveNpcCommandTests.cs
+  - ops/evidence/aaemu12-database-public-alpha-v1.yaml
+  - ops/evidence/aaemu12-wave2-integration-*.yaml
+  - ops/tasks/T-007/HANDOFF.md
+  - ops/tasks/T-043/HANDOFF.md
+  - ops/tasks/T-044/HANDOFF.md
+  - ops/tasks/T-045/HANDOFF.md
+
+runtime:
+  required: false
+  lease: null
+gates: [deterministic-evidence-tool-tests, deterministic-harness-tests, focused-aaemu12-tests, full-aaemu12-suite]
+validation_boundary: Install/build/test only. Do not query or mutate the new schemas, start a client/server, claim a physical result, or edit the runtime lease/global ledgers.
+handoff: ops/tasks/T-045/HANDOFF.md

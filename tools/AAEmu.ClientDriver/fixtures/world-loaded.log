@@ -1,0 +1,12 @@
+[801989E0] BackupNameAttachment=" Build(2) Date(30 August 2026) Time(16 59 07)"
+[38F38F32] Log Started at #c
+[0232BD25] Running 32 bit version
+[7AB6F5FE] Executable: D:\ArcheAge\bin32\archeage.exe
+[E5C771AC] FileVersion: 3.0.4.2
+<16:59:50> [1D01FDCA] Auth: client connected to server
+<17:00:06> [584C4FFD] [net 23:00:06.279] connection requested to: 127.0.0.1:1339
+<17:00:06> [0F08E548] [NetConnection] connect completed (succeeded:true)
+<17:00:06> [34CCC219] stream: connected to world server
+<17:00:06> [06A46B5B] stream: authorized by world server
+<17:00:21> [963385F6] Level System - Loading Start
+<17:00:28> [A39C1725] Level System - Loading Complete

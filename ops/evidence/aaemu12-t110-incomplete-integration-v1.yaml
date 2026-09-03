@@ -1,0 +1,305 @@
+schema_version: 1
+id: aaemu12-t110-incomplete-integration-v1
+recorded_at: '2026-09-01T20:19:22.9120174-06:00'
+verdict: PASS-receipt-integrity
+subject_verdict: INCOMPLETE-grade-Weak-parser-rejection-and-autonomy-observer-gap
+
+integration_identity:
+  task: T-111
+  task_thread_id: 01a05fdd-0f55-75f3-8f95-a596588c6520
+  owner_client_thread_id: client-new-thread:76cfa252-f51d-44ea-ab5f-3646117da15d
+  task_worktree: 'C:\Users\jensh\.codex\worktrees\c1ab\PB-W00-control'
+  dispatch_base: 8e1659331eba986f4c6742c3e77d29173a7f8fbe
+  preparation_commit: 8e1659331eba986f4c6742c3e77d29173a7f8fbe
+  binding_commit: 1b1a4cf3d43ec530b9889a82f17cc0abb76e2129
+  binding_parent: 8e1659331eba986f4c6742c3e77d29173a7f8fbe
+  binding_tree: fa5e46c262d57b46a095f2cc691967a88bae990f
+  saved_branch: integration/aaemu12-world
+  saved_branch_head_before: 1b1a4cf3d43ec530b9889a82f17cc0abb76e2129
+
+candidate:
+  commit: 1b914085d64b3957b3c394d9b9f75600c91e2a96
+  parent: 80bb3b9f3dc028e2b1830ef10421eed4dc13f4e1
+  tree: 03d3e8fcda1ae196023c9acd412e212770940261
+  stable_patch_id: 211ac120413c1c483c1ad9892afa08eecc9af3a9
+  exact_path_count: 2
+  replay_commit: d4e1bede6647ea8d7d97fed14a4819042cb9c15e
+  replay_parent: 1b1a4cf3d43ec530b9889a82f17cc0abb76e2129
+  replay_tree: 7d5b6b1c90da1ef79a237c3bf6e9d95e780c4fe5
+  replay_stable_patch_id: 211ac120413c1c483c1ad9892afa08eecc9af3a9
+  stable_patch_id_match: true
+  exact_paths:
+    - path: ops/evidence/aaemu12-t110-one-zone-autonomy-v8.yaml
+      candidate_blob: eed5dbb70e84ff2421ada3b54b4085b216526ebc
+      replay_blob: eed5dbb70e84ff2421ada3b54b4085b216526ebc
+      byte_identical: true
+    - path: ops/tasks/T-110/HANDOFF.md
+      candidate_blob: dd362f075e06119293cb6e20f3eb37107dcb7e83
+      replay_blob: dd362f075e06119293cb6e20f3eb37107dcb7e83
+      byte_identical: true
+  rejected_scope_changes: 0
+
+immutable_evidence:
+  root: 'D:\Codex-Labs\evidence\T-110\one-zone-autonomy-v8'
+  access: read-only-no-audit-output-written
+  manifest_path: final/manifest.json
+  manifest_schema: t110.sealed-evidence-manifest.v1
+  manifest_length: 1249803
+  manifest_sha256: b8678f4526f80197a0b659c9f22b660b686b3ed75731c3f57095123aedc943e1
+  terminal_result_path: final/terminal-result.json
+  terminal_result_length: 8148
+  terminal_result_sha256: bd29e1151367d88bd7df033dea51d88d4bec442ce3cdd54a1631afa5aab38a78
+  declared_payload_file_count: 5918
+  manifest_entry_count: 5918
+  actual_payload_file_count: 5918
+  verified_payload_file_count: 5918
+  declared_payload_total_bytes: 25649977
+  verified_payload_total_bytes: 25649977
+  duplicate_paths: 0
+  unsafe_paths: 0
+  missing_paths: 0
+  length_mismatches: 0
+  sha256_mismatches: 0
+  unlisted_payloads: 0
+  reparse_points: 0
+  result: 5918-of-5918-length-and-sha256-green-zero-missing-mismatched-duplicate-unsafe-unlisted-or-reparse
+
+independent_planner_recomputation:
+  implementation: separately-compiled-active-primary-and-independent-repeat-designations
+  active_primary_source: tooling/T110Planner.v2.cs
+  active_primary_source_sha256: f0fcfc2f35393296c43e28dc0100ff2c7c9d11e06fbeb072a2e5b744e86399dd
+  active_repeat_source: tooling/T110PlannerRepeat.v2.cs
+  active_repeat_source_sha256: 41722e219580a8d7ec5b4feb13c1ed9450d4dd32c4f0b80824a68470ad5a3584
+  retained_transform_bits:
+    - {bot_id: 20001, x_bits: 1179957453, y_bits: 1179643699, yaw_bits: -1065611208}
+    - {bot_id: 20002, x_bits: 1179966362, y_bits: 1179652403, yaw_bits: -1065603658}
+    - {bot_id: 20003, x_bits: 1179971072, y_bits: 1179656704, yaw_bits: -1065577192}
+  decoded_transforms:
+    - {bot_id: 20001, x: 13614.2, y: 13307.8, yaw: -3.93849}
+    - {bot_id: 20002, x: 13622.9, y: 13316.3, yaw: -3.94029}
+    - {bot_id: 20003, x: 13627.5, y: 13320.5, yaw: -3.9466}
+  choices_per_bot: 264
+  distances: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+  ordered_angles: [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, -165, -150, -135, -120, -105, -90, -75, -60, -45, -30, -15]
+  primary_enumeration_count: 18399744
+  repeat_enumeration_count: 18399744
+  finite_count: 18399744
+  own_within_radius_count: 18399744
+  pair_separated_count: 11544855
+  literal_row_margin_count: 3458
+  primary_eligible_count: 125
+  repeat_eligible_count: 125
+  semantic_sha256: 38b871081b5c3dc4be700d33f9890c51e10aa3b1c80839b8b916584fa553bfc1
+  independent_repeat_equal: true
+  selected_choice_orders: [28, 68, 56]
+  selected_distances: [10, 15, 15]
+  selected_angles: [60, -60, 120]
+  selected_fixture_xy_bits: [[1179959989, 1179633778], [1179951580, 1179656575], [1179985828, 1179652438]]
+  pairwise: [23.728951412717223, 31.125385098200656, 33.68843783628416]
+  anchor_to_fixture:
+    - [9.999996995925452, 13.820464345249864, 28.994381491873792]
+    - [19.223794761946415, 14.99947572427696, 19.009796352630115]
+    - [24.867553152163882, 19.03557310816287, 15.000276308693724]
+  minimum_pairwise: 23.728951412717223
+  minimum_literal_row_margin: 3.820467349324412
+  selected_maximum_distance: 15
+  selected_distance_sum: 40
+  selected_absolute_angle_sum: 240
+  persisted_enumeration_rows: 0
+
+independent_bootstrap_replay:
+  source: sealed-Game-Server-log
+  director_start_rows: 1
+  director_spawn_rows: 4
+  director_tick_rows: 4
+  director_stop_rows: 1
+  first_admission_elapsed_ms: 180038.044
+  admission_order: [20001, 20002, 20003]
+  inter_admission_gaps_ms: [15049.859, 15058.018]
+  maximum_failure_count: 0
+  maximum_wrong_zone_count: 0
+  maximum_in_flight_count: 0
+  interpretation: >-
+    The fourth spawn row was a run-one refill after the single retained fixture
+    was killed; it does not prove either complete fixture wave or lifecycle.
+
+independent_observer_replay:
+  client:
+    process_id: 127276
+    relaunched: false
+    cooperative_exit: true
+    forced_termination: false
+    sample_count: 1039
+    raw_file_count: 1039
+    raw_hashes_validated: 1039
+    row_chain_links_validated: 1039
+    row_or_raw_mismatches: 0
+    nonzero_client_samples: 0
+    error_samples: 0
+    maximum_adjacent_gap_ms: 719.196
+    terminal_chain_hash: b106ad863e3b33b018d2e50041ba8885a842dd24e2a61e71c31d68dc4702dc7b
+  autonomy:
+    - {bot_id: 20001, transport_samples: 533, raw_validated: 524, offline: 319, online: 205, malformed: 0, transport_error_tail: 9, maximum_adjacent_gap_ms: 2575.486}
+    - {bot_id: 20002, transport_samples: 535, raw_validated: 525, offline: 375, online: 150, malformed: 0, transport_error_tail: 10, maximum_adjacent_gap_ms: 2565.165}
+    - {bot_id: 20003, transport_samples: 535, raw_validated: 525, offline: 378, online: 147, malformed: 0, transport_error_tail: 10, maximum_adjacent_gap_ms: 2565.218}
+  first_two_samples_offline_for_all_bots: true
+  transport_errors_are_final_tails: true
+  contracted_maximum_gap_ms: 2000
+  gap_gate: FAIL-retained-with-subject-INCOMPLETE
+
+fixture_request_and_response:
+  request_count: 1
+  response_count: 1
+  retry_count: 0
+  later_fixture_command_count: 0
+  request_path: commands/wave-1/0000-spawnpassive-10004-10-20001-60.request.bin
+  request_length: 55
+  request_sha256: bd65dc9952049bf75e4610852cbfaade425e0714bc895769f11bb76766b314da
+  response_path: commands/wave-1/0000-spawnpassive-10004-10-20001-60.response.bin
+  response_length: 359
+  response_sha256: 32474d410485ba1fe987a80a0ed3b41b86f3729ee4fe3b30263f593e4de844d3
+  parsed:
+    command: 'spawnpassive 10004 10 20001 60'
+    object_id: 44979
+    anchor_bot_id: 20001
+    zone: 221
+    instance: 0
+    finite_rounded_coordinates: [13616.7, 13298.1, 28.5]
+    grade: Weak
+    error_count: 0
+  local_parser_requirement: 'grade=(?<grade>\d+)'
+  finding: >-
+    The server/source response is valid and authoritative with named
+    grade=Weak. The active retained local fixture parser alone required a
+    numeric grade and raised fixture-response-match-count:0. The contract then
+    required a stop without retry or later fixture command.
+
+independent_cleanup_replay:
+  shutdown_order: [Game, Login]
+  game_graceful_ctrl_c: true
+  login_graceful_ctrl_c: true
+  director_stop_count: 1
+  shutdown_cleanup_zero_count: 1
+  bot_despawn_count: 4
+  web_api_stop_count: 1
+  login_daemon_stop_count: 1
+  autonomy_observers_graceful_and_absent: 3
+  client_observer_cooperative_and_absent: true
+  game_server_log: {length: 21575642, sha256: 2ef1bb8c4676be1819d3d2303cedbf412b9111589225d67c0443ef06ab4a53b4}
+  game_error_log: {length: 702, sha256: a15bcb4fb74635f54ab4c87d5fb02c518853aef74058414abaa9682a2b98ace7}
+  login_server_log: {length: 3120, sha256: 528619e8c165c0e97c68153effe29660309a2143685ac4c2f2bbe9bfe4eefb11}
+  lossless_log_move_remaining_live_logs: 0
+  original_config: {length: 1772, sha256: 7b57a52149f6059cbcd972c38b161c46781d6730dbb3c6b93890171ae8c43202}
+  configured_config: {length: 1795, sha256: 5177e67c818d04ebf9c6b0164afc833e431cf4f687e660cffe02d5ef202de47c}
+  restored_exact_original_bytes: true
+  final_runtime_process_count: 0
+  final_client_process_count: 0
+  final_observer_process_count: 0
+  final_required_listener_count: 0
+  final_live_log_entry_count: 0
+  mysql_process_ids_unchanged: [6308, 8076]
+  reference_head_exact_clean_detached: 62e3eb1d87da01194802ac886cd500134facad28
+  host_head_exact: 62e3eb1d87da01194802ac886cd500134facad28
+  host_overlay_entry_count: 30
+  host_overlay_exact_and_reverse_patch_clean: true
+  installed_module_head_exact_clean_detached: 037b4a87dd25df74fc8db5506c1cbc7fe3301b44
+  installed_module_tree_exact: a1b9302625a65e10dfa9b7e11393a67134f914e8
+  direct_database_access: false
+  client_access: false
+  forced_termination: false
+  destructive_actions: false
+
+retained_evidence_anomalies:
+  - category: pre-runtime-tool-designation
+    finding: >-
+      Nineteen active tools and thirteen superseded drafts remain sealed. The
+      superseded set records interpolation parse errors, obsolete paths,
+      obsolete planner callers, manifest/tool-designation corrections, and
+      nullable-context compiler corrections; none is promoted over its active
+      replacement.
+  - category: supplemental-observer-recovery-tooling
+    finding: >-
+      Recover-T110ClientObserverLaunch.v2.ps1 and the v3 supplemental ledger
+      are active. The recovery v1 draft and supplemental-ledger v1/v2 drafts
+      remain superseded and sealed.
+  - category: client-observer-wrapper-share-mode
+    finding: >-
+      The initial wrapper ledger read omitted compatible file sharing. Exact
+      live PID 127276 was recovered and retained without relaunch.
+  - category: fixture-parser
+    finding: >-
+      The valid named grade token was rejected by the local numeric-grade
+      parser after the only fixture request. No retry or later fixture command
+      occurred.
+  - category: autonomy-observer-gaps
+    finding: >-
+      All three independently recomputed gaps exceed the 2,000 ms contract and
+      remain a terminal blocker.
+  - category: cleanup-wrapper
+    finding: >-
+      Pre-client audit and cooperative-stop wrappers had retained PowerShell
+      predicate and empty-byte bugs. Equivalent create-new in-memory/direct
+      API paths completed cleanup without overwrite or force termination.
+  - category: early-final-snapshot
+    finding: >-
+      final.json retains the expected FAIL while the client observer was still
+      present. final-post-client-stop.json is the sealed terminal cleanup PASS.
+
+integrator_verifier_anomalies:
+  - category: initial-unbound-default-checkout
+    finding: >-
+      T-111 initially opened at detached 92ec73ba11ad8de5c37d7b4d763998714c416392
+      without task files. No changes were made before PB-000 supplied the exact
+      committed thread/worktree binding.
+  - category: powershell-revision-argument
+    finding: >-
+      One redundant unquoted HEAD^{tree} query was parsed as an encoded
+      PowerShell argument. The bound commit already supplied the tree and the
+      quoted query then verified fa5e46c262d57b46a095f2cc691967a88bae990f.
+  - category: startup-output-window
+    finding: >-
+      The first combined required-startup read exceeded the output window.
+      CURRENT.yaml and BOARD.yaml were reread completely in contiguous bounded
+      chunks before verification, replay, or artifact creation.
+  - category: separate-planner-compilation
+    finding: >-
+      A first attempt to concatenate both C# sources into one compilation unit
+      failed because the repeat source's using directives followed primary
+      declarations. Both designated sources were then compiled separately and
+      completed matching full enumerations; no failed result was accepted.
+  - category: exact-client-timestamp-kind
+    finding: >-
+      One provisional client-gap calculation let ConvertFrom-Json localize and
+      truncate timestamps and was rejected. Exact -DateKind String parsing then
+      reproduced 719.196 ms with all raw hashes and chain links green.
+
+integration:
+  candidate_replayed_byte_identically: true
+  integrator_authored_paths:
+    - ops/evidence/aaemu12-t110-incomplete-integration-v1.yaml
+    - ops/tasks/T-111/HANDOFF.md
+  saved_branch_update: fast-forward-only-through-replay-and-artifact-commits
+  history_rewritten: false
+  runtime_started_or_controlled: false
+  external_evidence_mutated: false
+  runtime_host_module_config_reference_mutated: false
+  global_ledgers_lease_or_workspace_registry_mutated: false
+  database_or_client_accessed: false
+  source_tests_or_tooling_mutated: false
+  builds_or_tests_consumed: false
+
+retained_boundaries:
+  - T-110 remains INCOMPLETE; planner and delayed bootstrap proof do not establish autonomy acceptance.
+  - Commands two and three, wave-one three-fixture ownership, and actual three-fixture geometry are absent.
+  - One incidental first-fixture kill/refill does not prove the contracted lifecycle, ownership, or two credits per identity.
+  - Both lifecycle/recovery/logout/refill waves and all six required fixture objects/credits remain unproven.
+  - Run-two distinct-PID restart, ordered rebootstrap, and two-minute dwell are absent.
+  - Runtime successor behavior, scale, soak, packaging, client gameplay, database behavior, and AAEmu 3.0 remain unproven.
+  - T-037 remains blocked behind a fresh parser- and observer-safe successor runtime PASS and its independent integration.
+
+control_action: >-
+  PB-000 may accept this independently verified retained T-110 INCOMPLETE
+  receipt and bind a fresh v9 successor with a new lease and evidence root.
+  Never reinterpret T-110 as autonomy acceptance and never reuse, retry, or
+  overwrite the immutable v8 root.
+

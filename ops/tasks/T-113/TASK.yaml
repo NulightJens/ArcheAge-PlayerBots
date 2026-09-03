@@ -1,0 +1,44 @@
+schema_version: 1
+id: T-113
+title: Independently integrate retained T-112 runtime failure
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Independently verify the immutable T-112 v9 evidence root and exact two-path candidate, replay its retained FAIL receipt and handoff onto the saved lineage, record an integration receipt, and fast-forward the saved branch without reinterpreting successful planning/fixtures as lifecycle acceptance.
+depends_on: [T-112]
+runtime: {required: false, lease: null}
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\18b5\PB-W00-control'
+owner_client_thread_id: client-new-thread:1596f314-1e91-4d05-8074-0502d8fe85c9
+owner_thread_id: 01a06020-e7f8-7bc2-8d1e-d1b281ef764c
+inputs:
+  dispatch_base: 03b2b84a3b047a86323ac722ca3718dfbf91c54c
+  source_candidate: c98498696de64e4f8aa99509e2dbad3d1a6fd1b6
+  source_candidate_parent: 4277111312b09d549b29b0e3af8c0e4ebcef2168
+  source_candidate_tree: 6059e88d2f58c9c1632f2ff2194f47618ef6fb75
+  source_candidate_patch_id: e58936f2c2016aa590e6825748558c37fdf302d2
+  evidence_root: 'D:\Codex-Labs\evidence\T-112\one-zone-autonomy-v9'
+  manifest_sha256: b9a11a357e108a05f203ab5a43cd9f3ea9c83f1573748e20b1209b1352699b01
+write_scope:
+  - ops/evidence/aaemu12-t112-one-zone-autonomy-v9.yaml
+  - ops/tasks/T-112/HANDOFF.md
+  - ops/evidence/aaemu12-t112-fail-integration-v1.yaml
+  - ops/tasks/T-113/HANDOFF.md
+external_read_scope:
+  - aaemu12_t112_evidence_v9 immutable root only
+gates:
+  - exact-candidate-parent-tree-two-path-scope-patch-id-and-blob-replay
+  - complete-sealed-manifest-rehash-and-path-safety
+  - independent-parser-planner-scheduling-and-bootstrap-recomputation
+  - independent-wave-one-command-geometry-lifecycle-counter-and-observer-replay
+  - exact-config-runtime-process-listener-log-mysql-and-graceful-cleanup-evidence
+  - retained-fail-integration-and-saved-branch-fast-forward
+validation_boundary: Immutable evidence verification and retained FAIL integration only. Do not write external evidence, runtime host/module/config/reference, global ledgers/lease/workspace registry, database, client, source/tests, AAEmu 3.0, scale, soak, or packaging. Do not run build, focused tests, full suite, Login, Game, planners, or observers.
+contract: ops/tasks/T-113/CONTRACT.md
+handoff: ops/tasks/T-113/HANDOFF.md
+replay_commit: 94879030e015ab15bbfd5e896df6f9f6deb86476
+replay_tree: b5f9383a8cd37c10415245ca65d83bc3c84f01fa
+integrated_commit: 5108bcedb6782a24b0095fab88b021a628c01f8b
+integrated_tree: 432dbdb84234899886e5a8e01c613ff798f70441
+evidence_receipt: ops/evidence/aaemu12-t112-fail-integration-v1.yaml
+result: PASS-receipt-integrity-subject-retained-FAIL

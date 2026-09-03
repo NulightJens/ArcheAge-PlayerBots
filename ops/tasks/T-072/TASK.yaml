@@ -1,0 +1,45 @@
+schema_version: 1
+id: T-072
+title: Integrate natural recovery lifecycle correction
+track: AAEmu12
+status: done
+integration: integrated
+outcome: Independently replay the accepted T-071 natural recovery lifecycle correction, install the exact result into the registered AAEmu 1.2 integration host under a build-only lease, and qualify one immutable source/install identity with a clean build and exactly one complete unit-suite invocation.
+depends_on: [T-071]
+branch: codex-managed-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\dd46\PB-W00-control'
+owner_client_thread_id: client-new-thread:e4a39679-a28d-4b9b-8795-cb6c77815ef1
+owner_thread_id: 01a05c9d-4322-7f22-97dc-bb46803ecd6b
+inputs:
+  integration_head: d71a52b10e78be9ca6a91a3b1d5822a5ef199740
+  t071_candidate: 16e8c2fe707f7bd96e4b6977dd6b7c441124c63f
+  t071_parent: a1c15016e3e7ccc121c0bad048dc7bb9d5c7aa8f
+  tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
+  installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+  active_patch_sha256: 0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e
+  runtime_workspace: aaemu12_integration
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+write_scope:
+  - src/AAEmu.Game/Bots/Life/BotLifeController.cs
+  - src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Life/BotLifeControllerTests.cs
+  - tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs
+  - ops/tasks/T-071/HANDOFF.md
+  - ops/evidence/aaemu12-natural-recovery-integration-v1.yaml
+  - ops/tasks/T-072/HANDOFF.md
+external_write_scope:
+  - 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\modules\archeage-playerbots'
+  - registered AAEmu 1.2 build and test outputs only
+  - a new versioned scratch checkout retained after proof if required
+runtime:
+  required: false
+  lease: aaemu12
+  authority: install-build-test-only
+gates: [focused-aaemu12-tests, full-aaemu12-suite]
+validation_boundary: Integration/install/build/test only under the exact committed build-only lease. Do not start Login, GameServer, MySQL, or the ArcheAge client; access databases; edit global ledgers/lease; change retained runtime receipts; regenerate patches; change target/combat/loot/progression behavior beyond accepted T-071 blobs; or touch AAEmu 3.0.
+handoff: ops/tasks/T-072/HANDOFF.md
+integrated_commit: 7aabaa0aafd6e591d50251965bde0a5ab9c5c14f
+tested_module_source: 68aaaa3334a408d1d6d21e44472a8984e78618c2
+installed_module_tree: 9fa74d8057df8b5eb276ad223a10ed9b12791f88
+evidence_receipt: ops/evidence/aaemu12-natural-recovery-integration-v1.yaml

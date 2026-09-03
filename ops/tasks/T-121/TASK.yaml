@@ -1,0 +1,38 @@
+schema_version: 1
+id: T-121
+title: Implement server-owned arbitrary-level bot identities
+track: AAEmu12
+status: active
+integration: pending
+outcome: Create and persist a server-owned bot character at any validated level, including a clean level-one Nuian, without consuming or depending on player-visible character slots, then admit it through the normal BotManager lifecycle.
+depends_on: [T-120]
+runtime: {required: false, lease: null}
+source_base: 0bff81c350a216b7018099749fd64096fbffc098
+branch: codex/T-121-bot-identities
+worktree: 'C:\Users\jensh\.codex\worktrees\8064\PB-W00-control'
+owner_thread_id: 01a0635b-a425-7611-b165-d93d455f69e5
+write_scope:
+  - src/AAEmu.Game/Bots/Population/Identity/
+  - src/AAEmu.Game/Core/Managers/Bots/BotManager.cs
+  - src/AAEmu.Game/Core/Managers/Bots/IBotManager.cs
+  - src/AAEmu.Game/Core/Managers/Bots/BotArchetypeManager.cs
+  - src/AAEmu.Game/Scripts/Commands/AddBot.cs
+  - src/AAEmu.Game/Scripts/Commands/CreateBotCommand.cs
+  - tests/AAEmu.UnitTests/Bots/Population/Identity/
+  - tests/AAEmu.UnitTests/Game/Core/Managers/BotManagers/BotIdentityFactoryTests.cs
+  - tests/AAEmu.UnitTests/Game/Scripts/Commands/CreateBotCommandTests.cs
+  - compatibility/aaemu-1.2-r208022-bot-identity-factory.patch
+  - docs/BOT-IDENTITIES.md
+  - ops/tasks/T-121/HANDOFF.md
+gates:
+  - dedicated-server-owned-account-not-player-character-slots
+  - level-one-through-server-cap-validation
+  - race-gender-name-archetype-and-placement-validation
+  - authoritative-id-allocation-and-normal-persistence
+  - fresh-quest-state-and-level-appropriate-progression
+  - immediate-normal-bot-admission-without-client-connection
+  - collision-idempotency-and-fail-closed-tests
+  - focused-tests-and-isolated-aaemu12-build-zero-errors
+validation_boundary: Module source, a separate reviewed AAEmu 1.2 compatibility patch, focused deterministic tests, isolated build, documentation, and handoff only. Do not write or query a database, deploy to the registered host, control the retained T-120 runtime/client, edit global ledgers or the lease, run the full suite, force a process, delete identities, or touch AAEmu 3.0.
+contract: ops/tasks/T-121/CONTRACT.md
+handoff: ops/tasks/T-121/HANDOFF.md

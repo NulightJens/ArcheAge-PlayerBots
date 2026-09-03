@@ -1,0 +1,209 @@
+schema_version: 1
+receipt_id: aaemu12-runtime-recovery-observability-integration-v1
+recorded_at: '2026-09-01T22:35:00-06:00'
+verdict: PASS-corrected-count-green-receipt-reuse-integration
+
+scope:
+  task: T-116
+  owner_thread_id: 01a0605e-2939-75e0-b6cc-1fbb1b617f40
+  owner_client_thread_id: client-new-thread:d603189d-48ed-45a8-9ccc-6106b99e033a
+  worktree: 'C:\Users\jensh\.codex\worktrees\c9da\PB-W00-control'
+  lease: aaemu12-build-only
+  binding_commit: ad05f0235ae7fee4723de0259a3b13267876012d
+  binding_parent: 0ff36bf5a512602cd1f14e3685c1cbab98ac513b
+  binding_tree: fd53ec5bc7f60cd6e4a9ddc7cf35e908fdbcd165
+  runtime_required: false
+  archeage_client_allowed: false
+
+source_identity:
+  t114_candidate:
+    commit: 3b9824e5250caf90a6347cb286e31deda993a0cf
+    parent: d335ce053c58eaebbfda384412ef9be5c9d839da
+    tree: e342e61030ae78ab411fa7cb6a109839199ca610
+    stable_patch_id: f2172268436a17d0642b837ed5e0696b81c316d6
+  retained_t115_replay:
+    commit: 5f544acffdbef48b83278978b68c3f62b1441808
+    parent: 21ae2ebe9c39205e3fb2874d1eb1b128f6e9e78f
+    tree: 6bf7927fc28ca163ffa67da6a280fce4f22d4460
+    stable_patch_id: f2172268436a17d0642b837ed5e0696b81c316d6
+  t116_replay:
+    commit: 39f748fb3904584b50e1dabc0cfb0b3045793165
+    parent: ad05f0235ae7fee4723de0259a3b13267876012d
+    tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+    stable_patch_id: f2172268436a17d0642b837ed5e0696b81c316d6
+  exact_seven_path_set: true
+  candidate_replay_and_t116_blobs_equal: true
+  build_test_script_and_compatibility_inputs_equal_to_t115_replay: true
+  replay_blobs:
+    src/AAEmu.Game/Scripts/Commands/BotDebugCommand.cs: 3dcb8c803fad04657132c16ee37c0fec64911c9f
+    scripts/autonomy/AutonomyObserver.psm1: 173a2de8f8844f16be463ab0779670f0fe264198
+    tests/AAEmu.UnitTests/Game/Scripts/Commands/BotCommandsTests.cs: 38f199f79d9e8f5116678625b2f912bd752407fe
+    tests/AAEmu.UnitTests/Bots/Host/BotHostBehaviorTests.cs: e2158cd316bf1e809653f722de7764719c70911a
+    scripts/autonomy/tests/Test-AutonomyObserver.ps1: 587be6192a9138cb9c3c94ec9c612e16db56bcec
+    ops/evidence/aaemu12-runtime-recovery-observability-v1.yaml: 0ae6b043427c0e288e1dcd104073d3d964412b2b
+    ops/tasks/T-114/HANDOFF.md: 26ea78391a6ccc95cdd77e5c8f0dd4ea697af154
+
+retained_t115_handoff:
+  source_path: 'C:\Users\jensh\.codex\worktrees\e53c\PB-W00-control\ops\tasks\T-115\HANDOFF.md'
+  copied_path: ops/tasks/T-115/HANDOFF.md
+  length: 6725
+  git_blob: 01af6882c7143960bfa2b2fefb3a0ab05fff52c2
+  byte_identical: true
+  t115_verdict_preserved: BLOCKED-full-suite-count-mismatch
+
+count_reconciliation:
+  bot_commands_tests:
+    parent_discovered_tests: 46
+    candidate_discovered_tests: 46
+    added_methods: []
+    removed_methods: []
+    strengthened_existing_method: BotDebug_TransformTelemetry_IsInvariantRoundTripAndReadOnly
+  bot_host_behavior_tests:
+    parent_discovered_tests: 33
+    candidate_discovered_tests: 34
+    only_added_method: MultipleRuntimes_PendingRecoveryCountersStayFixedWhilePeerAndHostAdvance
+    removed_methods: []
+  exact_t107_baseline:
+    total: 1874
+    succeeded: 1870
+    skipped: 4
+    failed: 0
+  exact_t114_discovery_delta: 1
+  correct_expected_total:
+    total: 1875
+    succeeded: 1871
+    skipped: 4
+    failed: 0
+  t115_incorrect_contract_expected_succeeded: 1872
+  t115_incorrect_contract_expected_total: 1876
+  t115_reinterpreted_as_passing_own_contract: false
+
+retained_t115_execution:
+  build_log:
+    path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.UnitTests\bin\T115-no-incremental-solution-build.log'
+    length: 65490
+    sha256: 5f642388d853a5cd191d089fe00dcc6211143e423ffa4403cb6baf2b021c28a9
+    build_succeeded_markers: 1
+    warnings: 79
+    errors: 0
+  full_suite_log:
+    path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.UnitTests\bin\T115-full-suite-once.log'
+    length: 1404
+    sha256: bb8b3ed89578c304e3114b7885528b09c5bd6811ccd4a4208aaf91f6facccf08
+    matching_t115_full_suite_log_count: 1
+    test_summary_markers: 1
+    total: 1875
+    succeeded: 1871
+    skipped: 4
+    failed: 0
+    intentional_skips:
+      - Legacy_Darkrunner_Pve_MatchesGolden
+      - Legacy_Darkrunner_Pvp_MatchesGolden
+      - Legacy_Primeval_Pve_MatchesGolden
+      - Legacy_Primeval_Pvp_MatchesGolden
+  accepted_as_unchanged_green_receipt: true
+  evidence_of_second_t115_full_suite_invocation: false
+
+host_and_binary_fingerprint:
+  reference_head: 62e3eb1d87da01194802ac886cd500134facad28
+  reference_clean_detached: true
+  integration_host_head: 62e3eb1d87da01194802ac886cd500134facad28
+  integration_host_detached: true
+  host_status_entry_count: 30
+  host_tracked_patch_path_count: 28
+  host_untracked_entries:
+    - SQL/updates/2026-08-25_aaemu_game_bot_archetype_plans.sql
+    - modules/
+  compatibility_patch: compatibility/aaemu-1.2-r208022-v3.patch
+  compatibility_patch_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  strict_reference_apply_check_whitespace_error_all: passed
+  complete_integration_host_reverse_check_whitespace_error_all: passed
+  installed_module_transition:
+    from_commit: 5f544acffdbef48b83278978b68c3f62b1441808
+    from_tree: 6bf7927fc28ca163ffa67da6a280fce4f22d4460
+    to_commit: 39f748fb3904584b50e1dabc0cfb0b3045793165
+    to_tree: 7a9b2c3296bb5aee03c0016a4a7a72bb4c75073d
+    final_clean_detached: true
+  primary_outputs:
+    game_assembly_sha256: 0b770b543b167f7ae57fcb8eb9ad18357e75a5241b0b170a9b1fa4ac05f564f6
+    test_assembly_sha256: b26876024985b334a28a540681645336ad8b81ef8f9a8a7f4644f8e101adf29e
+    test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+    copied_game_assembly_sha256: 0b770b543b167f7ae57fcb8eb9ad18357e75a5241b0b170a9b1fa4ac05f564f6
+  complete_binary_manifests:
+    game_output_binary_count: 134
+    game_output_binary_manifest_sha256: 3fc2371bf0a002db882602c04cce3222a2de9e3e2065db38c73a58289306c904
+    test_output_binary_count: 234
+    test_output_binary_manifest_sha256: 83251e1531d05c2e2e7e6d9504ecc84b264e3c9d61401a57af675fbcc2978888
+    unchanged_before_and_after_focused_execution: true
+
+fresh_verification:
+  observer:
+    command: 'pwsh -NoLogo -NoProfile -File scripts/autonomy/tests/Test-AutonomyObserver.ps1 -ArtifactsDirectory D:\Codex-Labs\t116-observer-tests-v1'
+    assertions: 91
+    failed: 0
+    artifacts_path: 'D:\Codex-Labs\t116-observer-tests-v1'
+    artifact_file_count: 18
+    artifact_manifest_sha256: 60427417de8bd136811e0e81f450cbfb6bbf8b7a551e93faf868edfa8cad7c48
+    log_path: 'D:\Codex-Labs\t116-observer-tests-v1.log'
+    log_length: 94
+    log_sha256: 0599174720ad450002d73adc98363fce53e0a49abf8bff4513583b4b8add017b
+  bot_commands:
+    execution: direct-prebuilt-test-executable
+    filter: '/*/AAEmu.UnitTests.Game.Scripts.Commands/BotCommandsTests/*'
+    total: 46
+    succeeded: 46
+    skipped: 0
+    failed: 0
+    duration_ms: 656
+    log_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.UnitTests\bin\T116-BotCommandsTests-v1.log'
+    log_length: 7111
+    log_sha256: 59fa343ae4100f1478059ea6758a12d28c4c5b0272d61b167f85aec4ded4556a
+    report_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.UnitTests\bin\T116-BotCommandsTests-v1-report.html'
+    report_length: 165650
+    report_sha256: 3560bee8c6b6a213c57d3ae634d73d74d205a6526c6a95e87cc78fd6500761f7
+  bot_host_behavior:
+    execution: direct-prebuilt-test-executable
+    filter: '/*/AAEmu.UnitTests.Bots.Host/BotHostBehaviorTests/*'
+    total: 34
+    succeeded: 34
+    skipped: 0
+    failed: 0
+    duration_ms: 664
+    log_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.UnitTests\bin\T116-BotHostBehaviorTests-v1.log'
+    log_length: 48823
+    log_sha256: 41e6d90f0e3016d4b5c4a0bed672b6c6f53ffa2b276678fe5d83b9a155ea8c4a
+    report_path: 'D:\Codex-Labs\aaemu-1.2-r208022-integration-v1\AAEmu.UnitTests\bin\T116-BotHostBehaviorTests-v1-report.html'
+    report_length: 159410
+    report_sha256: 7a7f72ced3faf086f9bd8560c7f068979c267c978efa6a81714ed6a36661177b
+  t116_build_invocations: 0
+  t116_full_suite_invocations: 0
+  reused_t115_full_suite_invocations: 1
+  compilation_triggered_by_focused_executions: false
+
+final_state:
+  replay_worktree_clean_before_artifact: true
+  installed_module_clean_detached_at_t116_replay: true
+  reference_clean_detached: true
+  host_overlay_unchanged: true
+  saved_branch_fast_forward: exactly-replay-then-artifact-commit
+  artifact_commit: commit-containing-this-receipt-reported-after-creation
+  runtime_started_or_controlled: false
+  live_observer_started: false
+  deployed_config_written: false
+  database_or_client_accessed: false
+  external_runtime_evidence_written: false
+  global_ledgers_lease_or_workspace_registry_written_by_t116: false
+
+remaining_boundary:
+  t112_verdict: immutable-independently-integrated-FAIL
+  t115_verdict: BLOCKED-under-its-own-incorrect-count-contract
+  unproven:
+    - fresh physical per-runtime sampling
+    - both recovery waves
+    - cooperative observer shutdown-tail closure
+    - distinct-PID restart and rebootstrap
+    - dwell
+    - scale and soak
+    - packaging and release readiness
+    - AAEmu 3.0 release-boundary compatibility
+  control_tower_action: PB-000 alone updates global ledgers and releases the build-only lease before binding a fresh runtime successor.

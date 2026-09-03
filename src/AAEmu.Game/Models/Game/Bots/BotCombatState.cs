@@ -37,6 +37,13 @@ namespace AAEmu.Game.Models.Game.Bots
 
         // ---- Target ----
         public Unit Target { get; set; }
+        /// <summary>
+        /// Optional non-lethal floor for an explicitly contained attack. The combat
+        /// task disengages before its next decision once the target reaches this
+        /// percentage of maximum health.
+        /// </summary>
+        public byte? StopAtTargetHpPercent { get; set; }
+        internal Action NonlethalFloorReached { get; set; }
         public bool SentRelaxedAfterCombat { get; set; }
 
         // ---- Rest ----
@@ -80,6 +87,7 @@ namespace AAEmu.Game.Models.Game.Bots
         public string ActiveArchetype { get; set; }
 
         // ---- Stealth search ----
+        public Unit LostTarget { get; set; }
         public Vector3? LastKnownTargetPosition { get; set; }
         public DateTime SearchStartTime { get; set; }
         public bool IsSearching { get; set; }

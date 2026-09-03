@@ -1,0 +1,39 @@
+schema_version: 1
+id: T-069
+title: AAEmu 1.2 single-bot autonomy proof v3
+track: AAEmu12
+status: blocked
+integration: runtime-fail-retained
+outcome: Produce a new immutable runtime receipt proving or falsifying three complete autonomous gameplay iterations by one persistent bot using qualified native progression/resource snapshots, a safe natural recovery boundary, normal self-logout, and restart persistence without per-action operator control.
+depends_on: [T-065, T-068]
+runtime:
+  required: true
+  lease: aaemu12
+  archeage_client_allowed: false
+branch: codex-managed-detached-worktree
+worktree: 'C:\Users\jensh\.codex\worktrees\dd82\PB-W00-control'
+owner_client_thread_id: client-new-thread:546e51bc-826e-42df-aa7e-fa4c1965d2d6
+owner_thread_id: 01a05c73-58af-7d72-94ef-bca2b2dd39e7
+inputs:
+  dispatch_base: a0b826c9864de56e8b0e5c40f45f60a64e743d88
+  tested_module_source: 4287ec53e998ecff2e5eb9670908166957a79662
+  installed_module_tree: 1c6820f2f47ec79a3aab40174e1b448f894f67e4
+  integration_receipt: ops/evidence/aaemu12-progression-observability-integration-v1.yaml
+  retained_t065_v2_receipt: ops/evidence/aaemu12-t065-one-bot-autonomy-v2.yaml
+  runtime_workspace: aaemu12_integration
+  database_workspace: aaemu12_database_public_alpha_v1
+  evidence_workspace: aaemu12_t069_evidence_v3
+write_scope:
+  - ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+  - ops/tasks/T-069/HANDOFF.md
+external_write_scope:
+  - 'D:\Codex-Labs\evidence\T-069\one-bot-autonomy-v3'
+gate: serialized-one-bot-autonomy-proof-v3
+minimum_successful_iterations: 3
+failure_policy: Stop at the first smallest verified functional blocker, retain FAIL or INCOMPLETE evidence, clean up gracefully, and do not activate larger populations.
+validation_boundary: Runtime and evidence only. Managed addbot and inert opportunity staging are allowed at declared boundaries; read-only observation is allowed. Do not issue botstate, target, travel, attack, loot/progression, recovery, or logout gameplay commands. Do not edit source, deployed host files, global ledgers, databases, clients, retained evidence, or AAEmu 3.0.
+handoff: ops/tasks/T-069/HANDOFF.md
+attempt_commit: 1f26c4309868b379ab0fb64cad59ae48a6a75648
+evidence_receipt: ops/evidence/aaemu12-t069-one-bot-autonomy-v3.yaml
+blocker: unsafe-resource-boundary-new-mp-debt-at-completion
+integrated_commit: 2f0cedd6d2400c3f435f2d01415df27b357a13eb

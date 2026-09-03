@@ -3,6 +3,7 @@ using AAEmu.Game.Bots.Body;
 using AAEmu.Game.Bots.Host;
 using AAEmu.Game.Bots.Kernel;
 using AAEmu.Game.Models.Game.Bots;
+using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Skills;
 using AAEmu.Game.Models.Game.Skills.Static;
 using AAEmu.Game.Models.Game.Skills.Templates;
@@ -357,6 +358,41 @@ public class BotCastSkillActionTests
 
         await Assert.That(possible).IsFalse();
         await Assert.That(action.LastGate.Reason).IsEqualTo(GateReason.Cooldown);
+    }
+
+    [Test]
+    public async Task IsPossible_CompiledRotationRequirementRejectsUnlearnedSkill()
+    {
+        var (context, _) = CreateContext();
+        context.Bot.Skills = new CharacterSkills(context.Bot);
+        var action = new BotCastSkillAction(
+            41,
+            TargetSource.CurrentTarget,
+            _ => Skill(41, SkillTargetType.Hostile),
+            requireKnownSkill: true);
+
+        var possible = action.IsPossible(context);
+
+        await Assert.That(possible).IsFalse();
+        await Assert.That(action.LastGate.Reason).IsEqualTo(GateReason.Unlearned);
+    }
+
+    [Test]
+    public async Task IsPossible_CompiledRotationRequirementAllowsLearnedSkill()
+    {
+        var (context, _) = CreateContext();
+        context.Bot.Skills = new CharacterSkills(context.Bot);
+        context.Bot.Skills.Skills[41] = new Skill(Skill(41, SkillTargetType.Hostile));
+        var action = new BotCastSkillAction(
+            41,
+            TargetSource.CurrentTarget,
+            _ => Skill(41, SkillTargetType.Hostile),
+            requireKnownSkill: true);
+
+        var possible = action.IsPossible(context);
+
+        await Assert.That(possible).IsTrue();
+        await Assert.That(action.LastGate.Reason).IsEqualTo(GateReason.Ok);
     }
 
     [Test]

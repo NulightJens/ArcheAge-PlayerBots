@@ -1,0 +1,121 @@
+schema_version: 1
+id: aaemu12-passive-anchor-default-world-zero-v1
+task: T-100
+track: AAEmu12
+recorded_at: '2026-09-01T15:14:01-06:00'
+verdict: PASS
+
+source:
+  binding_commit: 96b8b5004a89a0dec6522753f64d03fd1d732c5b
+  dispatch_base: c0d08ddd3c2db5e542f17ec8b25751814ae344f9
+  accepted_integration_source: 1ab6c2e80a4c7e209149a804cdff6ae209142501
+  candidate_parent: 96b8b5004a89a0dec6522753f64d03fd1d732c5b
+  candidate_commit: exact-hash-reported-to-control-tower-after-commit
+  candidate_tree: exact-hash-reported-to-control-tower-after-commit
+  branch: task/T-100-default-world-anchor
+  writer_worktree: 'C:\Users\jensh\.codex\worktrees\c413\PB-W00-control'
+
+correction:
+  command: SpawnPassiveNpcCommand
+  prior_condition: >-
+    world.Template?.Id ?? 0 was followed by worldId == 0, conflating a
+    missing template with pinned AAEmu's valid default-world template ID 0.
+  corrected_condition: >-
+    world.Template == null fails with a precise error; otherwise
+    world.Template.Id is preserved, including 0, and the existing world,
+    instance, live-transform world ID, zone, finite-transform, resolver
+    identity, and post-snapshot checks remain exact.
+  missing_template_error: 'Active bot anchor 20001 does not have a world template.'
+  bot_transform_target_combat_or_movement_mutation_added: false
+
+focused_tests:
+  framework: TUnit-1.54.0.0
+  runtime: net10.0-x64
+  command: >-
+    AAEmu.UnitTests.exe --treenode-filter
+    '/*/AAEmu.UnitTests.Game.Scripts.Commands/SpawnPassiveNpcCommandTests/*'
+    --minimum-expected-tests 40 --no-progress --no-ansi --output Detailed
+  final:
+    total: 40
+    passed: 40
+    failed: 0
+    skipped: 0
+  coverage:
+    default_world_template_zero_resolves: PASS
+    snapshot_world_zero_zone_instance_finite_detached_and_no_mutation: PASS
+    spawn_position_world_zero_zone_terrain_and_detached_source: PASS
+    null_template_initial_and_post_snapshot: PASS
+    mismatched_instance_and_world_id: PASS
+    zone_zero_and_nonfinite_initial: PASS
+    resolver_identity_concurrent_departure_parent_world_and_transform_swap: PASS
+    post_snapshot_zone_instance_world_id_and_nonfinite_boundaries: PASS
+  superseded_fixture_run:
+    passed: 39
+    failed: 1
+    product_failures: 0
+    cause: >-
+      The new parent-world staleness test invoked pinned host ParentWorld's
+      null-dereferencing setter instead of the established private-field test
+      fixture seam.
+    correction: test-only-backing-reference-mutation
+
+isolated_build:
+  proof_workspace: 'D:\Codex-Labs\t100-aaemu12-source-build-v1'
+  host_base: 62e3eb1d87da01194802ac886cd500134facad28
+  complete_no_incremental:
+    command: >-
+      dotnet build AAEmu.UnitTests\AAEmu.UnitTests.csproj --no-incremental
+      --no-restore
+      -p:PlayerBotsModuleRoot=D:\Codex-Labs\t100-aaemu12-source-build-v1\modules\archeage-playerbots\
+    result: PASS
+    warnings: 72
+    errors: 0
+  final_test_only_recompile_after_fixture_correction:
+    result: PASS
+    warnings: 43
+    errors: 0
+    production_source_changed_after_complete_build: false
+  retained_warning_boundary: >-
+    Pinned package advisory plus existing host/module compiler, analyzer, and
+    TUnit warnings; no warning identifies the T-100 command or tests.
+
+compatibility_patch:
+  path: compatibility/aaemu-1.2-r208022-v3.patch
+  expected_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  observed_sha256: baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606
+  byte_identical: true
+  registered_reference:
+    workspace_id: aaemu12_reference
+    head: 62e3eb1d87da01194802ac886cd500134facad28
+    clean_detached: true
+    strict_apply_check: PASS
+    remained_clean: true
+  isolated_proof_workspace_reverse_check: PASS
+
+integrity:
+  writer_and_proof_module_diff_check: PASS
+  proof_host_diff_check: PASS
+  normalized_blob_matches:
+    command_source: 27d6e77bd0c0720f21a85a949bc0881fbb8fd34e
+    command_tests: 20781ea7f0e6395ca2d272a601b1e848685c6c6f
+  artifacts:
+    game_assembly_sha256: 05e3a0ad6a42c8266537a86bc120b9f4daed3cf41008b461128465605bd41dc1
+    test_assembly_sha256: 22d38dfe3cbebe4c5e888110a2b6fa4aa8ef70ad45272cb7b6d0e5c3e26ce515
+    test_executable_sha256: ff3585bfdb955a2ebb04bbfdd48b6e7f3ab6a9758336be969d426520f6ea6e52
+    final_test_report_sha256: 03586714c85a0dea6da0d9474a664c9afab1e95dbd97c12af4b0060dcd10f9d7
+  raw_logs_committed: false
+
+scope:
+  full_suite_invocations: 0
+  deployment_performed: false
+  runtime_started_stopped_inspected_or_controlled: false
+  registered_integration_host_or_module_written: false
+  registered_reference_written: false
+  external_runtime_evidence_written: false
+  database_or_client_accessed: false
+  global_ledgers_or_runtime_lease_written: false
+  aaemu30_scale_soak_or_packaging_touched: false
+
+retained_boundaries:
+  - T-098 remains an immutable retained runtime FAIL and is not reinterpreted by this source PASS.
+  - Installation, the once-per-wave full suite, and physical default-world fixture placement remain pending for independent integration and a fresh runtime successor.

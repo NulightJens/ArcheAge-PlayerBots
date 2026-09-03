@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Core.Packets.G2C;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.Models;
@@ -21,6 +22,8 @@ namespace AAEmu.Game.Models.Game.Bots
         private MoveTypeFlags _lastFlags;
         private byte _lastActorFlags;
         private DateTime _lastSendTime;
+        private int _regionX;
+        private int _regionY;
 
         private const double MinSendIntervalMs = 50;
 
@@ -37,6 +40,8 @@ namespace AAEmu.Game.Models.Game.Bots
             _lastFlags = MoveTypeFlags.Stopping;
             _lastActorFlags = 0;
             _lastSendTime = _time.GetUtcNow().UtcDateTime;
+            _regionX = RegionCoordinate(_lastPosition.X);
+            _regionY = RegionCoordinate(_lastPosition.Y);
             MoveTypeSink = moveType => _bot.BroadcastPacket(new SCOneUnitMovementPacket(_bot.ObjId, moveType), true);
         }
 
@@ -185,9 +190,28 @@ namespace AAEmu.Game.Models.Game.Bots
         private void BuildAndBroadcast(Vector3 pos, Vector3 velocity, GameStanceType stance,
             MoveTypeAlertness alertness, MoveTypeFlags flags, byte actorFlags, bool isStop)
         {
+            RefreshSpatialRegion(pos);
             var moveType = BuildMoveType(pos, velocity, stance, alertness, flags, actorFlags, isStop);
             MoveTypeSink(moveType);
         }
+
+        private void RefreshSpatialRegion(Vector3 position)
+        {
+            if (_bot.Region == null || !RequiresRegionRefresh(_regionX, _regionY, position))
+                return;
+
+            var previousZone = _bot.Transform.ZoneId;
+            WorldManager.Instance.AddVisibleObject(_bot);
+            _regionX = RegionCoordinate(position.X);
+            _regionY = RegionCoordinate(position.Y);
+            if (_bot.Transform.ZoneId != previousZone)
+                _bot.OnZoneChange(previousZone, _bot.Transform.ZoneId);
+        }
+
+        internal static bool RequiresRegionRefresh(int currentRegionX, int currentRegionY, Vector3 position) =>
+            currentRegionX != RegionCoordinate(position.X) || currentRegionY != RegionCoordinate(position.Y);
+
+        private static int RegionCoordinate(float position) => (int)(position / WorldManager.REGION_SIZE);
 
         internal UnitMoveType BuildMoveType(Vector3 pos, Vector3 velocity, GameStanceType stance,
             MoveTypeAlertness alertness, MoveTypeFlags flags, byte actorFlags, bool isStop)

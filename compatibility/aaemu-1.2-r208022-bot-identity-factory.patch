@@ -1,0 +1,622 @@
+diff --git a/AAEmu.Game/Configurations/AccessLevels.json b/AAEmu.Game/Configurations/AccessLevels.json
+index c288b494e..011ed5d62 100644
+--- a/AAEmu.Game/Configurations/AccessLevels.json
++++ b/AAEmu.Game/Configurations/AccessLevels.json
+@@ -38,6 +38,8 @@
+         // Admin
+         "add_bot": 100,
+         "addbot": 100,
++        "create_bot": 100,
++        "createbot": 100,
+         "addbuff": 100,
+         "addgold": 100,
+         "additem": 100,
+diff --git a/AAEmu.Game/Core/Managers/AccountManager.cs b/AAEmu.Game/Core/Managers/AccountManager.cs
+index ce6e353ee..6bcc8d0e1 100644
+--- a/AAEmu.Game/Core/Managers/AccountManager.cs
++++ b/AAEmu.Game/Core/Managers/AccountManager.cs
+@@ -150,6 +150,48 @@ public class AccountManager(ITickManager tickManager, ITimedRewardsManager timed
+         }
+     }
+ 
++    /// <summary>
++    /// Reads an existing game account without creating a row as a side effect.
++    /// Server-owned identities must be bound to an account provisioned by an
++    /// operator, never to an implicit account created by character creation.
++    /// </summary>
++    public bool TryGetExistingAccountDetails(uint accountId, out AccountDetails accountDetails)
++    {
++        accountDetails = new AccountDetails();
++        if (accountId == 0 || accountId > int.MaxValue)
++            return false;
++
++        try
++        {
++            using var connection = MySQL.CreateConnection();
++            using var command = connection.CreateCommand();
++            command.CommandText = "SELECT * FROM accounts WHERE account_id = @acc_id";
++            command.Parameters.AddWithValue("@acc_id", accountId);
++            command.Prepare();
++            using var reader = command.ExecuteReader();
++            if (!reader.Read())
++                return false;
++
++            accountDetails.AccountId = reader.GetInt32("account_id");
++            accountDetails.AccessLevel = reader.GetInt32("access_level");
++            accountDetails.Labor = reader.GetInt16("labor");
++            accountDetails.Credits = reader.GetInt32("credits");
++            accountDetails.Loyalty = reader.GetInt32("loyalty");
++            accountDetails.LastUpdated = reader.GetDateTime("last_updated");
++            accountDetails.LastLogin = reader.GetDateTime("last_login");
++            accountDetails.LastLaborTick = reader.GetDateTime("last_labor_tick");
++            accountDetails.LastCreditsTick = reader.GetDateTime("last_credits_tick");
++            accountDetails.LastLoyaltyTick = reader.GetDateTime("last_loyalty_tick");
++            return accountDetails.AccountId == (int)accountId;
++        }
++        catch (Exception exception)
++        {
++            Logger.Error(exception, $"Failed to read existing account {accountId}");
++            accountDetails = new AccountDetails();
++            return false;
++        }
++    }
++
+     public bool AddCredits(uint accountId, int creditsAmount)
+     {
+         object accLock;
+diff --git a/AAEmu.Game/Core/Managers/IAccountManager.cs b/AAEmu.Game/Core/Managers/IAccountManager.cs
+index 76f9b497b..32064d1b2 100644
+--- a/AAEmu.Game/Core/Managers/IAccountManager.cs
++++ b/AAEmu.Game/Core/Managers/IAccountManager.cs
+@@ -10,6 +10,7 @@ public interface IAccountManager : IInitializable
+     bool Contains(uint id);
+     int Count();
+     AccountDetails GetAccountDetails(uint accountId);
++    bool TryGetExistingAccountDetails(uint accountId, out AccountDetails accountDetails);
+     bool AddCredits(uint accountId, int creditsAmount);
+     bool RemoveCredits(uint accountId, int credits);
+     bool AddLoyalty(uint accountId, int loyaltyAmount);
+diff --git a/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs b/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
+index b120ffd3f..7f45856db 100644
+--- a/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
++++ b/AAEmu.Game/Core/Managers/UnitManagers/CharacterManager.cs
+@@ -3,11 +3,13 @@ using AAEmu.Commons.IO;
+ using AAEmu.Commons.Models;
+ using AAEmu.Commons.Utils;
+ using AAEmu.Commons.Utils.DB;
++using AAEmu.Game.Bots.Population.Identity;
+ using AAEmu.Game.Core.Managers.Id;
+ using AAEmu.Game.Core.Managers.World;
+ using AAEmu.Game.Core.Network.Connections;
+ using AAEmu.Game.Core.Packets.G2C;
+ using AAEmu.Game.Models;
++using AAEmu.Game.Models.Account;
+ using AAEmu.Game.Models.Game;
+ using AAEmu.Game.Models.Game.Char;
+ using AAEmu.Game.Models.Game.Char.Templates;
+@@ -16,6 +18,7 @@ using AAEmu.Game.Models.Game.Items;
+ using AAEmu.Game.Models.Game.Items.Actions;
+ using AAEmu.Game.Models.Game.Skills;
+ using AAEmu.Game.Models.Game.Units;
++using AAEmu.Game.Models.Game.World.Transform;
+ using AAEmu.Game.Models.StaticValues;
+ using AAEmu.Game.Models.Tasks.Characters;
+ using AAEmu.Game.Utils;
+@@ -38,7 +41,7 @@ public class CharacterManager(
+     IHousingManager housingManager,
+     IFamilyManager familyManager,
+     IMailManager mailManager,
+-    ITaskManager taskManager) : Singleton<CharacterManager>, ICharacterManager
++    ITaskManager taskManager) : Singleton<CharacterManager>, ICharacterManager, IBotIdentityAuthority
+ {
+     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+ 
+@@ -50,6 +53,8 @@ public class CharacterManager(
+     private readonly Dictionary<uint, ActabilityCategoriesTemplate> _actabilitiesCategories = [];
+     private readonly Dictionary<int, ExpertLimit> _expertLimits = [];
+     private readonly Dictionary<int, ExpandExpertLimit> _expandExpertLimits = [];
++    private readonly object _serverOwnedCreationGate = new();
++    private readonly Dictionary<uint, uint> _rollbackEligibleServerOwnedBots = [];
+ 
+     public CharacterTemplate GetTemplate(Race race, Gender gender)
+     {
+@@ -609,6 +614,469 @@ public class CharacterManager(
+         }
+     }
+ 
++    public byte MaxPlayerLevel => ExperienceManager.Instance.MaxPlayerLevel;
++
++    public bool CharacterExists(uint characterId)
++    {
++        if (characterId == 0)
++            return false;
++
++        try
++        {
++            using var connection = MySQL.CreateConnection();
++            using var command = connection.CreateCommand();
++            command.CommandText = "SELECT 1 FROM characters WHERE id = @id AND deleted = 0 LIMIT 1";
++            command.Parameters.AddWithValue("@id", characterId);
++            command.Prepare();
++            return command.ExecuteScalar() != null;
++        }
++        catch (Exception exception)
++        {
++            Logger.Error(exception, $"Unable to verify bot identity {characterId}");
++            return false;
++        }
++    }
++
++    /// <summary>
++    /// Creates a native persistent character without a GameConnection, character
++    /// selection slot, or client packet. All validation and allocation remain
++    /// owned by the server; PlayerBots supplies only the bounded creation request.
++    /// </summary>
++    public BotIdentityAuthorityResult CreateServerOwnedBot(BotIdentityAuthorityRequest request)
++    {
++        if (request == null || request.ServerOwnedAccountId == 0 ||
++            request.ServerOwnedAccountId > int.MaxValue)
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.AccountUnavailable,
++                "server_owned_account_invalid");
++        }
++        if (string.IsNullOrWhiteSpace(request.Name))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.InvalidName,
++                "name_missing");
++        }
++        if (accountManager.Contains(request.ServerOwnedAccountId))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.AccountOnline,
++                "server_owned_account_online");
++        }
++        if (!accountManager.TryGetExistingAccountDetails(request.ServerOwnedAccountId, out var accountDetails))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.AccountUnavailable,
++                "server_owned_account_missing");
++        }
++        if (request.Level == 0 || MaxPlayerLevel == 0 || request.Level > MaxPlayerLevel)
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.Failed,
++                "level_out_of_range");
++        }
++        if (!Enum.IsDefined(request.Race) || request.Race == Race.None ||
++            !Enum.IsDefined(request.Gender))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.TemplateUnavailable,
++                "race_or_gender_unsupported");
++        }
++        if (!IsPlayableAbility(request.Ability1) ||
++            !IsOptionalPlayableAbility(request.Ability2) ||
++            !IsOptionalPlayableAbility(request.Ability3) ||
++            new[] { request.Ability1, request.Ability2, request.Ability3 }
++                .Where(IsPlayableAbility)
++                .Distinct()
++                .Count() != new[] { request.Ability1, request.Ability2, request.Ability3 }
++                .Count(IsPlayableAbility))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.TemplateUnavailable,
++                "ability_plan_invalid");
++        }
++        if (!request.Placement.IsValid || !TryResolveBotPlacement(request.Placement, out var placement))
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.PlacementUnavailable,
++                "placement_unavailable");
++        }
++
++        var templateKey = (byte)(16 * (byte)request.Gender + (byte)request.Race);
++        if (!_templates.TryGetValue(templateKey, out var template) ||
++            !_abilityItems.TryGetValue((byte)request.Ability1, out var startingItems) ||
++            startingItems?.Items == null)
++        {
++            return BotIdentityAuthorityResult.Failure(
++                BotIdentityAuthorityStatus.TemplateUnavailable,
++                "character_template_unavailable");
++        }
++
++        lock (_serverOwnedCreationGate)
++        {
++            if (accountManager.Contains(request.ServerOwnedAccountId))
++            {
++                return BotIdentityAuthorityResult.Failure(
++                    BotIdentityAuthorityStatus.AccountOnline,
++                    "server_owned_account_online");
++            }
++
++            var name = request.Name.NormalizeName();
++            var nameValidation = nameManager.ValidateCharacterName(name);
++            if (nameValidation != CharacterCreateError.Ok)
++            {
++                var status = nameValidation is CharacterCreateError.NameAlreadyExists or CharacterCreateError.Failed
++                    ? BotIdentityAuthorityStatus.NameUnavailable
++                    : BotIdentityAuthorityStatus.InvalidName;
++                return BotIdentityAuthorityResult.Failure(status, $"name_{nameValidation.ToString().ToLowerInvariant()}");
++            }
++
++            uint characterId;
++            try
++            {
++                characterId = characterIdManager.GetNextId();
++            }
++            catch (Exception exception)
++            {
++                Logger.Error(exception, "Unable to allocate a server-owned bot character id");
++                return BotIdentityAuthorityResult.Failure(
++                    BotIdentityAuthorityStatus.IdUnavailable,
++                    "character_id_unavailable");
++            }
++
++            Character character = null;
++            var nameRegistered = false;
++            try
++            {
++                nameManager.AddCharacter(characterId, name, request.ServerOwnedAccountId);
++                nameRegistered = true;
++                character = InitializeServerOwnedBot(
++                    characterId,
++                    request,
++                    name,
++                    accountDetails,
++                    template,
++                    startingItems,
++                    placement);
++
++                if (!character.SaveDirectlyToDatabase())
++                {
++                    RollbackUncommittedBot(characterId, nameRegistered);
++                    return BotIdentityAuthorityResult.Failure(
++                        BotIdentityAuthorityStatus.PersistenceFailed,
++                        "character_persistence_failed");
++                }
++
++                _rollbackEligibleServerOwnedBots[characterId] = request.ServerOwnedAccountId;
++                return BotIdentityAuthorityResult.Created(character);
++            }
++            catch (Exception exception)
++            {
++                Logger.Error(exception,
++                    $"Unable to initialize server-owned bot {name} ({characterId})");
++                RollbackUncommittedBot(characterId, nameRegistered);
++                return BotIdentityAuthorityResult.Failure(
++                    BotIdentityAuthorityStatus.Failed,
++                    $"character_initialization_failed_{exception.GetType().Name}");
++            }
++        }
++    }
++
++    /// <summary>
++    /// Compensates a creation that was persisted but never returned as admitted.
++    /// The retained row is soft-tombstoned for auditability; no public deletion
++    /// command is exposed and an arbitrary character cannot enter this path.
++    /// </summary>
++    public bool RollbackServerOwnedBot(uint serverOwnedAccountId, uint characterId)
++    {
++        if (serverOwnedAccountId == 0 || characterId == 0)
++            return false;
++
++        lock (_serverOwnedCreationGate)
++        {
++            if (!_rollbackEligibleServerOwnedBots.TryGetValue(characterId, out var expectedAccountId) ||
++                expectedAccountId != serverOwnedAccountId)
++            {
++                return false;
++            }
++
++            try
++            {
++                using var connection = MySQL.CreateConnection();
++                using var command = connection.CreateCommand();
++                command.CommandText =
++                    "UPDATE characters SET deleted = 1, delete_request_time = @deleted_at, " +
++                    "delete_time = @delete_time, name = @tombstone_name " +
++                    "WHERE id = @id AND account_id = @account_id AND deleted = 0";
++                command.Parameters.AddWithValue("@deleted_at", DateTime.UtcNow);
++                command.Parameters.AddWithValue("@delete_time", DateTime.MinValue);
++                command.Parameters.AddWithValue("@tombstone_name", $"!bot_rollback_{characterId}");
++                command.Parameters.AddWithValue("@id", characterId);
++                command.Parameters.AddWithValue("@account_id", serverOwnedAccountId);
++                command.Prepare();
++                if (command.ExecuteNonQuery() != 1)
++                    return false;
++
++                _rollbackEligibleServerOwnedBots.Remove(characterId);
++                nameManager.RemoveCharacterId(characterId);
++                Logger.Warn(
++                    $"Soft-tombstoned unadmitted server-owned bot {characterId} on account {serverOwnedAccountId}");
++                return true;
++            }
++            catch (Exception exception)
++            {
++                Logger.Error(exception,
++                    $"Unable to compensate server-owned bot creation {characterId}");
++                return false;
++            }
++        }
++    }
++
++    public void CompleteServerOwnedBotCreation(uint serverOwnedAccountId, uint characterId)
++    {
++        if (serverOwnedAccountId == 0 || characterId == 0)
++            return;
++
++        lock (_serverOwnedCreationGate)
++        {
++            if (_rollbackEligibleServerOwnedBots.TryGetValue(characterId, out var expectedAccountId) &&
++                expectedAccountId == serverOwnedAccountId)
++            {
++                _rollbackEligibleServerOwnedBots.Remove(characterId);
++            }
++        }
++    }
++
++    private bool TryResolveBotPlacement(
++        BotIdentityPlacement requested,
++        out WorldSpawnPosition placement)
++    {
++        placement = null;
++        if (requested.Mode == BotIdentityPlacementMode.RaceSpawn)
++            return true;
++        if (requested.Mode != BotIdentityPlacementMode.Here ||
++            requested.InstanceId != WorldManager.DefaultInstanceId)
++        {
++            return false;
++        }
++
++        var world = worldManager.GetWorld(requested.InstanceId);
++        var zoneKeys = worldManager.GetZoneKeysByWorldId(requested.WorldId);
++        if (world?.Template?.Id != requested.WorldId ||
++            zoneKeys == null || !zoneKeys.Contains(requested.ZoneId))
++        {
++            return false;
++        }
++
++        placement = new WorldSpawnPosition
++        {
++            WorldId = requested.WorldId,
++            ZoneId = requested.ZoneId,
++            X = requested.X,
++            Y = requested.Y,
++            Z = requested.Z,
++            Roll = requested.Roll,
++            Pitch = requested.Pitch,
++            Yaw = requested.Yaw
++        };
++        return true;
++    }
++
++    private Character InitializeServerOwnedBot(
++        uint characterId,
++        BotIdentityAuthorityRequest request,
++        string name,
++        AccountDetails accountDetails,
++        CharacterTemplate template,
++        AbilityItems startingItems,
++        WorldSpawnPosition placement)
++    {
++        var modelParams = CreateServerOwnedBotModel(template, out var hairItemId);
++        var character = new Character(modelParams)
++        {
++            Id = characterId,
++            TemplateId = characterId,
++            ModelId = template.ModelId,
++            AccountId = request.ServerOwnedAccountId,
++            Name = name,
++            Race = request.Race,
++            Gender = request.Gender,
++            Level = request.Level,
++            Faction = factionManager.GetFaction(template.FactionId),
++            FactionName = "",
++            AccessLevel = AppConfiguration.Instance.Account.AccessLevelDefault,
++            NumInventorySlots = template.NumInventorySlot,
++            NumBankSlots = template.NumBankSlot,
++            Inventory = null,
++            Created = DateTime.UtcNow,
++            Updated = DateTime.UtcNow,
++            Ability1 = request.Ability1,
++            Ability2 = request.Ability2,
++            Ability3 = request.Ability3,
++            ReturnDistrictId = template.ReturnDistrictId,
++            ResurrectionDistrictId = template.ResurrectionDistrictId,
++            Slots = new ActionSlot[Character.MaxActionSlots]
++        };
++        character.Inventory = new Inventory(character);
++        character.InitializeLaborCache(accountDetails.Labor, accountDetails.LastUpdated);
++
++        var spawn = placement ?? template.SpawnPosition;
++        character.ServerId = spawn.WorldId;
++        character.Transform.ApplyWorldSpawnPosition(spawn);
++        for (var index = 0; index < character.Slots.Length; index++)
++            character.Slots[index] = new ActionSlot();
++
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Headgear, EquipmentItemSlot.Head, startingItems.Items.HeadgearGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Necklace, EquipmentItemSlot.Neck, startingItems.Items.NecklaceGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Shirt, EquipmentItemSlot.Chest, startingItems.Items.ShirtGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Belt, EquipmentItemSlot.Waist, startingItems.Items.BeltGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Pants, EquipmentItemSlot.Legs, startingItems.Items.PantsGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Gloves, EquipmentItemSlot.Hands, startingItems.Items.GlovesGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Shoes, EquipmentItemSlot.Feet, startingItems.Items.ShoesGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Bracelet, EquipmentItemSlot.Arms, startingItems.Items.BraceletGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Back, EquipmentItemSlot.Back, startingItems.Items.BackGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Undershirts, EquipmentItemSlot.Undershirt, startingItems.Items.UndershirtsGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Underpants, EquipmentItemSlot.Underpants, startingItems.Items.UnderpantsGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Mainhand, EquipmentItemSlot.Mainhand, startingItems.Items.MainhandGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Offhand, EquipmentItemSlot.Offhand, startingItems.Items.OffhandGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Ranged, EquipmentItemSlot.Ranged, startingItems.Items.RangedGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Musical, EquipmentItemSlot.Musical, startingItems.Items.MusicalGrade);
++        SetEquipItemTemplate(character.Inventory, startingItems.Items.Cosplay, EquipmentItemSlot.Cosplay, startingItems.Items.CosplayGrade);
++        for (var index = 0; index < Math.Min(7, template.Items.Length); index++)
++        {
++            var bodyItemId = index == 1 && hairItemId != 0
++                ? hairItemId
++                : template.Items[index];
++            SetEquipItemTemplate(
++                character.Inventory,
++                bodyItemId,
++                (EquipmentItemSlot)(index + 19),
++                0);
++        }
++
++        byte slot = 10;
++        AddCreationSupplies(character, startingItems, ref slot);
++        if (_abilityItems.TryGetValue((byte)AbilityType.General, out var generalItems) && generalItems != null)
++            AddCreationSupplies(character, generalItems, ref slot);
++
++        character.Abilities = new CharacterAbilities(character);
++        character.Abilities.SetAbility(character.Ability1, 0);
++        if (IsPlayableAbility(character.Ability2))
++            character.Abilities.SetAbility(character.Ability2, 1);
++        if (IsPlayableAbility(character.Ability3))
++            character.Abilities.SetAbility(character.Ability3, 2);
++        character.InitializeCreationProgression(
++            request.Level,
++            ExperienceManager.Instance.GetExpForLevel(request.Level));
++
++        character.Actability = new CharacterActability(character);
++        foreach (var (id, actabilityTemplate) in _actabilities)
++            character.Actability.Actabilities.Add(id, new Actability(actabilityTemplate));
++
++        character.Skills = new CharacterSkills(character);
++        foreach (var skill in skillManager.GetDefaultSkills())
++        {
++            if (skill.AddToSlot)
++                character.SetAction(skill.Slot, ActionSlotType.Spell, skill.Template.Id);
++        }
++        slot = 1;
++        while (slot < character.Slots.Length && character.Slots[slot].Type != ActionSlotType.None)
++            slot++;
++        foreach (var skill in skillManager.GetStartAbilitySkills(character.Ability1))
++        {
++            character.Skills.AddSkill(skill, 1, false);
++            if (slot < character.Slots.Length)
++                character.SetAction(slot++, ActionSlotType.Spell, skill.Id);
++        }
++
++        character.Appellations = new CharacterAppellations(character);
++        character.Quests = new CharacterQuests(character);
++        character.Mails = new CharacterMails(character);
++        character.Portals = new CharacterPortals(character);
++        character.Friends = new CharacterFriends(character);
++        character.Hp = character.MaxHp;
++        character.Mp = character.MaxMp;
++        character.RestoreSavedHpMp();
++        return character;
++    }
++
++    private static UnitCustomModelParams CreateServerOwnedBotModel(
++        CharacterTemplate template,
++        out uint hairItemId)
++    {
++        hairItemId = 0;
++        using var connection = SQLite.CreateConnection();
++        using var command = connection.CreateCommand();
++        command.CommandText =
++            "SELECT * FROM total_character_customs " +
++            "WHERE model_id = @model_id " +
++            "AND lower(CAST(npcOnly AS TEXT)) IN ('0', 'f', 'false') ORDER BY id LIMIT 1";
++        command.Parameters.AddWithValue("@model_id", template.ModelId);
++        command.Prepare();
++        using var reader = new SQLiteWrapperReader(command.ExecuteReader());
++        if (!reader.Read())
++        {
++            return new UnitCustomModelParams(UnitCustomModelType.Skin)
++                .SetModelId(template.ModelId);
++        }
++
++        hairItemId = reader.GetUInt32("hair_id");
++        var model = new UnitCustomModelParams(UnitCustomModelType.Face)
++            .SetModelId(template.ModelId)
++            .SetHairColorId(reader.GetUInt32("hair_color_id"))
++            .SetSkinColorId(reader.GetUInt32("skin_color_id"));
++        var face = model.Face;
++        face.MovableDecalAssetId = reader.GetUInt32("face_movable_decal_asset_id");
++        face.MovableDecalWeight = reader.GetFloat("face_movable_decal_weight");
++        face.MovableDecalScale = reader.GetFloat("face_movable_decal_scale");
++        face.MovableDecalRotate = reader.GetFloat("face_movable_decal_rotate");
++        face.MovableDecalMoveX = reader.GetInt16("face_movable_decal_move_x");
++        face.MovableDecalMoveY = reader.GetInt16("face_movable_decal_move_y");
++        face.SetFixedDecalAsset(0, reader.GetUInt32("face_fixed_decal_asset_0_id"),
++            reader.GetFloat("face_fixed_decal_asset_0_weight"));
++        face.SetFixedDecalAsset(1, reader.GetUInt32("face_fixed_decal_asset_1_id"),
++            reader.GetFloat("face_fixed_decal_asset_1_weight"));
++        face.SetFixedDecalAsset(2, reader.GetUInt32("face_fixed_decal_asset_2_id"),
++            reader.GetFloat("face_fixed_decal_asset_2_weight"));
++        face.SetFixedDecalAsset(3, reader.GetUInt32("face_fixed_decal_asset_3_id"),
++            reader.GetFloat("face_fixed_decal_asset_3_weight"));
++        face.DiffuseMapId = reader.GetUInt32("face_diffuse_map_id");
++        face.NormalMapId = reader.GetUInt32("face_normal_map_id");
++        face.EyelashMapId = reader.GetUInt32("face_eyelash_map_id");
++        face.NormalMapWeight = reader.GetFloat("face_normal_map_weight");
++        face.LipColor = reader.GetUInt32("lip_color");
++        face.LeftPupilColor = reader.GetUInt32("left_pupil_color");
++        face.RightPupilColor = reader.GetUInt32("right_pupil_color");
++        face.EyebrowColor = reader.GetUInt32("eyebrow_color");
++        face.DecoColor = reader.GetUInt32("deco_color");
++        if (reader.GetValue("modifier") is byte[] modifier && modifier.Length == 128)
++            face.Modifier = modifier;
++        return model;
++    }
++
++    private static bool IsPlayableAbility(AbilityType ability) =>
++        ability > AbilityType.General && ability < AbilityType.None;
++
++    private static bool IsOptionalPlayableAbility(AbilityType ability) =>
++        ability == AbilityType.None || IsPlayableAbility(ability);
++
++    private static void AddCreationSupplies(Character character, AbilityItems items, ref byte slot)
++    {
++        foreach (var item in items.Supplies)
++        {
++            character.Inventory.Bag.AcquireDefaultItem(ItemTaskType.Invalid, item.Id, item.Amount, item.Grade);
++            if (slot < character.Slots.Length)
++                character.SetAction(slot++, ActionSlotType.ItemType, item.Id);
++        }
++    }
++
++    private void RollbackUncommittedBot(uint characterId, bool nameRegistered)
++    {
++        characterIdManager.ReleaseId(characterId);
++        if (nameRegistered)
++            nameManager.RemoveCharacterId(characterId);
++    }
++
+     /// <summary>
+     /// Removed all items and assets this character currently owns
+     /// </summary>
+diff --git a/AAEmu.Game/Models/Game/Char/Character.cs b/AAEmu.Game/Models/Game/Char/Character.cs
+index b031afadc..364a7cad0 100644
+--- a/AAEmu.Game/Models/Game/Char/Character.cs
++++ b/AAEmu.Game/Models/Game/Char/Character.cs
+@@ -1469,6 +1469,25 @@ public partial class Character : Unit, ICharacter
+         QuestManager.Instance.DoOnLevelUpEvents(this);
+     }
+ 
++    /// <summary>
++    /// Initializes a newly-created character at an exact level without firing
++    /// gameplay packets, quest hooks, experience-rate multipliers, or level-up
++    /// side effects. This is only used before the character is first persisted.
++    /// </summary>
++    internal void InitializeCreationProgression(byte level, int experience)
++    {
++        Level = level;
++        Experience = experience;
++
++        if (Abilities == null)
++            return;
++
++        foreach (var ability in Abilities.Values)
++            ability.Exp = 0;
++        foreach (var abilityType in Abilities.GetActiveAbilities())
++            Abilities.Abilities[abilityType].Exp = experience;
++    }
++
+     private void ValidateAndFixExpAndLevel()
+     {
+         // Check if player has too little exp to be at their current level, and give them enough to maintain it

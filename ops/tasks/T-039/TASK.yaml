@@ -1,0 +1,28 @@
+schema_version: 1
+id: T-039
+title: Deterministic life-state FSM and profiles
+track: AAEmu12
+status: ready
+integration: pending
+outcome: Provide a pure deterministic bot life-state machine and data-driven behavior profiles without spawning or runtime integration.
+depends_on: [PB-W00]
+branch: assigned-by-codex
+worktree: assigned-by-codex
+owner_client_thread_id: client-new-thread:39823200-fca2-4fea-85d1-18d38831d4ee
+
+inputs:
+  module_source: current-worktree
+  host_reference: aaemu12_reference
+  validation_host: aaemu12_integration
+  client_fixture: aaemu12_client
+
+write_scope:
+  - src/AAEmu.Game/Bots/Life/**
+  - tests/AAEmu.UnitTests/Bots/Life/**
+
+runtime:
+  required: false
+  lease: null
+gates: [focused-aaemu12-tests]
+validation_boundary: Pure source work needs no runtime; final integration proof must use the current aaemu12_integration receipt.
+handoff: ops/tasks/T-039/HANDOFF.md
