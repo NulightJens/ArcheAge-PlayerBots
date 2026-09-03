@@ -54,6 +54,22 @@ Each character is loaded independently. A character that is already online or ca
 
 Combat rotations use live skill-template ranges. `AttackRange` and `BowRange` are fallback values; changing them does not override the client data for a known skill.
 
+## Quest autonomy
+
+Quest intake and completion ship disabled. Enable either independently:
+
+```json
+{
+  "QuestIntakeEnabled": true,
+  "QuestIntakeScanRadius": 60,
+  "QuestIntakeInteractionRadius": 6,
+  "QuestIntakeRetryBackoffMs": 30000,
+  "QuestCompletionEnabled": true
+}
+```
+
+Intake finds eligible NPC and doodad starters. Completion runs supported objectives and reports through AAEmu's normal quest APIs. See [Quest autonomy](QUEST-AUTONOMY.md) for behavior and limits.
+
 ## Activity and performance
 
 | Setting | Default | Purpose |

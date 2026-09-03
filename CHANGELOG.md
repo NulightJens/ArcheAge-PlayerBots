@@ -4,6 +4,27 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ## Unreleased
 
+## 0.2.0-alpha.6 - 2026-09-03
+
+### Added
+
+- Persistent AAEmu 1.2 bot creation under a configured server-owned account.
+- Learned-skill combat decisions with native range, cooldown, and resource checks.
+- Opt-in NPC/doodad quest intake and supported monster-hunt, corpse-gather, and report lifecycles.
+- Quest-marker and transfer-road routing with bounded local movement and recovery.
+- A static, color-coded decision monitor for quest, combat, navigation, and runtime state.
+
+### Changed
+
+- Nearby quest work is cleared before regional goals, while valid current work remains sticky.
+- Quest combat waits for native progress and respawns instead of leaving an objective early.
+- AAEmu 1.2 integrations are consolidated in `aaemu-1.2-r208022-v4.patch`.
+
+### Validation
+
+- A fresh Nuian completed seven native starter quests in a client-witnessed AAEmu 1.2 run, including main-story and signpost objectives.
+- The exact public candidate still requires its final client-witnessed restart repeat before release promotion.
+
 ### Human class and gear controls
 
 - Restored `/setclass [botId] <archetype> [level]` from the T-009 development path. It replaces all three skill trees, rebuilds active/passive skills, saves the final archetype, refreshes compatible gear, and normally respawns the bot so clients receive a fresh sheet.

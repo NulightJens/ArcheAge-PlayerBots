@@ -6,7 +6,7 @@
     "range": "melee"
   },
   "skills": {
-    "tripleSlash": 18131,
+    "tripleSlash": 18132,
     "shieldSlam": 10399,
     "thwart": 16486,
     "charge": 11918,
@@ -27,7 +27,16 @@
     "liberation": 11380,
     "invincibility": 10372
   },
-  "default": [],
+  "default": [
+    {
+      "action": "cast",
+      "skill": "tripleSlash",
+      "rel": 11.0,
+      "weight": 1.0,
+      "as": null,
+      "castWhileControlled": false
+    }
+  ],
   "rules": [
     {
       "when": {
@@ -250,24 +259,6 @@
           "rel": 27.0,
           "weight": 1.0,
           "as": "enemyCount:thwart",
-          "castWhileControlled": false
-        }
-      ]
-    },
-    {
-      "when": {
-        "kind": "enemyCount",
-        "children": [],
-        "min": 3,
-        "radius": 2
-      },
-      "then": [
-        {
-          "action": "castAoe",
-          "skill": "tripleSlash",
-          "rel": 27.0,
-          "weight": 1.0,
-          "as": "enemyCount:tripleSlash",
           "castWhileControlled": false
         }
       ]

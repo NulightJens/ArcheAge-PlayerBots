@@ -153,7 +153,8 @@ public sealed class BotRotationCompiler
                         _ => TargetSource.CurrentTarget
                     },
                     _templateResolver, cast: _cast, castWhileControlled: row.CastWhileControlled,
-                    onSuccess: BuildRowSuccessHandler(definition, row, skillId.Value, onSuccess), guard: guard),
+                    onSuccess: BuildRowSuccessHandler(definition, row, skillId.Value, onSuccess), guard: guard,
+                    requireKnownSkill: true),
                     row.IgnoreGlobalDelay),
             _ => null
         };
@@ -173,7 +174,8 @@ public sealed class BotRotationCompiler
         var cast = new RotationGlobalDelayAction(new RotationCastAction(skillId, name, TargetSource.CurrentTarget,
             _templateResolver, [new BotNextAction(reach.Name, BotRelevance.Move)], _cast,
             castWhileControlled: row.CastWhileControlled,
-            onSuccess: BuildRowSuccessHandler(definition, row, skillId, onSuccess), guard: guard),
+            onSuccess: BuildRowSuccessHandler(definition, row, skillId, onSuccess), guard: guard,
+            requireKnownSkill: true),
             row.IgnoreGlobalDelay);
         return cast;
     }

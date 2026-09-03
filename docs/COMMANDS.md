@@ -24,12 +24,15 @@ Stop the bot and save it through normal logout:
 | --- | --- |
 | `/bot [topic]` | Show the in-game PlayerBots guide |
 | `/addbot <characterId>` | Log in an existing offline character as a bot |
+| `/createbot <name> <race> <gender> <archetype> <level> [here\|race-spawn]` | Create and admit a persistent AAEmu 1.2 bot under the configured account |
 | `/removebot <characterId>` | Save and log out an active bot |
 | `/botstate <id>` | Show the bot's current state |
 | `/botstate <id> <state> [killGoal]` | Force a state and optionally stop grinding after a number of kills |
 | `/botstate <id> free` | Return the bot to automatic state control |
 
 Available states are `idle`, `grind`, `questing`, `roaming`, `following`, and `resting`.
+
+`/createbot` requires `AAEMU_PLAYERBOTS_ACCOUNT_ID`. See [Bot identities](BOT-IDENTITIES.md).
 
 ## Party control
 

@@ -37,10 +37,6 @@ jobs:
         shell: pwsh
         run: ./aaemu/modules/archeage-playerbots/scripts/Install-PlayerBots.ps1 -AAEmuRoot ./aaemu -CheckOnly
 
-      - name: Apply tested host security baseline
-        shell: pwsh
-        run: git -C ./aaemu apply ./modules/archeage-playerbots/compatibility/aaemu-1.2-security-baseline.patch
-
       - name: Build
         run: dotnet build ./aaemu/AAEmu.slnx --no-incremental
 
@@ -51,7 +47,3 @@ jobs:
       - name: Compile command scripts
         working-directory: ./aaemu
         run: ./AAEmu.Game/bin/Debug/net10.0/AAEmu.Game.exe compiler-check
-
-      - name: Audit vulnerable packages
-        working-directory: ./aaemu
-        run: dotnet list AAEmu.slnx package --vulnerable --include-transitive

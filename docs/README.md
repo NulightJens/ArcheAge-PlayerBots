@@ -6,6 +6,10 @@ Welcome to the ArcheAge PlayerBots guide. If you are new to the module, start wi
 
 Supported AAEmu versions, clean installation, database setup, updates, and the experimental ArcheAge 3.0 track.
 
+## [Shareable preview](PREVIEW.md)
+
+Create or install a checked source archive.
+
 ## [Configuration](CONFIGURATION.md)
 
 Startup bots, behavior settings, performance controls, archetypes, and rotations.
@@ -13,6 +17,13 @@ Startup bots, behavior settings, performance controls, archetypes, and rotations
 ## [Commands](COMMANDS.md)
 
 Everyday party controls, GM commands, diagnostics, and local administration.
+
+## Feature guides
+
+- [Bot identities](BOT-IDENTITIES.md)
+- [Quest autonomy](QUEST-AUTONOMY.md)
+- [World navigation](WORLD-NAVIGATION.md)
+- [Live bot monitor](../scripts/autonomy/README.md)
 
 ## [Troubleshooting](TROUBLESHOOTING.md)
 

@@ -217,6 +217,17 @@ public class BotOpsCommandTests
         await Assert.That(bot.Runtime.RotationOverrideId).IsEqualTo("test.rotation");
     }
 
+    [Test]
+    public async Task BotRotation_ShowWithoutAttachment_ReportsLearnedSkillDecisionFallback()
+    {
+        AddBot(1);
+
+        var output = Execute(new BotRotationCommand(), "1", "show");
+
+        await Assert.That(output.Messages.Single())
+            .Contains("rotation: (none, learned-skill decision fallback)");
+    }
+
     private BotSim.SimBot AddBot(uint id)
     {
         var bot = BotTestFixture.MakeBot(id, Vector3.Zero);

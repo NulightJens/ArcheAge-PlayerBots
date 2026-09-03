@@ -7,7 +7,7 @@ This runbook promotes the `3.0.4.2 r336598` track by evidence, not by configurat
 | Gate | State | Acceptance evidence |
 |---|---|---|
 | Asset identity | Passed | Client version, `game_pak`, both SQLite databases, SHA-256 provenance, SQLite integrity |
-| Host adapter | Passed | Active v3 patch, zero-error builds, clean 1.2 installer suite, 157/157 3.0 unit tests |
+| Host adapter | Passed | Active alpha-v4 patch and zero-error builds on both pinned hosts |
 | Server startup | Passed | Login/Game registration, module schema, unique ports, loopback status and `@system` metrics |
 | Client login/serializer | Passed once | Native account and character creation, character select, and world entry completed without serializer or DLL error |
 | One-bot lifecycle | Passed once | Rendered spawn/follow/combat, clean server restart, normal logout/re-add, zero overlap/error |
@@ -16,6 +16,8 @@ This runbook promotes the `3.0.4.2 r336598` track by evidence, not by configurat
 | Scale and recovery | Open | 0/10/50/100 cohorts, approved 3.0 budget, normal logout, 60-second recovery, clean shutdown |
 
 Server-start validation is deliberately below runtime support.
+
+Alpha.6 quest intake, completion, destination indexing, and transfer-road routing remain disabled on 3.0 until equivalent host APIs are available.
 
 ## Isolated startup
 

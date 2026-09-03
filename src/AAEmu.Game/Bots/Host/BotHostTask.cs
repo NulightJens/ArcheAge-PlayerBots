@@ -64,7 +64,8 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
 
     private void ExecuteTickCore(long start)
     {
-        var now = _host.TimeProvider.GetUtcNow().UtcDateTime;
+        var nowOffset = _host.TimeProvider.GetUtcNow();
+        var now = nowOffset.UtcDateTime;
         var config = BotConfig.Instance;
         var configuredPercent = (int)Math.Clamp(config.ActivityPercent, 0, 100);
         var effectivePercent = BotActivityGovernor.EffectiveActivePercent(
@@ -90,6 +91,7 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
             }
 
             BotCombatTask brain;
+            var questActivityClaimed = false;
             try
             {
                 lock (runtime.SyncRoot)
@@ -99,6 +101,10 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                         _retiredRuntimes.Add(runtime);
                         continue;
                     }
+
+                    questActivityClaimed = runtime.QuestLifecycleController.Step(runtime, config, nowOffset);
+                    if (!questActivityClaimed)
+                        questActivityClaimed = runtime.QuestIntakeController.Step(runtime, config, nowOffset);
 
                     runtime.Social.GuardLeader();
                     StepMover(runtime, now, config);
@@ -224,9 +230,12 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                 : BotEngineKind.NonCombat;
             if (engineKind == BotEngineKind.Combat)
             {
-                var archetype = BotArchetypeManager.Instance.GetState(runtime.Bot)?.ArchetypeName ??
-                                 runtime.CombatState.ActiveArchetype;
-                BotRotationManager.Instance.EnsureAttached(runtime, archetype);
+                // A planned low-level class has only its native learned kit and
+                // uses BasicCombat's live decision path. Static rotations are
+                // reserved for finalized three-tree classes.
+                var archetype = BotArchetypeManager.Instance.GetState(runtime.Bot)?.ArchetypeName;
+                if (!string.IsNullOrWhiteSpace(archetype))
+                    BotRotationManager.Instance.EnsureAttached(runtime, archetype);
             }
             var engine = runtime.Engines[(int)engineKind];
             if (!active)

@@ -1,7 +1,7 @@
 {
   "name": "ArcheAge PlayerBots",
   "id": "archeage-playerbots",
-  "version": "0.2.0-alpha.2",
+  "version": "0.2.0-alpha.6",
   "license": "GPL-3.0-or-later",
   "repository": "https://github.com/NulightJens/ArcheAge-PlayerBots",
   "modulePath": "modules/archeage-playerbots",
@@ -18,8 +18,8 @@
       "repository": "https://github.com/AAEmu/AAEmu",
       "testedBaseCommit": "62e3eb1d87da01194802ac886cd500134facad28",
       "status": "supported",
-      "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v2.patch",
-      "compatibilityPatchSha256": "edabf16963d53d58ff6cb1244611b09ed3589d94b1e4825d60494a1bd67b4802"
+      "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v4.patch",
+      "compatibilityPatchSha256": "3d6cce1161aae0468f1864145974d2d24f18de11659a92ad62d1a4548a0b484e"
     },
     {
       "id": "AAEmu30",
@@ -27,15 +27,13 @@
       "repository": "https://github.com/NL0bP/AAEmu",
       "testedBaseCommit": "8c1c943bb2309eefffb9da2aa99a408d0acbb095",
       "status": "server-start-validated",
-      "compatibilityPatch": "compatibility/aaemu-3.0.4.2-r336598-alpha-v3.patch",
-      "compatibilityPatchSha256": "7b3e9d8872cf708522631a11bb051bd9976c31d4f934eee0c9dfc1e90eec633c"
+      "compatibilityPatch": "compatibility/aaemu-3.0.4.2-r336598-alpha-v4.patch",
+      "compatibilityPatchSha256": "e6ac529d0aa7525d0eba342512cc8b259da03f2f0f59543f692b212d9586b671"
     }
   ],
   "install": {
-    "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v2.patch",
-    "compatibilityPatchSha256": "edabf16963d53d58ff6cb1244611b09ed3589d94b1e4825d60494a1bd67b4802",
-    "optionalHostSecurityPatch": "compatibility/aaemu-1.2-security-baseline.patch",
-    "optionalHostSecurityPatchSha256": "64d0fb4ba543a86670a4e8d9fa5859548fe23217b842f4b1660852e4131371ae",
+    "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v4.patch",
+    "compatibilityPatchSha256": "3d6cce1161aae0468f1864145974d2d24f18de11659a92ad62d1a4548a0b484e",
     "gameTargets": "build/AAEmu.PlayerBots.Game.targets",
     "testTargets": "build/AAEmu.PlayerBots.Tests.targets",
     "databaseMigration": "sql/2026-08-25_aaemu_game_bot_archetype_plans.sql",
