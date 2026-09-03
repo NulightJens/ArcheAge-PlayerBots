@@ -96,9 +96,12 @@ public sealed class BotCreateCommand : ICommand
         placement = default;
         var world = character?.ParentWorld;
         var transform = character?.Transform;
-        if (world?.Template == null || transform == null || transform.InstanceId != world.Id)
+        if (world?.Template == null || transform == null)
             return false;
 
+        // ParentWorld is the authoritative runtime instance for an admitted character.
+        // Transform.InstanceId can briefly retain stale metadata while the live client is
+        // entering or crossing a region, but its world-space position is already current.
         var position = transform.World.Position;
         var rotation = transform.World.Rotation;
         placement = new BotIdentityPlacement(

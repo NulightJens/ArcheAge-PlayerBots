@@ -79,6 +79,30 @@ public class CreateBotCommandTests
     }
 
     [Test]
+    public async Task Execute_HereWithStaleTransformInstance_UsesAuthoritativeParentWorld()
+    {
+        BotIdentityCreationRequest captured = null;
+        var command = new BotCreateCommand(request =>
+        {
+            captured = request;
+            return new BotIdentityCreationResult(BotIdentityCreationStatus.AdmissionFailed, "test_stop");
+        });
+        var caller = BotTestFixture.MakeBot(42, new System.Numerics.Vector3(101.5f, 202.5f, 303.5f));
+        var world = BotTestFixture.MakeWorld(43);
+        BotTestFixture.SetPrivateField(caller, "_parentWorld", world);
+        BotTestFixture.SetPrivateField(caller.Transform, "_instanceId", world.Id + 1);
+        BotTestFixture.SetPrivateField(caller.Transform, "_zoneId", 601u);
+
+        command.Execute(caller, ["HereBot", "Nuian", "Male", "Abolisher", "1", "here"],
+            CaptureOutput());
+
+        await Assert.That(captured).IsNotNull();
+        await Assert.That(captured.Placement.InstanceId).IsEqualTo(world.Id);
+        await Assert.That(captured.Placement.WorldId).IsEqualTo(world.Template.Id);
+        await Assert.That(captured.Placement.ZoneId).IsEqualTo(601u);
+    }
+
+    [Test]
     public async Task Execute_HereWithoutWorld_FailsBeforeFactory()
     {
         var createCalls = 0;
