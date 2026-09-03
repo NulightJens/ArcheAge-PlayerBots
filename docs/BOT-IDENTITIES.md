@@ -7,10 +7,9 @@ a connection's character-selection collection, or emit client packets.
 
 ## Host and configuration requirements
 
-AAEmu 1.2 must have both compatibility patches, in this order:
-
-1. `compatibility/aaemu-1.2-r208022-v3.patch`
-2. `compatibility/aaemu-1.2-r208022-bot-identity-factory.patch`
+AAEmu 1.2 requires `compatibility/aaemu-1.2-r208022-v4.patch`. The normal
+installer applies this complete host contract; the earlier supplemental
+identity patch is retained only as development history.
 
 Provision a game-account row reserved exclusively for server-owned bots. Do not
 use a player account and do not log the reserved account into the game server.

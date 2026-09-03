@@ -56,6 +56,12 @@ namespace AAEmu.Game.Scripts.Commands
                     $"Transform: world={transform.WorldId}, instance={transform.InstanceId}, zone={transform.ZoneId}, " +
                     $"x={position.X:R}, y={position.Y:R}, z={position.Z:R}, yaw_rad={yaw:R}"));
             CommandManager.SendNormalText(this, messageOutput, $"HP: {bot.Hp}/{bot.MaxHp}, MP: {bot.Mp}/{bot.MaxMp}");
+            CommandManager.SendNormalText(this, messageOutput,
+                $"Combat stats: level={bot.Level}, str={DiagnosticValue(() => bot.Str)}, " +
+                $"spi={DiagnosticValue(() => bot.Spi)}, facets={DiagnosticValue(() => bot.Facets)}, " +
+                $"melee_accuracy={DiagnosticValue(() => bot.MeleeAccuracy)}, dps={DiagnosticValue(() => bot.Dps)}, " +
+                $"dps_inc={DiagnosticValue(() => bot.DpsInc)}, melee_damage_mul={DiagnosticValue(() => bot.MeleeDamageMul)}, " +
+                $"learned_skills={bot.Skills?.Skills?.Count ?? 0}");
             CommandManager.SendNormalText(this, messageOutput, $"IsDead: {bot.IsDead}, IsInBattle: {bot.IsInBattle}");
             var isStealthed = bot.Buffs?.HasEffectsMatchingCondition(effect => effect.Template.Stealth) == true;
             CommandManager.SendNormalText(this, messageOutput, $"Stealthed: {isStealthed}");
@@ -64,6 +70,22 @@ namespace AAEmu.Game.Scripts.Commands
             {
                 CommandManager.SendNormalText(this, messageOutput, $"--- Movement State ---");
                 CommandManager.SendNormalText(this, messageOutput, $"Destination: {moveState.Destination?.ToString() ?? "null"}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Travel route: mode={moveState.TravelMode}, " +
+                    $"final={moveState.TravelDestination?.ToString() ?? "null"}, " +
+                    $"remaining={moveState.TravelWaypointCount}, " +
+                    $"distance={moveState.TravelRemainingDistance:F2}, speed={moveState.TravelSpeed:F2}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Travel steering: target={moveState.SteeringDestination?.ToString() ?? "null"}");
+                var destinationSurface = moveState.Destination.HasValue
+                    ? DiagnosticGroundHeight(bot, moveState.Destination.Value.X, moveState.Destination.Value.Y)
+                    : null;
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Destination surface: z={moveState.Destination?.Z.ToString("R", System.Globalization.CultureInfo.InvariantCulture) ?? "none"}, " +
+                    $"heightmap={destinationSurface?.ToString("R", System.Globalization.CultureInfo.InvariantCulture) ?? "none"}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Navigation decision: status={moveState.LastNavigationDecision?.Status.ToString() ?? "none"}, " +
+                    $"reason={moveState.LastNavigationDecision?.Reason.ToString() ?? "none"}");
                 CommandManager.SendNormalText(this, messageOutput, $"IsRunning: {moveState.IsRunning}");
                 CommandManager.SendNormalText(this, messageOutput, $"IsMoving: {moveState.IsMoving}");
                 CommandManager.SendNormalText(this, messageOutput, $"IsFalling: {moveState.IsFalling}");
@@ -84,6 +106,16 @@ namespace AAEmu.Game.Scripts.Commands
                 CommandManager.SendNormalText(this, messageOutput, $"IsResting: {combatState.IsResting}");
                 CommandManager.SendNormalText(this, messageOutput,
                     $"Target: {combatState.Target?.Name ?? "null"}, CurrentTarget: {bot.CurrentTarget?.Name ?? "null"}");
+                var decisionTarget = combatState.Target ?? bot.CurrentTarget;
+                var targetPosition = decisionTarget?.Transform?.World.Position;
+                var targetSurface = targetPosition.HasValue
+                    ? DiagnosticGroundHeight(bot, targetPosition.Value.X, targetPosition.Value.Y)
+                    : null;
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Decision target: template={decisionTarget?.TemplateId.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none"}, " +
+                    $"obj={decisionTarget?.ObjId.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none"}, " +
+                    $"position={targetPosition?.ToString() ?? "none"}, " +
+                    $"heightmap={targetSurface?.ToString("R", System.Globalization.CultureInfo.InvariantCulture) ?? "none"}");
                 CommandManager.SendNormalText(this, messageOutput,
                     $"Duel: active={combatState.InDuel}, opponent={combatState.DuelOpponent?.Name ?? "null"}");
                 var searchElapsed = combatState.IsSearching && combatState.SearchStartTime != default
@@ -157,6 +189,7 @@ namespace AAEmu.Game.Scripts.Commands
                         $"quest={Optional(questLifecycle.QuestId)}, " +
                         $"objective={Optional(questLifecycle.ObjectiveTargetTemplateId)}:" +
                         $"{Optional(questLifecycle.ObjectiveTargetObjectId)} " +
+                        $"item={Optional(questLifecycle.ObjectiveItemId)} " +
                         $"progress={Optional(questLifecycle.ObjectiveCurrent)}/" +
                         $"{Optional(questLifecycle.ObjectiveRequired)}, " +
                         $"report={questLifecycle.ReportKind?.ToString().ToLowerInvariant() ?? "none"}:" +
@@ -184,6 +217,30 @@ namespace AAEmu.Game.Scripts.Commands
 
         private static string Timestamp(DateTimeOffset? value) =>
             value?.ToUniversalTime().ToString("O") ?? "none";
+
+        private static string DiagnosticValue(Func<object> read)
+        {
+            try
+            {
+                return Convert.ToString(read(), System.Globalization.CultureInfo.InvariantCulture) ?? "unavailable";
+            }
+            catch
+            {
+                return "unavailable";
+            }
+        }
+
+        private static float? DiagnosticGroundHeight(Character bot, float x, float y)
+        {
+            try
+            {
+                return bot.ParentWorld?.GetHeight(x, y);
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         private static string Snapshot(BotLifeProgressionSnapshot? snapshot)
         {

@@ -80,8 +80,8 @@ public sealed class BotLifeController
     private const string NearbyMortalReason = "nearby_mortal";
 
     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
-    private static BotBehaviorProfile DefaultProfile { get; } = new(
-        "single-bot-one-kill",
+    private static BotBehaviorProfile ResidentProfile { get; } = new(
+        "resident",
         TimeSpan.Zero,
         TimeSpan.MaxValue,
         TimeSpan.Zero,
@@ -89,6 +89,7 @@ public sealed class BotLifeController
 
     private readonly object _syncRoot = new();
     private readonly BotBehaviorProfile _profile;
+    private readonly bool _singleBotOneKillEnabled;
     private BotLifeSnapshot _life = new(BotLifeState.Offline, DateTimeOffset.MinValue);
     private BotLifeTransition? _lastTransition;
     private string _activity;
@@ -106,9 +107,12 @@ public sealed class BotLifeController
     private BotLifeProgressionSnapshot? _progressionCompletion;
     private BotLifeProgressionDelta? _progressionDelta;
 
-    public BotLifeController(BotBehaviorProfile profile = null)
+    public BotLifeController(
+        BotBehaviorProfile profile = null,
+        bool singleBotOneKillEnabled = false)
     {
-        _profile = profile ?? DefaultProfile;
+        _profile = profile ?? ResidentProfile;
+        _singleBotOneKillEnabled = singleBotOneKillEnabled;
     }
 
     internal void ResetPostSpawn(uint botId, DateTimeOffset now)
@@ -142,7 +146,7 @@ public sealed class BotLifeController
 
         lock (_syncRoot)
         {
-            if (!lifecycleEligible || runtime.Retired || _logoutQueued)
+            if (!_singleBotOneKillEnabled || !lifecycleEligible || runtime.Retired || _logoutQueued)
                 return false;
 
             if (_activity == null)

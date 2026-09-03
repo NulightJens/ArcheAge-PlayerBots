@@ -33,6 +33,31 @@ public sealed class BotQuestAuthorityTests
     }
 
     [Test]
+    public async Task InterpretObjectiveReadsExactNativeItemGatherTemplateAndCounter()
+    {
+        var quest = BuildQuest(
+            new QuestActObjItemGather(new QuestComponentTemplate(new QuestTemplate()))
+            {
+                ItemId = 4058,
+                Count = 3,
+                Cleanup = true,
+                ThisComponentObjectiveIndex = 1
+            });
+        quest.Objectives[1] = 2;
+
+        var result = BotQuestAuthority.InterpretObjective(quest);
+
+        await Assert.That(result.Shape).IsEqualTo(BotQuestObjectiveShape.ItemGather);
+        await Assert.That(result.Objective.HasValue).IsFalse();
+        await Assert.That(result.ItemGather.HasValue).IsTrue();
+        await Assert.That(result.ItemGather.Value.ItemId).IsEqualTo(4058u);
+        await Assert.That(result.ItemGather.Value.ObjectiveIndex).IsEqualTo((byte)1);
+        await Assert.That(result.ItemGather.Value.Current).IsEqualTo(2);
+        await Assert.That(result.ItemGather.Value.Required).IsEqualTo(3);
+        await Assert.That(result.ItemGather.Value.Cleanup).IsTrue();
+    }
+
+    [Test]
     public async Task InterpretObjectiveRejectsUnsupportedObjectiveWithoutMutation()
     {
         var unsupported = new QuestActTemplate(new QuestComponentTemplate(new QuestTemplate()))

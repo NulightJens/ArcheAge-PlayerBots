@@ -55,6 +55,26 @@ public sealed class BotQuestIntakeControllerTests
     }
 
     [Test]
+    public async Task ActiveQuestPriorityStopsAndClearsTheOwnedIntakeRoute()
+    {
+        var fixture = MakeFixture((200, true, new Vector3(20, 0, 0)));
+        fixture.Controller.Step(fixture.Runtime, EnabledConfig(), fixture.Time.GetUtcNow());
+
+        var yielded = fixture.Controller.YieldToQuestLifecycle(
+            fixture.Runtime,
+            fixture.Time.GetUtcNow().AddSeconds(1));
+        var view = fixture.Controller.Inspect();
+
+        await Assert.That(yielded).IsTrue();
+        await Assert.That(fixture.StopRequests).IsEqualTo(1);
+        await Assert.That(fixture.Movement.Destination).IsNull();
+        await Assert.That(view.State).IsEqualTo(BotQuestIntakeState.Blocked);
+        await Assert.That(view.DecisionReason).IsEqualTo("quest_lifecycle_priority");
+        await Assert.That(view.NpcObjectId).IsNull();
+        await Assert.That(fixture.AcceptedQuestIds).IsEmpty();
+    }
+
+    [Test]
     public async Task MainStoryOutranksANearerSideQuestAndMovementIsNotReissued()
     {
         var fixture = MakeFixture(
@@ -73,6 +93,46 @@ public sealed class BotQuestIntakeControllerTests
         await Assert.That(view.QuestId).IsEqualTo(200u);
         await Assert.That(view.MainStory).IsTrue();
         await Assert.That(fixture.AcceptedQuestIds).IsEmpty();
+    }
+
+    [Test]
+    public async Task NearbySideQuestOutranksRemoteStaticMainStoryTravel()
+    {
+        var remoteMain = new QuestTemplate { Id = 200, ChapterIdx = 1, QuestIdx = 200 };
+        var fixture = MakeFixture(
+            (_, _) => [new BotQuestStaticStartDestination(4500, remoteMain, new Vector3(100, 0, 0), 100f)],
+            (100, false, new Vector3(2, 0, 0)));
+
+        var claimed = fixture.Controller.Step(
+            fixture.Runtime,
+            EnabledConfig(),
+            fixture.Time.GetUtcNow());
+
+        await Assert.That(claimed).IsTrue();
+        await Assert.That(fixture.AcceptedQuestIds).IsEquivalentTo([100u]);
+        await Assert.That(fixture.DestinationRequests).IsEmpty();
+        await Assert.That(fixture.Controller.Inspect().AcceptedCount).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task SelectedGiverJustOutsideScanRadius_RemainsOwnedWithoutReplanLoop()
+    {
+        var fixture = MakeFixture((200, true, new Vector3(59.5f, 0, 0)));
+        var config = EnabledConfig();
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow());
+        fixture.Runtime.Bot.Transform.Local.SetPosition(new Vector3(-1f, 0, 0));
+
+        var claimed = fixture.Controller.Step(
+            fixture.Runtime,
+            config,
+            fixture.Time.GetUtcNow().AddSeconds(1));
+        var view = fixture.Controller.Inspect();
+
+        await Assert.That(claimed).IsTrue();
+        await Assert.That(view.State).IsEqualTo(BotQuestIntakeState.Moving);
+        await Assert.That(view.QuestId).IsEqualTo(200u);
+        await Assert.That(fixture.StopRequests).IsEqualTo(0);
+        await Assert.That(fixture.DestinationRequests).Count().IsEqualTo(1);
     }
 
     [Test]
@@ -385,7 +445,12 @@ public sealed class BotQuestIntakeControllerTests
         QuestIntakeRetryBackoffMs = 30000
     };
 
-    private static Fixture MakeFixture(params QuestNpcSpec[] specs)
+    private static Fixture MakeFixture(params QuestNpcSpec[] specs) =>
+        MakeFixture(null, specs);
+
+    private static Fixture MakeFixture(
+        Func<BotRuntime, float, IReadOnlyList<BotQuestStaticStartDestination>> staticNpcStarts,
+        params QuestNpcSpec[] specs)
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 2, 12, 0, 0, TimeSpan.Zero));
         var bot = new QuestingCharacterMock
@@ -451,7 +516,15 @@ public sealed class BotQuestIntakeControllerTests
             onCancel: null,
             blackboard: blackboard,
             timeProvider: time);
-        var fixture = new Fixture(time, world, bot, movement, combat, blackboard, questsByNpcTemplate);
+        var fixture = new Fixture(
+            time,
+            world,
+            bot,
+            movement,
+            combat,
+            blackboard,
+            questsByNpcTemplate,
+            staticNpcStarts);
         var runtime = new BotRuntime(
             bot,
             movement,
@@ -481,7 +554,8 @@ public sealed class BotQuestIntakeControllerTests
             BotMovementState movement,
             BotCombatState combat,
             BotBlackboard blackboard,
-            Dictionary<uint, List<QuestTemplate>> questsByNpcTemplate)
+            Dictionary<uint, List<QuestTemplate>> questsByNpcTemplate,
+            Func<BotRuntime, float, IReadOnlyList<BotQuestStaticStartDestination>> staticNpcStarts)
         {
             Time = time;
             World = world;
@@ -492,7 +566,10 @@ public sealed class BotQuestIntakeControllerTests
             _questsByNpcTemplate = questsByNpcTemplate;
             Controller = new BotQuestIntakeController(
                 npcTemplateId => _questsByNpcTemplate.GetValueOrDefault(npcTemplateId) ?? [],
-                Accept,
+                (_, _, _) => [],
+                (bot, kind, questId, objectId) =>
+                    kind == BotQuestGiverKind.Npc && Accept(bot, questId, objectId),
+                (_, kind, _, _) => kind == BotQuestGiverKind.Npc,
                 (_, destination, _) =>
                 {
                     DestinationRequests.Add(destination);
@@ -504,7 +581,8 @@ public sealed class BotQuestIntakeControllerTests
                     Movement.Destination = null;
                 },
                 (_, position) => HeightOverride(position),
-                Events.Add);
+                Events.Add,
+                staticNpcStarts);
         }
 
         public FakeTimeProvider Time { get; }

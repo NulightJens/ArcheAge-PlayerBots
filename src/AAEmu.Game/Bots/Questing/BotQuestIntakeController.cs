@@ -3,10 +3,12 @@ using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Host;
 using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
+using AAEmu.Game.GameData;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Models.Game.DoodadObj;
 using AAEmu.Game.Models.Game.NPChar;
+using AAEmu.Game.Models.Game.Quests.Static;
 using AAEmu.Game.Models.Game.Quests.Templates;
 using AAEmu.Game.Models.Game.Units;
 using AAEmu.Game.Models.Tasks.Bots;
@@ -59,13 +61,16 @@ public readonly record struct BotQuestIntakeView(
 public sealed class BotQuestIntakeController
 {
     internal const float MaximumScanRadius = BotCombatTask.MaximumQuestTargetSearchRadius;
+    internal const float MaximumStaticStartRouteDistance = 500f;
     private const float DestinationTolerance = 0.25f;
+    private const float SelectedGiverLeash = 20f;
 
     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
     private readonly object _syncRoot = new();
     private readonly Func<uint, IReadOnlyList<QuestTemplate>> _questStarts;
     private readonly Func<BotRuntime, float, DateTimeOffset, IReadOnlyList<BotQuestStartCandidate>> _doodadStarts;
+    private readonly Func<BotRuntime, float, IReadOnlyList<BotQuestStaticStartDestination>> _staticNpcStarts;
     private readonly Func<Character, BotQuestGiverKind, uint, uint, bool> _acceptQuest;
     private readonly Func<Character, BotQuestGiverKind, uint, uint, bool> _validateGiverQuest;
     private readonly Action<Character, Vector3, bool> _setDestination;
@@ -75,6 +80,7 @@ public sealed class BotQuestIntakeController
     private readonly Dictionary<QuestCandidateKey, DateTimeOffset> _retryAfter = [];
 
     private GiverPlan _plan;
+    private StaticStartPlan _staticStartPlan;
     private Vector3? _ownedDestination;
     private volatile BotQuestIntakeState _state = BotQuestIntakeState.Disabled;
     private string _decisionReason = "not_started";
@@ -103,7 +109,8 @@ public sealed class BotQuestIntakeController
             setDestination,
             stopMovement,
             heightProvider,
-            eventSink)
+            eventSink,
+            authority.FindStaticNpcQuestStarts)
     {
     }
 
@@ -123,7 +130,8 @@ public sealed class BotQuestIntakeController
             setDestination,
             stopMovement,
             heightProvider,
-            eventSink)
+            eventSink,
+            null)
     {
     }
 
@@ -135,7 +143,8 @@ public sealed class BotQuestIntakeController
         Action<Character, Vector3, bool> setDestination,
         Action<Character> stopMovement,
         Func<Character, Vector3, float> heightProvider,
-        Action<string> eventSink)
+        Action<string> eventSink,
+        Func<BotRuntime, float, IReadOnlyList<BotQuestStaticStartDestination>> staticNpcStarts = null)
     {
         _questStarts = questStarts ??
             (npcTemplateId => QuestManager.Instance.GetPlayerBotNpcQuestStarts(npcTemplateId));
@@ -147,10 +156,10 @@ public sealed class BotQuestIntakeController
                 _ => false
             });
         _doodadStarts = doodadStarts ?? ((_, _, _) => []);
+        _staticNpcStarts = staticNpcStarts ?? ((_, _) => []);
         _validateGiverQuest = validateGiverQuest ?? ((_, _, _, _) => false);
         _setDestination = setDestination ??
-            ((bot, destination, run) => BotManager.Instance.SetBotDestination(
-                bot, destination.X, destination.Y, destination.Z, run));
+            ((bot, destination, run) => BotManager.Instance.SetBotTravelDestination(bot, destination, run));
         _stopMovement = stopMovement ?? (bot => BotManager.Instance.StopBot(bot));
         _heightProvider = heightProvider ??
             ((bot, position) => bot.ParentWorld.GetHeight(position.X, position.Y));
@@ -188,7 +197,17 @@ public sealed class BotQuestIntakeController
             if (_plan != null)
                 return StepPlan(runtime, config, now);
 
+            if (_staticStartPlan != null)
+                return StepStaticStartPlan(runtime, config, now);
+
             var candidates = FindCandidates(runtime, config, now);
+            // A remote main-story route is only a fallback. Nearby eligible quest
+            // interactions outrank travel so navigation never suppresses local work.
+            if (candidates.Count == 0 && TryBeginStaticMainStoryRoute(runtime, config, now))
+            {
+                return true;
+            }
+
             if (candidates.Count == 0)
             {
                 _retryAt = EarliestRetry();
@@ -249,6 +268,25 @@ public sealed class BotQuestIntakeController
         }
     }
 
+    /// <summary>
+    /// Relinquishes only movement owned by quest intake when an already-active
+    /// quest needs the bot. Completing and reporting accepted work always
+    /// outranks travelling to collect more work.
+    /// </summary>
+    internal bool YieldToQuestLifecycle(BotRuntime runtime, DateTimeOffset now)
+    {
+        ArgumentNullException.ThrowIfNull(runtime);
+
+        lock (_syncRoot)
+        {
+            if (_plan == null && _staticStartPlan == null && !_ownedDestination.HasValue)
+                return false;
+
+            InvalidatePlan(runtime, "quest_lifecycle_priority", now, stopOwnedMovement: true);
+            return true;
+        }
+    }
+
     internal static bool IsMainStory(QuestTemplate quest) =>
         quest != null && (quest.ChapterIdx != 0 || quest.QuestIdx != 0);
 
@@ -256,7 +294,10 @@ public sealed class BotQuestIntakeController
     {
         var bot = runtime.Bot;
         var giver = ResolveGiver(bot, _plan.Kind, _plan.ObjectId);
-        if (!TryValidateGiver(bot, _plan.Kind, giver, EffectiveScanRadius(config), out var distance, out var reason))
+        var selectedGiverRadius = Math.Max(
+            EffectiveScanRadius(config),
+            (float)config.QuestIntakeInteractionRadius) + SelectedGiverLeash;
+        if (!TryValidateGiver(bot, _plan.Kind, giver, selectedGiverRadius, out var distance, out var reason))
         {
             InvalidatePlan(runtime, reason, now, stopOwnedMovement: true);
             return true;
@@ -265,7 +306,7 @@ public sealed class BotQuestIntakeController
         var targetPosition = giver.Transform.World.Position;
         if (distance > config.QuestIntakeInteractionRadius)
         {
-            if (runtime.MovementState.Destination is { } currentDestination &&
+            if (CurrentRequestedDestination(runtime) is { } currentDestination &&
                 (!_ownedDestination.HasValue ||
                  Vector3.Distance(currentDestination, _ownedDestination.Value) > DestinationTolerance))
             {
@@ -273,17 +314,23 @@ public sealed class BotQuestIntakeController
                 return false;
             }
 
-            if (!_ownedDestination.HasValue ||
-                runtime.MovementState.Destination == null ||
-                Vector3.Distance(_ownedDestination.Value, targetPosition) > DestinationTolerance)
+            // A terrain-valid approach point is relative to the bot. Preserve the
+            // route already accepted for this giver instead of recalculating a
+            // slightly different endpoint on every movement tick.
+            if (!_ownedDestination.HasValue || CurrentRequestedDestination(runtime) == null)
             {
-                _setDestination(bot, targetPosition, true);
-                _ownedDestination = targetPosition;
+                var approachPosition = BotQuestApproachPlanner.ForWorldObject(
+                    bot.Transform.World.Position,
+                    targetPosition,
+                    (float)config.QuestIntakeInteractionRadius,
+                    bot.ParentWorld.GetHeight);
+                _setDestination(bot, approachPosition, true);
+                _ownedDestination = approachPosition;
                 SetState(BotQuestIntakeState.Moving, "moving_to_quest_giver", now);
                 Log(bot.Id, "move_requested",
                     $"giver={GiverName(_plan.Kind)} giver_obj={giver.ObjId} " +
                     $"giver_template={giver.TemplateId} distance={distance:F2} " +
-                    $"destination=({targetPosition.X:R},{targetPosition.Y:R},{targetPosition.Z:R})");
+                    $"destination=({approachPosition.X:R},{approachPosition.Y:R},{approachPosition.Z:R})");
             }
 
             return true;
@@ -353,6 +400,114 @@ public sealed class BotQuestIntakeController
         _retryAt = EarliestRetry();
         SetState(BotQuestIntakeState.Idle, "giver_intake_complete", now);
         return true;
+    }
+
+    private bool StepStaticStartPlan(BotRuntime runtime, BotConfig config, DateTimeOffset now)
+    {
+        var plan = _staticStartPlan;
+        var bot = runtime.Bot;
+        if (!IsEligible(bot, plan.Quest) || !IsMainStory(plan.Quest))
+        {
+            InvalidatePlan(runtime, "static_start_no_longer_eligible", now, stopOwnedMovement: true);
+            return true;
+        }
+
+        var localMatch = FindCandidates(runtime, config, now)
+            .FirstOrDefault(candidate =>
+                candidate.Kind == BotQuestGiverKind.Npc &&
+                candidate.Giver.TemplateId == plan.NpcTemplateId &&
+                candidate.Quest.Id == plan.Quest.Id);
+        if (localMatch.Giver != null)
+        {
+            StopOwnedMovement(runtime);
+            _staticStartPlan = null;
+            _plan = new GiverPlan(
+                BotQuestGiverKind.Npc,
+                localMatch.Giver.ObjId,
+                localMatch.Giver.TemplateId,
+                [localMatch.Quest]);
+            SetState(BotQuestIntakeState.Interacting, "static_start_giver_acquired", now);
+            Log(bot.Id, "static_route_arrived",
+                $"giver=npc giver_obj={localMatch.Giver.ObjId} " +
+                $"giver_template={localMatch.Giver.TemplateId} quest={localMatch.Quest.Id} " +
+                $"distance={localMatch.Distance:F2}");
+            return StepPlan(runtime, config, now);
+        }
+
+        var botPosition = bot.Transform.World.Position;
+        var distance = Vector3.Distance(botPosition, plan.Position);
+        if (!IsFinite(botPosition) || !IsFinite(plan.Position) || !float.IsFinite(distance) ||
+            distance > MaximumStaticStartRouteDistance)
+        {
+            InvalidatePlan(runtime, "static_start_route_invalid", now, stopOwnedMovement: true);
+            return true;
+        }
+
+        if (CurrentRequestedDestination(runtime) is { } currentDestination &&
+            (!_ownedDestination.HasValue ||
+             Vector3.Distance(currentDestination, _ownedDestination.Value) > DestinationTolerance))
+        {
+            InvalidatePlan(runtime, "movement_ownership_lost", now, stopOwnedMovement: false);
+            return false;
+        }
+
+        if (!_ownedDestination.HasValue ||
+            runtime.MovementState.Destination == null ||
+            Vector3.Distance(_ownedDestination.Value, plan.Position) > DestinationTolerance)
+        {
+            _setDestination(bot, plan.Position, true);
+            _ownedDestination = plan.Position;
+            SetState(BotQuestIntakeState.Moving, "moving_to_static_main_story_giver", now);
+            Log(bot.Id, "static_route_move_requested",
+                $"giver=npc giver_template={plan.NpcTemplateId} quest={plan.Quest.Id} " +
+                $"distance={distance:F2} destination=({plan.Position.X:R},{plan.Position.Y:R},{plan.Position.Z:R})");
+        }
+
+        return true;
+    }
+
+    private bool TryBeginStaticMainStoryRoute(
+        BotRuntime runtime,
+        BotConfig config,
+        DateTimeOffset now)
+    {
+        IReadOnlyList<BotQuestStaticStartDestination> routes;
+        try
+        {
+            routes = _staticNpcStarts(runtime, MaximumStaticStartRouteDistance) ?? [];
+        }
+        catch (Exception exception)
+        {
+            Log(runtime.Bot.Id, "static_route_scan_error", $"error={exception.GetType().Name}");
+            return false;
+        }
+
+        var selected = routes
+            .Where(route =>
+                route.NpcTemplateId != 0 &&
+                IsMainStory(route.Quest) &&
+                IsEligible(runtime.Bot, route.Quest) &&
+                IsFinite(route.Position) &&
+                float.IsFinite(route.Distance) &&
+                route.Distance <= MaximumStaticStartRouteDistance)
+            .OrderBy(route => route.Distance)
+            .ThenBy(route => route.NpcTemplateId)
+            .ThenBy(route => route.Quest.Id)
+            .FirstOrDefault();
+        if (selected.Quest == null)
+            return false;
+
+        _staticStartPlan = new StaticStartPlan(
+            selected.NpcTemplateId,
+            selected.Quest,
+            selected.Position);
+        _retryAt = null;
+        SetState(BotQuestIntakeState.Moving, "static_main_story_route_selected", now);
+        Log(runtime.Bot.Id, "static_route_selected",
+            $"giver=npc giver_template={selected.NpcTemplateId} quest={selected.Quest.Id} " +
+            $"main_story=true distance={selected.Distance:F2} " +
+            $"destination=({selected.Position.X:R},{selected.Position.Y:R},{selected.Position.Z:R})");
+        return StepStaticStartPlan(runtime, config, now);
     }
 
     private List<QuestCandidate> FindCandidates(BotRuntime runtime, BotConfig config, DateTimeOffset now)
@@ -555,7 +710,8 @@ public sealed class BotQuestIntakeController
             return false;
         }
 
-        if (_plan == null && (movement.Destination.HasValue || movement.IsMoving))
+        if (_plan == null && _staticStartPlan == null &&
+            (movement.Destination.HasValue || movement.IsMoving))
         {
             reason = "unowned_movement";
             return false;
@@ -570,7 +726,11 @@ public sealed class BotQuestIntakeController
         if (bot == null || quest == null || quest.Id == 0 || bot.Quests.HasQuest(quest.Id))
             return false;
 
-        return !bot.Quests.HasQuestCompleted(quest.Id) || quest.Repeatable;
+        if (bot.Quests.HasQuestCompleted(quest.Id) && !quest.Repeatable)
+            return false;
+
+        return quest.GetComponents(QuestComponentKind.Start)
+            .All(component => UnitRequirementsGameData.Instance.CanComponentRun(component, bot));
     }
 
     private static BaseUnit ResolveGiver(
@@ -643,6 +803,7 @@ public sealed class BotQuestIntakeController
     {
         StopOwnedMovement(runtime);
         _plan = null;
+        _staticStartPlan = null;
         _retryAfter.Clear();
         _retryAt = null;
         SetState(BotQuestIntakeState.Disabled, "disabled", now);
@@ -654,7 +815,7 @@ public sealed class BotQuestIntakeController
         DateTimeOffset now,
         bool stopOwnedMovement)
     {
-        if (_plan == null && !_ownedDestination.HasValue)
+        if (_plan == null && _staticStartPlan == null && !_ownedDestination.HasValue)
             return;
 
         var kind = _plan?.Kind;
@@ -662,6 +823,7 @@ public sealed class BotQuestIntakeController
         if (stopOwnedMovement)
             StopOwnedMovement(runtime);
         _plan = null;
+        _staticStartPlan = null;
         _ownedDestination = null;
         SetState(BotQuestIntakeState.Blocked, reason, now);
         Log(runtime.Bot.Id, "invalidated",
@@ -672,13 +834,16 @@ public sealed class BotQuestIntakeController
     private void StopOwnedMovement(BotRuntime runtime)
     {
         if (_ownedDestination.HasValue &&
-            runtime.MovementState.Destination is { } destination &&
+            CurrentRequestedDestination(runtime) is { } destination &&
             Vector3.Distance(destination, _ownedDestination.Value) <= DestinationTolerance)
         {
             _stopMovement(runtime.Bot);
         }
         _ownedDestination = null;
     }
+
+    private static Vector3? CurrentRequestedDestination(BotRuntime runtime) =>
+        runtime.MovementState.TravelDestination ?? runtime.MovementState.Destination;
 
     private bool SetState(BotQuestIntakeState state, string reason, DateTimeOffset now)
     {
@@ -713,6 +878,10 @@ public sealed class BotQuestIntakeController
         uint ObjectId,
         uint TemplateId,
         QuestTemplate[] Quests);
+    private sealed record StaticStartPlan(
+        uint NpcTemplateId,
+        QuestTemplate Quest,
+        Vector3 Position);
     private readonly record struct QuestCandidate(
         BotQuestGiverKind Kind,
         BaseUnit Giver,

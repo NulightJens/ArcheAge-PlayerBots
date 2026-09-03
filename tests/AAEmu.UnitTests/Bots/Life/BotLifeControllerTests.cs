@@ -20,6 +20,30 @@ namespace AAEmu.UnitTests.Bots.Life;
 [NotInParallel]
 public sealed class BotLifeControllerTests
 {
+    private static BotBehaviorProfile OneKillProfile { get; } = new(
+        "single-bot-one-kill",
+        TimeSpan.Zero,
+        TimeSpan.MaxValue,
+        TimeSpan.Zero,
+        TimeSpan.MaxValue);
+
+    [Test]
+    public async Task DefaultResidentProfile_DoesNotArmSingleBotOneKillLifecycle()
+    {
+        var fixture = MakeFixture(controller: new BotLifeController());
+        var requested = fixture.Runtime.LifeController.Step(
+            fixture.Runtime,
+            lifecycleEligible: true,
+            fixture.Time.GetUtcNow());
+
+        var view = fixture.Runtime.LifeController.Inspect();
+        await Assert.That(requested).IsFalse();
+        await Assert.That(view.ProfileId).IsEqualTo("resident");
+        await Assert.That(view.Life.State).IsEqualTo(BotLifeState.Idle);
+        await Assert.That(view.Activity).IsNull();
+        await Assert.That(fixture.Runtime.CombatState.KillGoal).IsNull();
+    }
+
     [Test]
     public async Task ProgressionObservation_CapturesExactDeltasAndStableInventoryFingerprint()
     {
@@ -511,6 +535,9 @@ public sealed class BotLifeControllerTests
             onCancel: null,
             blackboard: blackboard,
             timeProvider: time);
+        controller ??= new BotLifeController(
+            OneKillProfile,
+            singleBotOneKillEnabled: true);
         var runtime = new BotRuntime(
             bot,
             movement,

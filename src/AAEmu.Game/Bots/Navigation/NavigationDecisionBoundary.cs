@@ -21,7 +21,9 @@ public enum NavigationDiagnosticReason
     DestinationSurfaceInvalid,
     DestinationHeightSurfaceDisagreement,
     SurfaceMismatch,
-    ReachabilityRejected
+    ReachabilityRejected,
+    TerrainDropDetourAccepted,
+    TerrainDropRejected
 }
 
 public readonly struct NavigationDecision

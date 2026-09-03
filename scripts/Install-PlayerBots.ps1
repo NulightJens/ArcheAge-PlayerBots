@@ -15,7 +15,7 @@ $ErrorActionPreference = 'Stop'
 $tracks = @{
     'AAEmu12' = @{
         Base = '62e3eb1d87da01194802ac886cd500134facad28'
-        Patch = 'compatibility\aaemu-1.2-r208022-v3.patch'
+        Patch = 'compatibility\aaemu-1.2-r208022-v4.patch'
         Status = 'supported'
     }
     'AAEmu30' = @{

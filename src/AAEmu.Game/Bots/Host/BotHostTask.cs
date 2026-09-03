@@ -86,8 +86,13 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
         for (var i = 0; i < runtimes.Length; i++)
         {
             var runtime = runtimes[i];
-            var lifecycleEligible = isSoleRuntime ||
-                                    BotActivityDirectorTask.IsCurrentLifecycleEligible(runtime.Bot);
+            // The bounded one-kill lifecycle is a scale-test harness. Once native
+            // quest autonomy is enabled it must never preempt quest travel,
+            // objectives, reporting, or continued leveling.
+            var questAutonomyEnabled = config.QuestIntakeEnabled || config.QuestCompletionEnabled;
+            var lifecycleEligible = !questAutonomyEnabled &&
+                                    (isSoleRuntime ||
+                                     BotActivityDirectorTask.IsCurrentLifecycleEligible(runtime.Bot));
             runtime.Schedule.Now = now;
 
             if (Interlocked.CompareExchange(ref runtime.Running, 1, 0) != 0)
@@ -292,9 +297,12 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                 : BotEngineKind.NonCombat;
             if (engineKind == BotEngineKind.Combat)
             {
-                var archetype = BotArchetypeManager.Instance.GetState(runtime.Bot)?.ArchetypeName ??
-                                 runtime.CombatState.ActiveArchetype;
-                BotRotationManager.Instance.EnsureAttached(runtime, archetype);
+                // A planned low-level class has only its native learned kit and
+                // uses BasicCombat's live decision path. Static rotations are
+                // reserved for finalized three-tree classes.
+                var archetype = BotArchetypeManager.Instance.GetState(runtime.Bot)?.ArchetypeName;
+                if (!string.IsNullOrWhiteSpace(archetype))
+                    BotRotationManager.Instance.EnsureAttached(runtime, archetype);
             }
             var engine = runtime.Engines[(int)engineKind];
             if (!active)

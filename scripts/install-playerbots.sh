@@ -59,7 +59,7 @@ fi
 case "$track" in
   aaemu12)
     supported_base="$base_12"
-    patch_path="$module_root/compatibility/aaemu-1.2-r208022-v3.patch"
+    patch_path="$module_root/compatibility/aaemu-1.2-r208022-v4.patch"
     status=supported
     ;;
   aaemu30)

@@ -74,7 +74,7 @@ $requiredEntries = @(
     'archeage-playerbots/playerbots.module.json',
     'archeage-playerbots/scripts/Install-PlayerBots.ps1',
     'archeage-playerbots/scripts/install-playerbots.sh',
-    'archeage-playerbots/compatibility/aaemu-1.2-r208022-v3.patch',
+    'archeage-playerbots/compatibility/aaemu-1.2-r208022-v4.patch',
     'archeage-playerbots/compatibility/aaemu-3.0.4.2-r336598-alpha-v4.patch',
     'archeage-playerbots/sql/2026-08-25_aaemu_game_bot_archetype_plans.sql',
     'archeage-playerbots/src/AAEmu.Game/Scripts/Commands/BotQuestCommand.cs'

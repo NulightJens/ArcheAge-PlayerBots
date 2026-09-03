@@ -5,6 +5,7 @@ using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Bots.Life;
 using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Game;
@@ -1049,6 +1050,14 @@ public class BotCommandsTests
             onCancel: null,
             blackboard: blackboard,
             timeProvider: BotHost.Instance.TimeProvider);
+        var lifeController = new BotLifeController(
+            new BotBehaviorProfile(
+                "single-bot-one-kill",
+                TimeSpan.Zero,
+                TimeSpan.MaxValue,
+                TimeSpan.Zero,
+                TimeSpan.MaxValue),
+            singleBotOneKillEnabled: true);
         var runtime = new BotRuntime(
             bot,
             movement,
@@ -1057,7 +1066,8 @@ public class BotCommandsTests
             mover,
             brain,
             blackboard,
-            new BotConfig { UseEngine = false });
+            new BotConfig { UseEngine = false },
+            lifeController);
         BotHost.Instance.Register(runtime);
         try
         {

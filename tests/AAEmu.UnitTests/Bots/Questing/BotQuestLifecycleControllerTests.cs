@@ -100,6 +100,77 @@ public sealed class BotQuestLifecycleControllerTests
     }
 
     [Test]
+    public async Task ItemGatherKillsDerivedSourceTakesNativeLootAndWaitsForAuthoritativeCounter()
+    {
+        var fixture = MakeFixture();
+        var first = fixture.AddNpc(4100, 3);
+        var second = fixture.AddNpc(4100, 5);
+        fixture.Authority.Snapshots = [GatherSnapshot(251, 0, 3, 4058)];
+        fixture.Authority.GatherTargets = [first];
+        fixture.Authority.LootAttempt = new BotQuestLootAttempt(true, "native_loot_taken", 1, 0);
+        var config = EnabledConfig();
+
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow());
+        first.Hp = 0;
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow().AddMilliseconds(10));
+        var waiting = fixture.Controller.Inspect();
+
+        fixture.Authority.Snapshots = [GatherSnapshot(251, 1, 3, 4058)];
+        fixture.Authority.GatherTargets = [second];
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow().AddMilliseconds(20));
+        var reselected = fixture.Controller.Inspect();
+
+        await Assert.That(fixture.Authority.LootAttemptCount).IsEqualTo(1);
+        await Assert.That(waiting.State).IsEqualTo(BotQuestLifecycleState.WaitingForProgress);
+        await Assert.That(waiting.DecisionReason).IsEqualTo("awaiting_authoritative_gather_credit");
+        await Assert.That(waiting.ObjectiveItemId).IsEqualTo(4058u);
+        await Assert.That(reselected.ObjectiveCurrent).IsEqualTo(1);
+        await Assert.That(reselected.ObjectiveTargetObjectId).IsEqualTo(second.ObjId);
+        await Assert.That(fixture.BeginCombatCalls).IsEqualTo(2);
+        await Assert.That(fixture.Events).Contains(message => message.Contains("ev=quest_lifecycle_gather_loot_taken"));
+    }
+
+    [Test]
+    public async Task IncompleteGatherWaitsForRespawnAndRetainsLifecyclePriority()
+    {
+        var fixture = MakeFixture();
+        fixture.Authority.Snapshots = [GatherSnapshot(251, 2, 3, 4058)];
+        fixture.Authority.GatherTargets = [];
+        var config = EnabledConfig();
+
+        var initialClaim = fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow());
+        var waitClaim = fixture.Controller.Step(
+            fixture.Runtime,
+            config,
+            fixture.Time.GetUtcNow().AddMilliseconds(1001));
+        var waiting = fixture.Controller.Inspect();
+        var heldClaim = fixture.Controller.Step(
+            fixture.Runtime,
+            config,
+            fixture.Time.GetUtcNow().AddMilliseconds(1050));
+
+        var respawned = fixture.AddNpc(4100, 4);
+        fixture.Authority.GatherTargets = [respawned];
+        var resumedClaim = fixture.Controller.Step(
+            fixture.Runtime,
+            config,
+            fixture.Time.GetUtcNow().AddMilliseconds(1252));
+        var resumed = fixture.Controller.Inspect();
+
+        await Assert.That(initialClaim).IsTrue();
+        await Assert.That(waitClaim).IsTrue();
+        await Assert.That(heldClaim).IsTrue();
+        await Assert.That(resumedClaim).IsTrue();
+        await Assert.That(waiting.State).IsEqualTo(BotQuestLifecycleState.WaitingForRespawn);
+        await Assert.That(waiting.DecisionReason).IsEqualTo("waiting_for_objective_respawn");
+        await Assert.That(waiting.SuspensionCount).IsEqualTo(0);
+        await Assert.That(resumed.State).IsEqualTo(BotQuestLifecycleState.Fighting);
+        await Assert.That(resumed.ObjectiveTargetObjectId).IsEqualTo(respawned.ObjId);
+        await Assert.That(fixture.Events).Contains(message => message.Contains("ev=quest_lifecycle_respawn_wait"));
+        await Assert.That(fixture.Events).Contains(message => message.Contains("ev=quest_lifecycle_respawn_rescan"));
+    }
+
+    [Test]
     public async Task ObjectiveCountAtRequirementWaitsForReadyInsteadOfReportingEarly()
     {
         var fixture = MakeFixture();
@@ -171,6 +242,30 @@ public sealed class BotQuestLifecycleControllerTests
     }
 
     [Test]
+    public async Task OwnedReportRouteSurvivesSubDeduplicationEndpointDrift()
+    {
+        var fixture = MakeFixture();
+        var npc = fixture.AddNpc(901, 20);
+        fixture.DestinationDeduplicationTolerance = 0.5f;
+        fixture.Authority.Snapshots = [ReadySnapshot(100, BotQuestReportKind.Npc, 901, [])];
+        fixture.Authority.ReportObjects =
+            [new BotQuestWorldObject(BotQuestReportKind.Npc, npc, 20)];
+        var config = EnabledConfig();
+
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow());
+        npc.Transform.Local.SetPosition(new Vector3(20.3f, 0, 0));
+        fixture.Authority.ReportObjects =
+            [new BotQuestWorldObject(BotQuestReportKind.Npc, npc, 19.7f)];
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow().AddSeconds(1));
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow().AddSeconds(2));
+
+        await Assert.That(fixture.SetDestinationCalls).IsEqualTo(1);
+        await Assert.That(fixture.Controller.Inspect().State)
+            .IsEqualTo(BotQuestLifecycleState.MovingToReport);
+        await Assert.That(fixture.Controller.Inspect().SuspensionCount).IsEqualTo(0);
+    }
+
+    [Test]
     public async Task RejectedReportSuspendsAndDoesNotRetryBeforeBackoff()
     {
         var fixture = MakeFixture();
@@ -219,6 +314,60 @@ public sealed class BotQuestLifecycleControllerTests
     }
 
     [Test]
+    public async Task NativeAutoCompletionCountsWhenQuestDisappearsOutsideReportWait()
+    {
+        var fixture = MakeFixture();
+        fixture.Authority.Snapshots = [MonsterSnapshot(250, 2, 3, 3492)];
+        fixture.Authority.Targets = [fixture.AddNpc(3492, 4)];
+        var config = EnabledConfig();
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow());
+
+        fixture.Bot.Quests.SetCompletedQuestFlag(250, true);
+        fixture.Authority.Snapshots = [];
+        var claimed = fixture.Controller.Step(
+            fixture.Runtime,
+            config,
+            fixture.Time.GetUtcNow().AddSeconds(1));
+
+        await Assert.That(claimed).IsFalse();
+        await Assert.That(fixture.Controller.Inspect().CompletedCount).IsEqualTo(1);
+        await Assert.That(fixture.Events).Contains(message =>
+            message.Contains("ev=quest_lifecycle_completed quest=250"));
+    }
+
+    [Test]
+    public async Task ActiveQuestHoldsPriorityForOneTickAfterReleasingIntakeMovement()
+    {
+        var fixture = MakeFixture();
+        var route = new Vector3(40, 0, 0);
+        fixture.Authority.Snapshots = [MonsterSnapshot(250, 0, 3, 3492)];
+        fixture.Authority.Targets = [fixture.AddNpc(3492, 4)];
+        fixture.Movement.Destination = route;
+        fixture.Movement.IsMoving = true;
+        BotTestFixture.SetPrivateField(
+            fixture.Runtime.QuestIntakeController,
+            "_ownedDestination",
+            (Vector3?)route);
+        var config = EnabledConfig();
+
+        var released = fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow());
+        var afterRelease = fixture.Controller.Inspect();
+        fixture.Movement.Destination = null;
+        fixture.Movement.IsMoving = false;
+        var resumed = fixture.Controller.Step(
+            fixture.Runtime,
+            config,
+            fixture.Time.GetUtcNow().AddSeconds(1));
+
+        await Assert.That(released).IsTrue();
+        await Assert.That(afterRelease.State).IsEqualTo(BotQuestLifecycleState.SelectingTarget);
+        await Assert.That(afterRelease.DecisionReason).IsEqualTo("intake_movement_released");
+        await Assert.That(afterRelease.SuspensionCount).IsEqualTo(0);
+        await Assert.That(resumed).IsTrue();
+        await Assert.That(fixture.Controller.Inspect().State).IsEqualTo(BotQuestLifecycleState.Fighting);
+    }
+
+    [Test]
     public async Task UnsupportedAndAmbiguousObjectivesFailClosedWithoutCombatOrReport()
     {
         foreach (var shape in new[] { BotQuestObjectiveShape.Unsupported, BotQuestObjectiveShape.Ambiguous })
@@ -231,6 +380,7 @@ public sealed class BotQuestLifecycleControllerTests
                     true,
                     false,
                     shape,
+                    null,
                     null,
                     [],
                     [],
@@ -295,6 +445,186 @@ public sealed class BotQuestLifecycleControllerTests
             .IsEqualTo("report_endpoint_timeout");
     }
 
+    [Test]
+    public async Task RemoteWorldReportEndpointUsesBoundedStaticRouteThenRevalidatesLiveObject()
+    {
+        var fixture = MakeFixture();
+        var route = new Vector3(120, 0, 4);
+        fixture.Authority.Snapshots = [ReadySnapshot(100, BotQuestReportKind.Npc, 901, [])];
+        fixture.Authority.StaticReportDestinations =
+            [new BotQuestStaticReportDestination(BotQuestReportKind.Npc, 901, route, 120)];
+        var config = EnabledConfig();
+
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow());
+
+        await Assert.That(fixture.Movement.Destination).IsEqualTo(route);
+        await Assert.That(fixture.Controller.Inspect().DecisionReason)
+            .IsEqualTo("moving_to_static_report_endpoint");
+        await Assert.That(fixture.Authority.RequestedStaticReportMaximumDistance)
+            .IsEqualTo(BotQuestLifecycleController.MaximumReportRouteDistance);
+
+        var npc = fixture.AddNpc(901, 2);
+        fixture.Authority.ReportObjects =
+            [new BotQuestWorldObject(BotQuestReportKind.Npc, npc, 2)];
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow().AddSeconds(2));
+
+        await Assert.That(fixture.Movement.Destination).IsNull();
+        await Assert.That(fixture.Authority.Reports).Count().IsEqualTo(1);
+        await Assert.That(fixture.Authority.Reports.Single().ObjectId).IsEqualTo(npc.ObjId);
+    }
+
+    [Test]
+    public async Task RemoteMonsterObjectiveUsesMapDestinationThenRevalidatesLiveTarget()
+    {
+        var fixture = MakeFixture();
+        var route = new Vector3(120, 0, 4);
+        fixture.Authority.Snapshots = [MonsterSnapshot(250, 0, 3, 3492)];
+        fixture.Authority.StaticMonsterDestinations =
+            [new BotQuestStaticObjectiveDestination(3492, route, 30, 120, true)];
+        var config = EnabledConfig();
+
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow());
+
+        await Assert.That(fixture.Movement.Destination).IsEqualTo(route);
+        await Assert.That(fixture.Controller.Inspect().State)
+            .IsEqualTo(BotQuestLifecycleState.MovingToObjective);
+        await Assert.That(fixture.Controller.Inspect().DecisionReason)
+            .IsEqualTo("moving_to_static_objective");
+        await Assert.That(fixture.Authority.RequestedStaticObjectiveMaximumDistance)
+            .IsEqualTo(BotQuestLifecycleController.MaximumReportRouteDistance);
+
+        var fox = fixture.AddNpc(3492, 8);
+        fixture.Authority.Targets = [fox];
+        fixture.Controller.Step(
+            fixture.Runtime,
+            config,
+            fixture.Time.GetUtcNow().AddSeconds(2));
+
+        await Assert.That(fixture.Movement.Destination).IsNull();
+        await Assert.That(fixture.Combat.Target).IsSameReferenceAs(fox);
+        await Assert.That(fixture.Controller.Inspect().State)
+            .IsEqualTo(BotQuestLifecycleState.Fighting);
+    }
+
+    [Test]
+    public async Task ArrivedMonsterObjectiveWaitsForRespawnWithoutAbandoningQuest()
+    {
+        var fixture = MakeFixture();
+        fixture.Authority.Snapshots = [MonsterSnapshot(250, 0, 3, 3492)];
+        fixture.Authority.StaticMonsterDestinations =
+            [new BotQuestStaticObjectiveDestination(3492, new Vector3(2, 0, 0), 12, 2, true)];
+
+        var claimed = fixture.Controller.Step(
+            fixture.Runtime,
+            EnabledConfig(),
+            fixture.Time.GetUtcNow());
+
+        await Assert.That(claimed).IsTrue();
+        await Assert.That(fixture.Controller.Inspect().State)
+            .IsEqualTo(BotQuestLifecycleState.WaitingForRespawn);
+        await Assert.That(fixture.Controller.Inspect().DecisionReason)
+            .IsEqualTo("waiting_for_objective_respawn");
+        await Assert.That(fixture.Controller.Inspect().SuspensionCount).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task RegionalReportEndpointBeyondTheOldLocalCapRemainsRoutable()
+    {
+        var fixture = MakeFixture();
+        var route = new Vector3(646, 0, 4);
+        fixture.Authority.Snapshots = [ReadySnapshot(2532, BotQuestReportKind.Npc, 10581, [])];
+        fixture.Authority.StaticReportDestinations =
+            [new BotQuestStaticReportDestination(BotQuestReportKind.Npc, 10581, route, 646)];
+
+        var claimed = fixture.Controller.Step(
+            fixture.Runtime,
+            EnabledConfig(),
+            fixture.Time.GetUtcNow());
+
+        await Assert.That(claimed).IsTrue();
+        await Assert.That(BotQuestLifecycleController.MaximumReportRouteDistance).IsGreaterThan(646f);
+        await Assert.That(fixture.Movement.Destination).IsEqualTo(route);
+        await Assert.That(fixture.Controller.Inspect().DecisionReason)
+            .IsEqualTo("moving_to_static_report_endpoint");
+    }
+
+    [Test]
+    public async Task NearbyActiveObjectiveOutranksAReadyRegionalReportAndRemainsSticky()
+    {
+        var fixture = MakeFixture();
+        var fox = fixture.AddNpc(3492, 12);
+        fixture.Authority.Targets = [fox];
+        fixture.Authority.StaticReportDestinations =
+            [new BotQuestStaticReportDestination(
+                BotQuestReportKind.Npc,
+                10581,
+                new Vector3(646, 0, 4),
+                646)];
+        fixture.Authority.Snapshots =
+        [
+            ReadySnapshot(2532, BotQuestReportKind.Npc, 10581, []),
+            MonsterSnapshot(250, 0, 3, 3492)
+        ];
+        var config = EnabledConfig();
+
+        fixture.Controller.Step(fixture.Runtime, config, fixture.Time.GetUtcNow());
+        var selected = fixture.Controller.Inspect();
+        fixture.Controller.Step(
+            fixture.Runtime,
+            config,
+            fixture.Time.GetUtcNow().AddSeconds(1));
+        var retained = fixture.Controller.Inspect();
+
+        await Assert.That(selected.QuestId).IsEqualTo(250u);
+        await Assert.That(selected.State).IsEqualTo(BotQuestLifecycleState.Fighting);
+        await Assert.That(retained.QuestId).IsEqualTo(250u);
+        await Assert.That(fixture.Combat.Target).IsSameReferenceAs(fox);
+    }
+
+    [Test]
+    public async Task NearestReadyQuestInTheLocalClusterOutranksRegionalMainStory()
+    {
+        var fixture = MakeFixture();
+        var localRoute = new Vector3(176, 0, 4);
+        fixture.Authority.Snapshots =
+        [
+            ReadySnapshot(2532, BotQuestReportKind.Npc, 10581, []),
+            ReadySnapshot(330, BotQuestReportKind.Npc, 3511, [])
+        ];
+        fixture.Authority.StaticReportDestinations =
+        [
+            new BotQuestStaticReportDestination(BotQuestReportKind.Npc, 10581, new Vector3(646, 0, 4), 646),
+            new BotQuestStaticReportDestination(BotQuestReportKind.Npc, 3511, localRoute, 176)
+        ];
+
+        fixture.Controller.Step(
+            fixture.Runtime,
+            EnabledConfig(),
+            fixture.Time.GetUtcNow());
+
+        await Assert.That(fixture.Controller.Inspect().QuestId).IsEqualTo(330u);
+        await Assert.That(fixture.Movement.Destination).IsEqualTo(localRoute);
+    }
+
+    [Test]
+    public async Task TargetDiscoveryRetryGetsAFreshSelectionDeadlineAndCanAcquireRespawnedTarget()
+    {
+        var fixture = MakeFixture();
+        fixture.Authority.Snapshots = [MonsterSnapshot(100, 0, 1, 700)];
+        var config = EnabledConfig();
+        var started = fixture.Time.GetUtcNow();
+
+        fixture.Controller.Step(fixture.Runtime, config, started);
+        fixture.Controller.Step(fixture.Runtime, config, started.AddMilliseconds(1001));
+        fixture.Authority.Targets = [fixture.AddNpc(700, 4)];
+        fixture.Controller.Step(fixture.Runtime, config, started.AddMilliseconds(31001));
+
+        var view = fixture.Controller.Inspect();
+        await Assert.That(view.State).IsEqualTo(BotQuestLifecycleState.Fighting);
+        await Assert.That(view.DecisionReason).IsEqualTo("objective_target_selected");
+        await Assert.That(fixture.BeginCombatCalls).IsEqualTo(1);
+    }
+
     private static BotQuestSnapshot MonsterSnapshot(
         uint questId,
         int current,
@@ -305,10 +635,27 @@ public sealed class BotQuestLifecycleControllerTests
             true,
             false,
             BotQuestObjectiveShape.MonsterHunt,
-            new BotQuestMonsterHuntObjective(targetTemplateId, 0, current, required),
+            new BotQuestMonsterHuntObjective(targetTemplateId, questId + 10000, 0, current, required),
+            null,
             [],
             [],
             "monster_hunt");
+
+    private static BotQuestSnapshot GatherSnapshot(
+        uint questId,
+        int current,
+        int required,
+        uint itemId) =>
+        new(
+            questId,
+            false,
+            false,
+            BotQuestObjectiveShape.ItemGather,
+            null,
+            new BotQuestItemGatherObjective(itemId, questId + 10000, 0, current, required, true),
+            [],
+            [],
+            "item_gather");
 
     private static BotQuestSnapshot ReadySnapshot(
         uint questId,
@@ -320,6 +667,7 @@ public sealed class BotQuestLifecycleControllerTests
             true,
             true,
             BotQuestObjectiveShape.Unsupported,
+            null,
             null,
             [new BotQuestReportEndpoint(kind, templateId)],
             rewards,
@@ -423,6 +771,8 @@ public sealed class BotQuestLifecycleControllerTests
         public int BeginCombatCalls { get; private set; }
         public int EndCombatCalls { get; private set; }
         public int StopMovementCalls { get; private set; }
+        public int SetDestinationCalls { get; private set; }
+        public float DestinationDeduplicationTolerance { get; set; }
 
         public Npc AddNpc(uint templateId, float x)
         {
@@ -474,8 +824,18 @@ public sealed class BotQuestLifecycleControllerTests
             runtime.CombatState.TransitionTo(BotCombatStateType.Idle);
         }
 
-        public void SetDestination(Character _, Vector3 destination, bool __) =>
+        public void SetDestination(Character _, Vector3 destination, bool __)
+        {
+            SetDestinationCalls++;
+            if (Movement.Destination is { } current &&
+                DestinationDeduplicationTolerance > 0f &&
+                Vector3.Distance(current, destination) <= DestinationDeduplicationTolerance)
+            {
+                return;
+            }
+
             Movement.Destination = destination;
+        }
 
         public void StopMovement(Character _)
         {
@@ -488,7 +848,16 @@ public sealed class BotQuestLifecycleControllerTests
     {
         public IReadOnlyList<BotQuestSnapshot> Snapshots { get; set; } = [];
         public IReadOnlyList<Npc> Targets { get; set; } = [];
+        public IReadOnlyList<Npc> GatherTargets { get; set; } = [];
+        public IReadOnlyList<BotQuestStaticObjectiveDestination> StaticMonsterDestinations { get; set; } = [];
+        public IReadOnlyList<BotQuestStaticObjectiveDestination> StaticGatherDestinations { get; set; } = [];
+        public float RequestedStaticObjectiveMaximumDistance { get; private set; }
+        public BotQuestLootAttempt LootAttempt { get; set; } =
+            new(false, "quest_loot_entry_count", 0, 0);
+        public int LootAttemptCount { get; private set; }
         public IReadOnlyList<BotQuestWorldObject> ReportObjects { get; set; } = [];
+        public IReadOnlyList<BotQuestStaticReportDestination> StaticReportDestinations { get; set; } = [];
+        public float RequestedStaticReportMaximumDistance { get; private set; }
         public List<(uint QuestId, BotQuestReportKind Kind, uint ObjectId, int RewardIndex)> Reports { get; } = [];
         public bool ReportResult { get; set; } = true;
 
@@ -511,11 +880,57 @@ public sealed class BotQuestLifecycleControllerTests
             float radius,
             DateTimeOffset now) => Targets;
 
+        public IReadOnlyList<Npc> FindItemGatherTargets(
+            BotRuntime runtime,
+            uint questId,
+            uint itemId,
+            float radius,
+            DateTimeOffset now) => GatherTargets;
+
+        public IReadOnlyList<BotQuestStaticObjectiveDestination> FindStaticMonsterDestinations(
+            BotRuntime runtime,
+            BotQuestMonsterHuntObjective objective,
+            float maximumDistance)
+        {
+            RequestedStaticObjectiveMaximumDistance = maximumDistance;
+            return StaticMonsterDestinations;
+        }
+
+        public IReadOnlyList<BotQuestStaticObjectiveDestination> FindStaticItemGatherDestinations(
+            BotRuntime runtime,
+            uint questId,
+            BotQuestItemGatherObjective objective,
+            float maximumDistance)
+        {
+            RequestedStaticObjectiveMaximumDistance = maximumDistance;
+            return StaticGatherDestinations;
+        }
+
+        public BotQuestLootAttempt TryLootGatherItem(
+            Character bot,
+            uint questId,
+            uint itemId,
+            Npc corpse,
+            float interactionRadius)
+        {
+            LootAttemptCount++;
+            return LootAttempt;
+        }
+
         public IReadOnlyList<BotQuestWorldObject> FindReportObjects(
             BotRuntime runtime,
             BotQuestReportEndpoint endpoint,
             float radius,
             DateTimeOffset now) => ReportObjects;
+
+        public IReadOnlyList<BotQuestStaticReportDestination> FindStaticReportDestinations(
+            BotRuntime runtime,
+            BotQuestReportEndpoint endpoint,
+            float maximumDistance)
+        {
+            RequestedStaticReportMaximumDistance = maximumDistance;
+            return StaticReportDestinations;
+        }
 
         public bool ReportQuest(
             Character bot,

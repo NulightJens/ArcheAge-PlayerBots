@@ -22,6 +22,10 @@ public class BotIdentityFactoryTests
         await Assert.That(patch).Contains("skillManager.GetStartAbilitySkills(character.Ability1)");
         await Assert.That(patch).Contains("character.Quests = new CharacterQuests(character)");
         await Assert.That(patch).Contains("ExperienceManager.Instance.GetExpForLevel(request.Level)");
+        await Assert.That(patch).Contains("CreateServerOwnedBotModel(template, out var hairItemId)");
+        await Assert.That(patch).Contains("lower(CAST(npcOnly AS TEXT)) IN ('0', 'f', 'false')");
+        await Assert.That(patch).Contains("new UnitCustomModelParams(UnitCustomModelType.Face)");
+        await Assert.That(patch).Contains("ModelId = template.ModelId");
         await Assert.That(patch).Contains("character.SaveDirectlyToDatabase()");
         await Assert.That(patch).DoesNotContain("+            connection.SendPacket");
         await Assert.That(patch).DoesNotContain("+        new GameConnection");

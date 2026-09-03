@@ -6,8 +6,8 @@ the client or `game_pak` is never written.
 
 ## Data boundary
 
-`compatibility/aaemu-1.2-r208022-transfer-road-adapter.patch` adds one narrow
-host method, `TransferGameData.GetTransferRoadsSnapshot()`. AAEmu finishes a
+`compatibility/aaemu-1.2-r208022-v4.patch` includes the narrow host method
+`TransferGameData.GetTransferRoadsSnapshot()`. AAEmu finishes a
 load into a private replacement dictionary and atomically publishes an
 immutable store with a monotonically increasing revision. A capture copies all
 roads and points into read-only snapshot records; callers cannot reach the host
@@ -20,9 +20,9 @@ one-way flag, so this adapter labels those roads `Bidirectional`. The shared
 module model also supports `ForwardOnly` and `ReverseOnly` for a future host
 seam that exposes direction metadata.
 
-The compatibility patch is deliberately separate from the released AAEmu 1.2
-module patch. An integrator applies both reviewed patches; source workers do
-not edit the registered reference checkout or the deployed runtime host.
+The earlier transfer-road adapter is retained as development history. Normal
+installations use the complete v4 host patch; source workers do not edit the
+registered reference checkout or the deployed runtime host.
 
 ## Graph normalization
 
@@ -125,6 +125,28 @@ var session = new WorldRoadNavigationSession(
 
 The owner calls `Advance(currentBotPosition)` from its normal movement loop and
 retains the session until it reports `Completed` or `Failed`.
+
+## Quest destination indexing
+
+`BotQuestDestinationIndex` is the lightweight quest-to-travel bridge. It builds
+one immutable static-NPC spawn index per live `WorldInstance` and shares it
+across every bot. NPC quest-start associations are a separate lazy projection,
+so objective and report routing do not pay the intake-index cost. The only
+per-bot travel state is its current quest, semantic destination, route cursor,
+and bounded retry state.
+
+For monster and item-gather objectives the resolver combines three sources:
+
+1. the active quest component ID;
+2. read-only quest marker spheres already loaded by AAEmu from client data; and
+3. exact monster or loot-source templates mapped to server static spawns.
+
+An exact matching spawn inside an authored marker is preferred, followed by the
+marker area itself, then an unmarked exact spawn. The marker selects where the
+quest happens; it is not a navmesh and never directly moves the bot. The chosen
+point flows through `BotTravelRoutePlanner`, which prefers transfer roads and
+uses the BAI/local boundary for the final deviation. A nearby live object must
+still be revalidated before interaction or combat.
 
 ## Debug representation
 

@@ -4,6 +4,7 @@ using System.Numerics;
 using AAEmu.Commons.Utils;
 using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Bots.Navigation;
 using AAEmu.Game.Bots.Population.Identity;
 using AAEmu.Game.Core.Managers.Id;
 using AAEmu.Game.Core.Managers.UnitManagers;
@@ -559,10 +560,52 @@ public class BotManager : Singleton<BotManager>, IBotManager
         if (bot == null || !_botStates.TryGetValue(bot.Id, out var state))
             return;
 
+        ClearTravelRoute(state);
         state.Destination = new Vector3(x, y, z);
         state.IsRunning = run;
         state.FallVelocity = 0; // reset fall when starting to move
         Logger.Trace($"BOT id={bot.Id} obj={bot.ObjId} ev=destination pos=({x}, {y}, {z}) run={run}");
+    }
+
+    /// <summary>
+    /// Selects an authoritative road/BAI route while preserving the caller's final
+    /// destination for movement-ownership checks.
+    /// </summary>
+    public void SetBotTravelDestination(Character bot, Vector3 destination, bool run = true)
+    {
+        if (bot == null || !_botStates.TryGetValue(bot.Id, out var state))
+            return;
+
+        if (state.TravelDestination is { } current &&
+            Vector3.Distance(current, destination) <= 0.5f && state.Destination.HasValue)
+        {
+            return;
+        }
+
+        var route = BotTravelRoutePlanner.Plan(bot, destination);
+        ClearTravelRoute(state);
+        state.TravelDestination = destination;
+        state.TravelMode = route.Mode;
+        foreach (var waypoint in route.Waypoints)
+            state.TravelWaypoints.Enqueue(waypoint);
+
+        if (state.TravelWaypoints.Count == 0)
+            state.TravelWaypoints.Enqueue(destination);
+        state.Destination = state.TravelWaypoints.Dequeue();
+        state.TravelRemainingDistance = BotTravelPathFollower.MeasureRemaining(
+            bot.Transform.World.Position,
+            state.Destination.Value,
+            state.TravelWaypoints);
+        state.SteeringDestination = null;
+        state.TravelDirection = Vector3.Zero;
+        state.TravelSpeed = 0f;
+        state.ApprovedNavigationDestination = null;
+        state.IsRunning = run;
+        state.FallVelocity = 0;
+        Logger.Info(
+            $"BOT id={bot.Id} obj={bot.ObjId} ev=travel_route_selected mode={route.Mode} " +
+            $"road_steps={route.RoadSteps} waypoints={state.TravelWaypointCount} detail={route.Detail} " +
+            $"destination=({destination.X:F2},{destination.Y:F2},{destination.Z:F2})");
     }
 
     internal bool SetBotDestinationIfChanged(Character bot, Vector3 destination, bool run = true, float tolerance = 0.5f)
@@ -574,6 +617,34 @@ public class BotManager : Singleton<BotManager>, IBotManager
             return false;
 
         SetBotDestination(bot, destination.X, destination.Y, destination.Z, run);
+        return true;
+    }
+
+    internal bool SetBotRecoveryDestinationIfChanged(
+        Character bot,
+        Vector3 destination,
+        bool run = true,
+        float tolerance = 0.5f)
+    {
+        if (bot == null || !_botStates.TryGetValue(bot.Id, out var state))
+            return false;
+
+        if (state.Destination is { } current && Vector3.Distance(current, destination) <= tolerance)
+            return false;
+
+        if (!state.TravelDestination.HasValue)
+            return SetBotDestinationIfChanged(bot, destination, run, tolerance);
+
+        state.Destination = destination;
+        state.SteeringDestination = null;
+        state.TravelDirection = Vector3.Zero;
+        state.TravelSpeed = 0f;
+        state.ApprovedNavigationDestination = null;
+        state.IsRunning = run;
+        state.FallVelocity = 0f;
+        Logger.Trace(
+            $"BOT id={bot.Id} obj={bot.ObjId} ev=recovery_destination " +
+            $"pos=({destination.X}, {destination.Y}, {destination.Z}) run={run} route_preserved=true");
         return true;
     }
 
@@ -593,6 +664,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
     {
         if (bot == null || !_botStates.TryGetValue(bot.Id, out var state))
             return;
+        ClearTravelRoute(state);
         state.Destination = null;
         Logger.Trace($"BOT id={bot.Id} obj={bot.ObjId} ev=stop");
     }
@@ -633,6 +705,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
 
     private static void ResetMovementState(BotMovementState state)
     {
+        ClearTravelRoute(state);
         state.Destination = null;
         state.IsMoving = false;
         state.IsFalling = false;
@@ -640,6 +713,18 @@ public class BotManager : Singleton<BotManager>, IBotManager
         state.JumpRequested = false;
         state.IsJumping = false;
         state.JumpVerticalVelocity = 0;
+    }
+
+    private static void ClearTravelRoute(BotMovementState state)
+    {
+        state.TravelDestination = null;
+        state.TravelMode = "direct";
+        state.TravelWaypoints.Clear();
+        state.SteeringDestination = null;
+        state.TravelDirection = Vector3.Zero;
+        state.TravelSpeed = 0f;
+        state.TravelRemainingDistance = 0f;
+        state.ApprovedNavigationDestination = null;
     }
 
     private void StopAndClear(Character bot, Vector3 pos)

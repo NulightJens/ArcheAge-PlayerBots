@@ -223,6 +223,99 @@ public class BotMovementTaskTests
     }
 
     [Test]
+    public async Task Execute_TravelWaypointTowardTerrainDrop_IsVetoedAndClearsAdvisoryRoute()
+    {
+        var setup = CreateTask(
+            Vector3.Zero,
+            groundHeight: (x, y) => x >= 0.5f || MathF.Abs(y) >= 0.05f ? -10f : 0f);
+        setup.State.TravelDestination = new Vector3(10f, 0f, -10f);
+        setup.State.TravelMode = "bai";
+        setup.State.Destination = new Vector3(10f, 0f, -10f);
+        setup.State.TravelWaypoints.Enqueue(new Vector3(20f, 0f, -10f));
+
+        setup.Task.Execute();
+        setup.Task.Execute();
+        setup.Task.Execute();
+
+        await Assert.That(setup.Bot.Transform.World.Position.X).IsEqualTo(0.36f).Within(1e-4f);
+        await Assert.That(setup.Broadcaster.Calls.Select(call => call.Kind)).IsEquivalentTo(["Move", "Move", "Stop"]);
+        await Assert.That(setup.State.Destination).IsNull();
+        await Assert.That(setup.State.TravelDestination).IsNull();
+        await Assert.That(setup.State.TravelWaypointCount).IsEqualTo(0);
+        await Assert.That(setup.State.LastNavigationDecision.Value.Reason)
+            .IsEqualTo(NavigationDiagnosticReason.TerrainDropRejected);
+    }
+
+    [Test]
+    public async Task Execute_TravelWaypointTowardLocalTerrainDrop_UsesSafeContourAndRetainsRoute()
+    {
+        var setup = CreateTask(
+            Vector3.Zero,
+            groundHeight: (x, y) => x >= 0.5f && MathF.Abs(y) < 0.15f ? -10f : 0f);
+        setup.State.TravelDestination = new Vector3(10f, 0f, -10f);
+        setup.State.TravelMode = "bai";
+        setup.State.Destination = new Vector3(10f, 0f, -10f);
+        setup.State.TravelWaypoints.Enqueue(new Vector3(20f, 0f, -10f));
+
+        setup.Task.Execute();
+        setup.Task.Execute();
+        setup.Task.Execute();
+
+        await Assert.That(setup.Bot.Transform.World.Position.X).IsGreaterThan(0.5f);
+        await Assert.That(MathF.Abs(setup.Bot.Transform.World.Position.Y)).IsGreaterThan(0.15f);
+        await Assert.That(setup.Broadcaster.Calls.Select(call => call.Kind)).IsEquivalentTo(["Move", "Move", "Move"]);
+        await Assert.That(setup.State.Destination).IsNotNull();
+        await Assert.That(setup.State.TravelDestination).IsEqualTo(new Vector3(10f, 0f, -10f));
+        await Assert.That(setup.State.TravelWaypointCount).IsEqualTo(2);
+        await Assert.That(setup.State.LastNavigationDecision.Value.Status)
+            .IsEqualTo(NavigationDecisionStatus.Accepted);
+        await Assert.That(setup.State.LastNavigationDecision.Value.Reason)
+            .IsEqualTo(NavigationDiagnosticReason.TerrainDropDetourAccepted);
+    }
+
+    [Test]
+    public async Task Execute_TravelWaypointReached_AdvancesWithoutClearingLogicalDestination()
+    {
+        var setup = CreateTask(Vector3.Zero);
+        setup.State.TravelDestination = new Vector3(2f, 0f, 0f);
+        setup.State.TravelMode = "road+bai";
+        setup.State.Destination = new Vector3(0.4f, 0f, 0f);
+        setup.State.TravelWaypoints.Enqueue(new Vector3(2f, 0f, 0f));
+
+        setup.Task.Execute();
+
+        await Assert.That(setup.Bot.Transform.World.Position.X).IsEqualTo(0.12f).Within(1e-4f);
+        await Assert.That(setup.State.Destination).IsEqualTo(new Vector3(2f, 0f, 0f));
+        await Assert.That(setup.State.TravelDestination).IsEqualTo(new Vector3(2f, 0f, 0f));
+        await Assert.That(setup.State.TravelMode).IsEqualTo("road+bai");
+        await Assert.That(setup.State.TravelWaypointCount).IsEqualTo(1);
+        await Assert.That(setup.State.TravelSpeed).IsEqualTo(1.2f).Within(1e-4f);
+        await Assert.That(setup.State.SteeringDestination.Value.X).IsEqualTo(1.25f).Within(1e-4f);
+        await Assert.That(setup.Broadcaster.Calls.Single().Kind).IsEqualTo("Move");
+    }
+
+    [Test]
+    public async Task RecoveryDestinationPreservesLogicalRouteAndRemainingWaypoints()
+    {
+        var setup = CreateTask(Vector3.Zero);
+        var final = new Vector3(20f, 0f, 0f);
+        var next = new Vector3(10f, 0f, 0f);
+        var nudge = new Vector3(0f, 2f, 0f);
+        setup.State.TravelDestination = final;
+        setup.State.TravelMode = "road+bai";
+        setup.State.Destination = new Vector3(5f, 0f, 0f);
+        setup.State.TravelWaypoints.Enqueue(next);
+        setup.State.TravelWaypoints.Enqueue(final);
+
+        setup.Task.SetRecoveryDestination(setup.Bot, nudge);
+
+        await Assert.That(setup.State.Destination).IsEqualTo(nudge);
+        await Assert.That(setup.State.TravelDestination).IsEqualTo(final);
+        await Assert.That(setup.State.TravelMode).IsEqualTo("road+bai");
+        await Assert.That(setup.State.TravelWaypointCount).IsEqualTo(3);
+    }
+
+    [Test]
     public async Task Execute_ArrivesThisTick_SendsMoveThenStop()
     {
         var setup = CreateTask(Vector3.Zero);
@@ -459,7 +552,8 @@ public class BotMovementTaskTests
         bool running = true,
         BotConfig config = null,
         TimeProvider time = null,
-        INavigationDecisionBoundary navigationBoundary = null)
+        INavigationDecisionBoundary navigationBoundary = null,
+        Func<float, float, float> groundHeight = null)
     {
         var bot = new MovementCharacterMock { Id = 20, ObjId = 1020, Name = "bot20" };
         bot.Transform.Local.SetPosition(position);
@@ -474,7 +568,7 @@ public class BotMovementTaskTests
             state,
             broadcaster,
             baseSpeed: isRunning => isRunning ? 5.4f : 1.8f,
-            groundHeight: (_, _) => 0f,
+            groundHeight: groundHeight ?? ((_, _) => 0f),
             config: config,
             time: time,
             navigationBoundary: navigationBoundary);

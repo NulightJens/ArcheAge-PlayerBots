@@ -4,6 +4,19 @@ Player-facing patch notes come first; developer packaging detail follows.
 
 ## Unreleased
 
+## 0.2.0-alpha.6 - 2026-09-03
+
+### Nuian starter quest autonomy
+
+- Added a dedicated-account identity factory that can create and immediately admit a persistent level-one Nuian bot at its native race spawn or a validated player location.
+- Replaced invalid starter rotations with learned-skill-aware decisions that select only skills the character actually knows and pass native cooldown, mana, range, and facing gates.
+- Added opt-in nearby NPC and doodad quest intake, sticky local-first quest prioritization, native monster-hunt and owned-corpse item-gather execution, respawn waiting, guarded reporting, and native auto-completion observation.
+- Added a lightweight quest destination index that combines AAEmu quest markers and static spawns with transfer-road routing, then yields final approaches to bounded local movement.
+- Preserved the logical quest route during unsticking and lifecycle/intake handoffs so recovery nudges cannot silently replace the active quest destination.
+- Added a static, color-coded live decision board showing acquired quest priorities plus current quest, combat, navigation, and health/execution reasoning.
+- Retained client-witnessed AAEmu 1.2 proof from fresh Nuian `Freshnav14`: native quests 330, 250, 6198, 2531, 251, 324, and 325 completed autonomously, including the main-story chain and the signpost fox quest's native 3/3 auto-completion. The final route-ownership hardening remains pending one exact-candidate redeploy confirmation.
+- Consolidated the AAEmu 1.2 identity, doodad quest, and transfer-road adapters into immutable installer patch `aaemu-1.2-r208022-v4.patch`.
+
 ### Loopback command fixtures
 
 - Fixed fresh AAEmu 1.2 loopback `@system` actors to snapshot the lowest-character-ID qualified active bot's matching world, instance, non-zero zone, coordinates, and rotation without creating or registering a player, account, or connection.

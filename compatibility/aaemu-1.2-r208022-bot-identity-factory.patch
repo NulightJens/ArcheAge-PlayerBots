@@ -120,7 +120,7 @@ index b120ffd3f..7f45856db 100644
  
      public CharacterTemplate GetTemplate(Race race, Gender gender)
      {
-@@ -609,6 +614,410 @@ public class CharacterManager(
+@@ -609,6 +614,469 @@ public class CharacterManager(
          }
      }
  
@@ -401,10 +401,12 @@ index b120ffd3f..7f45856db 100644
 +        AbilityItems startingItems,
 +        WorldSpawnPosition placement)
 +    {
-+        var character = new Character(new UnitCustomModelParams())
++        var modelParams = CreateServerOwnedBotModel(template, out var hairItemId);
++        var character = new Character(modelParams)
 +        {
 +            Id = characterId,
 +            TemplateId = characterId,
++            ModelId = template.ModelId,
 +            AccountId = request.ServerOwnedAccountId,
 +            Name = name,
 +            Race = request.Race,
@@ -452,9 +454,12 @@ index b120ffd3f..7f45856db 100644
 +        SetEquipItemTemplate(character.Inventory, startingItems.Items.Cosplay, EquipmentItemSlot.Cosplay, startingItems.Items.CosplayGrade);
 +        for (var index = 0; index < Math.Min(7, template.Items.Length); index++)
 +        {
++            var bodyItemId = index == 1 && hairItemId != 0
++                ? hairItemId
++                : template.Items[index];
 +            SetEquipItemTemplate(
 +                character.Inventory,
-+                template.Items[index],
++                bodyItemId,
 +                (EquipmentItemSlot)(index + 19),
 +                0);
 +        }
@@ -503,6 +508,60 @@ index b120ffd3f..7f45856db 100644
 +        character.Mp = character.MaxMp;
 +        character.RestoreSavedHpMp();
 +        return character;
++    }
++
++    private static UnitCustomModelParams CreateServerOwnedBotModel(
++        CharacterTemplate template,
++        out uint hairItemId)
++    {
++        hairItemId = 0;
++        using var connection = SQLite.CreateConnection();
++        using var command = connection.CreateCommand();
++        command.CommandText =
++            "SELECT * FROM total_character_customs " +
++            "WHERE model_id = @model_id " +
++            "AND lower(CAST(npcOnly AS TEXT)) IN ('0', 'f', 'false') ORDER BY id LIMIT 1";
++        command.Parameters.AddWithValue("@model_id", template.ModelId);
++        command.Prepare();
++        using var reader = new SQLiteWrapperReader(command.ExecuteReader());
++        if (!reader.Read())
++        {
++            return new UnitCustomModelParams(UnitCustomModelType.Skin)
++                .SetModelId(template.ModelId);
++        }
++
++        hairItemId = reader.GetUInt32("hair_id");
++        var model = new UnitCustomModelParams(UnitCustomModelType.Face)
++            .SetModelId(template.ModelId)
++            .SetHairColorId(reader.GetUInt32("hair_color_id"))
++            .SetSkinColorId(reader.GetUInt32("skin_color_id"));
++        var face = model.Face;
++        face.MovableDecalAssetId = reader.GetUInt32("face_movable_decal_asset_id");
++        face.MovableDecalWeight = reader.GetFloat("face_movable_decal_weight");
++        face.MovableDecalScale = reader.GetFloat("face_movable_decal_scale");
++        face.MovableDecalRotate = reader.GetFloat("face_movable_decal_rotate");
++        face.MovableDecalMoveX = reader.GetInt16("face_movable_decal_move_x");
++        face.MovableDecalMoveY = reader.GetInt16("face_movable_decal_move_y");
++        face.SetFixedDecalAsset(0, reader.GetUInt32("face_fixed_decal_asset_0_id"),
++            reader.GetFloat("face_fixed_decal_asset_0_weight"));
++        face.SetFixedDecalAsset(1, reader.GetUInt32("face_fixed_decal_asset_1_id"),
++            reader.GetFloat("face_fixed_decal_asset_1_weight"));
++        face.SetFixedDecalAsset(2, reader.GetUInt32("face_fixed_decal_asset_2_id"),
++            reader.GetFloat("face_fixed_decal_asset_2_weight"));
++        face.SetFixedDecalAsset(3, reader.GetUInt32("face_fixed_decal_asset_3_id"),
++            reader.GetFloat("face_fixed_decal_asset_3_weight"));
++        face.DiffuseMapId = reader.GetUInt32("face_diffuse_map_id");
++        face.NormalMapId = reader.GetUInt32("face_normal_map_id");
++        face.EyelashMapId = reader.GetUInt32("face_eyelash_map_id");
++        face.NormalMapWeight = reader.GetFloat("face_normal_map_weight");
++        face.LipColor = reader.GetUInt32("lip_color");
++        face.LeftPupilColor = reader.GetUInt32("left_pupil_color");
++        face.RightPupilColor = reader.GetUInt32("right_pupil_color");
++        face.EyebrowColor = reader.GetUInt32("eyebrow_color");
++        face.DecoColor = reader.GetUInt32("deco_color");
++        if (reader.GetValue("modifier") is byte[] modifier && modifier.Length == 128)
++            face.Modifier = modifier;
++        return model;
 +    }
 +
 +    private static bool IsPlayableAbility(AbilityType ability) =>

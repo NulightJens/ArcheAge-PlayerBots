@@ -18,6 +18,7 @@ using AAEmu.Game.Models.Game.Items.Actions;
 using AAEmu.Game.Models.Game.Items.Containers;
 using AAEmu.Game.Models.Game.Items.Templates;
 using AAEmu.Game.Models.Game.Skills;
+using AAEmu.Game.Models.Game.Skills.Templates;
 using AAEmu.Game.Models.Game.Units;
 using Newtonsoft.Json;
 using NLog;
@@ -573,7 +574,11 @@ namespace AAEmu.Game.Core.Managers.Bots
         private void ReapplyArchetype(Character bot, BotArchetypeState state)
         {
             SynchronizeAbilityExp(bot);
-            ClearArchetypeSkills(bot);
+            // Planned low-level classes retain the native starter skills granted
+            // at character creation. Rebuilding from an archetype list can replace
+            // a visible starter with a hidden/internal chain variant.
+            if (!string.IsNullOrEmpty(state.ArchetypeName))
+                ClearArchetypeSkills(bot);
             LearnSkills(bot, state);
             EquipBestGear(bot, state);
         }
@@ -888,6 +893,11 @@ namespace AAEmu.Game.Core.Managers.Bots
                     Logger.Warn($"Skill ID {skillId} does not exist, skipping.");
                     continue;
                 }
+                if (!IsPlayerLearnableActiveSkill(skillTemplate))
+                {
+                    Logger.Debug($"Skill ID {skillId} is hidden or not player-learnable, skipping.");
+                    continue;
+                }
 
                 var abilityType = (AbilityType)skillTemplate.AbilityId;
                 if (!IsAbilityActive(bot, abilityType))
@@ -934,6 +944,9 @@ namespace AAEmu.Game.Core.Managers.Bots
         {
             return ability == bot.Ability1 || ability == bot.Ability2 || ability == bot.Ability3;
         }
+
+        internal static bool IsPlayerLearnableActiveSkill(SkillTemplate template) =>
+            template is { Show: true, NeedLearn: true };
 
         // ---- Gear methods ----
         private class WeaponConfiguration

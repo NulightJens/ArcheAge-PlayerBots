@@ -1,7 +1,7 @@
 {
   "name": "ArcheAge PlayerBots",
   "id": "archeage-playerbots",
-  "version": "0.2.0-alpha.5",
+  "version": "0.2.0-alpha.6",
   "license": "GPL-3.0-or-later",
   "repository": "https://github.com/NulightJens/ArcheAge-PlayerBots",
   "modulePath": "modules/archeage-playerbots",
@@ -18,8 +18,8 @@
       "repository": "https://github.com/AAEmu/AAEmu",
       "testedBaseCommit": "62e3eb1d87da01194802ac886cd500134facad28",
       "status": "supported",
-      "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v3.patch",
-      "compatibilityPatchSha256": "baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606"
+      "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v4.patch",
+      "compatibilityPatchSha256": "8e33ed82dcbfc6e9e7aaec46624610b542ea3a113ee834d2450fb2f818b56e14"
     },
     {
       "id": "AAEmu30",
@@ -32,8 +32,8 @@
     }
   ],
   "install": {
-    "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v3.patch",
-    "compatibilityPatchSha256": "baa0979a200eb7f4403985d7166092f937033c31650aa11336fba31543d96606",
+    "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v4.patch",
+    "compatibilityPatchSha256": "8e33ed82dcbfc6e9e7aaec46624610b542ea3a113ee834d2450fb2f818b56e14",
     "optionalHostSecurityPatch": "compatibility/aaemu-1.2-security-baseline.patch",
     "optionalHostSecurityPatchSha256": "64d0fb4ba543a86670a4e8d9fa5859548fe23217b842f4b1660852e4131371ae",
     "gameTargets": "build/AAEmu.PlayerBots.Game.targets",

@@ -7,6 +7,21 @@ namespace AAEmu.Game.Models.Game.Bots
     public class BotMovementState
     {
         public Vector3? Destination { get; set; }
+        /// <summary>
+        /// The behavior-owned final destination while <see cref="Destination"/> advances
+        /// through collision-aware local and road waypoints.
+        /// </summary>
+        public Vector3? TravelDestination { get; internal set; }
+        public string TravelMode { get; internal set; } = "direct";
+        public int TravelWaypointCount => TravelWaypoints.Count + (Destination.HasValue ? 1 : 0);
+        internal Queue<Vector3> TravelWaypoints { get; } = new();
+        /// <summary>The short-horizon point currently driving smooth route steering.</summary>
+        public Vector3? SteeringDestination { get; internal set; }
+        /// <summary>Retained horizontal speed for acceleration and braking between route ticks.</summary>
+        public float TravelSpeed { get; internal set; }
+        /// <summary>Approximate path distance remaining, updated without re-planning the route.</summary>
+        public float TravelRemainingDistance { get; internal set; }
+        internal Vector3 TravelDirection { get; set; }
         public NavigationDecision? LastNavigationDecision { get; internal set; }
         internal Vector3? ApprovedNavigationDestination { get; set; }
         public bool IsRunning { get; set; } = true;

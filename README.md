@@ -13,9 +13,14 @@ ArcheAge PlayerBots is an [AAEmu](https://github.com/AAEmu/AAEmu) module that le
 Features include:
 
 - logging in an existing character as a bot and saving it through normal logout;
+- creating a persistent character under an explicitly configured server-owned bot account;
 - native party roles and follow, stay, attack, and passive orders;
 - melee, archer, caster, healer, and tank behavior;
-- seven included archetypes with data-driven combat rotations;
+- learned-skill-aware combat decisions that reject unavailable skills and respect native cooldown and resource gates;
+- opt-in nearby quest intake and native monster-hunt/item-gather lifecycle automation;
+- lightweight quest-marker and transfer-road routing with bounded local movement recovery;
+- a static live decision board for quest, combat, navigation, and health state;
+- seven included archetypes with data-driven combat policy;
 - in-game configuration reloads, diagnostics, and performance metrics;
 - optional server-start spawning for selected character IDs.
 

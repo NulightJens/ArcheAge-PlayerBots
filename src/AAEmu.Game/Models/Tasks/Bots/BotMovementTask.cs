@@ -34,6 +34,15 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
     private const float TickInterval = 0.1f;
     private const float FallbackRunSpeed = 5.4f;
     private const float FallbackWalkSpeed = 1.8f;
+    private const float MaximumSafeTerrainDropPerTick = 1.25f;
+    private const float MaximumTravelTurnRadiansPerSecond = 3f * MathF.PI;
+    private static readonly float[] TerrainDetourRadians =
+    [
+        MathF.PI / 4f,
+        -MathF.PI / 4f,
+        MathF.PI / 2f,
+        -MathF.PI / 2f
+    ];
 
     private float _cachedRunSpeed = FallbackRunSpeed;
     private float _cachedWalkSpeed = FallbackWalkSpeed;
@@ -108,11 +117,40 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         if (_state.Destination is { } current && Vector3.Distance(current, position) <= tolerance)
             return;
 
+        ClearTravelRoute(_state);
         _state.Destination = position;
         _state.ApprovedNavigationDestination = null;
         _state.IsRunning = run;
         _state.FallVelocity = 0;
         Logger.Trace($"BOT id={bot.Id} obj={bot.ObjId} ev=destination pos=({position.X}, {position.Y}, {position.Z}) run={run}");
+    }
+
+    public void SetRecoveryDestination(
+        Character bot,
+        Vector3 position,
+        bool run = true,
+        float tolerance = 0.5f)
+    {
+        if (!ReferenceEquals(bot, _bot))
+            return;
+        if (_state.Destination is { } current && Vector3.Distance(current, position) <= tolerance)
+            return;
+        if (!_state.TravelDestination.HasValue)
+        {
+            SetDestination(bot, position, run, tolerance);
+            return;
+        }
+
+        _state.Destination = position;
+        _state.SteeringDestination = null;
+        _state.TravelDirection = Vector3.Zero;
+        _state.TravelSpeed = 0f;
+        _state.ApprovedNavigationDestination = null;
+        _state.IsRunning = run;
+        _state.FallVelocity = 0f;
+        Logger.Trace(
+            $"BOT id={bot.Id} obj={bot.ObjId} ev=recovery_destination " +
+            $"pos=({position.X}, {position.Y}, {position.Z}) run={run} route_preserved=true");
     }
 
     public void StopIfMoving(Character bot)
@@ -161,6 +199,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         if (!ReferenceEquals(bot, _bot) || target == null)
             return;
 
+        ClearTravelRoute(_state);
         _state.FollowTarget = target;
         _state.FollowDistance = distance;
         _state.Destination = null;
@@ -285,6 +324,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
         var now = _time.GetUtcNow().UtcDateTime;
         var currentPosition = _bot.Transform.World.Position;
+        AdvanceReachedTravelWaypoints(currentPosition);
         if (!AuthorizeDestination(currentPosition))
             return;
 
@@ -296,47 +336,162 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
             var planarCurrent = new Vector3(currentPosition.X, currentPosition.Y, 0f);
             var planarDestination = new Vector3(destination.X, destination.Y, 0f);
             var distance = Vector3.Distance(planarCurrent, planarDestination);
-            if (distance < 0.5f)
+            var followingTravelRoute = _state.TravelDestination.HasValue;
+            if (!followingTravelRoute && distance < 0.5f)
             {
                 currentPosition.X = destination.X;
                 currentPosition.Y = destination.Y;
-                _state.Destination = null;
+                var advanced = AdvanceTravelWaypoint();
                 if (!_state.IsJumping)
                 {
                     currentPosition.Z = GetGroundHeight(currentPosition.X, currentPosition.Y);
                     _bot.Transform.Local.SetPosition(currentPosition.X, currentPosition.Y, currentPosition.Z);
-                    StopAndClear(currentPosition, forceFinalize: false);
+                    if (!advanced)
+                        StopAndClear(currentPosition, forceFinalize: false);
+                    else
+                        _bot.Transform.FinalizeTransform();
                     return;
                 }
             }
             else
             {
-                var finalSpeed = _baseSpeed(_state.IsRunning) * GetDirectionalMultiplier(destination, currentPosition) * _bot.MoveSpeedMul;
-                var movement = BotMovementMath.StepTowards(planarCurrent, planarDestination, finalSpeed, TickInterval);
-                currentPosition.X = movement.Next.X;
-                currentPosition.Y = movement.Next.Y;
-                if (movement.Arrived)
-                    _state.Destination = null;
+                var speedLimit = _baseSpeed(_state.IsRunning) *
+                                 GetDirectionalMultiplier(destination, currentPosition) * _bot.MoveSpeedMul;
+                var moveDirection = Vector3.Zero;
+                var appliedSpeed = speedLimit;
+                var nextPosition = planarCurrent;
+                var arrivedAtDirectDestination = false;
+                var stepDistance = 0f;
+                var usedTerrainDetour = false;
 
-                groundZ = GetGroundHeight(currentPosition.X, currentPosition.Y);
+                if (followingTravelRoute)
+                {
+                    if (_state.TravelRemainingDistance <= 0f)
+                    {
+                        _state.TravelRemainingDistance = BotTravelPathFollower.MeasureRemaining(
+                            currentPosition,
+                            destination,
+                            _state.TravelWaypoints);
+                    }
+
+                    var steeringTarget = BotTravelPathFollower.SelectSteeringTarget(
+                        currentPosition,
+                        destination,
+                        _state.TravelWaypoints,
+                        _state.TravelSpeed);
+                    _state.SteeringDestination = steeringTarget;
+                    var desiredDirection = new Vector3(
+                        steeringTarget.X - currentPosition.X,
+                        steeringTarget.Y - currentPosition.Y,
+                        0f);
+                    moveDirection = BotTravelPathFollower.TurnTowards(
+                        _state.TravelDirection,
+                        desiredDirection,
+                        MaximumTravelTurnRadiansPerSecond * TickInterval);
+                    _state.TravelDirection = moveDirection;
+
+                    var brakingDistance = _state.TravelWaypoints.Count == 0
+                        ? distance
+                        : _state.TravelRemainingDistance;
+                    _state.TravelSpeed = BotTravelPathFollower.AdvanceSpeed(
+                        _state.TravelSpeed,
+                        speedLimit,
+                        brakingDistance,
+                        TickInterval);
+                    appliedSpeed = _state.TravelSpeed;
+
+                    var steeringDistance = desiredDirection.Length();
+                    stepDistance = Math.Min(appliedSpeed * TickInterval, steeringDistance);
+                    nextPosition = planarCurrent + moveDirection * stepDistance;
+                }
+                else
+                {
+                    var movement = BotMovementMath.StepTowards(
+                        planarCurrent,
+                        planarDestination,
+                        speedLimit,
+                        TickInterval);
+                    nextPosition = movement.Next;
+                    arrivedAtDirectDestination = movement.Arrived;
+                    var direction = planarDestination - nextPosition;
+                    moveDirection = direction.LengthSquared() < 1e-6f
+                        ? Vector3.Zero
+                        : Vector3.Normalize(direction);
+                }
+
+                var nextGroundZ = GetGroundHeight(nextPosition.X, nextPosition.Y);
+                if (!float.IsFinite(nextGroundZ) || groundZ - nextGroundZ > MaximumSafeTerrainDropPerTick)
+                {
+                    if (followingTravelRoute && TryFindTerrainDropDetour(
+                            planarCurrent,
+                            moveDirection,
+                            stepDistance,
+                            groundZ,
+                            out var detourPosition,
+                            out var detourGroundZ,
+                            out var detourDirection))
+                    {
+                        nextPosition = detourPosition;
+                        nextGroundZ = detourGroundZ;
+                        moveDirection = detourDirection;
+                        _state.TravelDirection = detourDirection;
+                        _state.LastNavigationDecision = new NavigationDecision(
+                            NavigationDecisionStatus.Accepted,
+                            NavigationDiagnosticReason.TerrainDropDetourAccepted);
+                        usedTerrainDetour = true;
+                        Logger.Info(
+                            $"BOT id={_bot.Id} obj={_bot.ObjId} ev=navigation_recovery reason=terrain_drop_detour " +
+                            $"from_z={groundZ:F2} accepted_z={detourGroundZ:F2} mode={_state.TravelMode}");
+                    }
+                    else
+                    {
+                        _state.LastNavigationDecision = new NavigationDecision(
+                            NavigationDecisionStatus.InvalidSurface,
+                            NavigationDiagnosticReason.TerrainDropRejected);
+                        Logger.Warn(
+                            $"BOT id={_bot.Id} obj={_bot.ObjId} ev=navigation_hazard reason=terrain_drop " +
+                            $"from_z={groundZ:F2} to_z={nextGroundZ:F2} mode={_state.TravelMode}");
+                        ClearTravelRoute(_state);
+                        StopAndClear(currentPosition, forceFinalize: true);
+                        return;
+                    }
+                }
+                currentPosition.X = nextPosition.X;
+                currentPosition.Y = nextPosition.Y;
+                if (followingTravelRoute)
+                {
+                    _state.TravelRemainingDistance = usedTerrainDetour
+                        ? BotTravelPathFollower.MeasureRemaining(
+                            currentPosition,
+                            destination,
+                            _state.TravelWaypoints)
+                        : Math.Max(
+                            0f,
+                            _state.TravelRemainingDistance - Vector3.Distance(planarCurrent, nextPosition));
+                    AdvanceReachedTravelWaypoints(currentPosition);
+                }
+                else if (arrivedAtDirectDestination)
+                {
+                    AdvanceTravelWaypoint();
+                }
+
+                groundZ = nextGroundZ;
                 var airborne = AdvanceJump(ref currentPosition, groundZ);
                 _bot.Transform.Local.SetPosition(currentPosition.X, currentPosition.Y, currentPosition.Z);
 
                 var combatWithTarget = _bot.IsInBattle && _bot.CurrentTarget != null;
                 var facingTarget = combatWithTarget
                     ? _bot.CurrentTarget.Transform.World.Position
-                    : destination;
+                    : currentPosition + moveDirection;
                 var targetAngle = BotMovementMath.ComputeFacingDegrees(currentPosition, facingTarget);
                 _bot.Transform.Local.SetRotationDegree(0f, 0f, targetAngle);
 
-                var direction = planarDestination - new Vector3(currentPosition.X, currentPosition.Y, 0f);
-                var moveDirection = direction.LengthSquared() < 1e-6f
-                    ? Vector3.Zero
-                    : Vector3.Normalize(direction);
+                if (_state.Destination is null)
+                    moveDirection = Vector3.Zero;
                 var velocity = BotMovementMath.ComputeVelocity(
                     moveDirection,
                     _bot.Transform.World.Rotation.Z,
-                    finalSpeed,
+                    appliedSpeed,
                     combatWithTarget);
 
                 if (airborne)
@@ -567,6 +722,49 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         return _groundHeight(x, y);
     }
 
+    private bool TryFindTerrainDropDetour(
+        Vector3 currentPosition,
+        Vector3 movementDirection,
+        float stepDistance,
+        float groundZ,
+        out Vector3 detourPosition,
+        out float detourGroundZ,
+        out Vector3 detourDirection)
+    {
+        detourPosition = currentPosition;
+        detourGroundZ = float.NaN;
+        detourDirection = Vector3.Zero;
+        if (stepDistance <= 0f || movementDirection.LengthSquared() < 1e-8f)
+            return false;
+
+        var direction = Vector3.Normalize(new Vector3(movementDirection.X, movementDirection.Y, 0f));
+        var preferredSign = (_bot.Id & 1u) == 0u ? 1f : -1f;
+        foreach (var unsignedAngle in TerrainDetourRadians)
+        {
+            var angle = unsignedAngle * preferredSign;
+            var cos = MathF.Cos(angle);
+            var sin = MathF.Sin(angle);
+            var candidateDirection = new Vector3(
+                direction.X * cos - direction.Y * sin,
+                direction.X * sin + direction.Y * cos,
+                0f);
+            var candidate = currentPosition + candidateDirection * stepDistance;
+            var candidateGroundZ = GetGroundHeight(candidate.X, candidate.Y);
+            if (!float.IsFinite(candidateGroundZ) ||
+                groundZ - candidateGroundZ > MaximumSafeTerrainDropPerTick)
+            {
+                continue;
+            }
+
+            detourPosition = candidate;
+            detourGroundZ = candidateGroundZ;
+            detourDirection = candidateDirection;
+            return true;
+        }
+
+        return false;
+    }
+
     private bool AuthorizeDestination(Vector3 currentPosition)
     {
         if (_state.Destination is not { } destination)
@@ -588,6 +786,8 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
             return true;
         }
 
+        if (_state.TravelDestination.HasValue)
+            ClearTravelRoute(_state);
         _state.Destination = null;
         _state.ApprovedNavigationDestination = null;
         Logger.Warn(
@@ -602,6 +802,9 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
     {
         _state.Destination = null;
         _state.ApprovedNavigationDestination = null;
+        _state.SteeringDestination = null;
+        _state.TravelDirection = Vector3.Zero;
+        _state.TravelSpeed = 0f;
         _state.IsMoving = false;
         _state.IsFalling = false;
         _state.FallVelocity = 0;
@@ -616,6 +819,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
     private static void ResetMovementState(BotMovementState state)
     {
+        ClearTravelRoute(state);
         state.Destination = null;
         state.ApprovedNavigationDestination = null;
         state.IsMoving = false;
@@ -624,5 +828,61 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         state.JumpRequested = false;
         state.IsJumping = false;
         state.JumpVerticalVelocity = 0;
+    }
+
+    private bool AdvanceTravelWaypoint()
+    {
+        if (_state.TravelDestination == null)
+        {
+            _state.Destination = null;
+            return false;
+        }
+
+        if (_state.TravelWaypoints.Count > 0)
+        {
+            _state.Destination = _state.TravelWaypoints.Dequeue();
+            _state.ApprovedNavigationDestination = null;
+            Logger.Info(
+                $"BOT id={_bot.Id} obj={_bot.ObjId} ev=travel_waypoint mode={_state.TravelMode} " +
+                $"remaining={_state.TravelWaypointCount} pos=({_state.Destination.Value.X:F2}," +
+                $"{_state.Destination.Value.Y:F2},{_state.Destination.Value.Z:F2})");
+            return true;
+        }
+
+        ClearTravelRoute(_state);
+        _state.Destination = null;
+        Logger.Info($"BOT id={_bot.Id} obj={_bot.ObjId} ev=travel_route_arrived");
+        return false;
+    }
+
+    private void AdvanceReachedTravelWaypoints(Vector3 currentPosition)
+    {
+        while (_state.TravelDestination.HasValue && _state.Destination is { } waypoint &&
+               BotTravelPathFollower.ShouldAdvance(
+                   currentPosition,
+                   waypoint,
+                   _state.TravelWaypoints.Count > 0))
+        {
+            var distanceToWaypoint = new Vector2(
+                waypoint.X - currentPosition.X,
+                waypoint.Y - currentPosition.Y).Length();
+            _state.TravelRemainingDistance = Math.Max(
+                0f,
+                _state.TravelRemainingDistance - distanceToWaypoint);
+            if (!AdvanceTravelWaypoint())
+                return;
+        }
+    }
+
+    private static void ClearTravelRoute(BotMovementState state)
+    {
+        state.TravelDestination = null;
+        state.TravelMode = "direct";
+        state.TravelWaypoints.Clear();
+        state.SteeringDestination = null;
+        state.TravelDirection = Vector3.Zero;
+        state.TravelSpeed = 0f;
+        state.TravelRemainingDistance = 0f;
+        state.ApprovedNavigationDestination = null;
     }
 }

@@ -579,6 +579,30 @@ public class BotHostBehaviorTests
     }
 
     [Test]
+    public async Task DefaultLifeController_RemainsResidentWithoutOneKillActivity()
+    {
+        var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 11, 59, 0, TimeSpan.Zero));
+        var host = MakeLifecycleHost(time, _ => false);
+        var runtime = MakeLifecycleRuntime(6300, time, new BotLifeController());
+
+        host.Register(runtime);
+        try
+        {
+            host.HostTask.Execute();
+
+            var life = runtime.LifeController.Inspect();
+            await Assert.That(life.ProfileId).IsEqualTo("resident");
+            await Assert.That(life.Life.State).IsEqualTo(BotLifeState.Idle);
+            await Assert.That(life.Activity).IsNull();
+            await Assert.That(runtime.CombatState.KillGoal).IsNull();
+        }
+        finally
+        {
+            host.Unregister(runtime.Bot.Id);
+        }
+    }
+
+    [Test]
     public async Task OneKillLifecycle_UsesAuthoritativeCreditAndInvokesLogoutOutsideIterationAndLock()
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 0, 0, TimeSpan.Zero));
@@ -729,6 +753,7 @@ public class BotHostBehaviorTests
                     true,
                     false,
                     BotQuestObjectiveShape.Unsupported,
+                    null,
                     null,
                     [],
                     [],
@@ -973,7 +998,7 @@ public class BotHostBehaviorTests
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2026, 9, 1, 12, 10, 0, TimeSpan.Zero));
         var host = MakeLifecycleHost(time, _ => false);
-        var controller = new BotLifeController();
+        var controller = MakeSingleBotOneKillController();
         var first = MakeLifecycleRuntime(6303, time, controller);
         host.Register(first);
         host.HostTask.Execute();
@@ -1295,6 +1320,7 @@ public class BotHostBehaviorTests
         BotQuestIntakeController questIntakeController = null,
         BotQuestLifecycleController questLifecycleController = null)
     {
+        controller ??= MakeSingleBotOneKillController();
         var bot = new LifecycleCharacterMock
         {
             Id = id,
@@ -1346,6 +1372,15 @@ public class BotHostBehaviorTests
             questLifecycleController);
     }
 
+    private static BotLifeController MakeSingleBotOneKillController() =>
+        new(new BotBehaviorProfile(
+            "single-bot-one-kill-test",
+            TimeSpan.Zero,
+            TimeSpan.MaxValue,
+            TimeSpan.Zero,
+            TimeSpan.MaxValue),
+            singleBotOneKillEnabled: true);
+
     private sealed class HostQuestAuthority : IBotQuestAuthority
     {
         public IReadOnlyList<BotQuestSnapshot> Snapshots { get; set; } = [];
@@ -1374,6 +1409,25 @@ public class BotHostBehaviorTests
             BotQuestReportEndpoint endpoint,
             float radius,
             DateTimeOffset now) => [];
+
+        public IReadOnlyList<Npc> FindItemGatherTargets(
+            BotRuntime runtime,
+            uint questId,
+            uint itemId,
+            float radius,
+            DateTimeOffset now) => [];
+
+        public BotQuestLootAttempt TryLootGatherItem(
+            Character bot,
+            uint questId,
+            uint itemId,
+            Npc corpse,
+            float interactionRadius) => new(false, "not_configured", 0, 0);
+
+        public IReadOnlyList<BotQuestStaticReportDestination> FindStaticReportDestinations(
+            BotRuntime runtime,
+            BotQuestReportEndpoint endpoint,
+            float maximumDistance) => [];
 
         public bool ReportQuest(
             Character bot,

@@ -6,11 +6,11 @@ The patches are intentionally visible and reviewable. They are applied to an AAE
 
 ## ArcheAge 1.2 host hooks
 
-`aaemu-1.2-r208022-v3.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and adds the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs. Version 3 also registers the GM-only `/botquest` quest-development command alongside the version 2 class, gear, and kit integration. Login and Game log `Selected Login database schema: <database>` and `Selected Game database schema: <database>` from their resolved `MySQLProvider.Database` values before either updater runs; each message contains only its schema name and no connection or credential fields. The accompanying 1.2 module source gives every fresh loopback `@system` actor the registered `MainWorld` and that same world's spawn transform without registering a player.
+`aaemu-1.2-r208022-v4.patch` is required. It targets AAEmu descendants of `62e3eb1d87da01194802ac886cd500134facad28` and consolidates the complete v3 host contract with server-owned bot identity creation, guarded doodad quest authority, and immutable transfer-road snapshots. It includes the conditional build imports plus lifecycle, service, party, duel, world-query, tick-metric, character, packet, command-API, and host-test hooks PlayerBots needs. Login and Game log `Selected Login database schema: <database>` and `Selected Game database schema: <database>` from their resolved `MySQLProvider.Database` values before either updater runs; each message contains only its schema name and no connection or credential fields.
 
-SHA-256: `0285c8c21133ec00abbd8f5de925c56dc2d87f7d8595fee89a6063b3ff02ca3e`
+SHA-256: `8e33ed82dcbfc6e9e7aaec46624610b542ea3a113ee834d2450fb2f818b56e14`
 
-The released `aaemu-1.2-r208022.patch` and the version 2 patch remain unchanged; neither is the active Unreleased installer contract.
+The released original, v2, and v3 patches and the three supplemental development adapters remain unchanged; none is the active alpha.6 installer contract.
 
 Use the installer rather than applying this patch manually; it validates lineage, applicability, dirty tracked files, and the migration.
 
