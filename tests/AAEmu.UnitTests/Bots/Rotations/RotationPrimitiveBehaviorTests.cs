@@ -101,6 +101,8 @@ public sealed class RotationPrimitiveBehaviorTests
         runtime.Social.ApplyFollow();
         var context = new BotContext(healer, runtime, runtime.Blackboard, Now,
             new BotConfig { UseEngine = false }, BotEngineKind.Combat);
+        healer.Skills = new CharacterSkills(healer);
+        healer.Skills.Skills[44] = new Skill(new SkillTemplate { Id = 44 });
         var definition = new BotRotationDefinition
         {
             Id = "party.heal",
@@ -485,6 +487,9 @@ public sealed class RotationPrimitiveBehaviorTests
             new BotCombatState { Target = target }, config: new BotConfig { UseEngine = false });
         var context = new BotContext(bot, runtime, runtime.Blackboard, Now,
             new BotConfig { UseEngine = false }, BotEngineKind.Combat);
+        bot.Skills = new CharacterSkills(bot);
+        foreach (var skillId in BotSkillIds.Darkrunner.SkillLearnOrder)
+            bot.Skills.Skills[skillId] = new Skill(templateResolver(skillId));
         var gapCloser = strategy.Actions.Single(action => action.Name == "gap:tigerStrike");
         var alternateGapCloser = strategy.TriggerNodes.Single(node => node.Actions.Any(action => action.Name == "gap:overwhelm"));
 
@@ -556,6 +561,8 @@ public sealed class RotationPrimitiveBehaviorTests
             config: new BotConfig { UseEngine = false });
         var context = new BotContext(bot, runtime, runtime.Blackboard, Now,
             new BotConfig { UseEngine = false }, BotEngineKind.Combat);
+        bot.Skills = new CharacterSkills(bot);
+        bot.Skills.Skills[42] = new Skill(new SkillTemplate { Id = 42 });
         var strategy = new BotRotationCompiler(
             templateResolver: id => new SkillTemplate
             {

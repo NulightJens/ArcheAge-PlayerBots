@@ -7,6 +7,8 @@ namespace AAEmu.Game.Bots.Body;
 public interface IBotMover
 {
     void SetDestination(Character bot, Vector3 position, bool run = true, float tolerance = 0.5f);
+    void SetRecoveryDestination(Character bot, Vector3 position, bool run = true, float tolerance = 0.5f) =>
+        SetDestination(bot, position, run, tolerance);
     void StopIfMoving(Character bot);
     void StopImmediately(Character bot);
     void Face(Character bot, float angle);
@@ -27,6 +29,11 @@ public sealed class BotManagerMover : IBotMover
     public void SetDestination(Character bot, Vector3 position, bool run = true, float tolerance = 0.5f)
     {
         BotManager.Instance.SetBotDestinationIfChanged(bot, position, run, tolerance);
+    }
+
+    public void SetRecoveryDestination(Character bot, Vector3 position, bool run = true, float tolerance = 0.5f)
+    {
+        BotManager.Instance.SetBotRecoveryDestinationIfChanged(bot, position, run, tolerance);
     }
 
     public void StopIfMoving(Character bot)

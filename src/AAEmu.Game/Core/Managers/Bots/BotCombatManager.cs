@@ -136,6 +136,7 @@ namespace AAEmu.Game.Core.Managers.Bots
             state.KillGoal = killGoal;
             state.KillCount = 0;
             state.Target = null;
+            state.LostTarget = null;
             state.ShouldRespawn = false;
             state.LastCombatTime = DateTime.UtcNow;
             state.LastFacingAngle = float.MinValue;
@@ -155,6 +156,11 @@ namespace AAEmu.Game.Core.Managers.Bots
             {
                 state.IsActive = false;
                 state.Target = null;
+                state.LostTarget = null;
+                state.LastKnownTargetPosition = null;
+                state.IsSearching = false;
+                state.SearchRadius = 0f;
+                state.SearchAngle = 0f;
                 state.IsResting = false;
                 state.SetForcedState(null);
                 state.TransitionTo(BotCombatStateType.Idle);
@@ -192,6 +198,7 @@ namespace AAEmu.Game.Core.Managers.Bots
             state.LastFacingAngle = float.MinValue;
             state.LastCombatTime = DateTime.UtcNow;
             state.LastKnownTargetPosition = null;
+            state.LostTarget = null;
             state.IsSearching = false;
             state.SearchRadius = 0f;
             state.SearchAngle = 0f;
@@ -271,6 +278,7 @@ namespace AAEmu.Game.Core.Managers.Bots
                     state.Target = null;
                     Host.GetRuntime(bot.Id)?.Blackboard.InvalidateAll();
                     state.LastKnownTargetPosition = null;
+                    state.LostTarget = null;
                     state.IsSearching = false;
                     state.SearchRadius = 0f;
                     state.SearchAngle = 0f;
@@ -350,8 +358,16 @@ namespace AAEmu.Game.Core.Managers.Bots
 
         private void EnsureTask(Character bot, BotCombatState state)
         {
-            if (_combatTasks.ContainsKey(bot.Id))
-                return;
+            if (_combatTasks.TryGetValue(bot.Id, out var existing))
+            {
+                if (!existing.Cancelled && ReferenceEquals(existing.State, state))
+                    return;
+
+                // A bot respawn can replace the manager/runtime state before an
+                // older brain has been retired. Never leave that brain consuming
+                // stale combat controls (targets, forced state, health floors).
+                DetachCombatTask(bot.Id);
+            }
 
             var broadcaster = Bots.GetBroadcaster(bot.Id);
             var runtime = Host.GetRuntime(bot.Id);

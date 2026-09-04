@@ -27,6 +27,7 @@ public sealed class BotCastSkillAction : IBotAction
 {
     private readonly Func<uint, SkillTemplate> _templateResolver;
     private readonly Func<BotCastRequest, SkillResult> _cast;
+    private readonly bool _requireKnownSkill;
     private bool _gateCached;
     private DateTime _gateAt;
     private Unit _gateTarget;
@@ -37,12 +38,14 @@ public sealed class BotCastSkillAction : IBotAction
         Func<uint, SkillTemplate> templateResolver = null,
         Func<BotCastRequest, SkillResult> cast = null,
         string name = null,
-        bool castWhileControlled = false)
+        bool castWhileControlled = false,
+        bool requireKnownSkill = false)
     {
         SkillId = skillId;
         TargetSource = targetSource;
         _templateResolver = templateResolver ?? (id => SkillManager.Instance.GetSkillTemplate(id));
         _cast = cast;
+        _requireKnownSkill = requireKnownSkill;
         CastWhileControlled = castWhileControlled;
         Name = string.IsNullOrWhiteSpace(name) ? $"cast:{skillId}" : name;
     }
@@ -115,6 +118,8 @@ public sealed class BotCastSkillAction : IBotAction
     {
         var template = ResolveTemplate();
         _gateTarget = ResolveTarget(context);
+        if (_requireKnownSkill && context.Bot?.Skills?.Skills?.ContainsKey(SkillId) != true)
+            return new GateResult(GateReason.Unlearned, $"skill {SkillId} is not learned");
         var distance = _gateTarget == null ? 0f : Distance(context.Bot, _gateTarget);
         var gate = BotSkillGate.Check(context.Bot, template, _gateTarget, distance, context.Now, context.Config,
             CastWhileControlled);

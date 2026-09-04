@@ -376,6 +376,19 @@ public class BotMovementBroadcasterTests
     }
 
     [Test]
+    public async Task RequiresRegionRefresh_ChangesOnlyAcrossSixtyFourMeterRegionBoundary()
+    {
+        await Assert.That(BotMovementBroadcaster.RequiresRegionRefresh(
+            244, 237, new Vector3(15656f, 15173.2f, 121.3f))).IsFalse();
+        await Assert.That(BotMovementBroadcaster.RequiresRegionRefresh(
+            220, 215, new Vector3(15656f, 15173.2f, 121.3f))).IsTrue();
+        await Assert.That(BotMovementBroadcaster.RequiresRegionRefresh(
+            0, 0, new Vector3(63.999f, 63.999f, 0f))).IsFalse();
+        await Assert.That(BotMovementBroadcaster.RequiresRegionRefresh(
+            0, 0, new Vector3(64f, 63.999f, 0f))).IsTrue();
+    }
+
+    [Test]
     public void Constructor_NullBot_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() => new BotMovementBroadcaster(null, _time));

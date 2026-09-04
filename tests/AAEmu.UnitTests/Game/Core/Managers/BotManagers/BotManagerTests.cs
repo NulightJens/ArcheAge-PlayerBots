@@ -217,6 +217,30 @@ public class BotManagerTests
     }
 
     [Test]
+    public async Task BasicCombat_ChaseDestination_UsesHorizontalRangeAndNavigationSurface()
+    {
+        var destination = BasicCombat.ComputeChaseDestination(
+            new Vector3(0f, 0f, 10f),
+            new Vector3(10f, 0f, 20f),
+            meleeRange: 1.5f,
+            groundHeight: (_, _) => 12.25f);
+
+        await Assert.That(destination).IsEqualTo(new Vector3(8.5f, 0f, 12.25f));
+    }
+
+    [Test]
+    public async Task BasicCombat_ChaseDestination_UsesBotHeightWhenSurfaceIsUnavailable()
+    {
+        var destination = BasicCombat.ComputeChaseDestination(
+            new Vector3(0f, 0f, 10f),
+            new Vector3(10f, 0f, 20f),
+            meleeRange: 1.5f,
+            groundHeight: (_, _) => float.NaN);
+
+        await Assert.That(destination).IsEqualTo(new Vector3(8.5f, 0f, 10f));
+    }
+
+    [Test]
     public async Task DespawnBot_Active_CancelsBothTasksAndRemovesAllState()
     {
         var previousCombatManager = BotCombatManager.Instance;
