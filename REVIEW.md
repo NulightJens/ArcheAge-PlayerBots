@@ -1,6 +1,6 @@
 # Review rules
 
-Reader: anyone reviewing a pull request here, including Devin Review and outside contributors. `CONTRIBUTING.md` is the contributor guide; `AGENTS.md` points agents to `docs/agents/`.
+Reader: anyone reviewing a pull request here, including outside contributors. `CONTRIBUTING.md` is the contributor guide; `AGENTS.md` points agents to `docs/agents/`.
 
 ## This repository
 
