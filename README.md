@@ -6,7 +6,7 @@
 
 PlayerBots adds server-controlled player characters to [AAEmu](https://github.com/AAEmu/AAEmu). Bring an offline character into the world, invite it to your party, and give it simple orders.
 
-The server owner installs PlayerBots. Players join with the matching ArcheAge client; no AI service or agent software is required.
+The server owner installs PlayerBots. Players join with the matching ArcheAge client.
 
 - Persistent characters with normal saving and logout.
 - Follow, stay, attack, and passive party commands.
@@ -21,11 +21,11 @@ PlayerBots is a source module compiled with a compatible AAEmu host. For ArcheAg
 then follow the [installation guide](docs/INSTALLATION.md) for the pinned host,
 setup commands and database migration.
 
-| Track | Status |
+| Game version | Availability |
 | --- | --- |
 | ArcheAge 1.2 r208022 | Current preview; pinned AAEmu host and .NET 10 required |
-| ArcheAge 3.0.4.2 r336598 | Frozen compatibility checkpoint; outside this preview installer |
-| [ArcheAge CN 10.0.2.13 r575](docs/COMPATIBILITY.md#archeage-10) | Working headless prototype with a separate 10.x integration |
+| ArcheAge 3.0.4.2 r336598 | Earlier compatibility version; not included in this download |
+| [ArcheAge CN 10.0.2.13 r575](docs/COMPATIBILITY.md#archeage-10) | Working server-bot prototype; download not yet available |
 
 The 10.x prototype has demonstrated movement, combat, loot, interactions, quest
 completion and save/re-entry. Its separate integration is not yet included in the

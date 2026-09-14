@@ -1,6 +1,6 @@
-# PlayerBots for people
+# Playing with bots
 
-PlayerBots adds server-controlled characters to an AAEmu server. You use normal game commands to spawn companions, form a party and practice combat. No AI service or agent software is required.
+PlayerBots adds server-controlled characters to an AAEmu server. You use normal game commands to spawn companions, form a party and practice combat.
 
 **Who installs it:** the AAEmu server owner. Other players join the configured server with the matching ArcheAge client. This is not a client mod that adds bots to someone else's server.
 
@@ -16,7 +16,7 @@ Use a dedicated character that is currently offline. Log in as a GM and replace 
 
 The character appears as a bot. This reuses a saved character; it does not create a new one.
 
-Invite it through the normal party UI. Be the current human party leader/owner, then give it a role and order:
+Invite it through the normal party UI. As its party leader, give it a role and order:
 
 ```text
 /botcontrol 2 role attacker
@@ -42,11 +42,11 @@ To stop aggressive behavior and hold position:
 /botcontrol 2 stay
 ```
 
-A normal party member who is not its current human owner cannot control the bot just by knowing its ID.
+Only the bot's current party leader can give it orders.
 
 ## Practice a duel
 
-**You against a bot:** use the game's normal duel request on an active bot. The implementation includes automatic acceptance after roughly one to five seconds. Normal server duel restrictions still apply.
+**You against a bot:** use the game's normal duel request on an active bot. The bot accepts after roughly one to five seconds. Normal server duel restrictions still apply.
 
 **Two bots against each other:** as a GM, admit two different offline characters, then use their bot IDs:
 
@@ -58,7 +58,7 @@ A normal party member who is not its current human owner cannot control the bot 
 
 Both bots must be alive, in the same instance and free of an existing duel. The command also rejects expedition membership. Let the native duel finish before moving on.
 
-Duel handling is implemented, but fresh live acceptance of this consolidated preview is pending. Treat it as experimental until the next release's supported-behavior statement confirms the exact package. Open-world faction PvP, arenas, balanced matchups and reliable long fights are not claimed complete.
+Duels are experimental in this preview. Open-world faction PvP, arenas, balanced matchups and reliable long fights remain in development.
 
 ## Create a new bot instead
 
@@ -76,7 +76,7 @@ Then a GM can create a level-one character at the native race start:
 
 Use the new ID reported by the command for subsequent orders. Creation saves the new character and admits it as a bot. It does not create the account. Keep real player accounts separate.
 
-Creating a character does not prove it can complete a full autonomous leveling journey. Quest autonomy is opt-in and still under development.
+Automatic questing is opt-in and still under development. Newly created bots cannot yet be relied on to level through the full game on their own.
 
 ## Choose a class and equipment
 
@@ -105,10 +105,10 @@ This saves and logs out the character. It does not delete it. Use `/addbot 2` to
 |---|---|
 | Unknown bot command | The server must have the correct PlayerBots installation and compiled commands. |
 | Bot cannot be added | Check the character ID and make sure the character is offline. |
-| Party control refused | The bot must be in your live party, and you must be its current human owner. |
+| Party control refused | The bot must be in your party, and you must be its current party leader. |
 | Attack asks for a target | Select a living target before issuing the order and keep it selected. |
 | Fresh creation reports configuration unavailable | The server's dedicated bot account ID is missing or invalid. |
 | Native duel refused | Check alive/same-instance/existing-duel/expedition restrictions. |
 | Movement or questing stalls | Inspect the bot and preserve its progress; current navigation and questing have known limitations. |
 
-Run `/bot`, `/help botcontrol` or `/botdebug 2` for in-game help. Server command APIs are optional; the ordinary workflow uses the game itself.
+Run `/bot`, `/help botcontrol` or `/botdebug 2` for in-game help.

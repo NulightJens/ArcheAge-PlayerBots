@@ -1,11 +1,12 @@
 # ArcheAge PlayerBots tools
 
 | Product | Use |
-|---|---|
-| [PlayerBots](https://github.com/NulightJens/ArcheAge-PlayerBots) | Server companions, party orders and experimental autonomous characters. |
-| [Route Recorder](https://github.com/NulightJens/ArcheAge-PlayerBots-Route-Recorder) | Record walks and city junction networks, with optional photos. Works independently of PlayerBots. |
-| [Client Autopilot](https://github.com/NulightJens/ArcheAge-PlayerBots-Client-Autopilot) | Experimental client control, input tools, optional capture and Street View camera functions. |
-| [Navigation Extractor](https://github.com/NulightJens/ArcheAge-PlayerBots-Navigation-Extractor) | Extract navigation snapshots from your own local game data and recorded routes. |
+| --- | --- |
+| [PlayerBots](https://github.com/NulightJens/ArcheAge-PlayerBots) | Add bot companions to your ArcheAge server, form parties and give combat orders. |
+| [Route Recorder](https://github.com/NulightJens/ArcheAge-PlayerBots-Route-Recorder) | Record roads and city junctions as you walk, with optional photos. |
+| [Client Autopilot](https://github.com/NulightJens/ArcheAge-PlayerBots-Client-Autopilot) | Let PlayerBots control your logged-in character, or use its camera and capture tools. Experimental. |
+| [Navigation Extractor](https://github.com/NulightJens/ArcheAge-PlayerBots-Navigation-Extractor) | Build navigation maps from local game data and recorded routes. |
 
-Install only the tools you need. PlayerBots runs without an AI service or Client Autopilot.
-Each product's README explains its requirements, installation and current limits.
+Install only the tools you need. Route Recorder works on its own; Client Autopilot
+requires PlayerBots. Navigation Extractor uses a built AAEmu/PlayerBots installation.
+Each README explains setup, supported versions and available features.
