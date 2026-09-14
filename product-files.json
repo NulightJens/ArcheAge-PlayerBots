@@ -12,6 +12,7 @@
     "assets/playerbots-readme-banner.png",
     "build/AAEmu.PlayerBots.Game.targets",
     "compatibility/aaemu-1.2-r208022-v21.patch",
+    "docs/COMPATIBILITY.md",
     "docs/INSTALLATION.md",
     "docs/PLAYING.md",
     "install.py",

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Document the working ArcheAge CN 10.0.2.13 r575 headless prototype and its separate installation requirements.
+
 - Restore the original README banner and friendly getting-started layout, with current guides and download links.
 
 ## 0.2.0-alpha.7 — 2026-09-14 · Preview

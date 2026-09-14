@@ -16,7 +16,7 @@ The server owner installs PlayerBots. Players join with the matching ArcheAge cl
 
 ## Installation
 
-PlayerBots is a source module compiled with a compatible AAEmu host. Download the
+PlayerBots is a source module compiled with a compatible AAEmu host. For ArcheAge 1.2, download the
 [0.2.0-alpha.7 preview](https://github.com/NulightJens/ArcheAge-PlayerBots/releases/tag/v0.2.0-alpha.7),
 then follow the [installation guide](docs/INSTALLATION.md) for the pinned host,
 setup commands and database migration.
@@ -25,13 +25,18 @@ setup commands and database migration.
 | --- | --- |
 | ArcheAge 1.2 r208022 | Current preview; pinned AAEmu host and .NET 10 required |
 | ArcheAge 3.0.4.2 r336598 | Frozen compatibility checkpoint; outside this preview installer |
+| [ArcheAge CN 10.0.2.13 r575](docs/COMPATIBILITY.md#archeage-10) | Working headless prototype with a separate 10.x integration |
+
+The 10.x prototype has demonstrated movement, combat, loot, interactions, quest
+completion and save/re-entry. Its separate integration is not yet included in the
+public downloads. See [version compatibility](docs/COMPATIBILITY.md) for details.
 
 Choose an exact release when installing or updating. The [changelog](CHANGELOG.md)
 describes what has changed.
 
 ## First companion
 
-After installation, log in as a GM and choose an existing offline character. Replace `2` with its character ID:
+For the 1.2 preview, log in as a GM after installation and choose an existing offline character. Replace `2` with its character ID:
 
 ```text
 /addbot 2
@@ -52,6 +57,7 @@ See [playing with bots](docs/PLAYING.md) for other roles, class and gear tools, 
 
 | I want to… | Read |
 | --- | --- |
+| Check game-version support | [Compatibility](docs/COMPATIBILITY.md) |
 | Install or update | [Installation](docs/INSTALLATION.md) |
 | Control bots in game | [Playing with bots](docs/PLAYING.md) |
 | Choose a class and equipment | [Classes and gear](docs/PLAYING.md#choose-a-class-and-equipment) |
