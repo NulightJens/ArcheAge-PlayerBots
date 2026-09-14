@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Restore the original README banner and friendly getting-started layout, with current guides and download links.
+
 ## 0.2.0-alpha.7 — 2026-09-14 · Preview
 
 - Separate the server bot core from optional real-client control and observers.

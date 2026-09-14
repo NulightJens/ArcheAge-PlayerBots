@@ -1,23 +1,75 @@
+<p align="center">
+  <img src="assets/playerbots-readme-banner.png" alt="ArcheAge PlayerBots companions overlooking an ArcheAge coastline" width="100%" />
+</p>
+
 # ArcheAge PlayerBots
 
-[Download this preview](https://github.com/NulightJens/ArcheAge-PlayerBots/releases/tag/v0.2.0-alpha.7) · [Tool family](FAMILY.md)
+PlayerBots adds server-controlled player characters to [AAEmu](https://github.com/AAEmu/AAEmu). Bring an offline character into the world, invite it to your party, and give it simple orders.
 
-Add server-controlled companions to your AAEmu server. Spawn saved characters,
-invite them to a party, give follow and combat orders, or practice native duels.
-No AI service or agent software is required.
+The server owner installs PlayerBots. Players join with the matching ArcheAge client; no AI service or agent software is required.
 
-**Preview: 0.2.0-alpha.7 · ArcheAge 1.2 r208022 · AAEmu on .NET 10**
+- Persistent characters with normal saving and logout.
+- Follow, stay, attack, and passive party commands.
+- Melee, archer, mage, healer, and tank behavior using native skills.
+- Configurable archetypes, rotations, startup bots, and diagnostics.
+- Experimental creation of fresh characters and automatic starter quests on ArcheAge 1.2.
 
-The server owner installs PlayerBots. Players connect with a matching, unmodified client.
+## Installation
 
-1. Follow [Installation](docs/INSTALLATION.md).
-2. Use [Playing with bots](docs/PLAYING.md) for spawning, party commands and duels.
-3. Read [Changes](CHANGELOG.md) and the [tool family](FAMILY.md).
+PlayerBots is a source module compiled with a compatible AAEmu host. Download the
+[0.2.0-alpha.7 preview](https://github.com/NulightJens/ArcheAge-PlayerBots/releases/tag/v0.2.0-alpha.7),
+then follow the [installation guide](docs/INSTALLATION.md) for the pinned host,
+setup commands and database migration.
 
-Party control and native combat are implemented. Quest autonomy, terrain recovery,
-client control and PvP remain experimental. This candidate builds successfully;
-fresh live acceptance of the consolidated version is pending. Full autonomous
-leveling, reliable obstacle traversal, arenas and balanced PvP are not release promises.
+| Track | Status |
+| --- | --- |
+| ArcheAge 1.2 r208022 | Current preview; pinned AAEmu host and .NET 10 required |
+| ArcheAge 3.0.4.2 r336598 | Frozen compatibility checkpoint; outside this preview installer |
 
-The 3.0 compatibility checkpoint is frozen and is not supported by this preview installer.
-Client Autopilot is an optional companion with its own installation.
+Choose an exact release when installing or updating. The [changelog](CHANGELOG.md)
+describes what has changed.
+
+## First companion
+
+After installation, log in as a GM and choose an existing offline character. Replace `2` with its character ID:
+
+```text
+/addbot 2
+```
+
+Invite the bot through the normal party UI, then issue an order:
+
+```text
+/botcontrol 2 role attacker
+/botcontrol 2 follow
+```
+
+Select a living target and use `/botcontrol 2 attack` to attack it, or `/botcontrol 2 passive` to stop attacking. When finished, `/removebot 2` saves and logs out the character.
+
+See [playing with bots](docs/PLAYING.md) for other roles, class and gear tools, and duels. Creating a fresh character has a separate [experimental walkthrough](docs/PLAYING.md#create-a-new-bot-instead).
+
+## Guides
+
+| I want to… | Read |
+| --- | --- |
+| Install or update | [Installation](docs/INSTALLATION.md) |
+| Control bots in game | [Playing with bots](docs/PLAYING.md) |
+| Choose a class and equipment | [Classes and gear](docs/PLAYING.md#choose-a-class-and-equipment) |
+| Practice a duel | [Duels](docs/PLAYING.md#practice-a-duel) |
+| Solve a problem | [Troubleshooting](docs/PLAYING.md#if-an-order-does-not-work) |
+| See what's changed | [Changelog](CHANGELOG.md) |
+
+[Companion tools](FAMILY.md) include Route Recorder, Client Autopilot and Navigation
+Extractor. Install only the tools you need. You can [report a bug or suggest an
+improvement](https://github.com/NulightJens/ArcheAge-PlayerBots/issues).
+
+## Current limits
+
+This is an experimental preview. Quest autonomy is opt-in, and complex routes,
+obstacles, caves and interiors can still cause problems. Full autonomous leveling,
+arenas, reliable long PvP fights and large living-world populations remain in
+development. Start with one companion and the simple commands above.
+
+## Acknowledgements
+
+This ArcheAge implementation draws on the [Playerbots family](https://github.com/mod-playerbots/mod-playerbots), with AAEmu providing the native game systems. PlayerBots is distributed under [GPL-3.0-or-later](LICENSE.GPL); retained file-specific notices still apply. AAEmu and PlayerBots are not affiliated with XLGames.
