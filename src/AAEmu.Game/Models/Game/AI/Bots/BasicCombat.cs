@@ -52,6 +52,9 @@ namespace AAEmu.Game.Models.Game.AI.Bots
             }
 
             // Start auto‑attack if not already
+#if !PLAYERBOTS_AAEMU_3_0
+            if (!AAEmu.Game.Bots.Host.BotDrivers.For(bot).Owns(bot))
+#endif
             if (!bot.IsAutoAttack)
                 StartAutoAttack(bot, target);
 
@@ -124,6 +127,18 @@ namespace AAEmu.Game.Models.Game.AI.Bots
             if (template == null)
                 return;
 
+#if !PLAYERBOTS_AAEMU_3_0
+            if (AAEmu.Game.Bots.Host.BotDrivers.For(bot).Owns(bot))
+            {
+                var runtime = AAEmu.Game.Bots.Host.BotDrivers.Runtime(bot);
+                if (runtime == null) return;
+                var context = new AAEmu.Game.Bots.Kernel.BotContext(bot, runtime, runtime.Blackboard,
+                    now, runtime.ConfigurationOverride ?? BotConfig.Instance, AAEmu.Game.Bots.Kernel.BotEngineKind.Combat);
+                new BotCastSkillAction(template.Id, templateResolver: _ => template, requireKnownSkill: true)
+                    .Execute(context, default);
+                return;
+            }
+#endif
             var skill = new Skill(template, bot);
             var caster = new SkillCasterUnit(bot.ObjId);
             var skillTarget = new SkillCastUnitTarget(target.ObjId);

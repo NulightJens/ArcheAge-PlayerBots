@@ -2,7 +2,11 @@ using System.Numerics;
 
 namespace AAEmu.Game.Bots.Navigation;
 
-/// <summary>Steers along an approved route with a short lookahead.</summary>
+/// <summary>
+/// Lightweight steering over an already-approved route. The expensive path is
+/// selected once; this follower only samples a short lookahead and retains
+/// speed and heading between movement ticks.
+/// </summary>
 internal static class BotTravelPathFollower
 {
     internal const float FinalArrivalRadius = 0.5f;
@@ -109,7 +113,12 @@ internal static class BotTravelPathFollower
     internal static bool ShouldAdvance(Vector3 current, Vector3 waypoint, bool hasAnotherWaypoint)
     {
         var radius = hasAnotherWaypoint ? IntermediateArrivalRadius : FinalArrivalRadius;
-        return PlanarDistance(current, waypoint) < radius;
+        var distance = PlanarDistance(current, waypoint);
+#if !PLAYERBOTS_AAEMU_3_0
+        return hasAnotherWaypoint ? distance < radius : distance <= radius;
+#else
+        return distance < radius;
+#endif
     }
 
     private static bool IsSharpCorner(Vector3 from, Vector3 corner, Vector3 to)

@@ -54,7 +54,7 @@ public sealed class BotActionQueue
         List<string> expired = null;
         foreach (var pair in _baskets)
         {
-            if (now >= pair.Value.CreatedAt && now - pair.Value.CreatedAt >= expiry)
+            if (now < pair.Value.CreatedAt || now - pair.Value.CreatedAt >= expiry)
                 (expired ??= []).Add(pair.Key);
         }
 

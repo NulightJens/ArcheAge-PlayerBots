@@ -9,5 +9,8 @@ namespace AAEmu.Game.Models.Game.Bots
         public byte LastKnownLevel { get; set; }
         public DateTime LastGearCheck { get; set; } = DateTime.MinValue;
         public bool IsInitialized { get; set; }
+#if !PLAYERBOTS_AAEMU_3_0
+        public bool PreservePlayerSkills { get; set; }
+#endif
     }
 }

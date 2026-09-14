@@ -42,7 +42,15 @@ namespace AAEmu.Game.Models.Game.Bots
             _lastSendTime = _time.GetUtcNow().UtcDateTime;
             _regionX = RegionCoordinate(_lastPosition.X);
             _regionY = RegionCoordinate(_lastPosition.Y);
-            MoveTypeSink = moveType => _bot.BroadcastPacket(new SCOneUnitMovementPacket(_bot.ObjId, moveType), true);
+            MoveTypeSink = moveType =>
+            {
+#if !PLAYERBOTS_AAEMU_3_0
+                var includeOwner = AAEmu.Game.Bots.Host.BotDrivers.For(_bot).AllowOwnerMovement(_bot, moveType);
+#else
+                const bool includeOwner = true;
+#endif
+                _bot.BroadcastPacket(new SCOneUnitMovementPacket(_bot.ObjId, moveType), includeOwner);
+            };
         }
 
         public void SendMove(Vector3 pos, Vector3 velocity, bool isInBattle)
@@ -103,8 +111,29 @@ namespace AAEmu.Game.Models.Game.Bots
                 isStop: !hasHorizontalMovement);
         }
 
+#if !PLAYERBOTS_AAEMU_3_0
+        public void SendClimb(Vector3 position, Vector3 velocity, uint anchorObjectId, float verticalOffset)
+        {
+            var flags = velocity.Z == 0 ? MoveTypeFlags.Stopping : MoveTypeFlags.Moving;
+            var actor = (byte)MoveTypeActorFlags.HangingFromObject;
+            var wirePosition = _bot.Transform.StickyParent != null ? _bot.Transform.Local.Position : position;
+            var move = BuildMoveType(wirePosition, new Vector3(0, 0, -velocity.Z), GameStanceType.Crouch,
+                MoveTypeAlertness.Idle, flags, actor, velocity.Z == 0);
+            move.GcId = anchorObjectId;
+            // Host decoder: 13-bit vertical coordinate over 100 metres; zero horizontal offset.
+            move.ClimbData = (uint)Math.Clamp((int)MathF.Round(verticalOffset * 8192f / 100f), 0, 8191);
+            move.DeltaMovement = [0, (sbyte)(Math.Sign(velocity.Z) * 127), 0];
+            RefreshSpatialRegion(position);
+            UpdateLastState(position, velocity, GameStanceType.Crouch, MoveTypeAlertness.Idle, flags, actor);
+            MoveTypeSink(move);
+        }
+#endif
+
         public void SendTeleport(Vector3 pos, bool isInBattle)
         {
+#if !PLAYERBOTS_AAEMU_3_0
+            if (AAEmu.Game.Bots.Host.BotDrivers.For(_bot).Owns(_bot)) return;
+#endif
             _bot.Transform.ResetFinalizeTransform();
             _bot.Transform.Local.SetPosition(pos.X, pos.Y, pos.Z);
             _bot.Transform.FinalizeTransform();
@@ -115,6 +144,13 @@ namespace AAEmu.Game.Models.Game.Bots
 
         public void SendFaceTarget(Vector3 pos, float rotationZ, bool isInBattle)
         {
+#if !PLAYERBOTS_AAEMU_3_0
+            if (AAEmu.Game.Bots.Host.BotDrivers.For(_bot) is { } driver && driver.Owns(_bot))
+            {
+                driver.RequestFacing(_bot, rotationZ * MathF.PI / 180f);
+                return;
+            }
+#endif
             _bot.Transform.Local.SetRotationDegree(0f, 0f, rotationZ);
 
             var zeroVelocity = Vector3.Zero;
@@ -190,6 +226,9 @@ namespace AAEmu.Game.Models.Game.Bots
         private void BuildAndBroadcast(Vector3 pos, Vector3 velocity, GameStanceType stance,
             MoveTypeAlertness alertness, MoveTypeFlags flags, byte actorFlags, bool isStop)
         {
+#if !PLAYERBOTS_AAEMU_3_0
+            if (AAEmu.Game.Bots.Host.BotDrivers.For(_bot).Owns(_bot)) return;
+#endif
             RefreshSpatialRegion(pos);
             var moveType = BuildMoveType(pos, velocity, stance, alertness, flags, actorFlags, isStop);
             MoveTypeSink(moveType);

@@ -36,7 +36,8 @@ internal enum BotQuestObjectiveShape
     ItemGather,
     Unsupported,
     Ambiguous,
-    Invalid
+    Invalid,
+    Interaction
 }
 
 internal readonly record struct BotQuestStartCandidate(
@@ -56,7 +57,13 @@ internal readonly record struct BotQuestMonsterHuntObjective(
     uint ComponentId,
     byte ObjectiveIndex,
     int Current,
-    int Required);
+    int Required)
+{
+    internal uint MonsterGroupId { get; init; }
+    internal uint[] GroupMembers { get; init; }
+    internal IEnumerable<uint> TargetTemplates => GroupMembers ?? [TargetNpcTemplateId];
+    internal bool Matches(uint templateId) => templateId != 0 && TargetTemplates.Contains(templateId);
+}
 
 internal readonly record struct BotQuestItemGatherObjective(
     uint ItemId,
@@ -70,7 +77,10 @@ internal readonly record struct BotQuestLootAttempt(
     bool Looted,
     string Reason,
     int MatchingItems,
-    int RemainingCorpseItems);
+    int RemainingCorpseItems)
+{
+    internal bool ConsumedByNativeDistribution { get; init; }
+}
 
 internal readonly record struct BotQuestReportEndpoint(
     BotQuestReportKind Kind,
@@ -103,10 +113,22 @@ internal sealed record BotQuestSnapshot(
     BotQuestItemGatherObjective? ItemGather,
     BotQuestReportEndpoint[] ReportEndpoints,
     int[] RewardIndices,
-    string Reason);
+    string Reason)
+{
+#if !PLAYERBOTS_AAEMU_3_0
+    internal BotQuestInteractionObjective? Interaction { get; init; }
+    internal int? PreferredRewardIndex { get; init; }
+#endif
+}
 
 internal interface IBotQuestAuthority
 {
+#if !PLAYERBOTS_AAEMU_3_0
+    BotInteractionPlan FindInteraction(BotRuntime runtime, BotQuestInteractionObjective objective, float radius) =>
+        BotInteractionPlan.Blocked("interaction_not_available");
+    BotInteractionAttempt ExecuteInteraction(Character bot, BotInteractionPlan plan) =>
+        new(false, "interaction_not_available");
+#endif
     IReadOnlyList<BotQuestStartCandidate> FindDoodadQuestStarts(
         BotRuntime runtime,
         float radius,
@@ -125,6 +147,15 @@ internal interface IBotQuestAuthority
         uint npcTemplateId,
         float radius,
         DateTimeOffset now);
+
+    IReadOnlyList<Npc> FindMonsterTargets(
+        BotRuntime runtime, BotQuestMonsterHuntObjective objective, float radius, DateTimeOffset now) =>
+        objective.TargetTemplates.Distinct()
+            .SelectMany(id => FindMonsterTargets(runtime, id, radius, now))
+            .Where(npc => npc != null && objective.Matches(npc.TemplateId))
+            .DistinctBy(npc => npc.ObjId)
+            .OrderBy(npc => Vector3.DistanceSquared(runtime.Bot.Transform.World.Position, npc.Transform.World.Position))
+            .ThenBy(npc => npc.ObjId).ToArray();
 
     IReadOnlyList<Npc> FindItemGatherTargets(
         BotRuntime runtime,
@@ -170,8 +201,12 @@ internal interface IBotQuestAuthority
         int rewardIndex);
 }
 
-/// <summary>Reads and advances quests only through AAEmu's guarded APIs.</summary>
-internal sealed class BotQuestAuthority : IBotQuestAuthority
+/// <summary>
+/// Thin production adapter around AAEmu's authoritative quest and world state.
+/// The AAEmu 1.2-specific guards called here are supplied by the separate
+/// compatibility patch; this module never mutates quest progress itself.
+/// </summary>
+internal sealed partial class BotQuestAuthority : IBotQuestAuthority
 {
     private static BotQuestDestinationIndex Destinations { get; } = BotQuestDestinationIndex.Instance;
     private static object GatherSourceSync { get; } = new();
@@ -182,9 +217,6 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
         float radius,
         DateTimeOffset now)
     {
-#if PLAYERBOTS_AAEMU_3_0
-        return [];
-#else
         var bot = runtime?.Bot;
         var world = bot?.ParentWorld;
         var position = bot?.Transform?.World?.Position;
@@ -212,7 +244,6 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
         }
 
         return candidates;
-#endif
     }
 
     public bool AcceptQuest(Character bot, BotQuestGiverKind kind, uint questId, uint giverObjectId) =>
@@ -237,7 +268,7 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             var objective = InterpretObjective(quest);
             var endpoints = ReadReportEndpoints(quest);
             var rewards = ReadRewardIndices(quest);
-            snapshots.Add(new BotQuestSnapshot(
+            var snapshot = new BotQuestSnapshot(
                 questId,
                 BotQuestIntakeController.IsMainStory(template),
                 quest.Status == QuestStatus.Ready || quest.Step == QuestComponentKind.Ready,
@@ -246,7 +277,29 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
                 objective.ItemGather,
                 endpoints,
                 rewards,
-                objective.Reason));
+                objective.Reason);
+#if !PLAYERBOTS_AAEMU_3_0
+            if (snapshot.Ready && quest.QuestSteps.TryGetValue(QuestComponentKind.Reward, out var rewardStep))
+            {
+                var options = rewardStep.Components.Values.Where(component => component.IsCurrentlyActive)
+                    .SelectMany(component => component.Acts).Select(act => act.Template)
+                    .OfType<QuestActSupplySelectiveItem>().GroupBy(act => act.ThisSelectiveIndex)
+                    .Select(group => (Index: group.Key,
+                        Rank: group.Min(act => AAEmu.Game.Bots.Equipment.BotGearContainers.Rank(bot.Ability1,
+                            ItemManager.Instance.GetTemplate(act.ItemId))),
+                        Level: group.Max(act => ItemManager.Instance.GetTemplate(act.ItemId)?.Level ?? 0)));
+                snapshot = snapshot with { PreferredRewardIndex = AAEmu.Game.Bots.Equipment.BotEquipmentPolicy.SelectReward(
+                    options, SelectRewardIndex(rewards)) };
+            }
+            if (BotQuestInteractions.ReadObjective(quest) is { } interaction)
+                snapshot = snapshot with
+                {
+                    ObjectiveShape = BotQuestObjectiveShape.Interaction,
+                    Interaction = interaction,
+                    Reason = interaction.Kind.ToString()
+                };
+#endif
+            snapshots.Add(snapshot);
         }
 
         return snapshots;
@@ -322,6 +375,7 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             if (!float.IsFinite(distance) || distance > maximumDistance)
                 continue;
 
+#if PLAYERBOTS_AAEMU_3_0
             try
             {
                 var surfaceZ = world.GetHeight(destination.X, destination.Y);
@@ -332,6 +386,7 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             {
                 // Keep the finite spawn height; movement validates the route boundary.
             }
+#endif
 
             distance = Vector3.Distance(botPosition.Value, destination);
             if (!float.IsFinite(distance) || distance > maximumDistance)
@@ -359,9 +414,7 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
         FindStaticObjectiveDestinations(
             runtime,
             objective.ComponentId,
-            objective.TargetNpcTemplateId == 0
-                ? new HashSet<uint>()
-                : new HashSet<uint> { objective.TargetNpcTemplateId },
+            objective.TargetTemplates.Where(id => id != 0).ToHashSet(),
             maximumDistance);
 
     public IReadOnlyList<BotQuestStaticObjectiveDestination> FindStaticItemGatherDestinations(
@@ -464,10 +517,9 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             return new BotQuestLootAttempt(false, "corpse_world_mismatch", 0, 0);
         if (!TryMeasure(bot, corpse, interactionRadius, out _))
             return new BotQuestLootAttempt(false, "corpse_out_of_range", 0, 0);
-        if (corpse.CharacterTagging == null || corpse.CharacterTagging.TagTeam != 0 ||
-            !ReferenceEquals(corpse.CharacterTagging.Tagger, bot))
+        if (!PlayerBotsQuestLootAdapter.CanLootCorpseTag(bot, corpse))
         {
-            return new BotQuestLootAttempt(false, "corpse_not_solo_owned", 0, 0);
+            return new BotQuestLootAttempt(false, "corpse_not_owned_by_bot_or_party", 0, 0);
         }
 
         var itemTemplate = ItemManager.Instance.GetTemplate(itemId);
@@ -487,12 +539,13 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             bot,
             corpse,
             matching[0],
-            out var remainingCorpseItems);
+            out var remainingCorpseItems, out var consumedByNativeDistribution);
         return new BotQuestLootAttempt(
             looted,
-            looted ? "native_loot_taken" : "native_loot_rejected",
+            looted ? "native_loot_taken" : consumedByNativeDistribution
+                ? "native_party_loot_distributed" : "native_loot_rejected",
             matching.Length,
-            remainingCorpseItems);
+            remainingCorpseItems) { ConsumedByNativeDistribution = consumedByNativeDistribution };
     }
 
     public IReadOnlyList<BotQuestWorldObject> FindReportObjects(
@@ -538,9 +591,6 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
         }
         else if (endpoint.Kind == BotQuestReportKind.Doodad)
         {
-#if PLAYERBOTS_AAEMU_3_0
-            return [];
-#else
             var position = bot.Transform?.World?.Position;
             if (!position.HasValue || !IsFinite(position.Value))
                 return [];
@@ -555,7 +605,6 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
 
                 candidates.Add(new BotQuestWorldObject(endpoint.Kind, doodad, distance));
             }
-#endif
         }
 
         return candidates
@@ -585,6 +634,7 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             if (!IsFinite(destination))
                 continue;
 
+#if PLAYERBOTS_AAEMU_3_0
             try
             {
                 var surfaceZ = world.GetHeight(destination.X, destination.Y);
@@ -595,6 +645,7 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             {
                 // Keep the finite spawn height; the movement boundary still validates it.
             }
+#endif
 
             var distance = Vector3.Distance(botPosition.Value, destination);
             if (!float.IsFinite(distance) || distance > maximumDistance)
@@ -621,9 +672,6 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
         uint worldObjectId,
         int rewardIndex)
     {
-#if PLAYERBOTS_AAEMU_3_0
-        return false;
-#else
         var npcObjectId = kind == BotQuestReportKind.Npc ? worldObjectId : 0;
         var doodadObjectId = kind == BotQuestReportKind.Doodad ? worldObjectId : 0;
         return QuestManager.Instance.TryReportPlayerBotQuest(
@@ -632,15 +680,22 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             npcObjectId,
             doodadObjectId,
             rewardIndex);
-#endif
     }
+
+#if !PLAYERBOTS_AAEMU_3_0
+    // Native templates are immutable after startup. Cache membership, never quest progress.
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<uint, uint[]> MonsterGroups = new();
+    private static uint[] ResolveMonsterGroup(uint groupId) => MonsterGroups.GetOrAdd(groupId,
+        id => NpcManager.Instance.GetAllTemplates().Keys
+            .Where(npcId => QuestManager.Instance.CheckGroupNpc(id, npcId)).OrderBy(npcId => npcId).ToArray());
+#endif
 
     internal static (
         BotQuestObjectiveShape Shape,
         BotQuestMonsterHuntObjective? Objective,
         BotQuestItemGatherObjective? ItemGather,
         string Reason)
-        InterpretObjective(Quest quest)
+        InterpretObjective(Quest quest, Func<uint, uint[]> groupMembers = null)
     {
         if (quest == null || !quest.QuestSteps.TryGetValue(QuestComponentKind.Progress, out var progress))
             return (BotQuestObjectiveShape.Unsupported, null, null, "no_progress_step");
@@ -657,10 +712,37 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             return (BotQuestObjectiveShape.Ambiguous, null, null, "multiple_active_objectives");
 
         var act = objectiveActs[0];
+#if !PLAYERBOTS_AAEMU_3_0
+        if (act.Template is QuestActObjAggro aggro)
+        {
+            if (quest.QuestAcceptorType != QuestAcceptorType.Npc || quest.AcceptorId == 0 ||
+                !quest.TryGetPlayerBotObjectiveCount(aggro.ThisComponentObjectiveIndex, out var rank))
+                return (BotQuestObjectiveShape.Invalid, null, null, "invalid_aggro_objective");
+            // The native OnKill handler chooses reward rank from real aggro.
+            // The bot only fights the actual quest acceptor; it never sets rank.
+            return (BotQuestObjectiveShape.MonsterHunt,
+                new BotQuestMonsterHuntObjective(quest.AcceptorId, act.QuestComponent.Template.Id,
+                    aggro.ThisComponentObjectiveIndex, rank > 0 ? 1 : 0, 1), null, "native_aggro_hunt");
+        }
+        if (act.Template is QuestActObjMonsterGroupHunt group)
+        {
+            var members = (groupMembers ?? ResolveMonsterGroup)(group.QuestMonsterGroupId)
+                .Where(id => id != 0).Distinct().OrderBy(id => id).ToArray();
+            if (group.QuestMonsterGroupId == 0 || members.Length == 0 || group.Count <= 0 ||
+                !quest.TryGetPlayerBotObjectiveCount(group.ThisComponentObjectiveIndex, out var current))
+                return (BotQuestObjectiveShape.Invalid, null, null, "invalid_monster_group_hunt_objective");
+            return (BotQuestObjectiveShape.MonsterHunt,
+                new BotQuestMonsterHuntObjective(members[0], act.QuestComponent.Template.Id,
+                    group.ThisComponentObjectiveIndex, current, group.Count)
+                { MonsterGroupId = group.QuestMonsterGroupId, GroupMembers = members },
+                null, "monster_group_hunt");
+        }
+#endif
+
         if (act.Template is QuestActObjMonsterHunt monster)
         {
             if (monster.NpcId == 0 || monster.Count <= 0 ||
-                !TryGetObjectiveCount(quest, monster.ThisComponentObjectiveIndex, out var current))
+                !quest.TryGetPlayerBotObjectiveCount(monster.ThisComponentObjectiveIndex, out var current))
             {
                 return (BotQuestObjectiveShape.Invalid, null, null, "invalid_monster_hunt_objective");
             }
@@ -680,9 +762,20 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
         if (act.Template is QuestActObjItemGather gather)
         {
             if (gather.ItemId == 0 || gather.Count <= 0 ||
-                !TryGetObjectiveCount(quest, gather.ThisComponentObjectiveIndex, out var current))
+                !quest.TryGetPlayerBotObjectiveCount(gather.ThisComponentObjectiveIndex, out var current))
             {
                 return (BotQuestObjectiveShape.Invalid, null, null, "invalid_item_gather_objective");
+            }
+
+            // A highlighted doodad is an interaction objective, not corpse loot.
+            // Some quests also require movement between multiple interactions.
+            if (gather.HighlightDoodadId != 0)
+            {
+                return (
+                    BotQuestObjectiveShape.Unsupported,
+                    null,
+                    null,
+                    "unsupported_doodad_item_gather");
             }
 
             return (
@@ -802,7 +895,9 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
                 containingSphere != null));
         }
 
-        // A marker can guide discovery when no exact static spawn is known.
+        // The client marker remains useful even when a quest source cannot be
+        // mapped to an exact static NPC spawn. Enter the authored area and let
+        // the live blackboard revalidate a legal target before combat begins.
         foreach (var sphere in spheres)
         {
             var distance = Vector3.Distance(botPosition.Value, sphere.Xyz);
@@ -832,9 +927,6 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
 
     private static HashSet<uint> ResolveGatherSourceTemplates(uint questId, uint itemId)
     {
-#if PLAYERBOTS_AAEMU_3_0
-        return [];
-#else
         var key = (questId, itemId);
         lock (GatherSourceSync)
         {
@@ -860,17 +952,6 @@ internal sealed class BotQuestAuthority : IBotQuestAuthority
             GatherSourceCache[key] = sources;
             return sources;
         }
-#endif
-    }
-
-    private static bool TryGetObjectiveCount(Quest quest, byte objectiveIndex, out int current)
-    {
-#if PLAYERBOTS_AAEMU_3_0
-        current = 0;
-        return false;
-#else
-        return quest.TryGetPlayerBotObjectiveCount(objectiveIndex, out current);
-#endif
     }
 
     private static string GetWorldName(Character bot)

@@ -4,14 +4,30 @@ using AAEmu.Game.Models.Game.Char;
 
 namespace AAEmu.Game.Models.Game.Bots
 {
+    public enum BotMovementOwner
+    {
+        None,
+        External,
+        QuestIntake,
+        QuestLifecycle,
+        PartyQuest
+    }
+
     public class BotMovementState
     {
+#if !PLAYERBOTS_AAEMU_3_0
+        internal AAEmu.Game.Bots.Questing.BotClimbMotion Climb { get; set; }
+        internal AAEmu.Game.Bots.Body.BotSafeRecovery SafeRecovery { get; } = new();
+#endif
         public Vector3? Destination { get; set; }
         /// <summary>
         /// The behavior-owned final destination while <see cref="Destination"/> advances
         /// through collision-aware local and road waypoints.
         /// </summary>
         public Vector3? TravelDestination { get; internal set; }
+        /// <summary>The controller that owns the current travel route.</summary>
+        public BotMovementOwner TravelOwner { get; internal set; }
+        public string TravelIntent { get; internal set; } = "transit";
         public string TravelMode { get; internal set; } = "direct";
         public int TravelWaypointCount => TravelWaypoints.Count + (Destination.HasValue ? 1 : 0);
         internal Queue<Vector3> TravelWaypoints { get; } = new();

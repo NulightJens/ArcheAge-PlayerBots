@@ -213,7 +213,11 @@ public sealed class BotSocialState
         lock (_sync)
         {
             if (_teamId.Value == 0 || _master == null || !ReferenceEquals(character, _master) ||
-                !character.IsOnline || character.IsDead)
+                (!character.IsOnline
+#if !PLAYERBOTS_AAEMU_3_0
+                 && !IsAdmittedHeadlessLeader(character)
+#endif
+                 ) || character.IsDead)
                 return false;
             if (_runtime.Bot.ParentWorld != null && character.ParentWorld != null &&
                 !ReferenceEquals(_runtime.Bot.ParentWorld, character.ParentWorld))
@@ -222,6 +226,20 @@ public sealed class BotSocialState
                    _runtime.Bot.Transform.InstanceId == character.Transform.InstanceId;
         }
     }
+
+#if !PLAYERBOTS_AAEMU_3_0
+    private bool IsAdmittedHeadlessLeader(Character character)
+    {
+        var host = _runtime.OwnerHost;
+        if (!character.IsBot || _runtime.Retired || host == null ||
+            !ReferenceEquals(host.GetRuntime(_runtime.Bot.Id), _runtime))
+            return false;
+        var leader = host.GetRuntime(character.Id);
+        return leader is { Retired: false } && ReferenceEquals(leader.Bot, character) &&
+               character.ParentWorld != null &&
+               ReferenceEquals(_runtime.Bot.ParentWorld, character.ParentWorld);
+    }
+#endif
 
     public Unit ResolveMasterTarget(uint targetObjId)
     {
@@ -245,9 +263,19 @@ public sealed class BotSocialState
 
         if (teamId == 0 || IsMasterAvailable(master))
             return true;
+#if !PLAYERBOTS_AAEMU_3_0
+        if (HasCoordinatedBotLeader)
+            return false; // The party coordinator owns this temporary hold.
+#endif
         SafeHold();
         return false;
     }
+
+#if !PLAYERBOTS_AAEMU_3_0
+    internal bool HasCoordinatedBotLeader => Master is { IsBot: true } master &&
+        BotPartyQuestCoordinator.IsConfigured(_runtime.Bot.Id) &&
+        BotPartyQuestCoordinator.IsConfigured(master.Id);
+#endif
 
     public void ApplyFollow()
     {

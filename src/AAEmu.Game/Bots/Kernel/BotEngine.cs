@@ -136,7 +136,7 @@ public sealed class BotEngine
                     relevance + AlternativeEpsilon,
                     skipPrerequisites: false,
                     basket.Event,
-                    now);
+                    basket.CreatedAt);
                 continue;
             }
 
@@ -148,7 +148,7 @@ public sealed class BotEngine
                     relevance + PrerequisiteEpsilon,
                     skipPrerequisites: false,
                     basket.Event,
-                    now);
+                    basket.CreatedAt);
                 if (prerequisitesPushed)
                 {
                     MultiplyAndPush(
@@ -157,13 +157,14 @@ public sealed class BotEngine
                         relevance + SelfEpsilon,
                         skipPrerequisites: true,
                         basket.Event,
-                        now);
+                        basket.CreatedAt);
                     continue;
                 }
             }
 
             var result = action.Execute(context, basket.Event);
             AddActionLog(now, basket.Node.Name, relevance, result);
+            if (result == BotActionResult.Pending) return true;
             if (result != BotActionResult.Success)
             {
                 MultiplyAndPush(
@@ -172,11 +173,12 @@ public sealed class BotEngine
                     relevance + AlternativeEpsilon,
                     skipPrerequisites: false,
                     basket.Event,
-                    now);
+                    basket.CreatedAt);
                 continue;
             }
 
-            MultiplyAndPush(context, basket.Node.Continuers, relevance, skipPrerequisites: false, basket.Event, now);
+            // Derived work belongs to the same request and retains its original expiry.
+            MultiplyAndPush(context, basket.Node.Continuers, relevance, skipPrerequisites: false, basket.Event, basket.CreatedAt);
             context.Runtime.HostMetrics?.RecordDecision(true);
             return true;
         }

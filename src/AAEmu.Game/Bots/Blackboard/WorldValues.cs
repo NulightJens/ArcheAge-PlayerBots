@@ -34,7 +34,18 @@ public static class WorldValues
         };
         hostileFilter ??= npc => !npc.IsDead && bot.CanAttack(npc) && !IsStealthed(npc);
 
-        var blackboard = new BotBlackboard();
+        var observedWorld = bot.ParentWorld;
+        var observedInstance = bot.Transform?.InstanceId;
+        var blackboard = new BotBlackboard(() =>
+        {
+            var world = bot.ParentWorld;
+            var instance = bot.Transform?.InstanceId;
+            if (ReferenceEquals(world, observedWorld) && instance == observedInstance)
+                return false;
+            observedWorld = world;
+            observedInstance = instance;
+            return true;
+        });
         var scanTtl = TimeSpan.FromMilliseconds(config.ScanTtlMs);
         var realPlayerScanTtl = TimeSpan.FromMilliseconds(config.RealPlayerScanTtlMs);
         var nearbyNpcScan = new NearbyNpcScan(bot, nearbyNpcs, config.SearchRadius, scanTtl);

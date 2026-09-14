@@ -30,8 +30,14 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
     private readonly BotConfig _config;
     private readonly TimeProvider _time;
     private BotCombatState _combatState;
+    private long? _lastStepTimestamp;
+    private bool _movementClockActive;
+#if !PLAYERBOTS_AAEMU_3_0
+    private readonly BotTerrainDetourWatch _terrainDetours = new();
+#endif
 
     private const float TickInterval = 0.1f;
+    private const float MaximumStepInterval = 0.25f;
     private const float FallbackRunSpeed = 5.4f;
     private const float FallbackWalkSpeed = 1.8f;
     private const float MaximumSafeTerrainDropPerTick = 1.25f;
@@ -72,8 +78,9 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         BotMovementState state,
         BotMovementBroadcaster broadcaster,
         Action<BotMovementTask> onCancel,
-        Func<float, float, float> groundHeight = null)
-        : this(bot, state, broadcaster, onCancel, null, groundHeight, null, null, null)
+        Func<float, float, float> groundHeight = null,
+        TimeProvider time = null)
+        : this(bot, state, broadcaster, onCancel, null, groundHeight, null, time, null)
     {
     }
 
@@ -102,6 +109,9 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
     public override void OnCancel()
     {
+#if !PLAYERBOTS_AAEMU_3_0
+        AAEmu.Game.Bots.Questing.BotClimbMotion.Cancel(_bot, _state, _broadcaster);
+#endif
         _onCancel?.Invoke(this);
     }
 
@@ -119,6 +129,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
         ClearTravelRoute(_state);
         _state.Destination = position;
+        _state.TravelOwner = BotMovementOwner.External;
         _state.ApprovedNavigationDestination = null;
         _state.IsRunning = run;
         _state.FallVelocity = 0;
@@ -145,6 +156,12 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         _state.SteeringDestination = null;
         _state.TravelDirection = Vector3.Zero;
         _state.TravelSpeed = 0f;
+#if !PLAYERBOTS_AAEMU_3_0
+        _state.TravelRemainingDistance = BotTravelPathFollower.MeasureRemaining(
+            _bot.Transform.World.Position,
+            position,
+            _state.TravelWaypoints);
+#endif
         _state.ApprovedNavigationDestination = null;
         _state.IsRunning = run;
         _state.FallVelocity = 0f;
@@ -166,6 +183,9 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         if (!ReferenceEquals(bot, _bot))
             return;
 
+#if !PLAYERBOTS_AAEMU_3_0
+        AAEmu.Game.Bots.Questing.BotClimbMotion.Cancel(_bot, _state, _broadcaster);
+#endif
         ResetMovementState(_state);
         Logger.Trace($"BOT id={bot.Id} obj={bot.ObjId} ev=stop_immediately");
         if (bot.Transform == null)
@@ -190,6 +210,9 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
             return;
 
         _broadcaster.SendTeleport(position, bot.IsInBattle);
+#if !PLAYERBOTS_AAEMU_3_0
+        AAEmu.Game.Bots.Questing.BotClimbMotion.Cancel(_bot, _state, _broadcaster);
+#endif
         ResetMovementState(_state);
         Logger.Trace($"BOT id={bot.Id} obj={bot.ObjId} ev=teleport pos=({position.X}, {position.Y}, {position.Z})");
     }
@@ -268,16 +291,72 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
     internal virtual void Step()
     {
-        ExecuteCore();
+#if !PLAYERBOTS_AAEMU_3_0
+        if (AAEmu.Game.Bots.Host.BotDrivers.For(_bot).Owns(_bot))
+        {
+            StepFromObservedPosition();
+            return;
+        }
+#endif
+        var stepInterval = MeasureStepInterval();
+        try
+        {
+            ExecuteCore(stepInterval);
+        }
+        finally
+        {
+            _movementClockActive = HasActiveMovement();
+        }
     }
 
-    private void ExecuteCore()
+#if !PLAYERBOTS_AAEMU_3_0
+    private void StepFromObservedPosition()
+    {
+        // This executor advances route knowledge from native reports only. It
+        // never integrates velocity, snaps to endpoints or simulates falling.
+        _state.IsMoving = false;
+        if (_bot.IsDead || _bot.SkillTask != null ||
+            IsMovementImpaired() || _bot.Transform.Parent != null || _bot.Transform.StickyParent != null)
+            return;
+        var current = _bot.Transform.World.Position;
+        if (_state.FollowTarget is { } followTarget)
+        {
+            if (!followTarget.IsOnline || followTarget.IsDead ||
+                !ReferenceEquals(_bot.ParentWorld, followTarget.ParentWorld) ||
+                _bot.Transform.InstanceId != followTarget.Transform.InstanceId)
+            {
+                _state.Destination = _state.SteeringDestination = null;
+                return;
+            }
+            var followPosition = _state.FormationSlot >= 0
+                ? BotFormation.PositionFor(followTarget, _state) : followTarget.Transform.World.Position;
+            var follow = BotMovementMath.ComputeFollowDestination(current, followPosition,
+                _state.FormationSlot >= 0 ? .35f : _state.FollowDistance);
+            _state.Destination = follow.Destination;
+            if (_state.ApprovedNavigationDestination != follow.Destination)
+                _state.ApprovedNavigationDestination = null;
+        }
+        while (_state.Destination is { } reached &&
+            new Vector2(reached.X-current.X,reached.Y-current.Y).Length() <= .65f && Math.Abs(reached.Z-current.Z) <= 2f)
+            if (!AdvanceTravelWaypoint()) break;
+        if (!AuthorizeDestination(current)) return;
+        _state.SteeringDestination = _state.Destination;
+        _state.IsMoving = _state.Destination.HasValue;
+    }
+#endif
+
+    private void ExecuteCore(float stepInterval)
     {
         if (_bot.ParentWorld == null)
         {
             Cancelled = true;
             return;
         }
+
+#if !PLAYERBOTS_AAEMU_3_0
+        if (_state.Climb != null && (_bot.IsDead || IsMovementImpaired() || _combatState?.IsForced == true))
+            AAEmu.Game.Bots.Questing.BotClimbMotion.Cancel(_bot, _state, _broadcaster);
+#endif
 
         if (_bot.IsDead)
         {
@@ -294,6 +373,13 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
             return;
         }
+
+#if !PLAYERBOTS_AAEMU_3_0
+        if (_state.Climb != null && _combatState?.IsForced == true)
+            AAEmu.Game.Bots.Questing.BotClimbMotion.Cancel(_bot, _state, _broadcaster);
+        if (AAEmu.Game.Bots.Questing.BotClimbMotion.Tick(_bot, _state, _broadcaster, stepInterval, _time.GetUtcNow()))
+            return;
+#endif
 
         if (_bot.SkillTask != null)
         {
@@ -328,6 +414,15 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         if (!AuthorizeDestination(currentPosition))
             return;
 
+#if !PLAYERBOTS_AAEMU_3_0
+        if (_terrainDetours.Observe(_bot.ParentWorld, _bot.Transform.InstanceId, _state, currentPosition,
+                now, _config.StuckMinMeters, _config.StuckSeconds))
+        {
+            RejectTerrainTravel(currentPosition, NavigationDiagnosticReason.TerrainDetourExhausted);
+            return;
+        }
+#endif
+
         var groundZ = GetGroundHeight(currentPosition.X, currentPosition.Y);
         TryStartJump(now, currentPosition, groundZ, _state.Destination);
 
@@ -339,6 +434,20 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
             var followingTravelRoute = _state.TravelDestination.HasValue;
             if (!followingTravelRoute && distance < 0.5f)
             {
+#if !PLAYERBOTS_AAEMU_3_0
+                var arrivalGround = GetGroundHeight(destination.X, destination.Y);
+                if (!float.IsFinite(arrivalGround) || MathF.Abs(arrivalGround - groundZ) > MaximumSafeTerrainDropPerTick)
+                {
+                    RejectTerrainTravel(currentPosition, arrivalGround > groundZ
+                        ? NavigationDiagnosticReason.TerrainRiseRejected : NavigationDiagnosticReason.TerrainDropRejected);
+                    return;
+                }
+                if (_bot.ParentWorld.IsWater(new Vector3(destination.X, destination.Y, arrivalGround)))
+                {
+                    RejectTerrainTravel(currentPosition, NavigationDiagnosticReason.WaterTraversalRejected);
+                    return;
+                }
+#endif
                 currentPosition.X = destination.X;
                 currentPosition.Y = destination.Y;
                 var advanced = AdvanceTravelWaypoint();
@@ -366,7 +475,12 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
                 if (followingTravelRoute)
                 {
+#if !PLAYERBOTS_AAEMU_3_0
+                    if (!float.IsFinite(_state.TravelRemainingDistance) ||
+                        _state.TravelRemainingDistance <= BotTravelPathFollower.FinalArrivalRadius)
+#else
                     if (_state.TravelRemainingDistance <= 0f)
+#endif
                     {
                         _state.TravelRemainingDistance = BotTravelPathFollower.MeasureRemaining(
                             currentPosition,
@@ -387,7 +501,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
                     moveDirection = BotTravelPathFollower.TurnTowards(
                         _state.TravelDirection,
                         desiredDirection,
-                        MaximumTravelTurnRadiansPerSecond * TickInterval);
+                        MaximumTravelTurnRadiansPerSecond * stepInterval);
                     _state.TravelDirection = moveDirection;
 
                     var brakingDistance = _state.TravelWaypoints.Count == 0
@@ -397,11 +511,11 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
                         _state.TravelSpeed,
                         speedLimit,
                         brakingDistance,
-                        TickInterval);
+                        stepInterval);
                     appliedSpeed = _state.TravelSpeed;
 
                     var steeringDistance = desiredDirection.Length();
-                    stepDistance = Math.Min(appliedSpeed * TickInterval, steeringDistance);
+                    stepDistance = Math.Min(appliedSpeed * stepInterval, steeringDistance);
                     nextPosition = planarCurrent + moveDirection * stepDistance;
                 }
                 else
@@ -410,7 +524,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
                         planarCurrent,
                         planarDestination,
                         speedLimit,
-                        TickInterval);
+                        stepInterval);
                     nextPosition = movement.Next;
                     arrivedAtDirectDestination = movement.Arrived;
                     var direction = planarDestination - nextPosition;
@@ -420,9 +534,69 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
                 }
 
                 var nextGroundZ = GetGroundHeight(nextPosition.X, nextPosition.Y);
+#if !PLAYERBOTS_AAEMU_3_0
+                var unsafeTerrainRise = float.IsFinite(nextGroundZ) &&
+                                        nextGroundZ - groundZ > MaximumSafeTerrainDropPerTick;
+                var unsafeTerrainDrop = !float.IsFinite(nextGroundZ) ||
+                                        groundZ - nextGroundZ > MaximumSafeTerrainDropPerTick;
+                if (!unsafeTerrainRise && float.IsFinite(nextGroundZ) &&
+                    _bot.ParentWorld.IsWater(new Vector3(nextPosition.X, nextPosition.Y, nextGroundZ)))
+                {
+                    RejectTerrainTravel(currentPosition, NavigationDiagnosticReason.WaterTraversalRejected);
+                    return;
+                }
+
+                if (unsafeTerrainRise || unsafeTerrainDrop)
+                {
+                    if (followingTravelRoute && TryFindTerrainDetour(
+                            planarCurrent,
+                            moveDirection,
+                            stepDistance,
+                            groundZ,
+                            out var detourPosition,
+                            out var detourGroundZ,
+                            out var detourDirection))
+                    {
+                        nextPosition = detourPosition;
+                        nextGroundZ = detourGroundZ;
+                        moveDirection = detourDirection;
+                        _state.TravelDirection = detourDirection;
+                        _state.LastNavigationDecision = new NavigationDecision(
+                            NavigationDecisionStatus.Accepted,
+                            unsafeTerrainRise
+                                ? NavigationDiagnosticReason.TerrainRiseDetourAccepted
+                                : NavigationDiagnosticReason.TerrainDropDetourAccepted);
+                        usedTerrainDetour = true;
+                        if (_terrainDetours.Detour(_bot.ParentWorld, _bot.Transform.InstanceId, _state,
+                                currentPosition, now))
+                        Logger.Info(
+                            $"BOT id={_bot.Id} obj={_bot.ObjId} ev=navigation_recovery reason=" +
+                            $"{(unsafeTerrainRise ? "terrain_rise_detour" : "terrain_drop_detour")} " +
+                            $"from_z={groundZ:F2} accepted_z={detourGroundZ:F2} mode={_state.TravelMode}");
+                    }
+                    else
+                    {
+                        if (unsafeTerrainRise)
+                        {
+                            RejectTerrainTravel(currentPosition, NavigationDiagnosticReason.TerrainRiseRejected);
+                            return;
+                        }
+
+                        _state.LastNavigationDecision = new NavigationDecision(
+                            NavigationDecisionStatus.InvalidSurface,
+                            NavigationDiagnosticReason.TerrainDropRejected);
+                        Logger.Warn(
+                            $"BOT id={_bot.Id} obj={_bot.ObjId} ev=navigation_hazard reason=terrain_drop " +
+                            $"from_z={groundZ:F2} to_z={nextGroundZ:F2} mode={_state.TravelMode}");
+                        ClearTravelRoute(_state);
+                        StopAndClear(currentPosition, forceFinalize: true);
+                        return;
+                    }
+                }
+#else
                 if (!float.IsFinite(nextGroundZ) || groundZ - nextGroundZ > MaximumSafeTerrainDropPerTick)
                 {
-                    if (followingTravelRoute && TryFindTerrainDropDetour(
+                    if (followingTravelRoute && TryFindTerrainDetour(
                             planarCurrent,
                             moveDirection,
                             stepDistance,
@@ -456,6 +630,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
                         return;
                     }
                 }
+#endif
                 currentPosition.X = nextPosition.X;
                 currentPosition.Y = nextPosition.Y;
                 if (followingTravelRoute)
@@ -476,7 +651,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
                 }
 
                 groundZ = nextGroundZ;
-                var airborne = AdvanceJump(ref currentPosition, groundZ);
+                var airborne = AdvanceJump(ref currentPosition, groundZ, stepInterval);
                 _bot.Transform.Local.SetPosition(currentPosition.X, currentPosition.Y, currentPosition.Z);
 
                 var combatWithTarget = _bot.IsInBattle && _bot.CurrentTarget != null;
@@ -501,6 +676,10 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
                 _bot.Transform.FinalizeTransform();
                 _state.IsMoving = true;
                 _state.IsFalling = airborne && _state.JumpVerticalVelocity < 0f;
+#if !PLAYERBOTS_AAEMU_3_0
+                if (!airborne)
+                    _state.SafeRecovery.ObserveGround(_bot, _state, _time.GetUtcNow().UtcDateTime, groundZ);
+#endif
 
                 if (_state.Destination is null && !airborne)
                     StopAndClear(currentPosition, forceFinalize: false);
@@ -512,7 +691,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         groundZ = GetGroundHeight(currentPosition.X, currentPosition.Y);
         if (_state.IsJumping)
         {
-            var airborne = AdvanceJump(ref currentPosition, groundZ);
+            var airborne = AdvanceJump(ref currentPosition, groundZ, stepInterval);
             _bot.Transform.Local.SetHeight(currentPosition.Z);
             if (airborne)
             {
@@ -531,7 +710,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
         if (currentPosition.Z > groundZ + 0.1f || _state.FallVelocity > 0f)
         {
-            var gravity = BotMovementMath.ApplyGravity(currentPosition.Z, groundZ, _state.FallVelocity, TickInterval);
+            var gravity = BotMovementMath.ApplyGravity(currentPosition.Z, groundZ, _state.FallVelocity, stepInterval);
             if (gravity.Landed)
             {
                 _state.FallVelocity = gravity.NewFallVelocity;
@@ -586,7 +765,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         Logger.Trace($"BOT id={_bot.Id} obj={_bot.ObjId} ev=jump reason={(requested ? "requested" : ambient ? "ambient" : "terrain_step")}");
     }
 
-    private bool AdvanceJump(ref Vector3 position, float groundZ)
+    private bool AdvanceJump(ref Vector3 position, float groundZ, float stepInterval)
     {
         if (!_state.IsJumping)
         {
@@ -598,7 +777,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
             position.Z,
             groundZ,
             _state.JumpVerticalVelocity,
-            TickInterval);
+            stepInterval);
         position.Z = jump.NewZ;
         _state.JumpVerticalVelocity = jump.NewVerticalVelocity;
         if (!jump.Landed)
@@ -722,7 +901,7 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
         return _groundHeight(x, y);
     }
 
-    private bool TryFindTerrainDropDetour(
+    private bool TryFindTerrainDetour(
         Vector3 currentPosition,
         Vector3 movementDirection,
         float stepDistance,
@@ -750,11 +929,24 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
                 0f);
             var candidate = currentPosition + candidateDirection * stepDistance;
             var candidateGroundZ = GetGroundHeight(candidate.X, candidate.Y);
+#if !PLAYERBOTS_AAEMU_3_0
+            if (!float.IsFinite(candidateGroundZ) ||
+                MathF.Abs(candidateGroundZ - groundZ) > MaximumSafeTerrainDropPerTick)
+#else
             if (!float.IsFinite(candidateGroundZ) ||
                 groundZ - candidateGroundZ > MaximumSafeTerrainDropPerTick)
+#endif
             {
                 continue;
             }
+
+#if !PLAYERBOTS_AAEMU_3_0
+            if (_bot.ParentWorld.IsWater(new Vector3(candidate.X, candidate.Y, candidateGroundZ)) ||
+                !_navigationBoundary.Evaluate(
+                    new Vector3(currentPosition.X, currentPosition.Y, groundZ),
+                    new Vector3(candidate.X, candidate.Y, candidateGroundZ)).IsAccepted)
+                continue;
+#endif
 
             detourPosition = candidate;
             detourGroundZ = candidateGroundZ;
@@ -764,6 +956,41 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
         return false;
     }
+
+#if !PLAYERBOTS_AAEMU_3_0
+    private void RejectTerrainTravel(Vector3 position, NavigationDiagnosticReason reason)
+    {
+        _state.LastNavigationDecision = new NavigationDecision(NavigationDecisionStatus.Unreachable, reason);
+        Logger.Warn($"BOT id={_bot.Id} obj={_bot.ObjId} ev=navigation_hazard reason={reason} " +
+                    $"mode={_state.TravelMode} detours={_terrainDetours.Detours}");
+        ClearTravelRoute(_state);
+        StopAndClear(position, forceFinalize: true);
+    }
+#endif
+
+    private float MeasureStepInterval()
+    {
+        var timestamp = _time.GetTimestamp();
+        var interval = TickInterval;
+        if (_movementClockActive && _lastStepTimestamp.HasValue)
+        {
+            var elapsed = _time.GetElapsedTime(_lastStepTimestamp.Value, timestamp).TotalSeconds;
+            if (double.IsFinite(elapsed) && elapsed > 0d)
+                interval = Math.Min((float)elapsed, MaximumStepInterval);
+        }
+
+        _lastStepTimestamp = timestamp;
+        return interval;
+    }
+
+    private bool HasActiveMovement() =>
+        _state.Destination.HasValue ||
+        _state.IsMoving ||
+        _state.IsFalling ||
+        _state.FollowTarget != null ||
+        _state.FallVelocity > 0f ||
+        _state.JumpRequested ||
+        _state.IsJumping;
 
     private bool AuthorizeDestination(Vector3 currentPosition)
     {
@@ -786,7 +1013,9 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
             return true;
         }
 
+#if PLAYERBOTS_AAEMU_3_0
         if (_state.TravelDestination.HasValue)
+#endif
             ClearTravelRoute(_state);
         _state.Destination = null;
         _state.ApprovedNavigationDestination = null;
@@ -800,6 +1029,13 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
 
     private void StopAndClear(Vector3 position, bool forceFinalize)
     {
+#if !PLAYERBOTS_AAEMU_3_0
+        AAEmu.Game.Bots.Questing.BotClimbMotion.Cancel(_bot, _state, _broadcaster);
+        // A finished direct move has no remaining route to own. Retain real
+        // routed travel for its controller to resume after a temporary stop.
+        if (!_state.TravelDestination.HasValue)
+            ClearTravelRoute(_state);
+#endif
         _state.Destination = null;
         _state.ApprovedNavigationDestination = null;
         _state.SteeringDestination = null;
@@ -834,6 +1070,9 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
     {
         if (_state.TravelDestination == null)
         {
+#if !PLAYERBOTS_AAEMU_3_0
+            ClearTravelRoute(_state);
+#endif
             _state.Destination = null;
             return false;
         }
@@ -877,6 +1116,8 @@ public class BotMovementTask : AAEmu.Game.Models.Tasks.Task, IBotMover
     private static void ClearTravelRoute(BotMovementState state)
     {
         state.TravelDestination = null;
+        state.TravelOwner = BotMovementOwner.None;
+        state.TravelIntent = "transit";
         state.TravelMode = "direct";
         state.TravelWaypoints.Clear();
         state.SteeringDestination = null;

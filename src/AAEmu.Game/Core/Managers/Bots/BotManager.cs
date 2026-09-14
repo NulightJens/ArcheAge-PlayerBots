@@ -32,7 +32,7 @@ public enum SpawnResult
     LoadFailed
 }
 
-public class BotManager : Singleton<BotManager>, IBotManager
+public partial class BotManager : Singleton<BotManager>, IBotManager
 {
     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
@@ -438,6 +438,15 @@ public class BotManager : Singleton<BotManager>, IBotManager
 
     private bool DespawnBotCore(uint characterId)
     {
+#if !PLAYERBOTS_AAEMU_3_0
+        if (ActiveBots.TryGetValue(characterId, out var attached) && BotDrivers.For(attached).Owns(attached))
+        {
+            var controlled = (_botHost ?? BotHost.Instance).GetRuntime(characterId);
+            if (controlled == null) return false;
+            controlled.Driver.Release(controlled);
+            return !ActiveBots.ContainsKey(characterId);
+        }
+#endif
         if (!ActiveBots.TryRemove(characterId, out var character))
         {
             Logger.Warn($"BotManager: no active bot found with character id {characterId}");
@@ -535,6 +544,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
     {
         if (bot == null || target == null || !_botStates.TryGetValue(bot.Id, out var state))
             return;
+        ClearTravelRoute(state);
         state.FollowTarget = target;
         state.FollowDistance = followDistance;
         state.Destination = null; // override any manual destination
@@ -562,6 +572,7 @@ public class BotManager : Singleton<BotManager>, IBotManager
 
         ClearTravelRoute(state);
         state.Destination = new Vector3(x, y, z);
+        state.TravelOwner = BotMovementOwner.External;
         state.IsRunning = run;
         state.FallVelocity = 0; // reset fall when starting to move
         Logger.Trace($"BOT id={bot.Id} obj={bot.ObjId} ev=destination pos=({x}, {y}, {z}) run={run}");
@@ -571,26 +582,63 @@ public class BotManager : Singleton<BotManager>, IBotManager
     /// Selects an authoritative road/BAI route while preserving the caller's final
     /// destination for movement-ownership checks.
     /// </summary>
-    public void SetBotTravelDestination(Character bot, Vector3 destination, bool run = true)
+    public bool SetBotTravelDestination(
+        Character bot,
+        Vector3 destination,
+        bool run = true,
+        BotTravelIntent intent = BotTravelIntent.Transit,
+        BotMovementOwner owner = BotMovementOwner.External)
     {
         if (bot == null || !_botStates.TryGetValue(bot.Id, out var state))
-            return;
+            return false;
 
         if (state.TravelDestination is { } current &&
-            Vector3.Distance(current, destination) <= 0.5f && state.Destination.HasValue)
+            Vector3.Distance(current, destination) <= 0.5f && state.Destination.HasValue &&
+            state.TravelOwner == owner)
         {
-            return;
+            return true;
         }
 
-        var route = BotTravelRoutePlanner.Plan(bot, destination);
+        var route = BotTravelRoutePlanner.Plan(bot, destination, intent);
+        if (route.Waypoints.Count == 0)
+        {
+            Logger.Warn(
+                $"BOT id={bot.Id} obj={bot.ObjId} ev=travel_route_rejected " +
+                $"owner={owner.ToString().ToLowerInvariant()} intent={intent.ToString().ToLowerInvariant()} " +
+                $"mode={route.Mode} detail={route.Detail} " +
+                $"destination=({destination.X:F2},{destination.Y:F2},{destination.Z:F2})");
+            return false;
+        }
+
+#if !PLAYERBOTS_AAEMU_3_0
+        if (owner is BotMovementOwner.QuestIntake or BotMovementOwner.QuestLifecycle &&
+            AAEmu.Game.Bots.Social.BotPartyQuestCoordinator.IsConfigured(bot.Id))
+            route = AAEmu.Game.Bots.Social.BotPartyTravelVariation.Apply(route, bot.Id, bot.ParentWorld.GetHeight);
+#endif
+        return ApplyTravelRoute(bot, state, destination, run, intent, owner, route);
+    }
+
+#if !PLAYERBOTS_AAEMU_3_0
+    internal bool SetBotPartyReturnRoute(Character bot, IReadOnlyList<Vector3> points)
+    {
+        if (bot == null || !_botStates.TryGetValue(bot.Id, out var state) || points.Count == 0 ||
+            !BotTravelRoutePlanner.HasGroundCompatibleWaypoints(points, bot.ParentWorld.GetHeight)) return false;
+        return ApplyTravelRoute(bot, state, points[^1], true, BotTravelIntent.QuestObjective,
+            BotMovementOwner.PartyQuest, new BotTravelRoute("party-return", points, 0, "rechecked_occupied_trail"));
+    }
+#endif
+
+    private static bool ApplyTravelRoute(Character bot, BotMovementState state, Vector3 destination, bool run,
+        BotTravelIntent intent, BotMovementOwner owner, BotTravelRoute route)
+    {
         ClearTravelRoute(state);
         state.TravelDestination = destination;
+        state.TravelOwner = owner;
         state.TravelMode = route.Mode;
+        state.TravelIntent = intent.ToString().ToLowerInvariant();
         foreach (var waypoint in route.Waypoints)
             state.TravelWaypoints.Enqueue(waypoint);
 
-        if (state.TravelWaypoints.Count == 0)
-            state.TravelWaypoints.Enqueue(destination);
         state.Destination = state.TravelWaypoints.Dequeue();
         state.TravelRemainingDistance = BotTravelPathFollower.MeasureRemaining(
             bot.Transform.World.Position,
@@ -603,9 +651,11 @@ public class BotManager : Singleton<BotManager>, IBotManager
         state.IsRunning = run;
         state.FallVelocity = 0;
         Logger.Info(
-            $"BOT id={bot.Id} obj={bot.ObjId} ev=travel_route_selected mode={route.Mode} " +
+            $"BOT id={bot.Id} obj={bot.ObjId} ev=travel_route_selected owner={owner.ToString().ToLowerInvariant()} " +
+            $"intent={state.TravelIntent} mode={route.Mode} " +
             $"road_steps={route.RoadSteps} waypoints={state.TravelWaypointCount} detail={route.Detail} " +
             $"destination=({destination.X:F2},{destination.Y:F2},{destination.Z:F2})");
+        return true;
     }
 
     internal bool SetBotDestinationIfChanged(Character bot, Vector3 destination, bool run = true, float tolerance = 0.5f)
@@ -718,6 +768,8 @@ public class BotManager : Singleton<BotManager>, IBotManager
     private static void ClearTravelRoute(BotMovementState state)
     {
         state.TravelDestination = null;
+        state.TravelOwner = BotMovementOwner.None;
+        state.TravelIntent = "transit";
         state.TravelMode = "direct";
         state.TravelWaypoints.Clear();
         state.SteeringDestination = null;

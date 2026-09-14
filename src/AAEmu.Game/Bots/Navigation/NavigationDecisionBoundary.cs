@@ -23,7 +23,13 @@ public enum NavigationDiagnosticReason
     SurfaceMismatch,
     ReachabilityRejected,
     TerrainDropDetourAccepted,
-    TerrainDropRejected
+    TerrainDropRejected,
+#if !PLAYERBOTS_AAEMU_3_0
+    TerrainRiseDetourAccepted,
+    TerrainRiseRejected,
+    TerrainDetourExhausted,
+    WaterTraversalRejected
+#endif
 }
 
 public readonly struct NavigationDecision
@@ -88,7 +94,10 @@ public interface INavigationDecisionBoundary
     NavigationDecision Evaluate(Vector3 start, Vector3 destination);
 }
 
-/// <summary>Checks a destination before publishing movement.</summary>
+/// <summary>
+/// Validates a destination before movement is published. The same-surface policy is a
+/// deliberately narrow compatibility seam; it does not claim wall or terrain avoidance.
+/// </summary>
 public sealed class NavigationDecisionBoundary : INavigationDecisionBoundary
 {
     public const float DefaultSurfaceHeightTolerance = 1f;

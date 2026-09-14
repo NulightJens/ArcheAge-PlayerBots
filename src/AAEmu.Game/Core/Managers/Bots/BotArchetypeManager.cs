@@ -675,6 +675,9 @@ namespace AAEmu.Game.Core.Managers.Bots
                 return;
 
             state.LastKnownLevel = bot.Level;
+#if !PLAYERBOTS_AAEMU_3_0
+            if (state.PreservePlayerSkills) return;
+#endif
 
             var def = GetEffectiveDefinition(state);
             if (def == null) return;
@@ -710,6 +713,19 @@ namespace AAEmu.Game.Core.Managers.Bots
             return state;
         }
 
+#if !PLAYERBOTS_AAEMU_3_0
+        internal void BindConnectedPlayer(Character player)
+        {
+            var state = new BotArchetypeState
+            {
+                IsInitialized = true, PreservePlayerSkills = true,
+                LastKnownLevel = player.Level, LastGearCheck = DateTime.UtcNow
+            };
+            AssignArchetype(player, state);
+            _archetypeStates[player.Id] = state;
+        }
+#endif
+
         public virtual void RemoveState(uint characterId)
         {
             _archetypeStates.TryRemove(characterId, out _);
@@ -725,7 +741,12 @@ namespace AAEmu.Game.Core.Managers.Bots
                 OnLevelUp(bot);
 
             var def = GetEffectiveDefinition(state);
-            if (def != null && (DateTime.UtcNow - state.LastGearCheck).TotalSeconds > 30)
+            if (def != null &&
+#if !PLAYERBOTS_AAEMU_3_0
+                !state.PreservePlayerSkills &&
+                !bot.IsDead && !bot.IsInBattle && bot.SkillTask == null &&
+#endif
+                (DateTime.UtcNow - state.LastGearCheck).TotalSeconds > 30)
             {
                 EquipBestGear(bot, state);
                 state.LastGearCheck = DateTime.UtcNow;
@@ -949,7 +970,7 @@ namespace AAEmu.Game.Core.Managers.Bots
             template is { Show: true, NeedLearn: true };
 
         // ---- Gear methods ----
-        private class WeaponConfiguration
+        internal class WeaponConfiguration
         {
             public Item Mainhand { get; set; }
             public Item Offhand { get; set; }
@@ -961,21 +982,80 @@ namespace AAEmu.Game.Core.Managers.Bots
             var def = GetEffectiveDefinition(state);
             if (def == null) return false;
 
-            var inventory = bot.Inventory;
+#if !PLAYERBOTS_AAEMU_3_0
+            def = AAEmu.Game.Bots.Equipment.BotEquipmentPolicy.ForGear(def);
+#endif
             var equipmentChanged = false;
+            foreach (var move in SelectEquipmentMoves(bot, def))
+            {
+                equipmentChanged |= move.SlotType == SlotType.Equipment
+                    ? EquipItemToSlot(bot, move.Item, move.Slot)
+                    : bot.Inventory.SplitOrMoveItem(ItemTaskType.Invalid, move.Item.Id,
+                        move.Item.SlotType, (byte)move.Item.Slot, 0, move.SlotType, move.Slot);
+            }
+
+            // Native moves already emit slot changes; unchanged loadouts stay silent.
+            if (equipmentChanged)
+                bot.BroadcastPacket(new SCUnitStatePacket(bot), true);
+            return equipmentChanged;
+        }
+
+#if !PLAYERBOTS_AAEMU_3_0
+        internal AAEmu.Game.Bots.Equipment.BotEquipmentMovePlan PlanNextEquipmentMove(
+            Character bot, BotArchetypeState state = null)
+        {
+            if (bot?.Inventory?.Bag == null || bot.Inventory.Equipment == null) return null;
+            var def = ResolveGearDefinition(bot, state);
+            if (def == null) return null;
+            foreach (var move in SelectEquipmentMoves(bot, def))
+            {
+                if (move.Item == null || (move.Item.SlotType == move.SlotType && move.Item.Slot == move.Slot))
+                    continue;
+                // A malformed winning candidate holds planning; do not silently pick a weaker item.
+                return AAEmu.Game.Bots.Equipment.BotEquipmentMovePlan.Create(bot, move.Item, move.SlotType, move.Slot);
+            }
+            return null;
+        }
+
+        internal BotArchetypeDefinition ResolveGearDefinition(Character bot, BotArchetypeState state)
+        {
+            if (bot == null) return null;
+            var def = state == null ? null : GetEffectiveDefinition(state);
+            if (def == null)
+            {
+                // Gear-only fallback: no archetype assignment, ability changes, or skill learning.
+                if ((int)bot.Ability1 is not (1 or 6 or 7)) return null;
+                def = GetDefinitionsSnapshot().Values
+                    .Where(candidate => candidate.StartingAbility == bot.Ability1)
+                    .OrderBy(candidate => candidate.Name, StringComparer.Ordinal).FirstOrDefault()
+                    ?? DefaultDefinitions().First(candidate => candidate.StartingAbility == bot.Ability1);
+            }
+            return AAEmu.Game.Bots.Equipment.BotEquipmentPolicy.ForGear(def);
+        }
+#endif
+
+        // Deliberately lazy: headless execution updates inventory between choices. Planning
+        // consumes only through its first needed move and never simulates native mutations.
+        private IEnumerable<(Item Item, SlotType SlotType, byte Slot)> SelectEquipmentMoves(
+            Character bot, BotArchetypeDefinition def)
+        {
+            var inventory = bot.Inventory;
 
             // ---- 1. Pick best weapon configuration ----
             var weaponCandidates = GearCandidates(
-                inventory,
+                bot,
                 EquipmentItemSlot.Mainhand,
                 EquipmentItemSlot.Offhand);
             var bestConfig = PickBestWeaponConfiguration(bot, def, weaponCandidates);
             if (bestConfig != null)
             {
-                equipmentChanged |= EquipItemToSlot(bot, bestConfig.Mainhand, (byte)EquipmentItemSlot.Mainhand);
+                yield return (bestConfig.Mainhand, SlotType.Equipment, (byte)EquipmentItemSlot.Mainhand);
                 if (bestConfig.Offhand != null)
-                    equipmentChanged |= EquipItemToSlot(bot, bestConfig.Offhand, (byte)EquipmentItemSlot.Offhand);
+                    yield return (bestConfig.Offhand, SlotType.Equipment, (byte)EquipmentItemSlot.Offhand);
                 else
+#if !PLAYERBOTS_AAEMU_3_0
+                    if (bot.Inventory.Equipment.GetItemBySlot((int)EquipmentItemSlot.Mainhand)?.Id == bestConfig.Mainhand.Id)
+#endif
                 {
                     // Unequip offhand if no offhand selected
                     var currentOffhand = bot.Inventory.Equipment.GetItemBySlot((int)EquipmentItemSlot.Offhand);
@@ -984,14 +1064,7 @@ namespace AAEmu.Game.Core.Managers.Bots
                         var freeBagSlot = inventory.Bag.GetUnusedSlot(-1);
                         if (freeBagSlot >= 0)
                         {
-                            equipmentChanged |= bot.Inventory.SplitOrMoveItem(
-                                ItemTaskType.Invalid,
-                                currentOffhand.Id,
-                                SlotType.Equipment,
-                                (byte)EquipmentItemSlot.Offhand,
-                                0,
-                                SlotType.Inventory,
-                                (byte)freeBagSlot);
+                            yield return (currentOffhand, SlotType.Inventory, (byte)freeBagSlot);
                         }
                     }
                 }
@@ -1000,24 +1073,28 @@ namespace AAEmu.Game.Core.Managers.Bots
             }
 
             // ---- 2. Ranged weapon ----
-            var bestBow = GearCandidates(inventory, EquipmentItemSlot.Ranged)
+            var bestBow = GearCandidates(bot, EquipmentItemSlot.Ranged)
                 .Where(i => i.Template is WeaponTemplate &&
                             EquipmentContainer.GetAllowedGearSlots(i.Template).Contains(EquipmentItemSlot.Ranged) &&
-                            GetWeaponCategory(i.Template) == "Bow")
+                            GetWeaponCategory(i.Template) == "Bow"
+#if !PLAYERBOTS_AAEMU_3_0
+                            && AAEmu.Game.Bots.Equipment.BotEquipmentPolicy.Rank(def.StartingAbility, i.Template) >= 0
+#endif
+                            )
                 .OrderByDescending(item => ScoreWeapon(def, item))
                 .FirstOrDefault();
             if (bestBow != null)
-                equipmentChanged |= EquipItemToSlot(bot, bestBow, (byte)EquipmentItemSlot.Ranged);
+                yield return (bestBow, SlotType.Equipment, (byte)EquipmentItemSlot.Ranged);
 
             // ---- 3. Musical instrument ----
-            var bestInstrument = GearCandidates(inventory, EquipmentItemSlot.Musical)
+            var bestInstrument = GearCandidates(bot, EquipmentItemSlot.Musical)
                 .Where(i => i.Template is WeaponTemplate &&
                             EquipmentContainer.GetAllowedGearSlots(i.Template).Contains(EquipmentItemSlot.Musical) &&
                             (GetWeaponCategory(i.Template) == "Lute" || GetWeaponCategory(i.Template) == "Flute"))
                 .OrderByDescending(item => ScoreWeapon(def, item))
                 .FirstOrDefault();
             if (bestInstrument != null)
-                equipmentChanged |= EquipItemToSlot(bot, bestInstrument, (byte)EquipmentItemSlot.Musical);
+                yield return (bestInstrument, SlotType.Equipment, (byte)EquipmentItemSlot.Musical);
 
             // ---- 4. Armor & Accessories ----
             var armorSlots = new[]
@@ -1031,25 +1108,23 @@ namespace AAEmu.Game.Core.Managers.Bots
 
             foreach (var slot in armorSlots)
             {
-                var bestItem = PickBestArmor(def, GearCandidates(inventory, slot), slot);
+                var bestItem = PickBestArmor(def, GearCandidates(bot, slot), slot);
                 if (bestItem != null)
-                    equipmentChanged |= EquipItemToSlot(bot, bestItem, (byte)slot);
+                    yield return (bestItem, SlotType.Equipment, (byte)slot);
             }
 
-            // SplitOrMoveItem already emits the slot-level equipment changes. Only send the
-            // full visual snapshot when at least one move actually succeeded. Periodic checks
-            // with an unchanged loadout must be completely silent to nearby 1.2 clients.
-            if (equipmentChanged)
-                bot.BroadcastPacket(new SCUnitStatePacket(bot), true);
-
-            return equipmentChanged;
         }
 
-        private static List<Item> GearCandidates(Inventory inventory, params EquipmentItemSlot[] equippedSlots)
+        private static List<Item> GearCandidates(Character bot, params EquipmentItemSlot[] equippedSlots)
         {
+            var inventory = bot.Inventory;
             var equippedItems = equippedSlots
                 .Select(slot => inventory.Equipment.GetItemBySlot((int)slot));
-            return MergeGearCandidates(equippedItems, inventory.Bag.Items);
+            var candidates = MergeGearCandidates(equippedItems, inventory.Bag.Items);
+#if !PLAYERBOTS_AAEMU_3_0
+            candidates.RemoveAll(item => !AAEmu.Game.Bots.Equipment.BotEquipmentPolicy.Usable(item.Template, bot.Level));
+#endif
+            return candidates;
         }
 
         internal static List<Item> MergeGearCandidates(IEnumerable<Item> equippedItems, IEnumerable<Item> bagItems)
@@ -1063,7 +1138,7 @@ namespace AAEmu.Game.Core.Managers.Bots
                 .ToList();
         }
 
-        private WeaponConfiguration PickBestWeaponConfiguration(Character bot, BotArchetypeDefinition def, List<Item> bagItems)
+        internal WeaponConfiguration PickBestWeaponConfiguration(Character bot, BotArchetypeDefinition def, List<Item> bagItems)
         {
             // Separate weapons and shields, but only those whose category is in the priority list
             var oneHandedWeapons = new List<Item>();
@@ -1078,6 +1153,10 @@ namespace AAEmu.Game.Core.Managers.Bots
                 if (!(item.Template is WeaponTemplate weapon))
                     continue;
 
+    #if !PLAYERBOTS_AAEMU_3_0
+                if (AAEmu.Game.Bots.Equipment.BotEquipmentPolicy.Rank(def.StartingAbility, item.Template) < 0)
+                    continue;
+#endif
                 var category = GetWeaponCategory(item.Template);
                 if (category == null || !allowedCategories.Contains(category))
                     continue; // skip weapons not in the priority list
@@ -1095,6 +1174,12 @@ namespace AAEmu.Game.Core.Managers.Bots
                 return null; // no valid weapons found
 
             var candidates = new List<WeaponConfiguration>();
+#if !PLAYERBOTS_AAEMU_3_0
+            // A single available sword is a valid archer backup; do not require two drops.
+            foreach (var weapon in oneHandedWeapons)
+                if (EquipmentContainer.GetAllowedGearSlots(weapon.Template).Contains(EquipmentItemSlot.Mainhand))
+                    candidates.Add(new WeaponConfiguration { Mainhand = weapon, Score = ScoreWeapon(def, weapon) });
+#endif
 
             // 1. Two-handed configurations
             foreach (var weapon in twoHandedWeapons)

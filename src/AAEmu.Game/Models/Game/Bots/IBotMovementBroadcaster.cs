@@ -4,6 +4,10 @@ namespace AAEmu.Game.Models.Game.Bots;
 
 public interface IBotMovementBroadcaster
 {
+#if !PLAYERBOTS_AAEMU_3_0
+    void SendClimb(Vector3 position, Vector3 velocity, uint anchorObjectId, float verticalOffset) =>
+        SendMove(position, velocity, false);
+#endif
     void SendMove(Vector3 position, Vector3 velocity, bool isInBattle);
 
     void SendStop(Vector3 position, bool isInBattle);

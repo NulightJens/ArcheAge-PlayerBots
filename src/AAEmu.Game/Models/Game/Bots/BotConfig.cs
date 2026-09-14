@@ -24,6 +24,8 @@ namespace AAEmu.Game.Models.Game.Bots
 
     public class BotConfig : Singleton<BotConfig>, ILoadable
     {
+        public BotConfig Copy() => (BotConfig)MemberwiseClone();
+
         private const int ActivityDirectorInitialDelayMaximumMs = 300000;
         private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
         /// <summary>Fallback hazard radius in metres when an area-trigger row has no positive radius; 40 m covers the legacy hazard envelope.</summary>
@@ -38,6 +40,23 @@ namespace AAEmu.Game.Models.Game.Bots
         public double StuckMinMeters { get; set; } = 0.3;
         public double StuckSeconds { get; set; } = 3.0;
         public double StuckNudgeMeters { get; set; } = 2.0;
+        public bool StuckTeleportEnabled { get; set; }
+#if !PLAYERBOTS_AAEMU_3_0
+        public bool PartyQuestEnabled { get; set; }
+        public uint[] PartyQuestBotIds { get; set; } = [];
+        public uint[][] PartyQuestGroups { get; set; } = [];
+        public uint[] PartyQuestSupportLeaders { get; set; } = [];
+        public string PartyQuestStateFile { get; set; } = "";
+        internal uint[][] ConfiguredQuestGroups() => PartyQuestGroups is { Length: > 0 }
+            ? PartyQuestGroups : PartyQuestBotIds is { Length: > 0 } ? [PartyQuestBotIds] : [];
+        internal BotConfig ForQuestGroup(uint[] ids)
+        {
+            var copy = (BotConfig)MemberwiseClone();
+            copy.PartyQuestBotIds = ids;
+            copy.PartyQuestGroups = [];
+            return copy;
+        }
+#endif
         public int StuckTeleportAttempts { get; set; } = 5;
         public double StuckTeleportSeconds { get; set; } = 90.0;
         public double FollowStopBand { get; set; } = 0.6;
@@ -83,12 +102,13 @@ namespace AAEmu.Game.Models.Game.Bots
         public int IterationsPerTick { get; set; } = 10;
         public int ExpireActionTimeMs { get; set; } = 5000;
         public int GlobalSkillDelayMs { get; set; } = 600;
+        // Retained configuration contract used by the frozen 3.0 startup adapter.
         public List<uint> AutoSpawnCharacterIds { get; set; } = [];
         public string AutoSpawnState { get; set; } = "grind";
         public int AutoSpawnDelayMs { get; set; } = 2000;
         /// <summary>Opt-in autonomous discovery, movement, and normal NPC/doodad acceptance of nearby quests.</summary>
         public bool QuestIntakeEnabled { get; set; }
-        public double QuestIntakeScanRadius { get; set; } = 60.0;
+        public double QuestIntakeScanRadius { get; set; } = 100.0;
         public double QuestIntakeInteractionRadius { get; set; } = 6.0;
         public int QuestIntakeRetryBackoffMs { get; set; } = 30000;
         /// <summary>Opt-in autonomous execution and reporting of supported active quests.</summary>
@@ -212,19 +232,10 @@ namespace AAEmu.Game.Models.Game.Bots
             GlobalSkillDelayMs = Math.Max(0, GlobalSkillDelayMs);
             AutoSpawnCharacterIds ??= [];
             var normalizedState = AutoSpawnState?.Trim().ToLowerInvariant();
-            if (!TryParseAutoSpawnState(normalizedState, out _))
-            {
-                Logger.Warn($"Invalid AutoSpawnState '{AutoSpawnState}', using idle.");
-                AutoSpawnState = "idle";
-            }
-            else
-            {
-                AutoSpawnState = normalizedState;
-            }
-
+            AutoSpawnState = TryParseAutoSpawnState(normalizedState, out _) ? normalizedState : "idle";
             AutoSpawnDelayMs = Math.Clamp(AutoSpawnDelayMs, 0, 60000);
             QuestIntakeScanRadius = Math.Clamp(
-                double.IsFinite(QuestIntakeScanRadius) ? QuestIntakeScanRadius : 60.0,
+                double.IsFinite(QuestIntakeScanRadius) ? QuestIntakeScanRadius : 100.0,
                 1.0,
                 100.0);
             QuestIntakeInteractionRadius = Math.Clamp(

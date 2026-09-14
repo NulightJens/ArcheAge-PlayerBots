@@ -1,7 +1,7 @@
 {
   "name": "ArcheAge PlayerBots",
   "id": "archeage-playerbots",
-  "version": "0.2.0-alpha.6",
+  "version": "0.2.0-alpha.7",
   "license": "GPL-3.0-or-later",
   "repository": "https://github.com/NulightJens/ArcheAge-PlayerBots",
   "modulePath": "modules/archeage-playerbots",
@@ -17,26 +17,17 @@
       "track": "ArcheAge 1.2 r208022",
       "repository": "https://github.com/AAEmu/AAEmu",
       "testedBaseCommit": "62e3eb1d87da01194802ac886cd500134facad28",
-      "status": "supported",
-      "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v4.patch",
-      "compatibilityPatchSha256": "3d6cce1161aae0468f1864145974d2d24f18de11659a92ad62d1a4548a0b484e"
-    },
-    {
-      "id": "AAEmu30",
-      "track": "ArcheAge 3.0.4.2 r336598",
-      "repository": "https://github.com/NL0bP/AAEmu",
-      "testedBaseCommit": "8c1c943bb2309eefffb9da2aa99a408d0acbb095",
-      "status": "server-start-validated",
-      "compatibilityPatch": "compatibility/aaemu-3.0.4.2-r336598-alpha-v4.patch",
-      "compatibilityPatchSha256": "e6ac529d0aa7525d0eba342512cc8b259da03f2f0f59543f692b212d9586b671"
+      "status": "build-verified-preview",
+      "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v21.patch",
+      "compatibilityPatchSha256": "8e9fe6483bff89b62550cf672faf1c6894ce40b370f5bab50e46b56645d4f646"
     }
   ],
   "install": {
-    "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v4.patch",
-    "compatibilityPatchSha256": "3d6cce1161aae0468f1864145974d2d24f18de11659a92ad62d1a4548a0b484e",
+    "compatibilityPatch": "compatibility/aaemu-1.2-r208022-v21.patch",
+    "compatibilityPatchSha256": "8e9fe6483bff89b62550cf672faf1c6894ce40b370f5bab50e46b56645d4f646",
     "gameTargets": "build/AAEmu.PlayerBots.Game.targets",
-    "testTargets": "build/AAEmu.PlayerBots.Tests.targets",
     "databaseMigration": "sql/2026-08-25_aaemu_game_bot_archetype_plans.sql",
     "databaseMigrationSha256": "c5bd4d43fb767837c7042dd2cc968decb69393876e5e5520a74aa721cc4eee5c"
-  }
+  },
+  "releaseStatus": "preview-candidate"
 }

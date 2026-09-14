@@ -40,6 +40,10 @@ public class BotCombatTask : Task
     private readonly BotBlackboard _blackboard;
     private readonly TimeProvider _timeProvider;
     private readonly Func<float, float, float> _heightProvider;
+    private readonly Func<Character, bool> _resurrect;
+#if !PLAYERBOTS_AAEMU_3_0
+    private DateTime? _respawnNotBeforeUtc;
+#endif
     private DateTime _lastHealTick;
 
     public BotCombatTask(Character bot, BotCombatState state, BotMovementBroadcaster broadcaster)
@@ -56,7 +60,8 @@ public class BotCombatTask : Task
         Func<Character, float, List<Npc>> nearbyNpcs = null,
         BotBlackboard blackboard = null,
         TimeProvider timeProvider = null,
-        Func<float, float, float> heightProvider = null)
+        Func<float, float, float> heightProvider = null,
+        Func<Character, bool> resurrect = null)
     {
         _bot = bot;
         _state = state;
@@ -68,6 +73,14 @@ public class BotCombatTask : Task
         _blackboard = blackboard ?? WorldValues.Create(bot, _nearbyNpcs);
         _timeProvider = timeProvider ?? TimeProvider.System;
         _heightProvider = heightProvider ?? ((x, y) => _bot.ParentWorld.GetHeight(x, y));
+#if PLAYERBOTS_AAEMU_3_0
+        _resurrect = resurrect;
+#else
+        _resurrect = resurrect ?? (character => CharacterResurrectionService.TryResurrect(
+            character,
+            inPlace: false,
+            mode: CharacterResurrectionMode.ServerControlled));
+#endif
         _lastHealTick = Now;
     }
 
@@ -149,6 +162,7 @@ public class BotCombatTask : Task
         if (!_bot.IsDead)
             return;
 
+#if PLAYERBOTS_AAEMU_3_0
         if (!_state.RespawnScheduled && !_state.ShouldRespawn)
         {
             _state.RespawnScheduled = true;
@@ -159,7 +173,68 @@ public class BotCombatTask : Task
         {
             RespawnBot();
         }
+#else
+        if (_state.ShouldRespawn)
+        {
+            var remaining = GetRemainingRespawnDelay(Now, EnsureRespawnDeadline());
+            if (remaining > TimeSpan.Zero)
+            {
+                _state.ShouldRespawn = false;
+                ScheduleRespawn(remaining);
+                return;
+            }
+
+            RespawnBot();
+            return;
+        }
+
+        if (!_state.RespawnScheduled)
+        {
+            var delay = GetRemainingRespawnDelay(Now, EnsureRespawnDeadline());
+            ScheduleRespawn(delay);
+        }
+#endif
     }
+
+#if !PLAYERBOTS_AAEMU_3_0
+    internal static DateTime GetRespawnDeadline(
+        Character character,
+        DateTime now,
+        TimeSpan configuredDelay)
+    {
+        var deathTime = character.DeadTime == DateTime.MinValue ? now : character.DeadTime;
+        var nativeDelay = TimeSpan.FromMilliseconds(Math.Max(0, character.RezWaitDuration));
+        var requiredDelay = nativeDelay > configuredDelay ? nativeDelay : configuredDelay;
+        try
+        {
+            return deathTime.Add(requiredDelay);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return DateTime.MaxValue;
+        }
+    }
+
+    internal static TimeSpan GetRemainingRespawnDelay(DateTime now, DateTime readyAt)
+    {
+        return readyAt > now ? readyAt - now : TimeSpan.Zero;
+    }
+
+    private DateTime EnsureRespawnDeadline()
+    {
+        _respawnNotBeforeUtc ??= GetRespawnDeadline(
+            _bot,
+            Now,
+            TimeSpan.FromSeconds(Math.Max(0, BotConfig.Instance.RespawnDelaySeconds)));
+        return _respawnNotBeforeUtc.Value;
+    }
+
+    private void ScheduleRespawn(TimeSpan delay)
+    {
+        _state.RespawnScheduled = true;
+        TaskManager.Instance.Schedule(new RespawnTask(_bot), delay);
+    }
+#endif
 
     private void UpdateBot()
     {
@@ -383,6 +458,9 @@ public class BotCombatTask : Task
                 return;
             }
         }
+
+        if (TryEnforceNonlethalFloor())
+            return;
 
         if (IsStealthed(_state.Target))
         {
@@ -612,6 +690,10 @@ public class BotCombatTask : Task
 
     private bool RunHandler(Unit target, bool useInjectedHandler)
     {
+#if !PLAYERBOTS_AAEMU_3_0
+        if (AAEmu.Game.Bots.Host.BotDrivers.For(_bot).Owns(_bot))
+            return BasicCombat.Execute(_bot, _state, target);
+#endif
         var handled = useInjectedHandler && _handler != null && _handler(_bot);
         return handled || BasicCombat.Execute(_bot, _state, target);
     }
@@ -633,6 +715,8 @@ public class BotCombatTask : Task
 
     private void ExitTemporaryState(bool resetRelaxedAfterCombat)
     {
+        _state.StopAtTargetHpPercent = null;
+        _state.NonlethalFloorReached = null;
         _state.LostTarget = null;
         _state.RestorePreviousState();
         _state.RevertToForcedState();
@@ -664,6 +748,44 @@ public class BotCombatTask : Task
         return (int)((float)unit.Hp / unit.MaxHp * 100);
     }
 
+    internal static bool HasReachedHpFloor(Unit target, byte stopPercent)
+    {
+        return target != null && target.MaxHp > 0 &&
+               (long)target.Hp * 100 <= (long)target.MaxHp * stopPercent;
+    }
+
+    internal bool TryEnforceNonlethalFloor()
+    {
+        if (_state.CurrentState != BotCombatStateType.Combat ||
+            _state.Target == null ||
+            _state.StopAtTargetHpPercent is not { } stopPercent ||
+            !HasReachedHpFloor(_state.Target, stopPercent))
+        {
+            return false;
+        }
+
+        var target = _state.Target;
+        var onFloorReached = _state.NonlethalFloorReached;
+        _state.Target = null;
+        _bot.CurrentTarget = null;
+        ExitTemporaryState();
+        Logger.Info($"BOT id={_bot.Id} ev=nonlethal_floor target={target.ObjId} " +
+                    $"hp={target.Hp}/{target.MaxHp} floor_pct={stopPercent}");
+        if (onFloorReached != null)
+        {
+            try
+            {
+                onFloorReached();
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception,
+                    $"BOT id={_bot.Id} ev=nonlethal_floor_callback_failed target={target.ObjId}");
+            }
+        }
+        return true;
+    }
+
     private bool TryDefend(out Unit attacker)
     {
         if (!DefendRules.IsBeingAttackedByPlayer(_bot, out attacker))
@@ -676,15 +798,14 @@ public class BotCombatTask : Task
 
     private void RespawnBot()
     {
+#if PLAYERBOTS_AAEMU_3_0
         if (_bot.IsDead)
         {
             _bot.Hp = _bot.MaxHp;
             _bot.Mp = _bot.MaxMp;
             _bot.PostUpdateCurrentHp(_bot, 0, _bot.Hp, KillReason.Unknown);
             _bot.BroadcastPacket(new SCUnitPointsPacket(_bot.ObjId, _bot.Hp, _bot.Mp
-#if PLAYERBOTS_AAEMU_3_0
                 , _bot.HighAbilityRsc
-#endif
             ), true);
             _bot.BroadcastPacket(new SCCharacterResurrectedPacket(
                 _bot.ObjId,
@@ -693,20 +814,34 @@ public class BotCombatTask : Task
                 _bot.Transform.World.Position.Z,
                 _bot.Transform.World.Rotation.Z
             ), true);
-#if !PLAYERBOTS_AAEMU_3_0
-            _bot.Buffs.RemoveBuff((uint)BuffConstants.WeakenedBody);
-            _bot.Buffs.RemoveBuff((uint)BuffConstants.RespawnCooldown);
-            _bot.Buffs.RemoveBuff((uint)BuffConstants.WarZoneLeech);
-#endif
             _bot.DiedInPvp = false;
             _bot.DiedInPvpWarZone = false;
             _bot.ClearAllAggro();
             _state.SentRelaxedAfterCombat = false;
             Logger.Info($"Bot '{_bot.Name}' respawned at {_bot.Transform.World.Position}");
         }
+#else
+        if (_bot.IsDead)
+        {
+            if (!_resurrect(_bot))
+            {
+                _state.RespawnScheduled = true;
+                _state.ShouldRespawn = false;
+                Logger.Warn($"Bot '{_bot.Name}' native resurrection remains pending; no valid return was available");
+                return;
+            }
+
+            _bot.ClearAllAggro();
+            _state.SentRelaxedAfterCombat = false;
+            Logger.Info($"Bot '{_bot.Name}' respawned at {_bot.Transform.World.Position}");
+        }
+#endif
 
         _state.RespawnScheduled = false;
         _state.ShouldRespawn = false;
+#if !PLAYERBOTS_AAEMU_3_0
+        _respawnNotBeforeUtc = null;
+#endif
     }
 
     private class RespawnTask : Task

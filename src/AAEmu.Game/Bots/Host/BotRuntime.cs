@@ -7,6 +7,7 @@ using AAEmu.Game.Models.Tasks.Bots;
 using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Kernel;
 using AAEmu.Game.Bots.Social;
+using AAEmu.Game.Bots.Life;
 using AAEmu.Game.Bots.Questing;
 
 namespace AAEmu.Game.Bots.Host;
@@ -22,6 +23,7 @@ public sealed class BotRuntime
         BotCombatTask brain = null,
         BotBlackboard blackboard = null,
         BotConfig config = null,
+        BotLifeController lifeController = null,
         BotQuestIntakeController questIntakeController = null,
         BotQuestLifecycleController questLifecycleController = null)
     {
@@ -33,6 +35,7 @@ public sealed class BotRuntime
         Mover?.BindCombatState(combatState);
         Brain = brain;
         Blackboard = blackboard ?? new BotBlackboard();
+        LifeController = lifeController ?? new BotLifeController();
         QuestIntakeController = questIntakeController ?? new BotQuestIntakeController();
         QuestLifecycleController = questLifecycleController ?? new BotQuestLifecycleController();
         CombatState.BotId = bot.Id;
@@ -70,6 +73,7 @@ public sealed class BotRuntime
     public int AttachedRotationVersion { get; set; }
     public string AttachedRotationArchetype { get; set; }
     public BotBlackboard Blackboard { get; }
+    public BotLifeController LifeController { get; }
     public BotQuestIntakeController QuestIntakeController { get; }
     public BotQuestLifecycleController QuestLifecycleController { get; }
     public BotSocialState Social { get; }
@@ -77,11 +81,24 @@ public sealed class BotRuntime
     public BotStuckWatch StuckWatch { get; }
     public BotEngine[] Engines { get; } = new BotEngine[3];
     public BotSchedule Schedule { get; } = new();
+#if !PLAYERBOTS_AAEMU_3_0
+    public IBotDriver Driver { get; set; } = ServerDriver.Instance;
+    public BotConfig ConfigurationOverride { get; set; }
+    internal DateTimeOffset NextObservationAt;
+    public string EquipmentStatus => EquipmentController.Reason;
+    internal AAEmu.Game.Bots.Equipment.BotEquipmentController EquipmentController { get; } = new();
+    internal string PartyRegroupDetail { get; set; } = "none";
+    internal string PartyQuestReason { get; set; } = "disabled";
+    internal bool PartyQuestSuppressBrain { get; set; }
+    internal uint? PartyQuestPriorityQuestId { get; set; }
+    internal bool PartyQuestPriorityIsAcceptance { get; set; }
+    internal IBotHost OwnerHost { get; set; }
+#endif
     public BotRuntimeMetrics Metrics { get; } = new();
     internal BotKillCreditSubscription KillCreditSubscription { get; }
     internal BotHostMetrics HostMetrics { get; set; }
     internal int Running;
-    internal object SyncRoot { get; } = new();
+    internal object SyncRoot { get; set; } = new();
     internal bool Retired { get; set; }
     internal bool MissingTransformLogged { get; set; }
 }

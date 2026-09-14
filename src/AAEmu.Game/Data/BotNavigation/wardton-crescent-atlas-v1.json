@@ -1,0 +1,34 @@
+{
+  "schema_version": "playerbots.recorded-transfer-road-snapshot.v1",
+  "revision": 1,
+  "route_id": "wardton-crescent-atlas-v1",
+  "target_dotnet_type": "AAEmu.Game.Bots.Navigation.TransferRoadNetworkSnapshot",
+  "roads": [
+    {
+      "worldId": 0,
+      "sourceWorldId": 1,
+      "zoneId": 179,
+      "pathName": "atlas/solzreed/wardton-crescent/segment-0",
+      "pathType": -1002,
+      "pathTypeName": "atlas-derived-road-live-ground",
+      "cellX": 0,
+      "cellY": 0,
+      "direction": "Bidirectional",
+      "points": [
+        { "x": 14812.000, "y": 14296.700, "z": 119.800, "surfaceId": 0 },
+        { "x": 14836.805, "y": 14261.223, "z": 120.741, "surfaceId": 0 },
+        { "x": 14852.614, "y": 14229.086, "z": 121.520, "surfaceId": 0 },
+        { "x": 14891.438, "y": 14187.359, "z": 122.760, "surfaceId": 0 },
+        { "x": 14906.885, "y": 14170.772, "z": 123.253, "surfaceId": 0 },
+        { "x": 14949.234, "y": 14132.984, "z": 124.487, "surfaceId": 0 },
+        { "x": 14982.823, "y": 14115.672, "z": 125.309, "surfaceId": 0 },
+        { "x": 15036.368, "y": 14096.078, "z": 126.549, "surfaceId": 0 },
+        { "x": 15045.439, "y": 14092.761, "z": 126.759, "surfaceId": 0 },
+        { "x": 15099.813, "y": 14086.489, "z": 127.949, "surfaceId": 0 },
+        { "x": 15156.831, "y": 14088.459, "z": 129.190, "surfaceId": 0 },
+        { "x": 15212.294, "y": 14085.556, "z": 130.398, "surfaceId": 0 },
+        { "x": 15256.613, "y": 14052.537, "z": 131.600, "surfaceId": 0 }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,10 @@ public partial class Character
     private int? _savedMpForBotLoad;
 
     public bool IsBot { get; internal set; }
+#if !PLAYERBOTS_AAEMU_3_0
+    // Session-only observer protection; never enables the host's global god mode.
+    public bool DocumentationGodMode { get; internal set; }
+#endif
 
 #if PLAYERBOTS_AAEMU_3_0
     public ConcurrentDictionary<uint, AAEmu.Game.Models.Game.NPChar.Aggro> AggroTable { get; } = new();

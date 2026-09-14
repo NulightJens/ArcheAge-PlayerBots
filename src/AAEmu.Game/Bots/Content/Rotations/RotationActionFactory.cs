@@ -114,6 +114,7 @@ public sealed class RotationCastAction : IBotAction
         _inner = new BotCastSkillAction(skillId, targetSource, templateResolver, cast, name, castWhileControlled,
             requireKnownSkill);
         _onSuccess = onSuccess;
+        _inner.NativeSuccess = onSuccess;
         _guard = guard;
         Name = name;
         Alternatives = alternatives ?? [];

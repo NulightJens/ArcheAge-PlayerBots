@@ -9,7 +9,10 @@ using AAEmu.Game.Utils.Scripts;
 
 namespace AAEmu.Game.Scripts.Commands;
 
-/// <summary>Creates and admits a persistent bot under the configured account.</summary>
+/// <summary>
+/// Creates one persistent identity under the configured server-owned account
+/// and immediately admits it through BotManager's ordinary lifecycle.
+/// </summary>
 public sealed class BotCreateCommand : ICommand
 {
     private readonly Func<BotIdentityCreationRequest, BotIdentityCreationResult> _create;
@@ -96,7 +99,9 @@ public sealed class BotCreateCommand : ICommand
         if (world?.Template == null || transform == null)
             return false;
 
-        // ParentWorld is authoritative while Transform.InstanceId catches up during region entry.
+        // ParentWorld is the authoritative runtime instance for an admitted character.
+        // Transform.InstanceId can briefly retain stale metadata while the live client is
+        // entering or crossing a region, but its world-space position is already current.
         var position = transform.World.Position;
         var rotation = transform.World.Rotation;
         placement = new BotIdentityPlacement(

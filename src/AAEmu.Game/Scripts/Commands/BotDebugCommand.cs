@@ -1,5 +1,6 @@
-﻿using AAEmu.Game.Core.Managers;
+using AAEmu.Game.Core.Managers;
 using AAEmu.Game.Bots.Host;
+using AAEmu.Game.Bots.Life;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
@@ -55,6 +56,10 @@ namespace AAEmu.Game.Scripts.Commands
                     $"Transform: world={transform.WorldId}, instance={transform.InstanceId}, zone={transform.ZoneId}, " +
                     $"x={position.X:R}, y={position.Y:R}, z={position.Z:R}, yaw_rad={yaw:R}"));
             CommandManager.SendNormalText(this, messageOutput, $"HP: {bot.Hp}/{bot.MaxHp}, MP: {bot.Mp}/{bot.MaxMp}");
+#if !PLAYERBOTS_AAEMU_3_0
+            CommandManager.SendNormalText(this, messageOutput,
+                $"Breath: {bot.Breath}/{bot.LungCapacity}, IsUnderWater: {bot.IsUnderWater}, RezWaitMs: {bot.RezWaitDuration}, DeadTime: {bot.DeadTime:O}");
+#endif
             CommandManager.SendNormalText(this, messageOutput,
                 $"Combat stats: level={bot.Level}, str={DiagnosticValue(() => bot.Str)}, " +
                 $"spi={DiagnosticValue(() => bot.Spi)}, facets={DiagnosticValue(() => bot.Facets)}, " +
@@ -70,7 +75,8 @@ namespace AAEmu.Game.Scripts.Commands
                 CommandManager.SendNormalText(this, messageOutput, $"--- Movement State ---");
                 CommandManager.SendNormalText(this, messageOutput, $"Destination: {moveState.Destination?.ToString() ?? "null"}");
                 CommandManager.SendNormalText(this, messageOutput,
-                    $"Travel route: mode={moveState.TravelMode}, " +
+                    $"Travel route: owner={moveState.TravelOwner.ToString().ToLowerInvariant()}, " +
+                    $"intent={moveState.TravelIntent}, mode={moveState.TravelMode}, " +
                     $"final={moveState.TravelDestination?.ToString() ?? "null"}, " +
                     $"remaining={moveState.TravelWaypointCount}, " +
                     $"distance={moveState.TravelRemainingDistance:F2}, speed={moveState.TravelSpeed:F2}");
@@ -85,6 +91,12 @@ namespace AAEmu.Game.Scripts.Commands
                 CommandManager.SendNormalText(this, messageOutput,
                     $"Navigation decision: status={moveState.LastNavigationDecision?.Status.ToString() ?? "none"}, " +
                     $"reason={moveState.LastNavigationDecision?.Reason.ToString() ?? "none"}");
+#if !PLAYERBOTS_AAEMU_3_0
+                if (moveState.Climb is { } climb)
+                    CommandManager.SendNormalText(this, messageOutput,
+                        $"Climb: quest={climb.QuestId}, anchor={climb.Plan.TemplateId}:{climb.Plan.ObjectId}, " +
+                        $"descending={climb.Descending}, at_height={climb.AtHeight}, target_z={climb.Plan.TargetHeight:F2}");
+#endif
                 CommandManager.SendNormalText(this, messageOutput, $"IsRunning: {moveState.IsRunning}");
                 CommandManager.SendNormalText(this, messageOutput, $"IsMoving: {moveState.IsMoving}");
                 CommandManager.SendNormalText(this, messageOutput, $"IsFalling: {moveState.IsFalling}");
@@ -138,6 +150,41 @@ namespace AAEmu.Game.Scripts.Commands
             string questLifecycleDebug = null;
             if (runtime != null)
             {
+#if !PLAYERBOTS_AAEMU_3_0
+                CommandManager.SendNormalText(this, messageOutput, $"Equipment: {runtime.EquipmentStatus}");
+#endif
+                var life = runtime.LifeController.Inspect();
+                var transition = life.LastTransition;
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life: state={life.Life.State}, entered_at={Timestamp(life.Life.EnteredAt)}, profile={life.ProfileId}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life transition: event={transition?.Event.Kind.ToString() ?? "none"}, " +
+                    $"outcome={transition?.Outcome.ToString() ?? "none"}, reason={transition?.Reason.ToString() ?? "none"}, " +
+                    $"at={Timestamp(transition?.Event.At)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life decision: activity={life.Activity ?? "none"}, reason={life.DecisionReason ?? "none"}, " +
+                    $"at={Timestamp(life.DecisionAt)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life recovery: state={RecoveryState(life.Recovery.State)}, " +
+                    $"started_at={Timestamp(life.Recovery.StartedAt)}, completed_at={Timestamp(life.Recovery.CompletedAt)}, " +
+                    $"observed_at={Timestamp(life.Recovery.ObservedAt)}, " +
+                    $"resources={Availability(life.Recovery.ResourcesAvailable)}, " +
+                    $"hp={Number(life.Recovery.Hp)}/{Number(life.Recovery.MaxHp)}, " +
+                    $"mp={Number(life.Recovery.Mp)}/{Number(life.Recovery.MaxMp)}");
+                var callback = !life.LogoutCallbackAt.HasValue
+                    ? "not_requested"
+                    : !life.LogoutSucceeded.HasValue
+                        ? "pending"
+                        : life.LogoutSucceeded.Value ? "succeeded" : "failed";
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life logout: callback={callback}, requested_at={Timestamp(life.LogoutRequestedAt)}, " +
+                    $"callback_at={Timestamp(life.LogoutCallbackAt)}, completed_at={Timestamp(life.LogoutCompletedAt)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life baseline: {Snapshot(life.ProgressionBaseline)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life completion: {Snapshot(life.ProgressionCompletion)}");
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Life delta: {Delta(life.ProgressionDelta)}");
                 var questIntake = runtime.QuestIntakeController.Inspect();
                 CommandManager.SendNormalText(this, messageOutput,
                     string.Create(System.Globalization.CultureInfo.InvariantCulture,
@@ -166,6 +213,8 @@ namespace AAEmu.Game.Scripts.Commands
                         $"progress_at={Timestamp(questLifecycle.ProgressObservedAt)}, " +
                         $"report_at={Timestamp(questLifecycle.ReportAttemptedAt)}, " +
                         $"completed_at={Timestamp(questLifecycle.CompletedAt)}, retry_at={Timestamp(questLifecycle.RetryAt)}, " +
+                        $"ignored=[{string.Join(',', questLifecycle.IgnoredQuestIds)}], " +
+                        $"blocked_main=[{string.Join(',', questLifecycle.BlockedMainStoryQuestIds)}], " +
                         $"completed={questLifecycle.CompletedCount}, suspended={questLifecycle.SuspensionCount}, " +
                         $"report_attempts={questLifecycle.ReportAttemptCount}");
                 var runtimeMetrics = runtime.Metrics;
@@ -208,6 +257,53 @@ namespace AAEmu.Game.Scripts.Commands
                 return null;
             }
         }
+
+        private static string Snapshot(BotLifeProgressionSnapshot? snapshot)
+        {
+            if (!snapshot.HasValue)
+                return "pending";
+
+            var value = snapshot.Value;
+            return
+                $"captured_at={Timestamp(value.CapturedAt)}, level={Number(value.Level)}, experience={Number(value.Experience)}, " +
+                $"hp={Number(value.Hp)}/{Number(value.MaxHp)}, mp={Number(value.Mp)}/{Number(value.MaxMp)}, " +
+                $"bag_slots={Number(value.OccupiedBagSlots)}, bag_units={Number(value.BagItemUnits)}, " +
+                $"inventory={(value.InventoryAvailable ? "available" : "unavailable")}, " +
+                $"summary={value.InventorySummary}, fingerprint={value.InventoryFingerprint}";
+        }
+
+        private static string Delta(BotLifeProgressionDelta? delta)
+        {
+            if (!delta.HasValue)
+                return "pending";
+
+            var value = delta.Value;
+            return
+                $"level={Signed(value.Level)}, experience={Signed(value.Experience)}, " +
+                $"hp={Signed(value.Hp)}, max_hp={Signed(value.MaxHp)}, mp={Signed(value.Mp)}, max_mp={Signed(value.MaxMp)}, " +
+                $"bag_slots={Signed(value.OccupiedBagSlots)}, bag_units={Signed(value.BagItemUnits)}, " +
+                $"inventory_changed={Boolean(value.InventoryChanged)}";
+        }
+
+        private static string Number(long? value) =>
+            value?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "unavailable";
+
+        private static string Signed(long? value) =>
+            value?.ToString("+0;-0;+0", System.Globalization.CultureInfo.InvariantCulture) ?? "unavailable";
+
+        private static string Boolean(bool? value) =>
+            value.HasValue ? value.Value.ToString().ToLowerInvariant() : "unavailable";
+
+        private static string Availability(bool? value) =>
+            value.HasValue ? value.Value ? "available" : "unavailable" : "pending";
+
+        private static string RecoveryState(BotLifeRecoveryState state) => state switch
+        {
+            BotLifeRecoveryState.NotRequired => "not_required",
+            BotLifeRecoveryState.Pending => "pending",
+            BotLifeRecoveryState.Completed => "completed",
+            _ => "unavailable"
+        };
 
         private static string QuestIntakeState(Bots.Questing.BotQuestIntakeState state) =>
             state.ToString().ToLowerInvariant();

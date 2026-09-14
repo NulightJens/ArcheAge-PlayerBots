@@ -57,7 +57,11 @@ public sealed record BotActivityDirectorSnapshot(
         null);
 }
 
-/// <summary>Keeps a configured set of existing characters active in one zone.</summary>
+/// <summary>
+/// Periodically reconciles an explicitly configured one-zone population. It may
+/// spawn one persistent identity per tick and may only despawn the just-created
+/// bot when that spawn fails the configured world boundary.
+/// </summary>
 public sealed class BotActivityDirectorTask : AAEmu.Game.Models.Tasks.Task
 {
     private enum BoundaryResult
@@ -156,7 +160,8 @@ public sealed class BotActivityDirectorTask : AAEmu.Game.Models.Tasks.Task
         var wasStarted = Interlocked.Exchange(ref _started, 0) != 0;
         Cancelled = true;
 
-        // Finish an active spawn decision before normal shutdown cleanup.
+        // Wait for an already-running spawn/boundary decision to finish before
+        // GameService proceeds to the normal all-bot shutdown cleanup.
         lock (_executionGate)
         {
         }
@@ -429,14 +434,9 @@ public sealed class BotActivityDirectorTask : AAEmu.Game.Models.Tasks.Task
     {
         var transform = bot?.Transform;
         var parentWorld = bot?.ParentWorld;
-#if PLAYERBOTS_AAEMU_3_0
-        var worldTemplateId = parentWorld?.TemplateId ?? 0;
-#else
-        var worldTemplateId = parentWorld?.Template?.Id ?? 0;
-#endif
-        if (transform == null || parentWorld == null ||
+        if (transform == null || parentWorld == null || parentWorld.Template == null ||
             transform.World == null || transform.InstanceId != WorldManager.DefaultInstanceId ||
-            parentWorld.Id != WorldManager.DefaultInstanceId || transform.WorldId != worldTemplateId)
+            parentWorld.Id != WorldManager.DefaultInstanceId || transform.WorldId != parentWorld.Template.Id)
         {
             return BoundaryResult.WrongWorld;
         }

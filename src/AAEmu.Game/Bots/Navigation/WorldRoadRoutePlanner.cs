@@ -134,7 +134,8 @@ public sealed class WorldRoadRoutePlanner
         ValidateOptions(_options);
     }
 
-    public RoadProjection ProjectNearest(WorldRoadGraph graph, RoadRouteEndpoint endpoint)
+    public RoadProjection ProjectNearest(WorldRoadGraph graph, RoadRouteEndpoint endpoint,
+        Func<Vector3, bool> isProjectionUsable = null)
     {
         if (graph == null || !IsFinite(endpoint.Position))
             return null;
@@ -162,7 +163,8 @@ public sealed class WorldRoadRoutePlanner
                 var surfaceId = start.SurfaceId == end.SurfaceId ? start.SurfaceId : 0;
                 var surfaceCompatible = endpoint.SurfaceId == 0 || surfaceId == 0 || endpoint.SurfaceId == surfaceId;
                 if (distance <= _options.MaximumProjectionDistance &&
-                    verticalGap <= _options.MaximumProjectionVerticalGap && surfaceCompatible)
+                    verticalGap <= _options.MaximumProjectionVerticalGap && surfaceCompatible &&
+                    (isProjectionUsable == null || isProjectionUsable(position)))
                 {
                     var segmentLength = Math.Sqrt(lengthSquared);
                     var candidate = new ProjectionCandidate(
@@ -202,14 +204,15 @@ public sealed class WorldRoadRoutePlanner
     public RoadRouteResult Plan(
         WorldRoadGraph graph,
         RoadRouteEndpoint start,
-        RoadRouteEndpoint destination)
+        RoadRouteEndpoint destination,
+        Func<Vector3, bool> isProjectionUsable = null)
     {
         if (graph == null || graph.Edges.Count == 0)
             return RoadRouteResult.Failure(graph, RoadRouteStatus.GraphUnavailable, "The graph has no usable roads.");
         if (!IsFinite(start.Position) || !IsFinite(destination.Position) || start.WorldId != destination.WorldId)
             return RoadRouteResult.Failure(graph, RoadRouteStatus.InvalidRequest, "Endpoints must be finite and in one world.");
 
-        var startProjection = ProjectNearest(graph, start);
+        var startProjection = ProjectNearest(graph, start, isProjectionUsable);
         if (startProjection == null)
         {
             return RoadRouteResult.Failure(
@@ -218,7 +221,7 @@ public sealed class WorldRoadRoutePlanner
                 "No safe road projection exists for the start endpoint.");
         }
 
-        var destinationProjection = ProjectNearest(graph, destination);
+        var destinationProjection = ProjectNearest(graph, destination, isProjectionUsable);
         if (destinationProjection == null)
         {
             return RoadRouteResult.Failure(

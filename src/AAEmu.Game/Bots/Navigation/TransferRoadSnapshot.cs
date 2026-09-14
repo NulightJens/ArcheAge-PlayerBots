@@ -15,7 +15,10 @@ public readonly record struct RoadPoint(float X, float Y, float Z, int SurfaceId
     public Vector3 Position => new(X, Y, Z);
 }
 
-/// <summary>An immutable transfer-road polyline in source order.</summary>
+/// <summary>
+/// Module-owned, immutable copy of one authoritative transfer-road polyline.
+/// Point order is the source order and is never normalized or rounded.
+/// </summary>
 public sealed class RoadPolylineSnapshot
 {
     public RoadPolylineSnapshot(
@@ -67,7 +70,10 @@ public interface ITransferRoadSnapshotProvider
 }
 
 #if !PLAYERBOTS_AAEMU_3_0
-/// <summary>Reads AAEmu 1.2 roads as bidirectional snapshots.</summary>
+/// <summary>
+/// AAEmu 1.2 adapter for the compatibility-patch snapshot seam. The host does not
+/// retain one-way metadata, so its roads are explicitly mapped as bidirectional.
+/// </summary>
 public sealed class AaemuTransferRoadSnapshotProvider : ITransferRoadSnapshotProvider
 {
     public TransferRoadNetworkSnapshot Capture()

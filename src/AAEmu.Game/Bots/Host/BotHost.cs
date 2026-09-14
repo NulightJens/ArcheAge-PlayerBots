@@ -6,7 +6,7 @@ using NLog;
 
 namespace AAEmu.Game.Bots.Host;
 
-public sealed class BotHost : Singleton<BotHost>, IBotHost
+public sealed partial class BotHost : Singleton<BotHost>, IBotHost
 {
     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
@@ -20,7 +20,6 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
     private readonly BotHostTask _hostTask;
     private BotRuntime[] _runtimeSnapshot = [];
     private int _started;
-
     internal BotHost()
     {
         _taskManager = null;
@@ -70,6 +69,10 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
         lock (runtime.SyncRoot)
         {
             runtime.Retired = false;
+#if !PLAYERBOTS_AAEMU_3_0
+            runtime.OwnerHost = this;
+#endif
+            runtime.LifeController.ResetPostSpawn(runtime.Bot.Id, _timeProvider.GetUtcNow());
             runtime.HostMetrics = Metrics;
             if (runtime.Brain != null)
                 runtime.Brain.HostMetrics = Metrics;
@@ -86,6 +89,9 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
             }
 
             runtime.KillCreditSubscription.Subscribe();
+#if !PLAYERBOTS_AAEMU_3_0
+            BotDrivers.Register(runtime);
+#endif
             PublishRuntimeSnapshot();
         }
 
@@ -95,7 +101,13 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
             runtime.Schedule.NextBrainAt = now + BotScheduler.InitialStagger(runtime.Bot.Id);
 
         Start();
+#if !PLAYERBOTS_AAEMU_3_0
+        NotifyRegistered(runtime);
+#endif
     }
+
+    public void StepMovement(BotRuntime runtime, DateTime now, AAEmu.Game.Models.Game.Bots.BotConfig config) =>
+        _hostTask.StepMover(runtime, now, config);
 
     public void Unregister(uint botId)
     {
@@ -176,6 +188,11 @@ public sealed class BotHost : Singleton<BotHost>, IBotHost
         lock (runtime.SyncRoot)
         {
             runtime.Retired = true;
+#if !PLAYERBOTS_AAEMU_3_0
+            NotifyRetired(runtime);
+            BotDrivers.Unregister(runtime);
+            runtime.OwnerHost = null;
+#endif
             runtime.KillCreditSubscription.Unsubscribe();
             runtime.TeamHooks.Dispose();
             runtime.Mover?.OnCancel();

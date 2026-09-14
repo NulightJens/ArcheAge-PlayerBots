@@ -7,5 +7,6 @@ public enum BotActionResult
     Impossible,
     NotUseful,
     Vetoed,
-    SkippedMinimal
+    SkippedMinimal,
+    Pending
 }

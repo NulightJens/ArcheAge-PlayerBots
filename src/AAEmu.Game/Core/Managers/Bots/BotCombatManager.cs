@@ -193,6 +193,8 @@ namespace AAEmu.Game.Core.Managers.Bots
             var state = GetState(bot);
             if (state == null) return;
             state.Target = null;
+            state.StopAtTargetHpPercent = null;
+            state.NonlethalFloorReached = null;
             state.IsResting = false;
             Host.GetRuntime(bot.Id)?.Blackboard.InvalidateAll();
             state.LastFacingAngle = float.MinValue;

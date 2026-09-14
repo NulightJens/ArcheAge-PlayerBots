@@ -21,12 +21,14 @@ public sealed class WorldRoadGraphBuilder
 
         var issues = new List<RoadGraphIssue>();
         var candidates = snapshot.Roads
-            .Select((road, index) => road == null
-                ? RejectNullRoad(index, issues)
-                : ValidateRoad(road, issues))
+            .SelectMany((road, index) => road == null
+                ? new[] { RejectNullRoad(index, issues) }
+                : ValidateSections(road, issues))
             .Where(candidate => candidate != null)
             .OrderBy(candidate => candidate.StableKey, StringComparer.Ordinal)
             .ToList();
+
+        candidates = SplitAtRoadEntrances(candidates);
 
         var unique = new List<RoadCandidate>();
         var geometryKeys = new HashSet<string>(StringComparer.Ordinal);
@@ -110,6 +112,105 @@ public sealed class WorldRoadGraphBuilder
             issues.OrderBy(issue => issue.RoadKey, StringComparer.Ordinal).ThenBy(issue => issue.Code),
             adjacency,
             _options.EndpointSnapTolerance);
+    }
+
+    private List<RoadCandidate> SplitAtRoadEntrances(List<RoadCandidate> roads)
+    {
+        // Recordings commonly join the middle of an older road. Expose those
+        // geometric junctions as endpoints; endpoint clustering retains world,
+        // height, slope and ambiguity checks. No off-road shortcut is created.
+        var result = new List<RoadCandidate>();
+        var originalEndpoints = CreateEndpoints(roads);
+        var ambiguous = FindAmbiguousEndpoints(originalEndpoints, new List<RoadGraphIssue>());
+        var roadIndices = roads.Select((road, index) => (road, index)).ToDictionary(x => x.road, x => x.index);
+        foreach (var candidate in roads)
+        {
+            var candidateIndex = roadIndices[candidate];
+            if (ambiguous.Contains(candidateIndex * 2) || ambiguous.Contains(candidateIndex * 2 + 1))
+            { result.Add(candidate); continue; }
+            var road = candidate.Source;
+            var cuts = new SortedDictionary<double, RoadPoint>();
+            foreach (var other in roads)
+            {
+                if (ReferenceEquals(candidate, other) || road.WorldId != other.Source.WorldId) continue;
+                if (ambiguous.Contains(roadIndices[other] * 2) || ambiguous.Contains(roadIndices[other] * 2 + 1)) continue;
+                foreach (var endpointIndex in new[] { roadIndices[other] * 2, roadIndices[other] * 2 + 1 })
+                {
+                    if (ambiguous.Contains(endpointIndex)) continue;
+                    var endpoint = originalEndpoints[endpointIndex].Point;
+                    double bestAt = -1;
+                    var bestDistance = _options.EndpointSnapTolerance;
+                    RoadPoint bestPoint = default;
+                    for (var i = 0; i < road.Points.Count - 1; i++)
+                    {
+                        var a = road.Points[i]; var b = road.Points[i + 1];
+                        if (endpoint.SurfaceId != 0 && a.SurfaceId != 0 && endpoint.SurfaceId != a.SurfaceId) continue;
+                        var delta = b.Position - a.Position;
+                        var fraction = Math.Clamp(Vector3.Dot(endpoint.Position - a.Position, delta) / delta.LengthSquared(), 0, 1);
+                        var projected = a.Position + delta * fraction;
+                        var distance = Vector3.Distance(projected, endpoint.Position);
+                        if (distance > bestDistance || MathF.Abs(projected.Z - endpoint.Z) > _options.EndpointVerticalTolerance) continue;
+                        if (distance > _options.ExactEndpointTolerance && !SafeRecordedSegment(projected, endpoint.Position)) continue;
+                        bestDistance = distance; bestAt = i + fraction;
+                        bestPoint = new(projected.X, projected.Y, projected.Z, a.SurfaceId == b.SurfaceId ? a.SurfaceId : 0);
+                    }
+                    if (bestAt > .0001 && bestAt < road.Points.Count - 1.0001) cuts[bestAt] = bestPoint;
+                }
+            }
+            if (cuts.Count == 0) { result.Add(candidate); continue; }
+            cuts[0] = road.Points[0]; cuts[road.Points.Count - 1] = road.Points[^1];
+            var boundaries = cuts.ToArray();
+            for (var n = 1; n < boundaries.Length; n++)
+            {
+                var points = new List<RoadPoint> { boundaries[n - 1].Value };
+                for (var i = (int)Math.Floor(boundaries[n - 1].Key) + 1; i < boundaries[n].Key; i++)
+                    points.Add(road.Points[i]);
+                if (Vector3.Distance(points[^1].Position, boundaries[n].Value.Position) >= _options.MinimumSegmentLength)
+                    points.Add(boundaries[n].Value);
+                if (points.Count < 2) continue;
+                var section = new RoadPolylineSnapshot(road.WorldId, road.ZoneId, road.PathName + $"/junction-{n}",
+                    road.PathType, road.CellX, road.CellY, road.Direction, points);
+                var validated = ValidateRoad(section, new List<RoadGraphIssue>());
+                if (validated != null) result.Add(validated);
+            }
+        }
+        return result.OrderBy(c => c.StableKey, StringComparer.Ordinal).ToList();
+    }
+
+    private IEnumerable<RoadCandidate> ValidateSections(RoadPolylineSnapshot road, ICollection<RoadGraphIssue> issues)
+    {
+        var complete = ValidateRoad(road, issues);
+        if (complete != null) return [complete];
+        // Retain traversable sections of a recording, never bridge its invalid
+        // segment. A single bad sample must not hide the entire recorded area.
+        var sections = new List<RoadCandidate>();
+        var start = 0;
+        for (var index = 1; index <= road.Points.Count; index++)
+        {
+            if (index < road.Points.Count && SafeRecordedSegment(road.Points[index - 1].Position, road.Points[index].Position))
+                continue;
+            if (index - start >= 2)
+            {
+                var section = new RoadPolylineSnapshot(road.WorldId, road.ZoneId,
+                    road.PathName + $"/valid-{start}-{index - 1}", road.PathType, road.CellX, road.CellY,
+                    road.Direction, road.Points.Skip(start).Take(index - start));
+                var candidate = ValidateRoad(section, issues);
+                if (candidate != null) sections.Add(candidate);
+            }
+            start = index;
+        }
+        return sections;
+    }
+
+    private bool SafeRecordedSegment(Vector3 start, Vector3 end)
+    {
+        if (!IsFinite(start) || !IsFinite(end)) return false;
+        var delta = end - start;
+        var length = delta.Length();
+        var planar = new Vector2(delta.X, delta.Y).Length();
+        return length >= _options.MinimumSegmentLength && length <= _options.MaximumPointGap &&
+            MathF.Abs(delta.Z) <= _options.MaximumVerticalStep &&
+            MathF.Abs(delta.Z) / MathF.Max(planar, _options.MinimumSegmentLength) <= _options.MaximumSlope;
     }
 
     private RoadCandidate ValidateRoad(RoadPolylineSnapshot road, ICollection<RoadGraphIssue> issues)
@@ -351,6 +452,8 @@ public sealed class WorldRoadGraphBuilder
         var delta = left.Point.Position - right.Point.Position;
         var planar = MathF.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
         return planar <= _options.EndpointSnapTolerance &&
+               (delta.Length() <= _options.ExactEndpointTolerance ||
+                MathF.Abs(delta.Z) / MathF.Max(planar, _options.MinimumSegmentLength) <= _options.MaximumSlope) &&
                MathF.Abs(delta.Z) <= _options.EndpointVerticalTolerance;
     }
 

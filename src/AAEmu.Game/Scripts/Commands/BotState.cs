@@ -77,8 +77,11 @@ namespace AAEmu.Game.Scripts.Commands
                         : combatState.Target.Name;
                 var hp = $"{bot.Hp}/{bot.MaxHp}";
                 var following = moveState?.FollowTarget?.Name ?? "None";
+                var healthFloor = combatState.StopAtTargetHpPercent is { } floor
+                    ? $"{floor}%"
+                    : "None";
                 CommandManager.SendNormalText(this, messageOutput,
-                    $"Bot '{bot.Name}' (Id: {bot.Id}) | State: {combatState.CurrentState} | Forced: {forcedStr} | Active: {combatState.IsActive} | Target: {targetName} | HP: {hp} | Following: {following}");
+                    $"Bot '{bot.Name}' (Id: {bot.Id}) | State: {combatState.CurrentState} | Forced: {forcedStr} | Active: {combatState.IsActive} | Target: {targetName} | HP: {hp} | Following: {following} | StopAtHP: {healthFloor}");
                 return;
             }
 
@@ -103,6 +106,8 @@ namespace AAEmu.Game.Scripts.Commands
             // Handle "free" – release forced state through the combat manager.
             if (cmd == "free")
             {
+                combatState.StopAtTargetHpPercent = null;
+                combatState.NonlethalFloorReached = null;
                 BotCombatManager.Instance.SetForcedState(bot, null);
                 if (combatState.IsActive)
                     BotCombatManager.Instance.StartListening(bot);
@@ -128,6 +133,9 @@ namespace AAEmu.Game.Scripts.Commands
                 CommandManager.SendErrorText(this, messageOutput, $"Invalid state. Use: idle, grind, questing, roaming, following, resting, or free.");
                 return;
             }
+
+            combatState.StopAtTargetHpPercent = null;
+            combatState.NonlethalFloorReached = null;
 
             if (killGoal.HasValue)
             {

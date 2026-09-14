@@ -3,11 +3,15 @@ using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Models.Game;
 using AAEmu.Game.Models.Game.Char;
 using AAEmu.Game.Utils.Scripts;
+using System.Numerics;
 
 namespace AAEmu.Game.Scripts.Commands
 {
     public class MoveBot : ICommand
     {
+        internal static Action<Character, float, float, float> Teleporter { get; set; } =
+            (bot, x, y, z) => BotManager.Instance.MoveBotTo(bot, x, y, z);
+
         public string[] CommandNames { get; set; } = ["movebot", "walkbot"];
 
         public void OnLoad()
@@ -17,12 +21,12 @@ namespace AAEmu.Game.Scripts.Commands
 
         public string GetCommandLineHelp()
         {
-            return "<characterId> <x> <y> <z> [walk|run]";
+            return "<characterId> <x> <y> <z> [walk|run|teleport]";
         }
 
         public string GetCommandHelpText()
         {
-            return "Moves a bot to the given coordinates by walking/running. Use 'walk' or 'run' as optional 5th argument (default run).";
+            return "Moves a bot to the given coordinates by walking/running, or teleports it for explicit GM staging. Use 'walk', 'run', or 'teleport' as optional 5th argument (default run).";
         }
 
         public void Execute(Character character, string[] args, IMessageOutput messageOutput)
@@ -43,11 +47,19 @@ namespace AAEmu.Game.Scripts.Commands
                 return;
             }
 
+            if (args.Length > 4 && args[4].Equals("teleport", StringComparison.OrdinalIgnoreCase))
+            {
+                Teleporter(bot, x, y, z);
+                CommandManager.SendNormalText(this, messageOutput,
+                    $"Bot '{bot.Name}' was teleported for GM staging to ({x}, {y}, {z}).");
+                return;
+            }
+
             bool run = true;
             if (args.Length > 4 && args[4].Equals("walk", StringComparison.OrdinalIgnoreCase))
                 run = false;
 
-            BotManager.Instance.SetBotDestination(bot, x, y, z, run);
+            BotManager.Instance.SetBotTravelDestination(bot, new Vector3(x, y, z), run);
             CommandManager.SendNormalText(this, messageOutput,
                 $"Bot '{bot.Name}' is now moving {(run ? "running" : "walking")} to ({x}, {y}, {z}).");
         }

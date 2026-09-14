@@ -201,7 +201,7 @@ public sealed class RotationSynthesizer
 
     public static string Serialize(BotRotationDefinition definition)
     {
-        return JsonConvert.SerializeObject(definition, Formatting.Indented) + Environment.NewLine;
+        return JsonConvert.SerializeObject(definition, Formatting.Indented).Replace("\r\n", "\n") + "\n";
     }
 
     public static string Classify(RotationSkillRow row)

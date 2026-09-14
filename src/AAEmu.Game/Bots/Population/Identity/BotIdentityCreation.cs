@@ -99,7 +99,10 @@ public sealed record BotIdentityAuthorityResult(
         new(status, reason);
 }
 
-/// <summary>AAEmu 1.2 boundary for native character creation and rollback.</summary>
+/// <summary>
+/// Narrow compatibility seam implemented by the AAEmu 1.2 host. The host owns
+/// validation, allocation, native initialization, persistence, and rollback.
+/// </summary>
 public interface IBotIdentityAuthority
 {
     byte MaxPlayerLevel { get; }

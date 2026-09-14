@@ -3,6 +3,7 @@ using AAEmu.Game.Bots.Blackboard;
 using AAEmu.Game.Bots.Body;
 using AAEmu.Game.Bots.Kernel;
 using AAEmu.Game.Bots.Content.Rotations;
+using AAEmu.Game.Bots.Ops;
 using AAEmu.Game.Core.Managers.Bots;
 using AAEmu.Game.Models.Game.Bots;
 using AAEmu.Game.Models.Tasks.Bots;
@@ -14,13 +15,21 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
 {
     private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
     private readonly BotHost _host;
+#if !PLAYERBOTS_AAEMU_3_0
+    private readonly AAEmu.Game.Bots.Social.BotPartyQuestGroupsCoordinator _partyQuests = new();
+    private readonly AAEmu.Game.Bots.Social.BotNativePartyPersistence _partyPersistence;
+#endif
     private readonly List<BotRuntime> _retiredRuntimes = [];
+    private readonly List<BotRuntime> _logoutRequests = [];
     private int _running;
     private DateTime _lastMetricsLogAt = DateTime.MinValue;
 
     internal BotHostTask(BotHost host)
     {
         _host = host;
+#if !PLAYERBOTS_AAEMU_3_0
+        _partyPersistence = new(host);
+#endif
     }
 
     internal void InitializeStart(DateTime now)
@@ -66,7 +75,8 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
     {
         var nowOffset = _host.TimeProvider.GetUtcNow();
         var now = nowOffset.UtcDateTime;
-        var config = BotConfig.Instance;
+        var hostConfig = BotConfig.Instance;
+        var config = hostConfig;
         var configuredPercent = (int)Math.Clamp(config.ActivityPercent, 0, 100);
         var effectivePercent = BotActivityGovernor.EffectiveActivePercent(
             configuredPercent,
@@ -77,11 +87,30 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
         var windowLength = Math.Max(1, (long)(config.ActivityWindowMs * TimeSpan.TicksPerMillisecond));
         var windowIndex = now.Ticks / windowLength;
         var runtimes = _host.GetRuntimeSnapshot();
+#if !PLAYERBOTS_AAEMU_3_0
+        _partyPersistence.Update(config, nowOffset);
+        _partyQuests.Update(runtimes, config, nowOffset);
+#endif
         _retiredRuntimes.Clear();
+        _logoutRequests.Clear();
+        var isSoleRuntime = runtimes.Length == 1;
 
         for (var i = 0; i < runtimes.Length; i++)
         {
             var runtime = runtimes[i];
+#if !PLAYERBOTS_AAEMU_3_0
+            config = runtime.ConfigurationOverride ?? hostConfig;
+#endif
+            // The bounded one-kill lifecycle is a scale-test harness. Once native
+            // quest autonomy is enabled it must never preempt quest travel,
+            // objectives, reporting, or continued leveling.
+            var questAutonomyEnabled = config.QuestIntakeEnabled || config.QuestCompletionEnabled;
+            var lifecycleEligible = !questAutonomyEnabled &&
+                                    (isSoleRuntime ||
+                                     BotActivityDirectorTask.IsCurrentLifecycleEligible(runtime.Bot));
+#if !PLAYERBOTS_AAEMU_3_0
+            lifecycleEligible &= !runtime.Driver.Owns(runtime.Bot);
+#endif
             runtime.Schedule.Now = now;
 
             if (Interlocked.CompareExchange(ref runtime.Running, 1, 0) != 0)
@@ -102,9 +131,84 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                         continue;
                     }
 
-                    questActivityClaimed = runtime.QuestLifecycleController.Step(runtime, config, nowOffset);
-                    if (!questActivityClaimed)
-                        questActivityClaimed = runtime.QuestIntakeController.Step(runtime, config, nowOffset);
+#if !PLAYERBOTS_AAEMU_3_0
+                    _host.CaptureObservers(runtime, nowOffset);
+                    if (runtime.Driver.BeforeStep(runtime, nowOffset)) continue;
+                    // A native box-opening cast owns this quiet tick, including movement/brain.
+                    if (runtime.EquipmentController.Step(runtime, config, nowOffset))
+                    {
+                        continue;
+                    }
+                    if (_partyQuests.Step(runtime, config, nowOffset))
+                    {
+#endif
+                    var lifecycle = runtime.QuestLifecycleController;
+                    var intake = runtime.QuestIntakeController;
+                    var hasSelectedQuest = lifecycle.HasSelectedQuest;
+                    var canYieldLifecycle = lifecycle.CanYieldForNearbyIntake(runtime);
+                    var hasActiveQuest = runtime.Bot.Quests?.ActiveQuests?.Count > 0;
+                    var shouldProbeIntake = canYieldLifecycle || (!hasSelectedQuest && hasActiveQuest);
+                    var passingBoard = false;
+                    var nearbyStoryIntake = false;
+                    var partyAcceptance = false;
+                    var partyOwnedWork = false;
+#if !PLAYERBOTS_AAEMU_3_0
+                    partyAcceptance = runtime.PartyQuestPriorityIsAcceptance && runtime.PartyQuestPriorityQuestId.HasValue;
+                    partyOwnedWork = partyAcceptance || lifecycle.HasPartyPriorityWork(runtime, nowOffset);
+                    shouldProbeIntake &= !partyOwnedWork;
+                    var canYieldSideReport = lifecycle.CanYieldForNearbyIntake(runtime, includeSideReport: true);
+                    passingBoard = !partyOwnedWork && canYieldSideReport &&
+                                   intake.HasSideReportIntakeOpportunity(runtime, config, nowOffset,
+                                       out nearbyStoryIntake);
+#endif
+                    var nearbyIntake = passingBoard || nearbyStoryIntake || shouldProbeIntake && intake.HasPriorityIntakeOpportunity(
+                        runtime,
+                        config,
+                        nowOffset);
+                    var yieldedLifecycle = nearbyIntake &&
+                                           lifecycle.YieldForNearbyIntake(runtime, nowOffset,
+                                               includeSideReport: passingBoard || nearbyStoryIntake);
+                    if (yieldedLifecycle)
+                    {
+                        // Let intake claim the next tick after lifecycle releases
+                        // its selected work and any owned movement.
+                        questActivityClaimed = true;
+                    }
+                    else
+                    {
+                        var intakeFirst = partyAcceptance || !lifecycle.HasSelectedQuest &&
+                                          (nearbyIntake || !hasActiveQuest);
+                        if (intakeFirst)
+                        {
+#if !PLAYERBOTS_AAEMU_3_0
+                            if (partyAcceptance) lifecycle.PauseForParty(runtime, nowOffset);
+#endif
+                            questActivityClaimed = intake.Step(runtime, config, nowOffset) || partyAcceptance;
+                            if (!questActivityClaimed)
+                                questActivityClaimed = lifecycle.Step(runtime, config, nowOffset);
+                        }
+                        else
+                        {
+                            questActivityClaimed = lifecycle.Step(runtime, config, nowOffset);
+                            if (!questActivityClaimed)
+                                questActivityClaimed = intake.Step(runtime, config, nowOffset);
+                        }
+                    }
+#if !PLAYERBOTS_AAEMU_3_0
+                    }
+                    else questActivityClaimed = true;
+#endif
+                    var logoutRequested = !questActivityClaimed && runtime.LifeController.Step(
+                        runtime,
+                        lifecycleEligible,
+                        nowOffset);
+                    if (logoutRequested)
+                    {
+                        _logoutRequests.Add(runtime);
+                        continue;
+                    }
+                    if (runtime.LifeController.ShouldSuspendRuntime)
+                        continue;
 
                     runtime.Social.GuardLeader();
                     StepMover(runtime, now, config);
@@ -112,7 +216,25 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
                     brain = runtime.Brain;
                 }
 
-                StepBrain(runtime, brain, now, windowIndex, effectivePercent, config);
+#if !PLAYERBOTS_AAEMU_3_0
+                if (runtime.Driver.Owns(runtime.Bot))
+                {
+                    lock (runtime.SyncRoot)
+                        if (!runtime.Retired && runtime.Driver.CanRunBrain)
+                            StepBrain(runtime, brain, now, windowIndex, effectivePercent, config);
+                }
+                else
+#endif
+                    StepBrain(runtime, brain, now, windowIndex, effectivePercent, config);
+
+                lock (runtime.SyncRoot)
+                {
+                    if (!questActivityClaimed && !runtime.Retired &&
+                        runtime.LifeController.Step(runtime, lifecycleEligible, nowOffset))
+                    {
+                        _logoutRequests.Add(runtime);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -125,7 +247,17 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
         }
 
         foreach (var runtime in _retiredRuntimes)
+        {
+#if !PLAYERBOTS_AAEMU_3_0
+            if (runtime.Driver.Owns(runtime.Bot)) runtime.Driver.Release(runtime);
+#endif
             _host.Unregister(runtime);
+        }
+
+        // Lifecycle evaluation only queues a request. The normal persisted
+        // DespawnBot path runs after all runtime iteration and SyncRoot locks.
+        foreach (var runtime in _logoutRequests)
+            InvokeLogout(runtime);
 
         var activeBots = 0;
         for (var i = 0; i < runtimes.Length; i++)
@@ -147,7 +279,29 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
         }
     }
 
-    private void StepMover(BotRuntime runtime, DateTime now, BotConfig config)
+    private void InvokeLogout(BotRuntime runtime)
+    {
+        var callbackAt = _host.TimeProvider.GetUtcNow();
+        if (!runtime.LifeController.TryBeginLogoutCallback(callbackAt))
+            return;
+
+        var succeeded = false;
+        try
+        {
+            succeeded = _host.LogoutBot(runtime.Bot.Id);
+        }
+        catch (Exception exception)
+        {
+            Logger.Error(exception, $"BOT id={runtime.Bot.Id} ev=life_logout_callback_failed");
+        }
+
+        runtime.LifeController.RecordLogoutResult(
+            runtime.Bot.Id,
+            succeeded,
+            _host.TimeProvider.GetUtcNow());
+    }
+
+    internal void StepMover(BotRuntime runtime, DateTime now, BotConfig config)
     {
         // Death is a lifecycle state, not a movement state. Preserve the pending
         // destination/follow intent for recovery, but never animate or advance a
@@ -168,7 +322,11 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
             return;
         }
 
-        runtime.StuckWatch.Update(now, worldPosition.Position, state.Destination.HasValue);
+        runtime.StuckWatch.Update(now, worldPosition.Position, state.Destination.HasValue
+#if !PLAYERBOTS_AAEMU_3_0
+            , runtime.Driver.ObservedFacing(runtime, new DateTimeOffset(now))
+#endif
+            );
         if (runtime.Mover == null)
             return;
 
@@ -210,6 +368,10 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
         {
             active = BotActivityGovernor.IsAlwaysActive(runtime) ||
                      BotActivityGovernor.IsInRotation(runtime.Bot.Id, windowIndex, effectivePercent);
+#if !PLAYERBOTS_AAEMU_3_0
+            if (runtime.PartyQuestSuppressBrain && !runtime.Bot.IsDead && !runtime.Bot.IsInBattle)
+                return;
+#endif
 
             // Lifecycle work must not compete with rotation actions. A compiled
             // combat rotation can remain continuously useful while the bot is
@@ -221,6 +383,15 @@ public sealed class BotHostTask : AAEmu.Game.Models.Tasks.Task
             {
                 active = true;
                 brain.Step();
+                runtime.Metrics.BrainSteps++;
+                return;
+            }
+
+            // Compiled combat rotations can remain continuously useful and
+            // starve LegacyTickAction. Enforce contained-attack floors before
+            // any engine action so a rotation cannot bypass the safety gate.
+            if (brain.TryEnforceNonlethalFloor())
+            {
                 runtime.Metrics.BrainSteps++;
                 return;
             }

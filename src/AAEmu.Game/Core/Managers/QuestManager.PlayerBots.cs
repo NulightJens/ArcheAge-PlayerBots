@@ -8,7 +8,11 @@ using AAEmu.Game.Models.Game.Quests.Templates;
 
 namespace AAEmu.Game.Core.Managers;
 
-/// <summary>Lazily built, read-only quest indexes shared by all bots.</summary>
+/// <summary>
+/// Read-only quest indexes used by PlayerBots. The indexes are built once, on
+/// first use after AAEmu has loaded its quest templates, rather than rescanning
+/// every quest during each bot brain tick.
+/// </summary>
 public partial class QuestManager
 {
     private readonly object _playerBotNpcQuestIndexLock = new();

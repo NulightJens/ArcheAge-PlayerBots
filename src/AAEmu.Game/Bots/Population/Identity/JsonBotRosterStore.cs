@@ -3,7 +3,11 @@ using System.Text.Json;
 
 namespace AAEmu.Game.Bots.Population.Identity;
 
-/// <summary>Stores bot policy only for characters that still exist in AAEmu.</summary>
+/// <summary>
+/// Versioned file persistence boundary for a bot roster. The supplied lookup is the
+/// seam to AAEmu's authoritative character store; every read and write fails closed
+/// when an identity is no longer present there.
+/// </summary>
 public sealed class JsonBotRosterStore : IBotRosterStore
 {
     private sealed class RosterDocument
@@ -18,6 +22,7 @@ public sealed class JsonBotRosterStore : IBotRosterStore
         public bool Enabled { get; set; }
         public string Profile { get; set; }
         public uint HomeZoneId { get; set; }
+        public string DesiredLifeState { get; set; }
     }
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -78,7 +83,10 @@ public sealed class JsonBotRosterStore : IBotRosterStore
         }
     }
 
-    /// <summary>Removes roster state when identity creation fails.</summary>
+    /// <summary>
+    /// Compensates only an identity creation that has not been returned as
+    /// successful. This is deliberately not exposed as a retirement command.
+    /// </summary>
     public bool RemoveForCreationRollback(BotIdentity identity)
     {
         lock (_gate)
@@ -128,7 +136,8 @@ public sealed class JsonBotRosterStore : IBotRosterStore
                     new BotIdentity(persisted.CharacterId),
                     persisted.Enabled,
                     persisted.Profile,
-                    persisted.HomeZoneId));
+                    persisted.HomeZoneId,
+                    persisted.DesiredLifeState));
             }
             catch (ArgumentException exception)
             {
@@ -155,7 +164,8 @@ public sealed class JsonBotRosterStore : IBotRosterStore
                 CharacterId = entry.Identity.CharacterId,
                 Enabled = entry.Enabled,
                 Profile = entry.Profile,
-                HomeZoneId = entry.HomeZoneId
+                HomeZoneId = entry.HomeZoneId,
+                DesiredLifeState = entry.DesiredLifeState
             }).ToList()
         };
 

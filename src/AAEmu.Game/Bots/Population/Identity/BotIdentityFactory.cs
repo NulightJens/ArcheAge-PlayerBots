@@ -3,7 +3,11 @@ using AAEmu.Game.Models.Game.Char;
 
 namespace AAEmu.Game.Bots.Population.Identity;
 
-/// <summary>Creates an AAEmu character, records its bot policy, and admits it.</summary>
+/// <summary>
+/// Coordinates one server-owned identity creation. The AAEmu host remains the
+/// authority for the character itself; module policy is registered before the
+/// character is admitted through the ordinary BotManager spawn lifecycle.
+/// </summary>
 public sealed class BotIdentityFactory : IBotIdentityFactory
 {
     public delegate SpawnResult AdmitBot(uint characterId, out Character character);
@@ -91,7 +95,8 @@ public sealed class BotIdentityFactory : IBotIdentityFactory
                 new BotIdentity(created.Id),
                 enabled: true,
                 profile: plan.Name,
-                homeZoneId: created.Transform.ZoneId));
+                homeZoneId: created.Transform.ZoneId,
+                desiredLifeState: "Resident"));
 
             stage = "admission";
             var admission = _admit(created.Id, out var admitted);
@@ -109,7 +114,8 @@ public sealed class BotIdentityFactory : IBotIdentityFactory
             }
             catch
             {
-                // Admission succeeded, so keep the live identity and its process-local guard.
+                // Admission already succeeded, so rolling back here would remove a live
+                // identity. The host guard is process-local and safe to retain.
                 completionReason = "created_and_admitted_rollback_guard_retained";
             }
 

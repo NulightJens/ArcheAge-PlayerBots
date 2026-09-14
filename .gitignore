@@ -1,9 +1,7 @@
-.idea/
-.vs/
-.vscode/
-artifacts/
 bin/
 obj/
-TestResults/
-*.user
-*.suo
+__pycache__/
+*.pyc
+artifacts/
+output/
+.venv/

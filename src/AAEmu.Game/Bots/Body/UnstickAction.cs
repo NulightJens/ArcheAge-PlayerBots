@@ -38,12 +38,39 @@ public sealed class UnstickAction : IBotAction
         _originalDestination ??= state.Destination;
         var attempt = state.Attempts + 1;
         var teleportAttempts = Math.Max(1, _config.StuckTeleportAttempts);
-        var age = context.Now >= state.LastMoveAt ? context.Now - state.LastMoveAt : TimeSpan.Zero;
-        if (attempt >= teleportAttempts || age >= TimeSpan.FromSeconds(Math.Max(0, _config.StuckTeleportSeconds)))
+        var age =
+#if PLAYERBOTS_AAEMU_3_0
+            context.Now >= state.LastMoveAt ? context.Now - state.LastMoveAt : TimeSpan.Zero;
+#else
+            Watch(context).NoPositionProgressFor(context.Now);
+#endif
+        var escalationDue = attempt >= teleportAttempts ||
+                            age >= TimeSpan.FromSeconds(Math.Max(0, _config.StuckTeleportSeconds));
+#if PLAYERBOTS_AAEMU_3_0
+        if (_config.StuckTeleportEnabled && escalationDue)
         {
             mover.Teleport(context.Bot, _originalDestination.Value);
             context.Runtime.HostMetrics?.RecordStuckRecovery(teleport: true);
             BotStuckWatch.LogUnstick(context.Bot, attempt, "teleport");
+            Watch(context).Reset(context.Bot.Transform.World.Position, context.Now);
+            _originalDestination = null;
+            return BotActionResult.Success;
+        }
+#else
+        if (escalationDue && state.SafeRecovery.FailedRoute(context.Runtime, _config, context.Now,
+                "movement_route", mover))
+        {
+            Watch(context).Reset(context.Bot.Transform.World.Position, context.Now);
+            _originalDestination = null;
+            return BotActionResult.Success;
+        }
+#endif
+
+        if (escalationDue)
+        {
+            // Release the route for normal replanning before last-resort recovery.
+            mover.StopImmediately(context.Bot);
+            BotStuckWatch.LogUnstick(context.Bot, attempt, "route_reset");
             Watch(context).Reset(context.Bot.Transform.World.Position, context.Now);
             _originalDestination = null;
             return BotActionResult.Success;
@@ -61,6 +88,9 @@ public sealed class UnstickAction : IBotAction
         // quest ownership remains valid after the nudge.
         mover.SetRecoveryDestination(context.Bot, nudge, true, 0.5f);
         state.Attempts = attempt;
+#if !PLAYERBOTS_AAEMU_3_0
+        Watch(context).ObserveRecoveryAttempt(context.Now);
+#endif
         context.Runtime.HostMetrics?.RecordStuckRecovery(teleport: false);
         BotStuckWatch.LogUnstick(context.Bot, attempt, "nudge");
         return BotActionResult.Success;

@@ -28,6 +28,7 @@ public sealed class BotCastSkillAction : IBotAction
     private readonly Func<uint, SkillTemplate> _templateResolver;
     private readonly Func<BotCastRequest, SkillResult> _cast;
     private readonly bool _requireKnownSkill;
+    internal Action<BotContext> NativeSuccess { get; set; }
     private bool _gateCached;
     private DateTime _gateAt;
     private Unit _gateTarget;
@@ -98,6 +99,26 @@ public sealed class BotCastSkillAction : IBotAction
                 return BotActionResult.Impossible;
         }
 
+#if !PLAYERBOTS_AAEMU_3_0
+        if (context.Runtime.Driver.Owns(context.Bot))
+        {
+            var pending = context.Runtime.Driver.TryEnqueue(context.Runtime,
+                new AAEmu.Game.Bots.Host.BotClientRequest(SkillId, target, 0, "skill")
+                {
+                    Completed = (result, at) =>
+                    {
+                        context.Runtime.HostMetrics?.RecordCast(result == SkillResult.Success);
+                        if (result != SkillResult.Success) return;
+                        context.Runtime.CombatState.LastSkillTime = at.UtcDateTime;
+                        var observed = new BotContext(context.Bot, context.Runtime, context.Blackboard,
+                            at.UtcDateTime, context.Config, context.EngineKind, context.Brain, context.Mover);
+                        NativeSuccess?.Invoke(observed);
+                    }
+                });
+            return pending == null ? BotActionResult.Impossible : BotActionResult.Pending;
+        }
+#endif
+
         var skill = new Skill(template, context.Bot);
         var request = new BotCastRequest(skill, new SkillCasterUnit(context.Bot.ObjId), target);
         var result = _cast != null
@@ -118,6 +139,10 @@ public sealed class BotCastSkillAction : IBotAction
     {
         var template = ResolveTemplate();
         _gateTarget = ResolveTarget(context);
+#if !PLAYERBOTS_AAEMU_3_0
+        if (context.Runtime.Driver.Owns(context.Bot) && context.Bot.ActivePlotState != null)
+            return new GateResult(GateReason.Casting, "native plot still owns the cast");
+#endif
         if (_requireKnownSkill && context.Bot?.Skills?.Skills?.ContainsKey(SkillId) != true)
             return new GateResult(GateReason.Unlearned, $"skill {SkillId} is not learned");
         var distance = _gateTarget == null ? 0f : Distance(context.Bot, _gateTarget);

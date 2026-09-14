@@ -45,7 +45,11 @@ public sealed class BotTeamHooks : IDisposable
                 continue;
 
             var character = member.Character;
-            if (character.Id == team.OwnerId && !character.IsBot)
+            if (character.Id == team.OwnerId
+#if PLAYERBOTS_AAEMU_3_0
+                && !character.IsBot
+#endif
+                )
                 master = character;
             if (mainTankId == 0 && member.Role == MemberRole.Tank)
                 mainTankId = character.Id;
@@ -118,9 +122,26 @@ public sealed class BotTeamHooks : IDisposable
 
     private void OnMasterDisconnect(object sender, OnDisconnectArgs args)
     {
+#if !PLAYERBOTS_AAEMU_3_0
+        // Quest coordination owns the bounded wait and rejoin decision. Do not
+        // convert a transient missing leader into a permanent operator pause.
+        var coordinated = _runtime.Social.HasCoordinatedBotLeader;
+#endif
         DetachMaster();
+#if !PLAYERBOTS_AAEMU_3_0
+        if (coordinated) return;
+#endif
         _runtime.Social.SafeHold();
     }
 
-    private void OnMasterDeath(object sender, OnDeathArgs args) => _runtime.Social.SafeHold();
+    private void OnMasterDeath(object sender, OnDeathArgs args)
+    {
+#if !PLAYERBOTS_AAEMU_3_0
+        // Native quest parties already have a reversible unavailable-member hold.
+        // An operator-style forced state here would survive the leader's respawn.
+        if (_runtime.Social.HasCoordinatedBotLeader)
+            return;
+#endif
+        _runtime.Social.SafeHold();
+    }
 }

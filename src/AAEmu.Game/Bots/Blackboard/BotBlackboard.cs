@@ -29,6 +29,18 @@ public sealed class BotBlackboard
     }
 
     private readonly Dictionary<string, IRegisteredValue> _values = new(StringComparer.Ordinal);
+    private readonly Func<bool> _observationScopeChanged;
+
+    public BotBlackboard() { }
+
+    internal BotBlackboard(Func<bool> observationScopeChanged)
+        => _observationScopeChanged = observationScopeChanged;
+
+    private void CheckObservationScope()
+    {
+        if (_observationScopeChanged?.Invoke() == true)
+            InvalidateAll();
+    }
 
     public void Register<T>(ValueKey<T> key, BotValue<T> value)
     {
@@ -39,11 +51,13 @@ public sealed class BotBlackboard
 
     public T Get<T>(ValueKey<T> key, DateTime now)
     {
+        CheckObservationScope();
         return ((RegisteredValue<T>)_values[key.Name]).Value.Get(now);
     }
 
     public bool TryGet<T>(ValueKey<T> key, DateTime now, out T value)
     {
+        CheckObservationScope();
         if (_values.TryGetValue(key.Name, out var registered) && registered is RegisteredValue<T> typed)
         {
             value = typed.Value.Get(now);

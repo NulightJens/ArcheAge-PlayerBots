@@ -5,31 +5,30 @@ using AAEmu.Game.Core.Managers.World;
 using AAEmu.Game.Models.Game.NPChar;
 using AAEmu.Game.Models.Game.Quests.Templates;
 using AAEmu.Game.Models.Game.World;
-#if PLAYERBOTS_AAEMU_3_0
-using IndexedWorld = AAEmu.Game.Models.Game.World.World;
-#else
-using IndexedWorld = AAEmu.Game.Models.Game.World.WorldInstance;
-#endif
 
 namespace AAEmu.Game.Bots.Questing;
 
-/// <summary>Indexes quest markers and static spawns once per world.</summary>
+/// <summary>
+/// Immutable, lazily-built world data shared by every bot. The index turns
+/// client-authored quest locations and AAEmu static spawns into cheap template
+/// lookups; per-bot controllers retain only their selected destination.
+/// </summary>
 internal sealed class BotQuestDestinationIndex
 {
-    private readonly ConditionalWeakTable<IndexedWorld, WorldIndex> _worlds = new();
+    private readonly ConditionalWeakTable<WorldInstance, WorldIndex> _worlds = new();
 
     public static BotQuestDestinationIndex Instance { get; } = new();
 
-    internal IReadOnlyList<IndexedNpcSpawn> GetNpcSpawns(IndexedWorld world, uint npcTemplateId) =>
+    internal IReadOnlyList<IndexedNpcSpawn> GetNpcSpawns(WorldInstance world, uint npcTemplateId) =>
         world != null && npcTemplateId != 0 &&
         GetWorldIndex(world).NpcSpawns.TryGetValue(npcTemplateId, out var spawns)
             ? spawns
             : [];
 
-    internal IReadOnlyList<IndexedQuestStart> GetNpcQuestStarts(IndexedWorld world) =>
+    internal IReadOnlyList<IndexedQuestStart> GetNpcQuestStarts(WorldInstance world) =>
         world == null ? [] : GetWorldIndex(world).QuestStarts.Value;
 
-    internal IReadOnlyList<SphereQuest> GetQuestSpheres(IndexedWorld world, uint componentId)
+    internal IReadOnlyList<SphereQuest> GetQuestSpheres(WorldInstance world, uint componentId)
     {
         if (world == null || componentId == 0)
             return [];
@@ -40,15 +39,11 @@ internal sealed class BotQuestDestinationIndex
 #endif
     }
 
-    private WorldIndex GetWorldIndex(IndexedWorld world) =>
+    private WorldIndex GetWorldIndex(WorldInstance world) =>
         _worlds.GetValue(world, BuildWorldIndex);
 
-    private static WorldIndex BuildWorldIndex(IndexedWorld world)
+    private static WorldIndex BuildWorldIndex(WorldInstance world)
     {
-#if PLAYERBOTS_AAEMU_3_0
-        // The 3.0 host has no immutable static-spawn snapshot seam.
-        return WorldIndex.Empty;
-#else
         var mutableSpawns = new Dictionary<uint, List<IndexedNpcSpawn>>();
         try
         {
@@ -87,7 +82,6 @@ internal sealed class BotQuestDestinationIndex
             new Lazy<IndexedQuestStart[]>(
                 () => BuildQuestStarts(npcSpawns),
                 LazyThreadSafetyMode.ExecutionAndPublication));
-#endif
     }
 
     private static IndexedQuestStart[] BuildQuestStarts(

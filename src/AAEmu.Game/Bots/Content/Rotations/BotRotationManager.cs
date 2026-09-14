@@ -162,6 +162,11 @@ public sealed class BotRotationManager : Singleton<BotRotationManager>, ILoadabl
 
     public bool EnsureAttached(BotRuntime runtime, string archetypeName)
     {
+#if !PLAYERBOTS_AAEMU_3_0
+        // Connected characters use the existing live learned-skill decision.
+        // Old transcribed rotations may synthesize hidden plot strike IDs.
+        if (runtime?.Driver.Owns(runtime.Bot) == true) return false;
+#endif
         if (runtime == null || string.IsNullOrWhiteSpace(archetypeName))
             return false;
 
@@ -192,6 +197,9 @@ public sealed class BotRotationManager : Singleton<BotRotationManager>, ILoadabl
 
     public bool SetRotation(BotRuntime runtime, string rotationId)
     {
+#if !PLAYERBOTS_AAEMU_3_0
+        if (runtime?.Driver.Owns(runtime.Bot) == true) return false;
+#endif
         if (runtime == null || string.IsNullOrWhiteSpace(rotationId) || GetRotation(rotationId) == null)
             return false;
 
